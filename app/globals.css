@@ -220,3 +220,7 @@
 .more-events-head.section-head{display:flex!important;flex-direction:row!important;justify-content:flex-start!important;align-items:center!important;width:100%;direction:rtl;text-align:right}
 .more-events-head h2{margin:0!important;text-align:right;direction:rtl}
 @media(max-width:520px){.more-events-head.section-head{align-items:center!important;flex-direction:row!important}}
+
+/* Keep trending cards in a true horizontal carousel on wide screens too */
+.trending-row{grid-auto-columns:minmax(245px,40%)}
+@media(max-width:800px){.trending-row{grid-auto-columns:minmax(245px,78%)}}
