@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
-import { ArrowLeft, Bell, CalendarDays, CheckCircle2, House, MapPin, Search, Settings, Sparkles, Ticket, UserRound, ChevronLeft } from "lucide-react";
+import { ArrowLeft, Bell, CalendarDays, CheckCircle2, House, MapPin, Search, Settings, Sparkles, Ticket, UserRound, ChevronLeft, Share2, ExternalLink, CreditCard } from "lucide-react";
 const events = [
  {id:1,date:"الجمعة، ١٥ نوفمبر",title:"ليلة موسيقية سودانية",place:"الخرطوم",category:"موسيقى وفنون",price:"١٥٬٠٠٠",cover:"cover-one",tag:"موسيقى مباشرة"},
  {id:2,date:"السبت، ٢٣ نوفمبر",title:"معرض روّاد الأعمال",place:"أم درمان",category:"أعمال ومعارض",price:"مجاناً",cover:"cover-two",tag:"معرض ولقاءات"},
@@ -9,7 +9,7 @@ const events = [
 const categories=["الكل","موسيقى وحفلات","رياضة","ترفيه","مسرح وسينما","ورش ودورات","مرافق"];
 type Tab="home"|"tickets"|"notifications"|"profile";
 export default function Home(){
- const [activeTab,setActiveTab]=useState<Tab>("home"),[category,setCategory]=useState("الكل"),[search,setSearch]=useState(""),[selectedEvent,setSelectedEvent]=useState<number|null>(null);
+ const [activeTab,setActiveTab]=useState<Tab>("home"),[category,setCategory]=useState("الكل"),[search,setSearch]=useState(""),[selectedEvent,setSelectedEvent]=useState<number|null>(null),[selectedTier,setSelectedTier]=useState(0),[showPayment,setShowPayment]=useState(false);
  const [fullName,setFullName]=useState(""),[email,setEmail]=useState(""),[phone,setPhone]=useState(""),[saved,setSaved]=useState(false);
  const visible=useMemo(()=>events.filter(e=>(category==="الكل"||e.category===category)&&(e.title.includes(search.trim())||e.place.includes(search.trim()))),[category,search]);
  const selected=events.find(e=>e.id===selectedEvent);
