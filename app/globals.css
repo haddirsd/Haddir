@@ -252,3 +252,19 @@ html[data-theme="dark"] body{background:#15111b;color:#f4edf9}
 .theme-dark .auth-theme-toggle{background:#292132;color:var(--fg);border-color:var(--line)}
 .theme-dark .screen-topbar .header-icon,.theme-dark .header-icon{background:#292132;color:var(--fg);border-color:var(--line)}
 @media(prefers-reduced-motion:reduce){.theme-toggle{transition:none}}
+
+/* Unified profile and account settings */
+.profile-account-card{display:block!important;padding:22px;margin-bottom:18px}
+.profile-account-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.profile-account-identity{flex:1;min-width:170px}
+.profile-account-identity>strong{font-size:16px}
+.profile-account-identity>p{margin:5px 0;color:var(--muted);font-size:12px}
+.account-type{display:inline-flex;margin-top:5px;padding:5px 9px;border-radius:99px;background:#f0e8fa;color:#69439a;font-size:10px;font-weight:700}
+.profile-form-unified{margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+.profile-save-note{margin:0;color:var(--muted);font-size:10px;line-height:1.8}
+.profile-settings-panel{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 20px;margin-bottom:18px;border:1px solid var(--line);border-radius:16px;background:#fff}
+.profile-settings-panel strong{font-size:13px}
+.profile-settings-panel p{margin:5px 0 0;color:var(--muted);font-size:11px}
+.theme-dark .account-type{background:#39284b;color:#dfc8f7}
+.theme-dark .profile-settings-panel{background:var(--surface);border-color:var(--line);color:var(--fg)}
+@media(max-width:520px){.profile-account-card{padding:16px}.profile-settings-panel{align-items:flex-start;flex-direction:column}}
