@@ -1,5 +1,6 @@
 "use client";
-import { useMemo, useState } from "react";\nimport { QRCodeSVG as QrCodeSVG } from "qrcode.react";
+import { useMemo, useState } from "react";
+import { QRCodeSVG as QrCodeSVG } from "qrcode.react";
 import { ArrowLeft, Bell, CalendarDays, CheckCircle2, House, MapPin, Search, Settings, Sparkles, Ticket, UserRound, ChevronLeft, Share2, ExternalLink, CreditCard } from "lucide-react";
 const events = [
  {id:1,date:"الجمعة، ١٥ نوفمبر",title:"ليلة موسيقية سودانية",place:"الخرطوم",category:"موسيقى وحفلات",price:"١٥٬٠٠٠",cover:"cover-one",tag:"موسيقى مباشرة",time:"٧:٠٠ مساءً",venue:"قاعة الصداقة، الخرطوم",status:"متوفر",map:"https://www.google.com/maps/search/?api=1&query=Friendship+Hall+Khartoum",about:"أمسية فنية تجمع أصواتاً سودانية وموسيقى حيّة في أجواء مليانة طرب وونسة.",tiers:[{name:"التذكرة العادية",price:"١٥٬٠٠٠ ج.س"},{name:"التذكرة المميزة",price:"٢٥٬٠٠٠ ج.س"},{name:"VIP",price:"٤٠٬٠٠٠ ج.س"}]},
@@ -15,7 +16,8 @@ type Tab="home"|"tickets"|"notifications"|"profile";
 export default function Home(){
  const [activeTab,setActiveTab]=useState<Tab>("home"),[category,setCategory]=useState("الكل"),[search,setSearch]=useState(""),[selectedEvent,setSelectedEvent]=useState<number|null>(null),[selectedTier,setSelectedTier]=useState(0),[showPayment,setShowPayment]=useState(false);
  const [fullName,setFullName]=useState(""),[email,setEmail]=useState(""),[phone,setPhone]=useState(""),[saved,setSaved]=useState(false);
- const [ticketCount,setTicketCount]=useState(1),[paymentMethod,setPaymentMethod]=useState("bankak"),[receipt,setReceipt]=useState<File|null>(null),[bookingDone,setBookingDone]=useState(false);\n const [manualCode,setManualCode]=useState(""),[validationMessage,setValidationMessage]=useState(""),[validationState,setValidationState]=useState<"valid"|"invalid"|"used">("invalid"),[ticketUsed,setTicketUsed]=useState(false);
+ const [ticketCount,setTicketCount]=useState(1),[paymentMethod,setPaymentMethod]=useState("bankak"),[receipt,setReceipt]=useState<File|null>(null),[bookingDone,setBookingDone]=useState(false);
+ const [manualCode,setManualCode]=useState(""),[validationMessage,setValidationMessage]=useState(""),[validationState,setValidationState]=useState<"valid"|"invalid"|"used">("invalid"),[ticketUsed,setTicketUsed]=useState(false);
  const visible=useMemo(()=>events.filter(e=>(category==="الكل"||e.category===category)&&(e.title.includes(search.trim())||e.place.includes(search.trim()))),[category,search]);
  const selected=events.find(e=>e.id===selectedEvent);
  const go=(tab:Tab)=>{setActiveTab(tab);setSelectedEvent(null);window.scrollTo({top:0,behavior:"smooth"});};
