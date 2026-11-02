@@ -142,3 +142,14 @@
 .theme-dark .event-title,.theme-dark .detail-section h2,.theme-dark .screen-heading h1{color:var(--fg)}
 .theme-dark .bottom-nav{background:#211a2a;border-color:var(--line)}
 @media(prefers-reduced-motion:reduce){.loader-ring{animation:none}}
+
+
+.ticket-download-row{display:flex;justify-content:center;margin:18px auto 24px}
+@media print{
+ @page{size:A5 portrait;margin:10mm}
+ body *{visibility:hidden!important}
+ .ticket-card-wrap,.ticket-card-wrap *{visibility:visible!important}
+ .ticket-card-wrap{position:absolute!important;inset:0!important;width:100%!important;margin:0!important;padding:0!important}
+ .haddir-ticket{box-shadow:none!important;border:1px solid #ddd!important;break-inside:avoid}
+ .ticket-download-row,.bottom-nav,.screen-topbar,.info-strip,.gatekeeper-card{display:none!important}
+}
