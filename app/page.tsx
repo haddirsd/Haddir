@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { getSupabaseBrowserClient } from "../lib/supabase";
 import { QRCodeSVG as QrCodeSVG } from "qrcode.react";
-import { ArrowLeft, Bell, CalendarDays, CheckCircle2, House, MapPin, Search, Settings, Sparkles, Ticket, UserRound, ChevronLeft, Share2, ExternalLink, CreditCard } from "lucide-react";
+import { ArrowLeft, Bell, CalendarDays, CheckCircle2, House, MapPin, Search, Settings, Sparkles, Ticket, UserRound, ChevronLeft, Share2, ExternalLink, CreditCard, Download } from "lucide-react";
 const events = [
  {id:1,date:"الجمعة، ١٥ نوفمبر",title:"ليلة موسيقية سودانية",place:"الخرطوم",category:"موسيقى وحفلات",price:"١٥٬٠٠٠",cover:"cover-one",tag:"موسيقى مباشرة",time:"٧:٠٠ مساءً",venue:"قاعة الصداقة، الخرطوم",status:"متوفر",map:"https://www.google.com/maps/search/?api=1&query=Friendship+Hall+Khartoum",about:"أمسية فنية تجمع أصواتاً سودانية وموسيقى حيّة في أجواء مليانة طرب وونسة.",tiers:[{name:"التذكرة العادية",price:"١٥٬٠٠٠ ج.س"},{name:"التذكرة المميزة",price:"٢٥٬٠٠٠ ج.س"},{name:"VIP",price:"٤٠٬٠٠٠ ج.س"}]},
  {id:2,date:"السبت، ٢٣ نوفمبر",title:"معرض روّاد الأعمال",place:"أم درمان",category:"ورش ودورات",price:"مجاناً",cover:"cover-two",tag:"معرض ولقاءات",time:"١٠:٠٠ صباحاً",venue:"مركز أم درمان الثقافي",status:"أوشك على النفاذ",map:"https://www.google.com/maps/search/?api=1&query=Omdurman+Cultural+Center",about:"مساحة للتعارف وتبادل الخبرات واستكشاف مشاريع وأفكار جديدة.",tiers:[{name:"دخول عام",price:"مجاناً"},{name:"دخول مع ورشة",price:"٥٬٠٠٠ ج.س"}]},
