@@ -175,3 +175,23 @@
 @keyframes welcome-float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(9px) rotate(18deg)}}
 @media(max-width:800px){.home-discovery{padding-top:17px}.trending-row{grid-auto-columns:minmax(245px,78%)}.home-search{min-height:54px}.welcome-motion{top:76px;width:calc(100% - 28px);margin:0}}
 @media(prefers-reduced-motion:reduce){.welcome-motion,.welcome-spark,.welcome-orbit{animation:none}}
+
+
+/* Booking clarity, search recovery and real-work loading behavior */
+.empty-state{display:grid;justify-items:center;gap:9px;padding:28px 18px;border:1px dashed #d9c9e6;border-radius:17px;background:#fbf8fd;text-align:center;color:var(--fg)}
+.empty-state>strong{font-size:14px}
+.empty-state p{max-width:340px;margin:0;color:var(--muted);font-size:11px;line-height:1.9}
+.empty-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:9px;margin-top:5px}
+.empty-actions .btn{min-height:39px;padding:0 15px;font-size:11px}
+.booking-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:17px 0;padding:9px;border:1px solid var(--line);border-radius:13px;background:#fff}
+.booking-steps span{display:flex;align-items:center;justify-content:center;min-height:34px;padding:6px 4px;border-radius:9px;color:var(--muted);font-size:10px;font-weight:700;text-align:center}
+.booking-steps .step-current{background:#eee4f7;color:#5b2e82}
+.booking-steps .step-done{background:#edf6ef;color:#34754b}
+.detail-quantity{display:grid;gap:13px;margin-top:14px;padding:16px;border:1px solid #e3d5ef;border-radius:15px;background:#fcf9ff}
+.detail-quantity h3{margin:0;font-size:13px}
+.detail-total{display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid #eadff1;color:var(--muted);font-size:11px}
+.detail-total strong{color:var(--green);font-size:16px}
+.checkout-form .booking-steps{margin:0 0 5px}
+@media(max-width:480px){.booking-steps{gap:4px;padding:6px}.booking-steps span{font-size:9px;min-height:32px}.detail-quantity{padding:13px}}
+.theme-dark .booking-steps,.theme-dark .detail-quantity{background:#211a2a;border-color:var(--line)}
+.theme-dark .empty-state{background:#211a2a;border-color:var(--line);color:var(--fg)}
