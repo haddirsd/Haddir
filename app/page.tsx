@@ -14,7 +14,8 @@ const formatMoney=(value:number)=>new Intl.NumberFormat("ar-SD").format(value)+"
 type Tab="home"|"tickets"|"notifications"|"profile";
 export default function Home(){
  const [activeTab,setActiveTab]=useState<Tab>("home"),[category,setCategory]=useState("الكل"),[search,setSearch]=useState(""),[selectedEvent,setSelectedEvent]=useState<number|null>(null),[selectedTier,setSelectedTier]=useState(0),[showPayment,setShowPayment]=useState(false);
- const [fullName,setFullName]=useState(""),[email,setEmail]=useState(""),[phone,setPhone]=useState(""),[saved,setSaved]=useState(false);\n const [ticketCount,setTicketCount]=useState(1),[paymentMethod,setPaymentMethod]=useState("bankak"),[receipt,setReceipt]=useState<File|null>(null),[bookingDone,setBookingDone]=useState(false);
+ const [fullName,setFullName]=useState(""),[email,setEmail]=useState(""),[phone,setPhone]=useState(""),[saved,setSaved]=useState(false);
+ const [ticketCount,setTicketCount]=useState(1),[paymentMethod,setPaymentMethod]=useState("bankak"),[receipt,setReceipt]=useState<File|null>(null),[bookingDone,setBookingDone]=useState(false);
  const visible=useMemo(()=>events.filter(e=>(category==="الكل"||e.category===category)&&(e.title.includes(search.trim())||e.place.includes(search.trim()))),[category,search]);
  const selected=events.find(e=>e.id===selectedEvent);
  const go=(tab:Tab)=>{setActiveTab(tab);setSelectedEvent(null);window.scrollTo({top:0,behavior:"smooth"});};
