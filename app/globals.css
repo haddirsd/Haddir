@@ -208,3 +208,11 @@
 .events-grid.search-results{grid-template-columns:minmax(0,1fr)}
 @media(max-width:800px){.trending-row{grid-auto-columns:minmax(245px,78%)}}
 @media(prefers-reduced-motion:reduce){.trending-dot::after{animation:none}.trending-row{scroll-behavior:auto}}
+
+
+/* Consistent Arabic RTL alignment across the application screens */
+.app-shell{direction:rtl;text-align:right}
+.app-shell input,.app-shell textarea,.app-shell select{direction:rtl;text-align:right}
+.trending-head.section-head{display:flex!important;flex-direction:row!important;justify-content:flex-start!important;align-items:center!important;width:100%;direction:rtl;text-align:right}
+.trending-head h2{margin:0!important;text-align:right;direction:rtl}
+@media(max-width:520px){.trending-head.section-head{align-items:center!important;flex-direction:row!important}}
