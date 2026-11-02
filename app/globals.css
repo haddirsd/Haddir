@@ -224,3 +224,31 @@
 /* Keep trending cards in a true horizontal carousel on wide screens too */
 .trending-row{grid-auto-columns:minmax(245px,40%)}
 @media(max-width:800px){.trending-row{grid-auto-columns:minmax(245px,78%)}}
+
+
+/* Complete application-wide light/dark theme */
+:root{color-scheme:light}
+html[data-theme="dark"]{color-scheme:dark}
+html[data-theme="dark"] body{background:#15111b;color:#f4edf9}
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex:none}
+.auth-theme-toggle{margin:0 0 18px;padding:9px 13px;border:1px solid var(--line);border-radius:11px;background:var(--surface,#fff);color:var(--fg);font-size:11px;font-weight:700}
+.theme-dark{--bg:#15111b;--fg:#f4edf9;--muted:#b6a9c1;--line:#3a3044;--surface:#211a2a;--surface-soft:#292132;--green:#b58be0;--dark:#d3b5f2;background:var(--bg);color:var(--fg)}
+.theme-dark .auth-gate{background:var(--bg)}
+.theme-dark .auth-card,.theme-dark .search-box,.theme-dark .home-search,.theme-dark .category,.theme-dark .empty-state,.theme-dark .checkout-label select,.theme-dark .account-details>div,.theme-dark .receipt-upload,.theme-dark .success-summary,.theme-dark .booking-steps,.theme-dark .detail-quantity,.theme-dark .gatekeeper-card,.theme-dark .haddir-ticket,.theme-dark .step,.theme-dark .payment-placeholder,.theme-dark .payment-summary,.theme-dark .checkout-total,.theme-dark .payment-icon,.theme-dark .profile-card,.theme-dark .notification-item,.theme-dark .ticket-card,.theme-dark .tier-card,.theme-dark .checkout-section,.theme-dark .checkout-event,.theme-dark .event-card,.theme-dark .bottom-nav,.theme-dark .screen-topbar,.theme-dark .topbar,.theme-dark .detail-topbar{background:var(--surface);color:var(--fg);border-color:var(--line)}
+.theme-dark .home-search input,.theme-dark .search-box input,.theme-dark .auth-card input,.theme-dark .checkout-label select,.theme-dark .gatekeeper-input input{background:transparent;color:var(--fg)}
+.theme-dark .category{color:var(--muted)}
+.theme-dark .category.active,.theme-dark .btn-primary{background:#7546a3;border-color:#7546a3;color:#fff}
+.theme-dark .btn-outline{background:var(--surface);border-color:var(--line);color:var(--fg)}
+.theme-dark .event-body,.theme-dark .detail-content,.theme-dark .payment-screen,.theme-dark .screen,.theme-dark .profile-content{color:var(--fg)}
+.theme-dark .event-title,.theme-dark .detail-section h2,.theme-dark .screen-heading h1,.theme-dark .haddir-ticket-event h2,.theme-dark .haddir-ticket-meta strong,.theme-dark .haddir-ticket-head>strong,.theme-dark .tier-name,.theme-dark .auth-card h1,.theme-dark .auth-card strong,.theme-dark .checkout-section h2,.theme-dark .gatekeeper-heading h2{color:var(--fg)}
+.theme-dark .event-meta,.theme-dark .event-meta span,.theme-dark .detail-facts,.theme-dark .detail-section p,.theme-dark .auth-card>p{color:var(--muted)}
+.theme-dark .event-footer,.theme-dark .haddir-ticket-head,.theme-dark .haddir-ticket-qr,.theme-dark .haddir-ticket-meta,.theme-dark .success-summary{border-color:var(--line)}
+.theme-dark .haddir-ticket-footer,.theme-dark .welcome-motion,.theme-dark .empty-state,.theme-dark .auth-message,.theme-dark .checkout-total,.theme-dark .payment-placeholder{background:#292132;color:#d9c5ed;border-color:var(--line)}
+.theme-dark .welcome-motion strong,.theme-dark .welcome-motion p{color:#eadcf8}
+.theme-dark .map-link{background:#292132;border-color:var(--line);color:#d9c5ed}
+.theme-dark .account-note,.theme-dark .checkout-footnote,.theme-dark .detail-demo-note,.theme-dark .demo-note{color:var(--muted)}
+.theme-dark .haddir-ticket{box-shadow:0 18px 45px #0005}
+.theme-dark .auth-card .checkout-label input{background:#292132;color:var(--fg);border-color:var(--line)}
+.theme-dark .auth-theme-toggle{background:#292132;color:var(--fg);border-color:var(--line)}
+.theme-dark .screen-topbar .header-icon,.theme-dark .header-icon{background:#292132;color:var(--fg);border-color:var(--line)}
+@media(prefers-reduced-motion:reduce){.theme-toggle{transition:none}}
