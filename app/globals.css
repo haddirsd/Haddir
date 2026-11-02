@@ -195,3 +195,16 @@
 @media(max-width:480px){.booking-steps{gap:4px;padding:6px}.booking-steps span{font-size:9px;min-height:32px}.detail-quantity{padding:13px}}
 .theme-dark .booking-steps,.theme-dark .detail-quantity{background:#211a2a;border-color:var(--line)}
 .theme-dark .empty-state{background:#211a2a;border-color:var(--line);color:var(--fg)}
+
+
+/* Trending carousel and search result presentation */
+.trending-head{justify-content:flex-start;direction:rtl;margin:0 0 11px}
+.trending-head h2{display:flex;align-items:center;gap:9px;margin:0;font-size:15px;font-weight:800;color:var(--fg)}
+.trending-dot{position:relative;display:inline-block;width:8px;height:8px;flex:none;border-radius:50%;background:#ef3340;box-shadow:0 0 5px 2px #ef334080,0 0 12px 4px #ef33404d}
+.trending-dot::after{position:absolute;inset:-4px;border:1px solid #ef334080;border-radius:50%;content:"";animation:trending-pulse 1.7s ease-out infinite}
+@keyframes trending-pulse{0%{transform:scale(.65);opacity:.9}100%{transform:scale(1.9);opacity:0}}
+.trending-row{direction:ltr;grid-auto-columns:minmax(245px,31%);scroll-behavior:smooth;overscroll-behavior-x:contain}
+.trending-card{direction:rtl}
+.events-grid.search-results{grid-template-columns:minmax(0,1fr)}
+@media(max-width:800px){.trending-row{grid-auto-columns:minmax(245px,78%)}}
+@media(prefers-reduced-motion:reduce){.trending-dot::after{animation:none}.trending-row{scroll-behavior:auto}}
