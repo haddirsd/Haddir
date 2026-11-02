@@ -6,7 +6,7 @@ const events = [
  {id:2,date:"السبت، ٢٣ نوفمبر",title:"معرض روّاد الأعمال",place:"أم درمان",category:"أعمال ومعارض",price:"مجاناً",cover:"cover-two",tag:"معرض ولقاءات"},
  {id:3,date:"الخميس، ٢٨ نوفمبر",title:"ستاند أب كوميدي",place:"بورتسودان",category:"ترفيه",price:"١٠٬٠٠٠",cover:"cover-three",tag:"ضحك وونسة"}
 ];
-const categories=["الكل","موسيقى وفنون","أعمال ومعارض","ترفيه","رياضة"];
+const categories=["الكل","موسيقى وحفلات","رياضة","ترفيه","مسرح وسينما","ورش ودورات","مرافق"];
 type Tab="home"|"tickets"|"notifications"|"profile";
 export default function Home(){
  const [activeTab,setActiveTab]=useState<Tab>("home"),[category,setCategory]=useState("الكل"),[search,setSearch]=useState(""),[selectedEvent,setSelectedEvent]=useState<number|null>(null);
