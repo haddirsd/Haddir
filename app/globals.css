@@ -165,7 +165,7 @@
 .trending-card .event-title{font-size:14px}
 .more-events{padding-top:4px}
 .more-events-note{color:var(--muted);font-size:12px}
-.welcome-motion{position:relative;isolation:isolate;display:flex;align-items:center;gap:13px;width:min(1160px,calc(100% - 36px));margin:18px auto 0;padding:15px 18px;overflow:hidden;border:1px solid #e7d9f1;border-radius:17px;background:linear-gradient(110deg,#f6effc,#fff 72%);color:#4e2a6d;box-shadow:0 12px 32px #4a21640d;animation:welcome-enter .65s cubic-bezier(.2,.8,.2,1) both}
+.welcome-motion{position:fixed;z-index:60;top:82px;left:50%;transform:translateX(-50%);isolation:isolate;display:flex;align-items:center;gap:13px;width:min(1160px,calc(100% - 36px));margin:18px auto 0;padding:15px 18px;overflow:hidden;border:1px solid #e7d9f1;border-radius:17px;background:linear-gradient(110deg,#f6effc,#fff 72%);color:#4e2a6d;box-shadow:0 12px 32px #4a21640d;animation:welcome-enter .65s cubic-bezier(.2,.8,.2,1) both}
 .welcome-spark{display:grid;place-items:center;flex:none;width:42px;height:42px;border-radius:14px;background:#eadcf6;color:#74449a;animation:welcome-pulse 1.8s ease-in-out infinite}
 .welcome-motion strong{font-size:14px}
 .welcome-motion p{margin:4px 0 0;color:#89759b;font-size:11px}
@@ -173,5 +173,5 @@
 @keyframes welcome-enter{from{opacity:0;transform:translateY(-12px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes welcome-pulse{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.1) rotate(9deg)}}
 @keyframes welcome-float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(9px) rotate(18deg)}}
-@media(max-width:800px){.home-discovery{padding-top:17px}.trending-row{grid-auto-columns:minmax(245px,78%)}.home-search{min-height:54px}.welcome-motion{width:calc(100% - 28px);margin-top:13px}}
+@media(max-width:800px){.home-discovery{padding-top:17px}.trending-row{grid-auto-columns:minmax(245px,78%)}.home-search{min-height:54px}.welcome-motion{top:76px;width:calc(100% - 28px);margin:0}}
 @media(prefers-reduced-motion:reduce){.welcome-motion,.welcome-spark,.welcome-orbit{animation:none}}
