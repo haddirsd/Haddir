@@ -2,9 +2,9 @@
 import { useMemo, useState } from "react";
 import { ArrowLeft, Bell, CalendarDays, CheckCircle2, House, MapPin, Search, Settings, Sparkles, Ticket, UserRound, ChevronLeft, Share2, ExternalLink, CreditCard } from "lucide-react";
 const events = [
- {id:1,date:"الجمعة، ١٥ نوفمبر",title:"ليلة موسيقية سودانية",place:"الخرطوم",category:"موسيقى وفنون",price:"١٥٬٠٠٠",cover:"cover-one",tag:"موسيقى مباشرة"},
- {id:2,date:"السبت، ٢٣ نوفمبر",title:"معرض روّاد الأعمال",place:"أم درمان",category:"أعمال ومعارض",price:"مجاناً",cover:"cover-two",tag:"معرض ولقاءات"},
- {id:3,date:"الخميس، ٢٨ نوفمبر",title:"ستاند أب كوميدي",place:"بورتسودان",category:"ترفيه",price:"١٠٬٠٠٠",cover:"cover-three",tag:"ضحك وونسة"}
+ {id:1,date:"الجمعة، ١٥ نوفمبر",title:"ليلة موسيقية سودانية",place:"الخرطوم",category:"موسيقى وحفلات",price:"١٥٬٠٠٠",cover:"cover-one",tag:"موسيقى مباشرة",time:"٧:٠٠ مساءً",venue:"قاعة الصداقة، الخرطوم",status:"متوفر",map:"https://www.google.com/maps/search/?api=1&query=Friendship+Hall+Khartoum",about:"أمسية فنية تجمع أصواتاً سودانية وموسيقى حيّة في أجواء مليانة طرب وونسة.",tiers:[{name:"التذكرة العادية",price:"١٥٬٠٠٠ ج.س"},{name:"التذكرة المميزة",price:"٢٥٬٠٠٠ ج.س"},{name:"VIP",price:"٤٠٬٠٠٠ ج.س"}]},
+ {id:2,date:"السبت، ٢٣ نوفمبر",title:"معرض روّاد الأعمال",place:"أم درمان",category:"ورش ودورات",price:"مجاناً",cover:"cover-two",tag:"معرض ولقاءات",time:"١٠:٠٠ صباحاً",venue:"مركز أم درمان الثقافي",status:"أوشك على النفاذ",map:"https://www.google.com/maps/search/?api=1&query=Omdurman+Cultural+Center",about:"مساحة للتعارف وتبادل الخبرات واستكشاف مشاريع وأفكار جديدة.",tiers:[{name:"دخول عام",price:"مجاناً"},{name:"دخول مع ورشة",price:"٥٬٠٠٠ ج.س"}]},
+ {id:3,date:"الخميس، ٢٨ نوفمبر",title:"ستاند أب كوميدي",place:"بورتسودان",category:"ترفيه",price:"١٠٬٠٠٠",cover:"cover-three",tag:"ضحك وونسة",time:"٨:٣٠ مساءً",venue:"المسرح القومي، بورتسودان",status:"متوفر",map:"https://www.google.com/maps/search/?api=1&query=Port+Sudan+Theatre",about:"ليلة كوميدية خفيفة مع فقرات ستاند أب ومواقف من حياتنا اليومية.",tiers:[{name:"عادية",price:"١٠٬٠٠٠ ج.س"},{name:"مميزة",price:"٢٠٬٠٠٠ ج.س"}]}
 ];
 const categories=["الكل","موسيقى وحفلات","رياضة","ترفيه","مسرح وسينما","ورش ودورات","مرافق"];
 type Tab="home"|"tickets"|"notifications"|"profile";
