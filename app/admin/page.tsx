@@ -28,7 +28,10 @@ export default function AdminPage() {
   const [savingEvent, setSavingEvent] = useState(false);
   const [eventMessage, setEventMessage] = useState("");
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
-  const emptyEventForm = {title:"",description:"",category:"",city:"",venue:"",address:"",starts_at:"",ends_at:"",cover_image_url:"",ticket_name:"تذكرة عامة",price:"",quantity_total:"",is_trending:false};
+  const emptyEventForm = {title:"",description:"",category:"",city:"",venue:"",address:"",location_url:"",starts_at:"",ends_at:"",cover_image_url:"",is_trending:false};
+  type TicketForm = {id?:string;name:string;description:string;price:string;quantity_total:string;quantity_sold:number};
+  const emptyTicket = ():TicketForm => ({name:"تذكرة عامة",description:"",price:"",quantity_total:"",quantity_sold:0});
+  const [ticketForms,setTicketForms] = useState<TicketForm[]>([emptyTicket()]);
   const [eventForm, setEventForm] = useState(emptyEventForm);
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState("");
@@ -72,7 +75,7 @@ export default function AdminPage() {
     if (!supabase || !role || section === "overview") return;
     setSectionLoading(true); setError(""); setRows([]);
     let result: {data:any[]|null,error:any} = {data:[],error:null};
-    if (section === "events") result = await supabase.from("events").select("id,title,category,city,venue,starts_at,status,created_at,is_trending,description,address,ends_at,cover_image_url").order("created_at",{ascending:false}).limit(100);
+    if (section === "events") result = await supabase.from("events").select("id,title,category,city,venue,starts_at,status,created_at,is_trending,description,address,location_url,ends_at,cover_image_url").order("created_at",{ascending:false}).limit(100);
     if (section === "bookings") result = await supabase.from("bookings").select("id,booking_number,customer_name,customer_phone,event_id,subtotal,currency,status,created_at").order("created_at",{ascending:false}).limit(100);
     if (section === "payments") result = await supabase.from("payment_submissions").select("id,booking_id,transfer_reference,receipt_path,amount,currency,status,review_note,created_at,bookings(booking_number,customer_name,customer_phone,subtotal)").order("created_at",{ascending:false}).limit(100);
     if (section === "users" && role !== "supervisor") result = await supabase.from("profiles").select("id,full_name,phone,role,created_at").order("created_at",{ascending:false}).limit(100);
@@ -83,6 +86,25 @@ export default function AdminPage() {
   };
 
   useEffect(() => { void loadSection(); }, [section, role]);
+
+  const deleteEvent = async (r:Row) => {
+    const supabase=getSupabaseBrowserClient();if(!supabase||!role||!["owner","admin"].includes(role))return;
+    if(!window.confirm("حذف الفعالية «"+r.title+"»؟ إذا كانت مرتبطة بحجوزات أو تذاكر صادرة فسيتم إلغاؤها وإخفاؤها مع الاحتفاظ بالسجلات المالية والتذاكر السابقة."))return;
+    setSectionLoading(true);
+    const [{count:bookings},{count:tickets}] = await Promise.all([
+      supabase.from("bookings").select("id",{count:"exact",head:true}).eq("event_id",r.id),
+      supabase.from("tickets").select("id",{count:"exact",head:true}).eq("event_id",r.id)
+    ]);
+    if((bookings||0)>0||(tickets||0)>0){
+      const {error}=await supabase.from("events").update({status:"cancelled",is_trending:false}).eq("id",r.id);
+      if(!error) await supabase.from("ticket_types").update({is_active:false}).eq("event_id",r.id);
+      setSectionLoading(false);if(error){setError("تعذر إلغاء الفعالية: "+error.message);return;}
+      setEventMessage("الفعالية مرتبطة بحجوزات/تذاكر؛ ألغيناها وأخفيناها مع الاحتفاظ بالسجلات.");await loadSection();return;
+    }
+    const {error}=await supabase.from("events").delete().eq("id",r.id);
+    setSectionLoading(false);if(error){setError("تعذر حذف الفعالية: "+error.message);return;}
+    setEventMessage("تم حذف الفعالية نهائياً.");await loadSection();
+  };
 
   const publishEvent = async (eventId: string) => {
     const supabase = getSupabaseBrowserClient();
@@ -100,8 +122,10 @@ export default function AdminPage() {
   const editEvent = (r: Row) => {
     setEditingEventId(r.id);
     const localDate=(v:string|null)=>v?new Date(new Date(v).getTime()-new Date(v).getTimezoneOffset()*60000).toISOString().slice(0,16):"";
-    setEventForm({...emptyEventForm,title:r.title||"",description:r.description||"",category:r.category||"",city:r.city||"",venue:r.venue||"",address:r.address||"",starts_at:localDate(r.starts_at),ends_at:localDate(r.ends_at),cover_image_url:r.cover_image_url||"",is_trending:!!r.is_trending});
+    setEventForm({...emptyEventForm,title:r.title||"",description:r.description||"",category:r.category||"",city:r.city||"",venue:r.venue||"",address:r.address||"",location_url:r.location_url||"",starts_at:localDate(r.starts_at),ends_at:localDate(r.ends_at),cover_image_url:r.cover_image_url||"",is_trending:!!r.is_trending});
     setCoverFile(null);setCoverPreview(r.cover_image_url||"");
+    const supabase=getSupabaseBrowserClient();
+    void (async()=>{if(!supabase)return;const {data,error}=await supabase.from("ticket_types").select("id,name,description,price,quantity_total,quantity_sold,is_active").eq("event_id",r.id).order("created_at",{ascending:true});if(error){setEventMessage("تعذر تحميل أنواع التذاكر: "+error.message);return;}setTicketForms((data||[]).map((t:any)=>({id:t.id,name:t.name,description:t.description||"",price:String(t.price),quantity_total:String(t.quantity_total),quantity_sold:Number(t.quantity_sold||0)})));if(!data?.length)setTicketForms([emptyTicket()]);})();
     setShowEventForm(true);setEventMessage("");window.scrollTo({top:0,behavior:"smooth"});
   };
 
@@ -122,22 +146,38 @@ export default function AdminPage() {
       if (uploadError) { setEventMessage("تعذر رفع صورة الغلاف: "+uploadError.message); setSavingEvent(false); return; }
       coverUrl = supabase.storage.from("event-covers").getPublicUrl(path).data.publicUrl;
     }
-    const eventPayload = {title:eventForm.title.trim(),description:eventForm.description.trim()||null,category:eventForm.category.trim()||null,city:eventForm.city.trim()||null,venue:eventForm.venue.trim()||null,address:eventForm.address.trim()||null,starts_at:new Date(eventForm.starts_at).toISOString(),ends_at:eventForm.ends_at?new Date(eventForm.ends_at).toISOString():null,cover_image_url:coverUrl,is_trending:eventForm.is_trending};
-    if(editingEventId){const {error:updateError}=await supabase.from("events").update(eventPayload).eq("id",editingEventId);if(updateError){setEventMessage("تعذر تحديث الفعالية: "+updateError.message);setSavingEvent(false);return;}setEventMessage("تم تحديث بيانات الفعالية بنجاح.");setEditingEventId(null);setEventForm(emptyEventForm);setCoverFile(null);setCoverPreview("");setShowEventForm(false);setSavingEvent(false);await loadSection();return;}
+    const eventPayload = {title:eventForm.title.trim(),description:eventForm.description.trim()||null,category:eventForm.category.trim()||null,city:eventForm.city.trim()||null,venue:eventForm.venue.trim()||null,address:eventForm.address.trim()||null,location_url:eventForm.location_url.trim()||null,starts_at:new Date(eventForm.starts_at).toISOString(),ends_at:eventForm.ends_at?new Date(eventForm.ends_at).toISOString():null,cover_image_url:coverUrl,is_trending:eventForm.is_trending};
+    if(editingEventId){
+      const {error:updateError}=await supabase.from("events").update(eventPayload).eq("id",editingEventId);
+      if(updateError){setEventMessage("تعذر تحديث الفعالية: "+updateError.message);setSavingEvent(false);return;}
+      const {data:existingTickets,error:existingError}=await supabase.from("ticket_types").select("id,quantity_sold").eq("event_id",editingEventId);
+      if(existingError){setEventMessage("تم تحديث الفعالية لكن تعذر تحميل التذاكر: "+existingError.message);setSavingEvent(false);return;}
+      const keptIds=ticketForms.map(t=>t.id).filter(Boolean) as string[];
+      for(const t of ticketForms){
+        if(!t.name.trim()||!t.quantity_total||Number(t.price)<0||Number(t.quantity_total)<t.quantity_sold){setEventMessage("راجع بيانات التذاكر: الكمية لا يمكن أن تقل عن المباع.");setSavingEvent(false);return;}
+        const payload={name:t.name.trim(),description:t.description.trim()||null,price:Number(t.price),currency:"SDG",quantity_total:Number(t.quantity_total),is_active:true};
+        const result=t.id?await supabase.from("ticket_types").update(payload).eq("id",t.id):await supabase.from("ticket_types").insert({...payload,event_id:editingEventId,quantity_sold:0});
+        if(result.error){setEventMessage("تم تحديث بيانات الفعالية لكن تعذر حفظ التذاكر: "+result.error.message);setSavingEvent(false);return;}
+      }
+      for(const old of (existingTickets||[]).filter((t:any)=>!keptIds.includes(t.id))){
+        if(Number(old.quantity_sold)>0){await supabase.from("ticket_types").update({is_active:false}).eq("id",old.id);continue;}
+        const {count}=await supabase.from("booking_items").select("id",{count:"exact",head:true}).eq("ticket_type_id",old.id);
+        if((count||0)>0) await supabase.from("ticket_types").update({is_active:false}).eq("id",old.id);
+        else await supabase.from("ticket_types").delete().eq("id",old.id);
+      }
+      setEventMessage("تم تحديث الفعالية وجميع أنواع التذاكر.");setEditingEventId(null);setEventForm(emptyEventForm);setTicketForms([emptyTicket()]);setCoverFile(null);setCoverPreview("");setShowEventForm(false);setSavingEvent(false);await loadSection();return;
+    }
     const slug = eventForm.title.trim().toLowerCase().normalize("NFKD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9\\u0600-\\u06ff]+/g,"-").replace(/^-|-$/g,"") + "-" + Math.random().toString(36).slice(2,7);
     const { data: event, error: eventError } = await supabase.from("events").insert({...eventPayload,slug,status:"draft",created_by:user.id}).select("id").single();
     if (eventError || !event) { setEventMessage("تعذر إنشاء الفعالية: " + (eventError?.message || "خطأ غير معروف")); setSavingEvent(false); return; }
-    const { error: ticketError } = await supabase.from("ticket_types").insert({
-      event_id:event.id, name:eventForm.ticket_name.trim(), price:Number(eventForm.price),
-      currency:"SDG", quantity_total:Number(eventForm.quantity_total), quantity_sold:0, is_active:true
-    });
+    const { error: ticketError } = await supabase.from("ticket_types").insert(ticketForms.map(t=>({event_id:event.id,name:t.name.trim(),description:t.description.trim()||null,price:Number(t.price),currency:"SDG",quantity_total:Number(t.quantity_total),quantity_sold:0,is_active:true})));
     if (ticketError) {
       await supabase.from("events").delete().eq("id",event.id);
       setEventMessage("لم يتم حفظ نوع التذكرة، وتم التراجع عن إنشاء الفعالية: " + ticketError.message);
       setSavingEvent(false); return;
     }
     setEventMessage("تم إنشاء الفعالية ونوع التذكرة كمسودة بنجاح.");
-    setEditingEventId(null);setEventForm(emptyEventForm);setCoverFile(null);setCoverPreview("");
+    setEditingEventId(null);setEventForm(emptyEventForm);setTicketForms([emptyTicket()]);setCoverFile(null);setCoverPreview("");
     setShowEventForm(false); setSavingEvent(false); await loadSection();
   };
 
@@ -167,7 +207,7 @@ export default function AdminPage() {
       users:[{key:"full_name",label:"الاسم"},{key:"phone",label:"الهاتف"},{key:"role",label:"الدور"},{key:"created_at",label:"تاريخ التسجيل",format:r=>new Date(r.created_at).toLocaleDateString("ar-SD")}]
     };
     const cols=columns[section]||[];
-    return <div className="admin-table-wrap"><table className="admin-data-table"><thead><tr>{cols.map(c=><th key={c.key}>{c.label}</th>)}{section==="events"&&(role==="owner"||role==="admin")&&<th>الإجراء</th>}</tr></thead><tbody>{rows.map((r,i)=><tr key={r.id||i}>{cols.map(c=><td key={c.key}>{c.format?c.format(r):fmt(r[c.key])}{section==="payments"&&c.key==="transfer_reference"&&r.receipt_path?<small className="admin-table-sub"> · إيصال: {r.receipt_path}</small>:null}</td>)}{section==="events"&&(role==="owner"||role==="admin")&&<td><><button className="admin-create-button" type="button" disabled={sectionLoading} onClick={()=>editEvent(r)}>تعديل</button> {r.is_trending?<span> · رائج الآن</span>:null} {r.status==="draft"?<button className="admin-create-button" type="button" disabled={sectionLoading} onClick={()=>void publishEvent(r.id)}>نشر الفعالية</button>:r.status==="published"?<span>منشورة</span>:<span>—</span>}</></td>}</tr>)}</tbody></table>{rows.length===0&&<p className="admin-no-data">لا توجد سجلات حتى الآن.</p>}</div>;
+    return <div className="admin-table-wrap"><table className="admin-data-table"><thead><tr>{cols.map(c=><th key={c.key}>{c.label}</th>)}{section==="events"&&(role==="owner"||role==="admin")&&<th>الإجراء</th>}</tr></thead><tbody>{rows.map((r,i)=><tr key={r.id||i}>{cols.map(c=><td key={c.key}>{c.format?c.format(r):fmt(r[c.key])}{section==="payments"&&c.key==="transfer_reference"&&r.receipt_path?<small className="admin-table-sub"> · إيصال: {r.receipt_path}</small>:null}</td>)}{section==="events"&&(role==="owner"||role==="admin")&&<td><><button className="admin-create-button" type="button" disabled={sectionLoading} onClick={()=>editEvent(r)}>تعديل</button> <button className="admin-delete-button" type="button" disabled={sectionLoading} onClick={()=>void deleteEvent(r)}>حذف</button> {r.is_trending?<span> · رائج الآن</span>:null} {r.status==="draft"?<button className="admin-create-button" type="button" disabled={sectionLoading} onClick={()=>void publishEvent(r.id)}>نشر الفعالية</button>:r.status==="published"?<span>منشورة</span>:<span>—</span>}</></td>}</tr>)}</tbody></table>{rows.length===0&&<p className="admin-no-data">لا توجد سجلات حتى الآن.</p>}</div>;
   };
 
   return <main className="admin-shell" dir="rtl">
@@ -183,7 +223,7 @@ export default function AdminPage() {
         <div className="admin-welcome"><div><span className="admin-eyebrow">لوحة التحكم</span><h2>مرحباً، {name}</h2><p>{supervisor?"راجع الحجوزات وإثباتات التحويل.":"تابع أداء منصة حاضر وأدر عملياتها من مكان واحد."}</p></div><div className="admin-welcome-mark"><LayoutDashboard size={30}/></div></div>
         {error&&<div className="admin-notice" role="status">{error}</div>}
         {section==="overview"&&<><div className="admin-metric-grid">{metrics.map(m=><article className="admin-metric" key={m.title}><span><m.icon size={20}/></span><small>{m.title}</small><strong>{dataReady?m.value.toLocaleString("ar-SD"):"—"}</strong></article>)}</div><div className="admin-panel"><div className="admin-panel-head"><div><h3>{supervisor?"المهام اليومية":"نظرة سريعة"}</h3><p>بيانات مباشرة من قاعدة بيانات حاضر</p></div></div><div className="admin-shortcuts">{(supervisor?["bookings","payments"] as Section[]:["events","bookings","payments","users","reports"] as Section[]).map(item=><button key={item} onClick={()=>setSection(item)}><span>{item==="events"?<CalendarDays/>:item==="bookings"?<Ticket/>:item==="payments"?<Wallet/>:item==="users"?<Users/>:<Activity/>}</span><b>{labels[item]}</b><ArrowRight size={16}/></button>)}</div></div></>}
-        {section!=="overview"&&<div className="admin-panel"><div className="admin-panel-head"><div><h3>{labels[section]}</h3><p>السجلات الفعلية المحفوظة في قاعدة البيانات</p></div><div className="admin-panel-actions">{section==="events"&&(role==="owner"||role==="admin")&&<button className="admin-create-button" onClick={()=>{setShowEventForm(v=>!v);setEditingEventId(null);setEventForm(emptyEventForm);setEventMessage("");}}>{showEventForm?"إغلاق":"＋ إضافة فعالية"}</button>}<button className="admin-refresh" onClick={()=>void loadSection()} disabled={sectionLoading}><RefreshCw size={16}/> تحديث</button></div></div>{section==="events"&&showEventForm&&<form className="admin-event-form" onSubmit={createEvent}><h3>{editingEventId?"تعديل بيانات الفعالية":"بيانات الفعالية"}</h3><div className="admin-form-grid"><label>اسم الفعالية *<input required value={eventForm.title} onChange={e=>setEventForm({...eventForm,title:e.target.value})}/></label><label>التصنيف<input value={eventForm.category} onChange={e=>setEventForm({...eventForm,category:e.target.value})} placeholder="موسيقى، رياضة، مؤتمر..."/></label><label>المدينة<input value={eventForm.city} onChange={e=>setEventForm({...eventForm,city:e.target.value})}/></label><label>المكان<input value={eventForm.venue} onChange={e=>setEventForm({...eventForm,venue:e.target.value})}/></label><label>العنوان التفصيلي<input value={eventForm.address} onChange={e=>setEventForm({...eventForm,address:e.target.value})}/></label><label className="admin-form-wide">صورة الغلاف (من جهازك)<input type="file" accept="image/*" onChange={e=>{const file=e.target.files?.[0]||null;setCoverFile(file);if(file){const url=URL.createObjectURL(file);setCoverPreview(url);}else{setCoverPreview(eventForm.cover_image_url);}}}/><small className="admin-form-hint">الصيغ المدعومة حسب المتصفح · الحد الأقصى 10 MB · تُرفع الصورة الأصلية دون ضغط.</small></label>{coverPreview&&<div className="admin-cover-preview"><img src={coverPreview} alt="معاينة صورة الغلاف"/><button type="button" onClick={()=>{setCoverFile(null);setCoverPreview("");setEventForm({...eventForm,cover_image_url:""});}}>إزالة الصورة</button></div>}<label>تاريخ ووقت البداية *<input type="datetime-local" required value={eventForm.starts_at} onChange={e=>setEventForm({...eventForm,starts_at:e.target.value})}/></label><label>تاريخ ووقت النهاية<input type="datetime-local" value={eventForm.ends_at} onChange={e=>setEventForm({...eventForm,ends_at:e.target.value})}/></label></div><label className="admin-form-wide">وصف الفعالية<textarea rows={3} value={eventForm.description} onChange={e=>setEventForm({...eventForm,description:e.target.value})}/></label><label className="admin-trending-check"><input type="checkbox" checked={eventForm.is_trending} onChange={e=>setEventForm({...eventForm,is_trending:e.target.checked})}/> إظهار الفعالية في «رائج الآن»</label>{!editingEventId&&<><h3>نوع التذكرة الأول</h3><div className="admin-form-grid"><label>اسم التذكرة *<input required value={eventForm.ticket_name} onChange={e=>setEventForm({...eventForm,ticket_name:e.target.value})}/></label><label>السعر بالجنيه السوداني *<input type="number" min="0" step="0.01" required value={eventForm.price} onChange={e=>setEventForm({...eventForm,price:e.target.value})}/></label><label>الكمية المتاحة *<input type="number" min="1" step="1" required value={eventForm.quantity_total} onChange={e=>setEventForm({...eventForm,quantity_total:e.target.value})}/></label></div></>}<p className="admin-form-hint">سيتم حفظ الفعالية كمسودة، ولن تظهر للجمهور إلا بعد نشرها.</p>{eventMessage&&<p className="admin-form-message" role="status">{eventMessage}</p>}<button className="admin-create-button" type="submit" disabled={savingEvent}>{savingEvent?"جاري الحفظ...":editingEventId?"حفظ التعديلات":"حفظ الفعالية"}</button></form>}{sectionLoading?<p className="admin-no-data">جاري تحميل البيانات...</p>:renderRows()}</div>}
+        {section!=="overview"&&<div className="admin-panel"><div className="admin-panel-head"><div><h3>{labels[section]}</h3><p>السجلات الفعلية المحفوظة في قاعدة البيانات</p></div><div className="admin-panel-actions">{section==="events"&&(role==="owner"||role==="admin")&&<button className="admin-create-button" onClick={()=>{setShowEventForm(v=>!v);setEditingEventId(null);setEventForm(emptyEventForm);setEventMessage("");}}>{showEventForm?"إغلاق":"＋ إضافة فعالية"}</button>}<button className="admin-refresh" onClick={()=>void loadSection()} disabled={sectionLoading}><RefreshCw size={16}/> تحديث</button></div></div>{section==="events"&&showEventForm&&<form className="admin-event-form" onSubmit={createEvent}><h3>{editingEventId?"تعديل بيانات الفعالية":"بيانات الفعالية"}</h3><div className="admin-form-grid"><label>اسم الفعالية *<input required value={eventForm.title} onChange={e=>setEventForm({...eventForm,title:e.target.value})}/></label><label>التصنيف<input value={eventForm.category} onChange={e=>setEventForm({...eventForm,category:e.target.value})} placeholder="موسيقى، رياضة، مؤتمر..."/></label><label>المدينة<input value={eventForm.city} onChange={e=>setEventForm({...eventForm,city:e.target.value})}/></label><label>المكان<input value={eventForm.venue} onChange={e=>setEventForm({...eventForm,venue:e.target.value})}/></label><label>العنوان التفصيلي<input value={eventForm.address} onChange={e=>setEventForm({...eventForm,address:e.target.value})}/></label><label>رابط الموقع / Google Maps<input type="url" placeholder="https://maps.google.com/..." value={eventForm.location_url} onChange={e=>setEventForm({...eventForm,location_url:e.target.value})}/></label><label className="admin-form-wide">صورة الغلاف (من جهازك)<input type="file" accept="image/*" onChange={e=>{const file=e.target.files?.[0]||null;setCoverFile(file);if(file){const url=URL.createObjectURL(file);setCoverPreview(url);}else{setCoverPreview(eventForm.cover_image_url);}}}/><small className="admin-form-hint">الصيغ المدعومة حسب المتصفح · الحد الأقصى 10 MB · تُرفع الصورة الأصلية دون ضغط.</small></label>{coverPreview&&<div className="admin-cover-preview"><img src={coverPreview} alt="معاينة صورة الغلاف"/><button type="button" onClick={()=>{setCoverFile(null);setCoverPreview("");setEventForm({...eventForm,cover_image_url:""});}}>إزالة الصورة</button></div>}<label>تاريخ ووقت البداية *<input type="datetime-local" required value={eventForm.starts_at} onChange={e=>setEventForm({...eventForm,starts_at:e.target.value})}/></label><label>تاريخ ووقت النهاية<input type="datetime-local" value={eventForm.ends_at} onChange={e=>setEventForm({...eventForm,ends_at:e.target.value})}/></label></div><label className="admin-form-wide">وصف الفعالية<textarea rows={3} value={eventForm.description} onChange={e=>setEventForm({...eventForm,description:e.target.value})}/></label><label className="admin-trending-check"><input type="checkbox" checked={eventForm.is_trending} onChange={e=>setEventForm({...eventForm,is_trending:e.target.checked})}/> إظهار الفعالية في «رائج الآن»</label><div className="admin-ticket-editor"><div className="admin-ticket-heading"><h3>أنواع التذاكر</h3><button type="button" className="admin-create-button" onClick={()=>setTicketForms(v=>[...v,emptyTicket()])}>＋ إضافة فئة تذكرة</button></div>{ticketForms.map((t,i)=><div className="admin-ticket-row" key={t.id||"new-"+i}><div className="admin-ticket-row-head"><b>الفئة {i+1}</b>{ticketForms.length>1&&<button type="button" className="admin-delete-button" onClick={()=>setTicketForms(v=>v.filter((_,j)=>j!==i))}>إزالة</button>}</div><div className="admin-form-grid"><label>اسم التذكرة *<input required value={t.name} onChange={e=>setTicketForms(v=>v.map((x,j)=>j===i?{...x,name:e.target.value}:x))}/></label><label>الوصف (اختياري)<input value={t.description} onChange={e=>setTicketForms(v=>v.map((x,j)=>j===i?{...x,description:e.target.value}:x))}/></label><label>السعر بالجنيه السوداني *<input type="number" min="0" step="0.01" required value={t.price} onChange={e=>setTicketForms(v=>v.map((x,j)=>j===i?{...x,price:e.target.value}:x))}/></label><label>الكمية المتاحة *<input type="number" min={t.quantity_sold||1} step="1" required value={t.quantity_total} onChange={e=>setTicketForms(v=>v.map((x,j)=>j===i?{...x,quantity_total:e.target.value}:x))}/></label>{t.quantity_sold>0&&<small className="admin-form-hint">تم بيع {t.quantity_sold} — لا يمكن تقليل الكمية عنها.</small>}</div></div>)}</div><p className="admin-form-hint">سيتم حفظ الفعالية كمسودة، ولن تظهر للجمهور إلا بعد نشرها.</p>{eventMessage&&<p className="admin-form-message" role="status">{eventMessage}</p>}<button className="admin-create-button" type="submit" disabled={savingEvent}>{savingEvent?"جاري الحفظ...":editingEventId?"حفظ التعديلات":"حفظ الفعالية"}</button></form>}{sectionLoading?<p className="admin-no-data">جاري تحميل البيانات...</p>:renderRows()}</div>}
         <footer className="admin-footer">حاضر · نظام إدارة الفعاليات والتذاكر <span>{roleLabel}</span></footer>
       </div>
     </section>
