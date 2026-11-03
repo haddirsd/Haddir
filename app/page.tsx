@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { getSupabaseBrowserClient } from "../lib/supabase";
 import { QRCodeSVG as QrCodeSVG } from "qrcode.react";
-import { ArrowLeft, Bell, CalendarDays, CheckCircle2, House, MapPin, Search, Settings, Sparkles, Ticket, UserRound, ChevronLeft, Share2, ExternalLink, CreditCard, Download } from "lucide-react";
+import { ArrowLeft, Bell, CalendarDays, CheckCircle2, House, MapPin, Settings, Sparkles, Ticket, UserRound, ChevronLeft, Share2, ExternalLink, CreditCard, Download } from "lucide-react";
 type EventItem = {id:string;date:string;title:string;place:string;category:string;price:string;cover:string;coverImageUrl:string|null;tag:string;time:string;venue:string;status:string;map:string;about:string;isTrending:boolean;tiers:{name:string;price:string}[]};
 const formatEventDate=(value:string)=>new Intl.DateTimeFormat("ar-SD",{weekday:"long",day:"numeric",month:"long"}).format(new Date(value));
 
@@ -13,42 +13,11 @@ const formatMoney=(value:number)=>new Intl.NumberFormat("ar-SD").format(value)+"
 type Tab="home"|"tickets"|"notifications"|"profile";
 export default function Home(){
  const [events,setEvents]=useState<EventItem[]>([]),[eventsLoading,setEventsLoading]=useState(true),[eventsError,setEventsError]=useState("");
- const [activeTab,setActiveTab]=useState<Tab>("home"),[category,setCategory]=useState("الكل"),[search,setSearch]=useState(""),[selectedEvent,setSelectedEvent]=useState<string|null>(null),[selectedTier,setSelectedTier]=useState(0),[tierChosen,setTierChosen]=useState(false),[showPayment,setShowPayment]=useState(false),[darkMode,setDarkMode]=useState(false),[loginEmail,setLoginEmail]=useState("");
+ const [activeTab,setActiveTab]=useState<Tab>("home"),[selectedEvent,setSelectedEvent]=useState<string|null>(null),[selectedTier,setSelectedTier]=useState(0),[tierChosen,setTierChosen]=useState(false),[showPayment,setShowPayment]=useState(false),[darkMode,setDarkMode]=useState(false),[loginEmail,setLoginEmail]=useState("");
  const [fullName,setFullName]=useState(""),[email,setEmail]=useState(""),[phone,setPhone]=useState(""),[saved,setSaved]=useState(false),[profileSaving,setProfileSaving]=useState(false);
  const [authUser,setAuthUser]=useState<{id:string;email?:string;user_metadata?:Record<string,unknown>}|null>(null),[userRole,setUserRole]=useState("customer"),[authMessage,setAuthMessage]=useState(""),[activeWorkspace,setActiveWorkspace]=useState<"customer"|"organizer"|"gatekeeper"|"advertiser"|"admin"|"owner"|null>(null);
  const [ticketCount,setTicketCount]=useState(1),[paymentMethod,setPaymentMethod]=useState("bankak"),[receipt,setReceipt]=useState<File|null>(null),[bookingDone,setBookingDone]=useState(false);
  const [showWelcome,setShowWelcome]=useState(false);
- const trendingRowRef=useRef<HTMLDivElement|null>(null);
- const trendingPaused=useRef(false);
- const trendingIndex=useRef(0);
- useEffect(()=>{
-  const row=trendingRowRef.current;
-  if(!row)return;
-  const cards=()=>Array.from(row.querySelectorAll<HTMLElement>(".trending-card"));
-  const total=Math.floor(cards().length/2);
-  if(!total)return;
-  trendingIndex.current=0;
-  const centerCard=(index:number,behavior:ScrollBehavior="smooth")=>{
-   const card=cards()[index];
-   if(!card)return;
-   row.scrollTo({left:card.offsetLeft-(row.clientWidth-card.clientWidth)/2,behavior});
-  };
-  centerCard(0,"auto");
-  const timer=window.setInterval(()=>{
-   if(trendingPaused.current)return;
-   if(trendingIndex.current===total){
-    // نحن على نسخة البطاقة الأولى بعد الثالثة؛ نعيد المؤشر للأصلية
-    // في نفس الموضع بصرياً، ثم نواصل إلى الثانية دون رجوع ظاهر.
-    trendingIndex.current=0;
-    centerCard(0,"auto");
-    return;
-   }
-   trendingIndex.current+=1;
-   centerCard(trendingIndex.current);
-  },3700);
-  return()=>window.clearInterval(timer);
- },[events,category,search,activeTab,selectedEvent]);
- useEffect(()=>{const resetSearch=()=>setSearch("");window.addEventListener("pageshow",resetSearch);return()=>window.removeEventListener("pageshow",resetSearch);},[]);
  useEffect(()=>{const saved=window.localStorage.getItem("haddir-theme");const prefersDark=window.matchMedia?.("(prefers-color-scheme: dark)").matches;setDarkMode(saved?saved==="dark":!!prefersDark);},[]);
  useEffect(()=>{document.documentElement.dataset.theme=darkMode?"dark":"light";document.documentElement.style.colorScheme=darkMode?"dark":"light";window.localStorage.setItem("haddir-theme",darkMode?"dark":"light");},[darkMode]);
  useEffect(()=>{const key="haddir-welcome-seen";if(!sessionStorage.getItem(key)){setShowWelcome(true);sessionStorage.setItem(key,"1");const timer=window.setTimeout(()=>setShowWelcome(false),3600);return()=>window.clearTimeout(timer);}},[]);
@@ -58,7 +27,6 @@ export default function Home(){
  const signInWithEmail=async()=>{const supabase=getSupabaseBrowserClient();if(!supabase||!loginEmail.trim()){setAuthMessage("أدخل بريدك الإلكتروني أولاً.");return;}const {error}=await supabase.auth.signInWithOtp({email:loginEmail.trim(),options:{emailRedirectTo:window.location.origin}});setAuthMessage(error?error.message:"أرسلنا رابط تسجيل الدخول إلى بريدك الإلكتروني. افتح الرسالة للمتابعة.");};
  const saveProfile=async()=>{if(!authUser){setAuthMessage("سجّل الدخول أولاً لحفظ بياناتك.");return;}const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("تعذر الاتصال بقاعدة البيانات حالياً.");return;}setProfileSaving(true);setSaved(false);setAuthMessage("");const {data,error}=await supabase.from("profiles").update({full_name:fullName.trim(),phone:phone.trim()||null}).eq("id",authUser.id).select("full_name,phone").single();setProfileSaving(false);if(error){setAuthMessage("ما قدرنا نحفظ بياناتك. تأكد من الاتصال وحاول مرة تانية.");return;}setFullName(data.full_name||"");setPhone(data.phone||"");setSaved(true);};
  const signOut=async()=>{if(!window.confirm("هل تريد تسجيل الخروج من حسابك؟ ستعود إلى شاشة تسجيل الدخول."))return;const supabase=getSupabaseBrowserClient();if(supabase){const {error}=await supabase.auth.signOut();if(error){setAuthMessage("تعذر تسجيل الخروج حالياً. حاول مرة أخرى.");return;}}setAuthMessage("تم تسجيل الخروج بنجاح. يمكنك تسجيل الدخول مرة أخرى في أي وقت.");};
- const visible=useMemo(()=>events.filter(e=>(category==="الكل"||e.category===category)&&(e.title.includes(search.trim())||e.place.includes(search.trim()))),[category,search]);
 
  const selected=events.find(e=>e.id===selectedEvent);
  const resetBooking=()=>{setSelectedEvent(null);setSelectedTier(0);setTierChosen(false);setShowPayment(false);setTicketCount(1);setPaymentMethod("bankak");setReceipt(null);setBookingDone(false);};
@@ -74,12 +42,9 @@ export default function Home(){
  {activeTab==="home"&&<>
  {showWelcome&&<div className="welcome-motion" role="status"><span className="welcome-spark"><Sparkles size={19}/></span><div><strong>أهلاً بيك في حاضر</strong><p>لحظاتك الحلوة بتبدأ من هنا</p></div><span className="welcome-orbit">✦</span></div>}
  <section className="home-discovery" id="events"><div className="container">
- <label className="search-box home-search"><Search size={19}/><input name="event-search" autoComplete="off" value={search} onChange={e=>setSearch(e.target.value)} placeholder="ابحث عن فعالية أو مدينة..." aria-label="ابحث عن فعالية أو مدينة"/></label>
-  {!search.trim()?<section className="trending-section"><div className="section-head compact-head trending-head"><h2>رائج الآن<span className="trending-dot" aria-hidden="true"/></h2></div>
-  {eventsLoading?<div className="empty-state"><strong>جاري تحميل الفعاليات...</strong></div>:eventsError?<div className="empty-state" role="alert"><strong>ما قدرنا نحمّل الفعاليات</strong><p>{eventsError}</p><button className="btn btn-outline" onClick={()=>window.location.reload()}>إعادة المحاولة</button></div>:visible.some(e=>e.isTrending)?<div className="trending-row" ref={trendingRowRef} onMouseEnter={()=>{trendingPaused.current=true;}} onMouseLeave={()=>{trendingPaused.current=false;}} onTouchStart={()=>{trendingPaused.current=true;}} onTouchEnd={()=>{trendingPaused.current=false;}} onFocusCapture={()=>{trendingPaused.current=true;}} onBlurCapture={()=>{trendingPaused.current=false;}}><div className="trending-track">{[...visible.filter(e=>e.isTrending),...visible.filter(e=>e.isTrending)].map((e,index)=><article className="event-card event-card-clickable trending-card" key={e.id+"-"+index} role="button" tabIndex={0} aria-label={"عرض تفاصيل "+e.title} onClick={()=>openEvent(e.id)} onKeyDown={event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openEvent(e.id);}}}><div className={"event-cover "+e.cover}>{e.coverImageUrl&&<img className="event-cover-image" src={e.coverImageUrl} alt={e.title} loading="lazy"/>}<span className="cover-label">{e.tag}</span>{!e.coverImageUrl&&<span className="cover-symbol">✦</span>}</div><div className="event-body"><div className="event-date"><CalendarDays size={12}/>{e.date}</div><h3 className="event-title">{e.title}</h3><div className="event-meta"><span><MapPin size={12}/>{e.place}</span><span>{e.category}</span></div><div className="event-footer"><div className="event-price">{e.price} <small>{e.price==="مجاناً"?"":"ج.س"}</small></div><span className="text-link">التفاصيل <ArrowLeft size={12}/></span></div></div></article>)}</div></div>:<div className="empty-state"><strong>ما في فعاليات مضافة لرائج الآن</strong><p>اختار مربع «إظهار الفعالية في رائج الآن» من إضافة أو تعديل الفعالية.</p></div>}
-  </section>:null}
-  <section className="more-events">{!search.trim()&&<div className="section-head compact-head more-events-head"><h2>بقية الفعاليات</h2><span>{visible.filter(e=>!e.isTrending).length} فعاليات</span></div>}
- {(search.trim()?visible.length>0:visible.some(e=>!e.isTrending))?<div className={"events-grid"+(search.trim()?" search-results":"")}>{(search.trim()?visible:visible.filter(e=>!e.isTrending)).map(e=><article className="event-card event-card-clickable" key={e.id} role="button" tabIndex={0} aria-label={"عرض تفاصيل "+e.title} onClick={()=>openEvent(e.id)} onKeyDown={event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openEvent(e.id);}}}><div className={"event-cover "+e.cover}>{e.coverImageUrl&&<img className="event-cover-image" src={e.coverImageUrl} alt={e.title} loading="lazy"/>}<span className="cover-label">{e.tag}</span>{!e.coverImageUrl&&<span className="cover-symbol">✦</span>}</div><div className="event-body"><div className="event-date"><CalendarDays size={12}/>{e.date}</div><h3 className="event-title">{e.title}</h3><div className="event-meta"><span><MapPin size={12}/>{e.place}</span><span>{e.category}</span></div><div className="event-footer"><div className="event-price">{e.price} <small>{e.price==="مجاناً"?"":"ج.س"}</small></div><span className="text-link">التفاصيل <ArrowLeft size={12}/></span></div></div></article>)}</div>:visible.length===0&&search.trim()?<div className="empty-state"><strong>ما لقينا فعاليات مطابقة لبحثك</strong><p>جرّب تغيّر عبارة البحث أو امسح البحث عشان تشوف كل الفعاليات.</p><div className="empty-actions"><button className="btn btn-outline" onClick={()=>setSearch("")}>مسح البحث</button><button className="btn btn-primary" onClick={()=>{setCategory("الكل");setSearch("");}}>عرض الكل</button></div></div>:!search.trim()&&visible.length>0?<p className="more-events-note">دي كل الفعاليات المتاحة حالياً.</p>:null}
+ <section className="more-events all-events">
+  <div className="section-head compact-head more-events-head"><h2>كل الفعاليات</h2><span>{events.length} فعاليات</span></div>
+  {eventsLoading?<div className="empty-state"><strong>جاري تحميل الفعاليات...</strong></div>:eventsError?<div className="empty-state" role="alert"><strong>ما قدرنا نحمّل الفعاليات</strong><p>{eventsError}</p><button className="btn btn-outline" onClick={()=>window.location.reload()}>إعادة المحاولة</button></div>:events.length>0?<div className="events-grid">{events.map(e=><article className="event-card event-card-clickable" key={e.id} role="button" tabIndex={0} aria-label={"عرض تفاصيل "+e.title} onClick={()=>openEvent(e.id)} onKeyDown={event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openEvent(e.id);}}}><div className={"event-cover "+e.cover}>{e.coverImageUrl&&<img className="event-cover-image" src={e.coverImageUrl} alt={e.title} loading="lazy"/>}<span className="cover-label">{e.tag}</span>{!e.coverImageUrl&&<span className="cover-symbol">✦</span>}</div><div className="event-body"><div className="event-date"><CalendarDays size={12}/>{e.date}</div><h3 className="event-title">{e.title}</h3><div className="event-meta"><span><MapPin size={12}/>{e.place}</span><span>{e.category}</span></div><div className="event-footer"><div className="event-price">{e.price} <small>{e.price==="مجاناً"?"":"ج.س"}</small></div><span className="text-link">التفاصيل <ArrowLeft size={12}/></span></div></div></article>)}</div>:<div className="empty-state"><strong>ما في فعاليات منشورة حالياً</strong><p>الفعاليات الجديدة حتظهر هنا تلقائياً بعد نشرها.</p></div>}
  </section>
  </div></section>
  </>}
