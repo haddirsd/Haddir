@@ -297,8 +297,9 @@ html[data-theme="dark"] body{background:#15111b;color:#f4edf9}
 .redesign-section-head h2{margin:0;color:var(--fg);font-size:19px;font-weight:800}
 .redesign-title{display:flex;align-items:center;gap:11px}
 .live-pill{padding:5px 11px;border:1px solid #ddd0fa;border-radius:999px;background:#f3edff;color:#6336a0;font-size:10px;font-weight:800}
-.trending-carousel{display:block;overflow:hidden;overscroll-behavior-x:contain;padding:4px 0 17px;direction:ltr}
-.trending-track{display:flex;flex-flow:row nowrap;align-items:stretch;gap:0;width:100%;min-width:100%;animation:none;transform:none;will-change:auto}
+.trending-carousel{display:block;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;touch-action:pan-x;padding:4px 0 17px;direction:ltr;scroll-snap-type:x mandatory;scrollbar-width:none}
+.trending-carousel::-webkit-scrollbar{display:none}
+.trending-track{display:flex;flex-flow:row nowrap;align-items:stretch;gap:0;width:max-content;min-width:max-content;animation:none;transform:none;will-change:auto}
 .trending-group{display:flex;flex:none;flex-wrap:nowrap;align-items:stretch;gap:14px;padding-right:14px;width:max-content}
 @keyframes trending-loop{from{transform:translateX(0)}to{transform:translateX(50%)}}
 .trending-group[aria-hidden="true"]{display:none}
