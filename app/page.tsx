@@ -21,6 +21,33 @@ export default function Home(){
  const [showWelcome,setShowWelcome]=useState(false);
  const trendingRowRef=useRef<HTMLDivElement|null>(null);
  const trendingPaused=useRef(false);
+ const trendingIndex=useRef(0);
+ useEffect(()=>{
+  const row=trendingRowRef.current;
+  if(!row)return;
+  const cards=()=>Array.from(row.querySelectorAll<HTMLElement>(".trending-card"));
+  const first=cards();
+  const total=Math.floor(first.length/2);
+  if(!total)return;
+  trendingIndex.current=0;
+  const centerCard=(index:number)=>{
+   const items=cards();
+   const card=items[index];
+   if(!card)return;
+   row.scrollTo({left:card.offsetLeft-(row.clientWidth-card.clientWidth)/2,behavior:"smooth"});
+  };
+  centerCard(0);
+  const timer=window.setInterval(()=>{
+   if(trendingPaused.current)return;
+   trendingIndex.current+=1;
+   if(trendingIndex.current>=total){
+    trendingIndex.current=0;
+    row.scrollTo({left:0,behavior:"auto"});
+    window.requestAnimationFrame(()=>centerCard(0));
+   }else centerCard(trendingIndex.current);
+  },3700);
+  return()=>window.clearInterval(timer);
+ },[events,category,search,activeTab,selectedEvent]);
  useEffect(()=>{const saved=window.localStorage.getItem("haddir-theme");const prefersDark=window.matchMedia?.("(prefers-color-scheme: dark)").matches;setDarkMode(saved?saved==="dark":!!prefersDark);},[]);
  useEffect(()=>{document.documentElement.dataset.theme=darkMode?"dark":"light";document.documentElement.style.colorScheme=darkMode?"dark":"light";window.localStorage.setItem("haddir-theme",darkMode?"dark":"light");},[darkMode]);
  useEffect(()=>{const key="haddir-welcome-seen";if(!sessionStorage.getItem(key)){setShowWelcome(true);sessionStorage.setItem(key,"1");const timer=window.setTimeout(()=>setShowWelcome(false),3600);return()=>window.clearTimeout(timer);}},[]);
