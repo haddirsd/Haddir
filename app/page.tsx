@@ -35,11 +35,12 @@ export default function Home(){
   const timer=window.setInterval(()=>{
    if(paused||document.hidden||window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
    const current=cards.reduce((best,card,index)=>{
-    const distance=Math.abs(card.offsetLeft-carousel.offsetLeft-carousel.scrollLeft);
+    const distance=Math.abs(card.getBoundingClientRect().left-carousel.getBoundingClientRect().left);
     return distance<best.distance?{index,distance}:best;
    },{index:0,distance:Number.POSITIVE_INFINITY}).index;
    const next=(current+1)%cards.length;
-   carousel.scrollTo({left:cards[next].offsetLeft-carousel.offsetLeft,behavior:"smooth"});
+   const delta=cards[next].getBoundingClientRect().left-carousel.getBoundingClientRect().left;
+   carousel.scrollTo({left:carousel.scrollLeft+delta,behavior:"smooth"});
   },4000);
   return()=>{
    window.clearInterval(timer);
