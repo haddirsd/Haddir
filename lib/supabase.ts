@@ -11,3 +11,5 @@ export function getSupabaseBrowserClient() {
   });
   return browserClient;
 }
+
+// Rebuild production with the latest Supabase public environment configuration.
