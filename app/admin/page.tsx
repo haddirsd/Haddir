@@ -24,6 +24,10 @@ export default function AdminPage() {
   const [rows, setRows] = useState<Row[]>([]);
   const [counts, setCounts] = useState({ events: 0, bookings: 0, pending: 0, users: 0, confirmed: 0, revenue: 0 });
   const [dataReady, setDataReady] = useState(false);
+  const [showEventForm, setShowEventForm] = useState(false);
+  const [savingEvent, setSavingEvent] = useState(false);
+  const [eventMessage, setEventMessage] = useState("");
+  const [eventForm, setEventForm] = useState({title:"",description:"",category:"",city:"",venue:"",address:"",starts_at:"",ends_at:"",cover_image_url:"",ticket_name:"تذكرة عامة",price:"",quantity_total:""});
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
@@ -76,6 +80,37 @@ export default function AdminPage() {
 
   useEffect(() => { void loadSection(); }, [section, role]);
 
+  const createEvent = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase || !role || !["owner","admin"].includes(role)) return;
+    setSavingEvent(true); setEventMessage("");
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setEventMessage("انتهت الجلسة، سجل الدخول مرة أخرى."); setSavingEvent(false); return; }
+    const slug = eventForm.title.trim().toLowerCase().normalize("NFKD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9\\u0600-\\u06ff]+/g,"-").replace(/^-|-$/g,"") + "-" + Math.random().toString(36).slice(2,7);
+    const { data: event, error: eventError } = await supabase.from("events").insert({
+      title:eventForm.title.trim(), slug, description:eventForm.description.trim() || null,
+      category:eventForm.category.trim() || null, city:eventForm.city.trim() || null,
+      venue:eventForm.venue.trim() || null, address:eventForm.address.trim() || null,
+      starts_at:new Date(eventForm.starts_at).toISOString(),
+      ends_at:eventForm.ends_at ? new Date(eventForm.ends_at).toISOString() : null,
+      cover_image_url:eventForm.cover_image_url.trim() || null, status:"draft", created_by:user.id
+    }).select("id").single();
+    if (eventError || !event) { setEventMessage("تعذر إنشاء الفعالية: " + (eventError?.message || "خطأ غير معروف")); setSavingEvent(false); return; }
+    const { error: ticketError } = await supabase.from("ticket_types").insert({
+      event_id:event.id, name:eventForm.ticket_name.trim(), price:Number(eventForm.price),
+      currency:"SDG", quantity_total:Number(eventForm.quantity_total), quantity_sold:0, is_active:true
+    });
+    if (ticketError) {
+      await supabase.from("events").delete().eq("id",event.id);
+      setEventMessage("لم يتم حفظ نوع التذكرة، وتم التراجع عن إنشاء الفعالية: " + ticketError.message);
+      setSavingEvent(false); return;
+    }
+    setEventMessage("تم إنشاء الفعالية ونوع التذكرة كمسودة بنجاح.");
+    setEventForm({title:"",description:"",category:"",city:"",venue:"",address:"",starts_at:"",ends_at:"",cover_image_url:"",ticket_name:"تذكرة عامة",price:"",quantity_total:""});
+    setShowEventForm(false); setSavingEvent(false); await loadSection();
+  };
+
   const signOut = async () => { const supabase = getSupabaseBrowserClient(); if (supabase) await supabase.auth.signOut(); router.replace("/"); };
 
   if (loading) return <main className="admin-loading" dir="rtl"><div className="admin-spinner"/><p>جاري التحقق من صلاحياتك...</p></main>;
@@ -118,7 +153,7 @@ export default function AdminPage() {
         <div className="admin-welcome"><div><span className="admin-eyebrow">لوحة التحكم</span><h2>مرحباً، {name}</h2><p>{supervisor?"راجع الحجوزات وإثباتات التحويل.":"تابع أداء منصة حاضر وأدر عملياتها من مكان واحد."}</p></div><div className="admin-welcome-mark"><LayoutDashboard size={30}/></div></div>
         {error&&<div className="admin-notice" role="status">{error}</div>}
         {section==="overview"&&<><div className="admin-metric-grid">{metrics.map(m=><article className="admin-metric" key={m.title}><span><m.icon size={20}/></span><small>{m.title}</small><strong>{dataReady?m.value.toLocaleString("ar-SD"):"—"}</strong></article>)}</div><div className="admin-panel"><div className="admin-panel-head"><div><h3>{supervisor?"المهام اليومية":"نظرة سريعة"}</h3><p>بيانات مباشرة من قاعدة بيانات حاضر</p></div></div><div className="admin-shortcuts">{(supervisor?["bookings","payments"] as Section[]:["events","bookings","payments","users","reports"] as Section[]).map(item=><button key={item} onClick={()=>setSection(item)}><span>{item==="events"?<CalendarDays/>:item==="bookings"?<Ticket/>:item==="payments"?<Wallet/>:item==="users"?<Users/>:<Activity/>}</span><b>{labels[item]}</b><ArrowRight size={16}/></button>)}</div></div></>}
-        {section!=="overview"&&<div className="admin-panel"><div className="admin-panel-head"><div><h3>{labels[section]}</h3><p>السجلات الفعلية المحفوظة في قاعدة البيانات</p></div><button className="admin-refresh" onClick={()=>void loadSection()} disabled={sectionLoading}><RefreshCw size={16}/> تحديث</button></div>{sectionLoading?<p className="admin-no-data">جاري تحميل البيانات...</p>:renderRows()}</div>}
+        {section!=="overview"&&<div className="admin-panel"><div className="admin-panel-head"><div><h3>{labels[section]}</h3><p>السجلات الفعلية المحفوظة في قاعدة البيانات</p></div><div className="admin-panel-actions">{section==="events"&&(role==="owner"||role==="admin")&&<button className="admin-create-button" onClick={()=>{setShowEventForm(v=>!v);setEventMessage("");}}>{showEventForm?"إغلاق":"＋ إضافة فعالية"}</button>}<button className="admin-refresh" onClick={()=>void loadSection()} disabled={sectionLoading}><RefreshCw size={16}/> تحديث</button></div></div>{section==="events"&&showEventForm&&<form className="admin-event-form" onSubmit={createEvent}><h3>بيانات الفعالية</h3><div className="admin-form-grid"><label>اسم الفعالية *<input required value={eventForm.title} onChange={e=>setEventForm({...eventForm,title:e.target.value})}/></label><label>التصنيف<input value={eventForm.category} onChange={e=>setEventForm({...eventForm,category:e.target.value})} placeholder="موسيقى، رياضة، مؤتمر..."/></label><label>المدينة<input value={eventForm.city} onChange={e=>setEventForm({...eventForm,city:e.target.value})}/></label><label>المكان<input value={eventForm.venue} onChange={e=>setEventForm({...eventForm,venue:e.target.value})}/></label><label>العنوان التفصيلي<input value={eventForm.address} onChange={e=>setEventForm({...eventForm,address:e.target.value})}/></label><label>رابط صورة الغلاف<input type="url" value={eventForm.cover_image_url} onChange={e=>setEventForm({...eventForm,cover_image_url:e.target.value})}/></label><label>تاريخ ووقت البداية *<input type="datetime-local" required value={eventForm.starts_at} onChange={e=>setEventForm({...eventForm,starts_at:e.target.value})}/></label><label>تاريخ ووقت النهاية<input type="datetime-local" value={eventForm.ends_at} onChange={e=>setEventForm({...eventForm,ends_at:e.target.value})}/></label></div><label className="admin-form-wide">وصف الفعالية<textarea rows={3} value={eventForm.description} onChange={e=>setEventForm({...eventForm,description:e.target.value})}/></label><h3>نوع التذكرة الأول</h3><div className="admin-form-grid"><label>اسم التذكرة *<input required value={eventForm.ticket_name} onChange={e=>setEventForm({...eventForm,ticket_name:e.target.value})}/></label><label>السعر بالجنيه السوداني *<input type="number" min="0" step="0.01" required value={eventForm.price} onChange={e=>setEventForm({...eventForm,price:e.target.value})}/></label><label>الكمية المتاحة *<input type="number" min="1" step="1" required value={eventForm.quantity_total} onChange={e=>setEventForm({...eventForm,quantity_total:e.target.value})}/></label></div><p className="admin-form-hint">سيتم حفظ الفعالية كمسودة، ولن تظهر للجمهور إلا بعد نشرها.</p>{eventMessage&&<p className="admin-form-message" role="status">{eventMessage}</p>}<button className="admin-create-button" type="submit" disabled={savingEvent}>{savingEvent?"جاري الحفظ...":"حفظ الفعالية"}</button></form>}{sectionLoading?<p className="admin-no-data">جاري تحميل البيانات...</p>:renderRows()}</div>}
         <footer className="admin-footer">حاضر · نظام إدارة الفعاليات والتذاكر <span>{roleLabel}</span></footer>
       </div>
     </section>
