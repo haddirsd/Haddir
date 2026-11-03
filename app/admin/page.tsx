@@ -38,6 +38,8 @@ export default function AdminPage() {
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState("");
   const [rejectionReasons,setRejectionReasons]=useState<Record<string,string>>({});
+  const [updatingUserId,setUpdatingUserId]=useState<string|null>(null);
+  const [userMessage,setUserMessage]=useState("");
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
@@ -129,6 +131,22 @@ export default function AdminPage() {
     setRejectionReasons(v=>{const next={...v};delete next[row.id];return next;});
     setEventMessage(decision==="approve"?("تم اعتماد الدفع وإصدار "+Number(data?.tickets_created||0)+" تذكرة."):"تم رفض إثبات الدفع وإرسال السبب للعميل.");
     await loadSection();
+  };
+
+  const updateUserRole = async (userRow:Row, nextRole:string) => {
+    const supabase=getSupabaseBrowserClient();
+    if(!supabase||!role||!["owner","admin"].includes(role)||updatingUserId)return;
+    if(["owner","admin"].includes(userRow.role)){setError("لا يمكن تغيير صلاحية مالك المنصة أو مدير الإدارة من هذه الشاشة.");return;}
+    if(!["supervisor","organizer","gatekeeper","advertiser","customer"].includes(nextRole))return;
+    const {data:{user}}=await supabase.auth.getUser();
+    if(user?.id===userRow.id){setError("لا يمكنك تغيير دور حسابك الحالي من هنا.");return;}
+    if(!window.confirm("تأكيد تغيير دور "+(userRow.full_name||"هذا المستخدم")+"؟"))return;
+    setUpdatingUserId(userRow.id);setError("");setUserMessage("");
+    const {error:updateError}=await supabase.rpc("admin_update_profile_role",{p_user_id:userRow.id,p_role:nextRole});
+    setUpdatingUserId(null);
+    if(updateError){setError("تعذر تعديل دور المستخدم: "+updateError.message);return;}
+    setRows(current=>current.map(item=>item.id===userRow.id?{...item,role:nextRole}:item));
+    setUserMessage("تم تحديث دور المستخدم بنجاح.");
   };
 
   const deleteEvent = async (r:Row) => {
@@ -271,6 +289,25 @@ export default function AdminPage() {
       users:[{key:"full_name",label:"الاسم"},{key:"phone",label:"الهاتف"},{key:"role",label:"الدور"},{key:"created_at",label:"تاريخ التسجيل",format:r=>new Date(r.created_at).toLocaleDateString("ar-SD")}]
     };
     const cols=columns[section]||[];
+    if(section==="users"){
+      const roleNames:Record<string,string>={owner:"مالك المنصة",admin:"مدير الإدارة",supervisor:"مشرف",organizer:"منظم",gatekeeper:"بواب",advertiser:"مُعلن",customer:"عميل عادي"};
+      return <div className="admin-users-table-wrap">
+        <table className="admin-users-table">
+          <thead><tr><th>الإسم</th><th>رقم الهاتف</th><th>الدور</th><th>تاريخ التسجيل</th><th>تعديل الدور</th></tr></thead>
+          <tbody>{rows.map((r,i)=><tr key={r.id||i}>
+            <td data-label="الإسم"><strong>{fmt(r.full_name)}</strong></td>
+            <td data-label="رقم الهاتف"><span dir="ltr">{fmt(r.phone)}</span></td>
+            <td data-label="الدور"><span className="admin-user-role">{roleNames[r.role]||fmt(r.role)}</span></td>
+            <td data-label="تاريخ التسجيل">{r.created_at?new Date(r.created_at).toLocaleDateString("ar-SD"):"—"}</td>
+            <td data-label="تعديل الدور"><select aria-label={"تعديل دور "+(r.full_name||"المستخدم")} value={r.role||"customer"} disabled={updatingUserId===r.id||["owner","admin"].includes(r.role)} onChange={e=>void updateUserRole(r,e.target.value)}>
+              <option value="customer">عميل عادي</option><option value="supervisor">مشرف</option><option value="organizer">منظم</option><option value="gatekeeper">بواب</option><option value="advertiser">مُعلن</option>
+              {!["customer","supervisor","organizer","gatekeeper","advertiser"].includes(r.role)&&<option value={r.role}>{roleNames[r.role]||r.role}</option>}
+            </select>{updatingUserId===r.id&&<small className="admin-user-saving">جاري الحفظ…</small>}</td>
+          </tr>)}</tbody>
+        </table>
+        {rows.length===0&&<p className="admin-no-data">لا يوجد مستخدمون مسجلون حتى الآن.</p>}
+      </div>;
+    }
     if(section==="events"){
       return <div className="admin-event-cards">
         {rows.length===0?<p className="admin-no-data">لا توجد فعاليات حتى الآن. أضف أول فعالية من الزر بالأعلى.</p>:rows.map((r,i)=><article className="admin-event-card" key={r.id||i}>
