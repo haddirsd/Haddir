@@ -107,7 +107,7 @@ export default function AdminPage() {
     setSectionLoading(true); setError(""); setRows([]);
     let result: {data:any[]|null,error:any} = {data:[],error:null};
     if (section === "events") result = await supabase.from("events").select("id,title,category,city,venue,starts_at,status,created_at,is_trending,description,address,location_url,ends_at,cover_image_url").order("created_at",{ascending:false}).limit(100);
-    if (section === "bookings") result = await supabase.from("bookings").select("id,booking_number,customer_name,customer_phone,event_id,subtotal,currency,status,created_at,events(title),payment_submissions(payment_account_name,payment_account_number,transfer_reference,created_at)").order("created_at",{ascending:false}).limit(100);
+    if (section === "bookings") result = await supabase.from("bookings").select("id,booking_number,customer_name,customer_email,customer_phone,event_id,subtotal,currency,status,expires_at,created_at,events(title),booking_items(quantity,unit_price,line_total,ticket_types(name)),payment_submissions(payment_account_name,payment_account_number,transfer_reference,created_at)").order("created_at",{ascending:false}).limit(100);
     if (section === "payments") result = await supabase.from("payment_submissions").select("id,booking_id,transfer_reference,receipt_path,amount,currency,status,review_note,created_at,bookings(booking_number,customer_name,customer_phone,subtotal)").order("created_at",{ascending:false}).limit(100);
     if (section === "users" && role !== "supervisor") result = await supabase.from("profiles").select("id,full_name,phone,role,created_at").order("created_at",{ascending:false}).limit(100);
     if (section === "reports" && role !== "supervisor") result = await supabase.from("bookings").select("subtotal,currency,status,created_at").order("created_at",{ascending:false}).limit(500);
@@ -125,6 +125,17 @@ export default function AdminPage() {
   };
 
   useEffect(() => { void loadSection(); }, [section, role]);
+
+  useEffect(() => {
+    const supabase=getSupabaseBrowserClient();
+    if(!supabase||section!=="bookings"||!role)return;
+    const channel=supabase.channel("admin-live-bookings")
+      .on("postgres_changes",{event:"*",schema:"public",table:"bookings"},()=>{void loadSection();})
+      .on("postgres_changes",{event:"*",schema:"public",table:"booking_items"},()=>{void loadSection();})
+      .on("postgres_changes",{event:"*",schema:"public",table:"payment_submissions"},()=>{void loadSection();})
+      .subscribe();
+    return()=>{void supabase.removeChannel(channel);};
+  },[section,role]);
 
   const deleteEvent = async (r:Row) => {
     const supabase=getSupabaseBrowserClient();if(!supabase||!role||!["owner","admin"].includes(role))return;
@@ -247,7 +258,7 @@ export default function AdminPage() {
     }
     const columns: Record<string,{key:string,label:string,format?:(r:Row)=>string}[]> = {
       events:[{key:"title",label:"الفعالية"},{key:"category",label:"التصنيف"},{key:"city",label:"المدينة"},{key:"venue",label:"الموقع"},{key:"starts_at",label:"الموعد",format:r=>r.starts_at?new Date(r.starts_at).toLocaleString("ar-SD"):"—"},{key:"status",label:"الحالة",format:r=>statusLabels[r.status]||fmt(r.status)}],
-      bookings:[{key:"booking_number",label:"رقم الحجز"},{key:"event",label:"الفعالية",format:r=>r.events?.title||"—"},{key:"customer_name",label:"الزبون"},{key:"customer_phone",label:"الهاتف"},{key:"subtotal",label:"المبلغ",format:r=>money(r.subtotal,r.currency)},{key:"payment_account",label:"حساب التحويل",format:r=>{const p=(r.payment_submissions||[]).find((x:any)=>x.payment_account_name||x.payment_account_number);return p?`${p.payment_account_name||"—"} — ${p.payment_account_number||"—"}`:"لم يُرسل إثبات دفع بعد";}},{key:"transfer_reference",label:"مرجع التحويل",format:r=>(r.payment_submissions||[]).find((x:any)=>x.transfer_reference)?.transfer_reference||"—"},{key:"status",label:"الحالة",format:r=>statusLabels[r.status]||fmt(r.status)},{key:"created_at",label:"التاريخ",format:r=>new Date(r.created_at).toLocaleDateString("ar-SD")}],
+      bookings:[{key:"booking_number",label:"رقم الحجز"},{key:"event",label:"الفعالية",format:r=>r.events?.title||"—"},{key:"ticket",label:"التذكرة / العدد",format:r=>(r.booking_items||[]).map((x:any)=>`${x.ticket_types?.name||"تذكرة"} × ${x.quantity}`).join("، ")||"—"},{key:"customer_name",label:"الزبون"},{key:"customer_phone",label:"الهاتف"},{key:"subtotal",label:"المبلغ",format:r=>money(r.subtotal,r.currency)},{key:"payment_account",label:"حساب التحويل",format:r=>{const p=(r.payment_submissions||[]).find((x:any)=>x.payment_account_name||x.payment_account_number);return p?`${p.payment_account_name||"—"} — ${p.payment_account_number||"—"}`:"لم يُرسل إثبات دفع بعد";}},{key:"transfer_reference",label:"مرجع التحويل",format:r=>(r.payment_submissions||[]).find((x:any)=>x.transfer_reference)?.transfer_reference||"—"},{key:"status",label:"الحالة",format:r=>statusLabels[r.status]||fmt(r.status)},{key:"created_at",label:"التاريخ",format:r=>new Date(r.created_at).toLocaleDateString("ar-SD")}],
       payments:[{key:"booking",label:"الحجز",format:r=>r.bookings?.booking_number||r.booking_id},{key:"customer",label:"الزبون",format:r=>r.bookings?.customer_name||"—"},{key:"transfer_reference",label:"مرجع التحويل"},{key:"receipt_url",label:"الإيصال",format:r=>r.receipt_url?"متاح":"—"},{key:"amount",label:"المبلغ",format:r=>money(r.amount,r.currency)},{key:"status",label:"الحالة",format:r=>statusLabels[r.status]||fmt(r.status)},{key:"review_note",label:"ملاحظة المراجعة"},{key:"created_at",label:"التاريخ",format:r=>new Date(r.created_at).toLocaleDateString("ar-SD")}],
       users:[{key:"full_name",label:"الاسم"},{key:"phone",label:"الهاتف"},{key:"role",label:"الدور"},{key:"created_at",label:"تاريخ التسجيل",format:r=>new Date(r.created_at).toLocaleDateString("ar-SD")}]
     };
