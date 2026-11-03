@@ -39,6 +39,7 @@ export default function AdminPage() {
   const [coverPreview, setCoverPreview] = useState("");
   const [rejectionReasons,setRejectionReasons]=useState<Record<string,string>>({});
   const [updatingUserId,setUpdatingUserId]=useState<string|null>(null);
+  const [userMessage,setUserMessage]=useState("");
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
@@ -140,12 +141,12 @@ export default function AdminPage() {
     const {data:{user}}=await supabase.auth.getUser();
     if(user?.id===userRow.id){setError("لا يمكنك تغيير دور حسابك الحالي من هنا.");return;}
     if(!window.confirm("تأكيد تغيير دور "+(userRow.full_name||"هذا المستخدم")+"؟"))return;
-    setUpdatingUserId(userRow.id);setError("");
+    setUpdatingUserId(userRow.id);setError("");setUserMessage("");
     const {error:updateError}=await supabase.from("profiles").update({role:nextRole}).eq("id",userRow.id).not("role","in","(owner,admin)");
     setUpdatingUserId(null);
     if(updateError){setError("تعذر تعديل دور المستخدم: "+updateError.message);return;}
     setRows(current=>current.map(item=>item.id===userRow.id?{...item,role:nextRole}:item));
-    setEventMessage("تم تحديث دور المستخدم بنجاح.");
+    setUserMessage("تم تحديث دور المستخدم بنجاح.");
   };
 
   const deleteEvent = async (r:Row) => {
