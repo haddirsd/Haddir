@@ -33,6 +33,8 @@ export default function AdminPage() {
   type TicketForm = {id?:string;name:string;description:string;price:string;currency:string;quantity_total:string;quantity_sold:number;sales_start_at:string;sales_end_at:string;is_active:boolean};
   const emptyTicket = ():TicketForm => ({name:"تذكرة عامة",description:"",price:"",currency:"SDG",quantity_total:"",quantity_sold:0,sales_start_at:"",sales_end_at:"",is_active:true});
   const [ticketForms,setTicketForms] = useState<TicketForm[]>([emptyTicket()]);
+  type EventAccountForm={id?:string;account_name:string;account_number:string;is_active:boolean;sort_order:number};
+  const [eventAccountForms,setEventAccountForms]=useState<EventAccountForm[]>([]);
   const [eventForm, setEventForm] = useState(emptyEventForm);
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState("");
