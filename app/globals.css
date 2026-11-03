@@ -292,7 +292,7 @@ html[data-theme="dark"] body{background:#15111b;color:#f4edf9}
 
 /* Seamless endless trending carousel */
 .trending-row{display:block;overflow:hidden;direction:ltr;padding:3px 2px 17px;mask-image:linear-gradient(to right,transparent,black 2%,black 98%,transparent)}
-.trending-track{display:flex;flex-direction:row;align-items:stretch;gap:16px;width:max-content;animation:haddir-trending-loop 32s linear infinite}
+.trending-track{display:flex;flex-direction:row;align-items:stretch;gap:16px;width:max-content;animation:haddir-trending-loop 25s linear infinite}
 .trending-row:hover .trending-track,.trending-row:focus-within .trending-track{animation-play-state:paused}
 .trending-card{flex:0 0 min(40vw,360px);width:min(40vw,360px);direction:rtl}
 @keyframes haddir-trending-loop{from{transform:translateX(0)}to{transform:translateX(-50%)}}
