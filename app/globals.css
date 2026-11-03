@@ -926,3 +926,23 @@ body{font-size:16px}
 .theme-dark .admin-event-card-actions{border-color:var(--line)}
 @media(max-width:520px){.admin-event-cards{grid-template-columns:1fr}.admin-event-card{padding:16px}.admin-event-card-meta{grid-template-columns:1fr 1fr}.admin-event-card-actions button{flex:1}}
 @media(max-width:360px){.admin-event-card-meta{grid-template-columns:1fr}}
+
+
+/* Admin bookings card layout */
+.admin-booking-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:14px;padding-top:8px}
+.admin-booking-card{min-width:0;padding:18px;border:1px solid #e9e1ef;border-radius:17px;background:#fff;box-shadow:0 5px 18px #2f164908}
+.admin-booking-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:13px;border-bottom:1px solid #f0eaf3}
+.admin-booking-card-head>div{min-width:0}
+.admin-booking-card-head small,.admin-booking-card-grid small{display:block;margin-bottom:5px;color:#887d90;font-size:10px;font-weight:600}
+.admin-booking-card-head h4{margin:0;color:#30213b;font-size:16px;font-weight:900;overflow-wrap:anywhere}
+.admin-booking-card-event{display:flex;align-items:center;gap:9px;margin:14px 0;padding:11px 12px;border-radius:12px;background:#f7f3fa;color:#5d367d}
+.admin-booking-card-event strong{min-width:0;font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+.admin-booking-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 12px}
+.admin-booking-card-grid>div{min-width:0}
+.admin-booking-card-grid strong{display:block;color:#44364e;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.theme-dark .admin-booking-card{background:var(--surface);border-color:var(--line);box-shadow:none}
+.theme-dark .admin-booking-card-head{border-color:var(--line)}
+.theme-dark .admin-booking-card-head h4,.theme-dark .admin-booking-card-grid strong{color:var(--fg)}
+.theme-dark .admin-booking-card-event{background:var(--bg);color:var(--fg)}
+@media(max-width:520px){.admin-booking-cards{grid-template-columns:1fr}.admin-booking-card{padding:15px}.admin-booking-card-grid{gap:12px 9px}}
+@media(max-width:350px){.admin-booking-card-grid{grid-template-columns:1fr}}
