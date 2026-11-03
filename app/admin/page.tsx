@@ -41,6 +41,7 @@ export default function AdminPage() {
   const [paymentMethodRows,setPaymentMethodRows]=useState<PaymentMethodRow[]>([]);
   const [paymentMethodMessage,setPaymentMethodMessage]=useState("");
   const [paymentMethodSaving,setPaymentMethodSaving]=useState(false);
+  const [rejectionReasons,setRejectionReasons]=useState<Record<string,string>>({});
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
@@ -139,13 +140,14 @@ export default function AdminPage() {
 
   const reviewPayment=async(row:Row,decision:"approve"|"reject")=>{
     const supabase=getSupabaseBrowserClient();if(!supabase||!role)return;
-    const reason=decision==="reject"?window.prompt("اكتب سبب رفض إثبات الدفع ليظهر للعميل في الإشعارات:",""):null;
-    if(decision==="reject"&&!reason?.trim())return;
+    const reason=decision==="reject"?(rejectionReasons[row.id]||"").trim():null;
+    if(decision==="reject"&&!reason){setError("اكتب سبب الرفض أولاً حتى نرسله للعميل.");return;}
     if(decision==="approve"&&!window.confirm("تأكيد قبول الدفع وإصدار تذاكر برموز دخول من 10 أرقام؟"))return;
     setSectionLoading(true);setError("");
-    const {data,error}=await supabase.rpc("review_payment_submission",{p_submission_id:row.id,p_decision:decision,p_rejection_reason:reason?.trim()||null});
+    const {data,error}=await supabase.rpc("review_payment_submission",{p_submission_id:row.id,p_decision:decision,p_rejection_reason:reason||null});
     setSectionLoading(false);
     if(error){setError("تعذرت مراجعة إثبات الدفع: "+error.message);return;}
+    setRejectionReasons(v=>{const next={...v};delete next[row.id];return next;});
     setEventMessage(decision==="approve"?("تم اعتماد الدفع وإصدار "+Number(data?.tickets_created||0)+" تذكرة."):"تم رفض إثبات الدفع وإرسال السبب للعميل.");
     await loadSection();
   };
@@ -292,6 +294,35 @@ export default function AdminPage() {
         </article>)}
       </div>;
     }
+    if(section==="payments"){
+      return <div className="admin-payment-cards">
+        {rows.length===0?<p className="admin-no-data">لا توجد إثباتات دفع حتى الآن.</p>:rows.map((r,i)=>{
+          const pending=r.status==="submitted";
+          return <article className="admin-payment-card" key={r.id||i}>
+            <div className="admin-payment-card-head">
+              <div><small>رقم الحجز</small><h4>{r.bookings?.booking_number||"—"}</h4></div>
+              <span className={"admin-event-status status-"+(r.status||"submitted")}>{statusLabels[r.status]||fmt(r.status)}</span>
+            </div>
+            <div className="admin-payment-card-grid">
+              <div><small>العميل</small><strong>{fmt(r.bookings?.customer_name)}</strong></div>
+              <div><small>رقم الهاتف</small><strong dir="ltr">{fmt(r.bookings?.customer_phone)}</strong></div>
+              <div><small>المبلغ المحوّل</small><strong>{money(r.amount,r.currency)}</strong></div>
+              <div><small>مرجع التحويل</small><strong>{fmt(r.transfer_reference)}</strong></div>
+              <div><small>تاريخ الإرسال</small><strong>{r.created_at?new Date(r.created_at).toLocaleString("ar-SD"):"—"}</strong></div>
+              <div><small>الإيصال</small>{r.receipt_url?<a className="admin-payment-receipt" href={r.receipt_url} target="_blank" rel="noreferrer">عرض إيصال التحويل</a>:<strong>غير مرفق</strong>}</div>
+              {r.review_note&&<div className="admin-payment-note"><small>ملاحظة المراجعة</small><strong>{r.review_note}</strong></div>}
+            </div>
+            {pending&&<div className="admin-payment-actions">
+              <button className="admin-payment-approve" type="button" disabled={sectionLoading||!r.receipt_url} onClick={()=>void reviewPayment(r,"approve")}>قبول الدفع وإصدار التذاكر</button>
+              <div className="admin-payment-reject-box">
+                <label>سبب الرفض (سيصل للعميل)<textarea rows={2} value={rejectionReasons[r.id]||""} onChange={e=>setRejectionReasons(v=>({...v,[r.id]:e.target.value}))} placeholder="مثلاً: صورة الإيصال غير واضحة أو المبلغ غير مطابق..."/></label>
+                <button className="admin-payment-reject" type="button" disabled={sectionLoading||!(rejectionReasons[r.id]||"").trim()} onClick={()=>void reviewPayment(r,"reject")}>رفض وإرسال السبب</button>
+              </div>
+            </div>}
+          </article>;
+        })}
+      </div>;
+    }
     if(section==="bookings"){
       return <div className="admin-booking-cards">
         {rows.length===0?<p className="admin-no-data">لا توجد حجوزات حتى الآن.</p>:rows.map((r,i)=>{
@@ -317,7 +348,7 @@ export default function AdminPage() {
         })}
       </div>;
     }
-    return <div className="admin-table-wrap"><table className="admin-data-table"><thead><tr>{cols.map(c=><th key={c.key}>{c.label}</th>)}{section==="payments"&&<th>قرار المراجعة</th>}</tr></thead><tbody>{rows.map((r,i)=><tr key={r.id||i}>{cols.map(c=><td key={c.key}>{section==="payments"&&c.key==="receipt_url"&&r.receipt_url?<a className="admin-create-button" href={r.receipt_url} target="_blank" rel="noreferrer">عرض الإيصال</a>:c.format?c.format(r):fmt(r[c.key])}</td>)}{section==="payments"&&<td>{r.status==="submitted"?<><button className="admin-create-button" type="button" disabled={sectionLoading||!r.receipt_url} onClick={()=>void reviewPayment(r,"approve")}>قبول وإصدار التذاكر</button> <button className="admin-delete-button" type="button" disabled={sectionLoading} onClick={()=>void reviewPayment(r,"reject")}>رفض</button></>:<span>{statusLabels[r.status]||fmt(r.status)}</span>}</td>}</tr>)}</tbody></table>{rows.length===0&&<p className="admin-no-data">لا توجد سجلات حتى الآن.</p>}</div>;
+    return <div className="admin-table-wrap"><table className="admin-data-table"><thead><tr>{cols.map(c=><th key={c.key}>{c.label}</th>)}</tr></thead><tbody>{rows.map((r,i)=><tr key={r.id||i}>{cols.map(c=><td key={c.key}>{c.format?c.format(r):fmt(r[c.key])}</td>)}</tr>)}</tbody></table>{rows.length===0&&<p className="admin-no-data">لا توجد سجلات حتى الآن.</p>}</div>;
   };
 
   return <main className="admin-shell" dir="rtl">
