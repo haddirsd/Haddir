@@ -137,6 +137,19 @@ export default function AdminPage() {
     return()=>{void supabase.removeChannel(channel);};
   },[section,role]);
 
+  const reviewPayment=async(row:Row,decision:"approve"|"reject")=>{
+    const supabase=getSupabaseBrowserClient();if(!supabase||!role)return;
+    const reason=decision==="reject"?window.prompt("اكتب سبب رفض إثبات الدفع ليظهر للعميل في الإشعارات:",""):null;
+    if(decision==="reject"&&!reason?.trim())return;
+    if(decision==="approve"&&!window.confirm("تأكيد قبول الدفع وإصدار تذاكر برموز دخول من 10 أرقام؟"))return;
+    setSectionLoading(true);setError("");
+    const {data,error}=await supabase.rpc("review_payment_submission",{p_submission_id:row.id,p_decision:decision,p_rejection_reason:reason?.trim()||null});
+    setSectionLoading(false);
+    if(error){setError("تعذرت مراجعة إثبات الدفع: "+error.message);return;}
+    setEventMessage(decision==="approve"?("تم اعتماد الدفع وإصدار "+Number(data?.tickets_created||0)+" تذكرة."):"تم رفض إثبات الدفع وإرسال السبب للعميل.");
+    await loadSection();
+  };
+
   const deleteEvent = async (r:Row) => {
     const supabase=getSupabaseBrowserClient();if(!supabase||!role||!["owner","admin"].includes(role))return;
     if(!window.confirm("حذف الفعالية «"+r.title+"»؟ إذا كانت مرتبطة بحجوزات أو تذاكر صادرة فسيتم إلغاؤها وإخفاؤها مع الاحتفاظ بالسجلات المالية والتذاكر السابقة."))return;
