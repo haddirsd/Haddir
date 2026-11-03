@@ -13,6 +13,7 @@ const toNumber=(value:string)=>{const digits=value.replace(/[٠-٩]/g,d=>String(
 const formatMoney=(value:number)=>new Intl.NumberFormat("ar-SD").format(value)+" ج.س";
 type Tab="home"|"tickets"|"notifications"|"profile";
 export default function Home(){
+ const [events,setEvents]=useState<EventItem[]>([]);
  const [activeTab,setActiveTab]=useState<Tab>("home"),[category,setCategory]=useState("الكل"),[search,setSearch]=useState(""),[selectedEvent,setSelectedEvent]=useState<string|null>(null),[selectedTier,setSelectedTier]=useState(0),[tierChosen,setTierChosen]=useState(false),[showPayment,setShowPayment]=useState(false),[darkMode,setDarkMode]=useState(false),[loginEmail,setLoginEmail]=useState("");
  const [fullName,setFullName]=useState(""),[email,setEmail]=useState(""),[phone,setPhone]=useState(""),[saved,setSaved]=useState(false),[profileSaving,setProfileSaving]=useState(false);
  const [authUser,setAuthUser]=useState<{id:string;email?:string;user_metadata?:Record<string,unknown>}|null>(null),[userRole,setUserRole]=useState("customer"),[authMessage,setAuthMessage]=useState(""),[activeWorkspace,setActiveWorkspace]=useState<"customer"|"organizer"|"gatekeeper"|"advertiser"|"admin"|"owner"|null>(null);
