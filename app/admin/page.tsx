@@ -336,6 +336,7 @@ export default function AdminPage() {
             <div className="admin-booking-card-event"><Ticket size={17}/><strong>{r.events?.title||"فعالية غير محددة"}</strong></div>
             <div className="admin-booking-card-grid">
               <div><small>العميل</small><strong>{fmt(r.customer_name)}</strong></div>
+              <div><small>البريد الإلكتروني</small><strong>{fmt(r.customer_email)}</strong></div>
               <div><small>رقم الهاتف</small><strong dir="ltr">{fmt(r.customer_phone)}</strong></div>
               <div><small>التذاكر</small><strong>{items}</strong></div>
               <div><small>إجمالي المبلغ</small><strong>{money(r.subtotal,r.currency)}</strong></div>
