@@ -35,7 +35,7 @@ export default function Home(){
   };
   void loadAccountData();
   const table=activeTab==="tickets"?"tickets":"notifications";
-  const channel=supabase.channel("customer-"+table+"-"+authUser.id).on("postgres_changes",{event:"*",schema:"public",table,filter:"user_id=eq."+authUser.id},()=>{void loadAccountData();}).subscribe();
+  const channel=supabase.channel("customer-"+table+"-"+authUser.id).on("postgres_changes",{event:"*",schema:"public",table,...(table==="notifications"?{filter:"user_id=eq."+authUser.id}:{})},()=>{void loadAccountData();}).subscribe();
   return()=>{alive=false;void supabase.removeChannel(channel);};
  },[authUser,activeTab]);
  useEffect(()=>{const saved=window.localStorage.getItem("haddir-theme");const prefersDark=window.matchMedia?.("(prefers-color-scheme: dark)").matches;setDarkMode(saved?saved==="dark":!!prefersDark);},[]);
