@@ -400,3 +400,25 @@ html[data-theme="dark"] body{background:#15111b;color:#f4edf9}
  .detail-dock-summary span{max-width:145px}
 }
 @media(prefers-reduced-motion:reduce){.tier-card{transition:none}}
+
+
+/* Global readability pass: slightly larger typography across customer and admin screens */
+:root{font-size:16px}
+body{font-size:16px}
+:where(.nav,.btn,.bottom-nav button,.desktop-greeting,.screen-heading p,.ticket-tabs,.empty-panel p,.info-strip,.notification-item strong,.notification-item p,.notification-item small,.profile-card strong,.profile-card p,.guest-label,.profile-form label,.profile-form input,.settings-row,.detail-topbar>span,.detail-back,.detail-share,.detail-subtitle,.event-status,.detail-facts small,.detail-facts strong,.map-link,.detail-section>p,.tier-heading span,.tier-note,.tier-name,.tier-card strong,.detail-dock-summary small,.detail-dock-summary span,.pay-button,.payment-screen>p,.payment-summary,.payment-placeholder p,.checkout-form>p,.event-list-top>span,.event-list-top>strong,.event-list-info h3,.event-list-info p,.redesign-section-head>span,.trending-card-copy>div,.admin-sidebar nav button,.admin-side-caption,.admin-mini-profile b,.admin-mini-profile small,.admin-logout,.admin-topbar>div:first-child>span,.admin-top-user,.admin-welcome p,.admin-eyebrow,.admin-notice,.admin-metric small,.admin-panel-head p,.admin-shortcuts button b,.admin-empty-panel p,.admin-empty-panel small,.admin-footer,.admin-create-button,.admin-event-form label,.admin-event-form input,.admin-event-form textarea,.admin-form-hint,.admin-form-message){font-size:1.08em}
+:where(.section-desc,.event-meta,.event-date,.event-price,.text-link,.demo-note,.empty-state,.tab-placeholder p,.tab-placeholder small,.event-modal .event-body p,.demo-warning,.checkout-form label,.checkout-footnote,.account-note,.profile-save-note){font-size:1.08em}
+.screen-heading h1{font-size:35px}
+.screen-heading p{line-height:2}
+.detail-title-row h1{font-size:clamp(29px,5.2vw,41px)}
+.detail-section h2{font-size:20px}
+.admin-topbar h1{font-size:21px}
+.admin-welcome h2{font-size:25px}
+.admin-panel-head h3{font-size:17px}
+@media(max-width:560px){
+ .screen-heading h1{font-size:34px}
+ .detail-title-row h1{font-size:29px}
+ .detail-facts strong{font-size:11px}
+ .detail-facts small{font-size:10px}
+ .admin-topbar h1{font-size:18px}
+ .admin-sidebar nav button{font-size:10px}
+}
