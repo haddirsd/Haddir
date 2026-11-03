@@ -80,6 +80,19 @@ export default function AdminPage() {
 
   useEffect(() => { void loadSection(); }, [section, role]);
 
+  const publishEvent = async (eventId: string) => {
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase || !role || !["owner","admin"].includes(role)) return;
+    const confirmed = window.confirm("هل تريد نشر هذه الفعالية الآن؟ ستصبح ظاهرة للزوار.");
+    if (!confirmed) return;
+    setSectionLoading(true);
+    const { error } = await supabase.from("events").update({ status: "published" }).eq("id", eventId).eq("status", "draft");
+    setSectionLoading(false);
+    if (error) { setError("تعذر نشر الفعالية: " + error.message); return; }
+    setEventMessage("تم إرسال طلب النشر بنجاح.");
+    await loadSection();
+  };
+
   const createEvent = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const supabase = getSupabaseBrowserClient();
@@ -137,7 +150,7 @@ export default function AdminPage() {
       users:[{key:"full_name",label:"الاسم"},{key:"phone",label:"الهاتف"},{key:"role",label:"الدور"},{key:"created_at",label:"تاريخ التسجيل",format:r=>new Date(r.created_at).toLocaleDateString("ar-SD")}]
     };
     const cols=columns[section]||[];
-    return <div className="admin-table-wrap"><table className="admin-data-table"><thead><tr>{cols.map(c=><th key={c.key}>{c.label}</th>)}</tr></thead><tbody>{rows.map((r,i)=><tr key={r.id||i}>{cols.map(c=><td key={c.key}>{c.format?c.format(r):fmt(r[c.key])}{section==="payments"&&c.key==="transfer_reference"&&r.receipt_path?<small className="admin-table-sub"> · إيصال: {r.receipt_path}</small>:null}</td>)}</tr>)}</tbody></table>{rows.length===0&&<p className="admin-no-data">لا توجد سجلات حتى الآن.</p>}</div>;
+    return <div className="admin-table-wrap"><table className="admin-data-table"><thead><tr>{cols.map(c=><th key={c.key}>{c.label}</th>)}{section==="events"&&(role==="owner"||role==="admin")&&<th>الإجراء</th>}</tr></thead><tbody>{rows.map((r,i)=><tr key={r.id||i}>{cols.map(c=><td key={c.key}>{c.format?c.format(r):fmt(r[c.key])}{section==="payments"&&c.key==="transfer_reference"&&r.receipt_path?<small className="admin-table-sub"> · إيصال: {r.receipt_path}</small>:null}</td>)}{section==="events"&&(role==="owner"||role==="admin")&&<td>{r.status==="draft"?<button className="admin-create-button" type="button" disabled={sectionLoading} onClick={()=>void publishEvent(r.id)}>نشر الفعالية</button>:r.status==="published"?<span>منشورة</span>:<span>—</span>}</td>}</tr>)}</tbody></table>{rows.length===0&&<p className="admin-no-data">لا توجد سجلات حتى الآن.</p>}</div>;
   };
 
   return <main className="admin-shell" dir="rtl">
