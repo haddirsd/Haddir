@@ -142,7 +142,7 @@ export default function AdminPage() {
     if(user?.id===userRow.id){setError("لا يمكنك تغيير دور حسابك الحالي من هنا.");return;}
     if(!window.confirm("تأكيد تغيير دور "+(userRow.full_name||"هذا المستخدم")+"؟"))return;
     setUpdatingUserId(userRow.id);setError("");setUserMessage("");
-    const {error:updateError}=await supabase.from("profiles").update({role:nextRole}).eq("id",userRow.id).not("role","in","(owner,admin)");
+    const {error:updateError}=await supabase.rpc("admin_update_profile_role",{p_user_id:userRow.id,p_role:nextRole});
     setUpdatingUserId(null);
     if(updateError){setError("تعذر تعديل دور المستخدم: "+updateError.message);return;}
     setRows(current=>current.map(item=>item.id===userRow.id?{...item,role:nextRole}:item));
