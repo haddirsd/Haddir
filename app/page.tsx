@@ -26,25 +26,26 @@ export default function Home(){
   const row=trendingRowRef.current;
   if(!row)return;
   const cards=()=>Array.from(row.querySelectorAll<HTMLElement>(".trending-card"));
-  const first=cards();
-  const total=Math.floor(first.length/2);
+  const total=cards().length;
   if(!total)return;
   trendingIndex.current=0;
-  const centerCard=(index:number)=>{
-   const items=cards();
-   const card=items[index];
+  const centerCard=(index:number,behavior:ScrollBehavior="smooth")=>{
+   const card=cards()[index];
    if(!card)return;
-   row.scrollTo({left:card.offsetLeft-(row.clientWidth-card.clientWidth)/2,behavior:"smooth"});
+   row.scrollTo({left:card.offsetLeft-(row.clientWidth-card.clientWidth)/2,behavior});
   };
-  centerCard(0);
+  centerCard(0,"auto");
   const timer=window.setInterval(()=>{
    if(trendingPaused.current)return;
-   trendingIndex.current+=1;
-   if(trendingIndex.current>=total){
+   const next=trendingIndex.current+1;
+   if(next>=total){
+    // انتهت النسخة المكررة؛ ارجع لنفس البطاقة الأولى دون حركة عكسية.
     trendingIndex.current=0;
-    row.scrollTo({left:0,behavior:"auto"});
-    window.requestAnimationFrame(()=>centerCard(0));
-   }else centerCard(trendingIndex.current);
+    centerCard(0,"auto");
+   }else{
+    trendingIndex.current=next;
+    centerCard(next);
+   }
   },3700);
   return()=>window.clearInterval(timer);
  },[events,category,search,activeTab,selectedEvent]);
