@@ -18,7 +18,8 @@ export default function Home(){
  const [fullName,setFullName]=useState(""),[email,setEmail]=useState(""),[phone,setPhone]=useState(""),[saved,setSaved]=useState(false),[profileSaving,setProfileSaving]=useState(false);
  const [authUser,setAuthUser]=useState<{id:string;email?:string;user_metadata?:Record<string,unknown>}|null>(null),[userRole,setUserRole]=useState("customer"),[authMessage,setAuthMessage]=useState(""),[activeWorkspace,setActiveWorkspace]=useState<"customer"|"organizer"|"gatekeeper"|"advertiser"|"admin"|"owner"|null>(null);
  const [ticketCount,setTicketCount]=useState(1),[eventPaymentAccounts,setEventPaymentAccounts]=useState<EventPaymentAccount[]>([]),[paymentMethods,setPaymentMethods]=useState<PaymentMethod[]>([]),[paymentMethodsLoading,setPaymentMethodsLoading]=useState(false),[paymentMethod,setPaymentMethod]=useState(""),[receipt,setReceipt]=useState<File|null>(null),[bookingDone,setBookingDone]=useState(false),[bookingId,setBookingId]=useState<string|null>(null),[bookingNumber,setBookingNumber]=useState(""),[bookingError,setBookingError]=useState(""),[bookingSubmitting,setBookingSubmitting]=useState(false);
- const [showWelcome,setShowWelcome]=useState(false);\n const [myTickets,setMyTickets]=useState<any[]>([]),[myNotifications,setMyNotifications]=useState<any[]>([]),[accountDataLoading,setAccountDataLoading]=useState(false),[accountDataError,setAccountDataError]=useState("");
+ const [showWelcome,setShowWelcome]=useState(false);
+ const [myTickets,setMyTickets]=useState<any[]>([]),[myNotifications,setMyNotifications]=useState<any[]>([]),[accountDataLoading,setAccountDataLoading]=useState(false),[accountDataError,setAccountDataError]=useState("");
  const trendingEvents=events.filter(e=>e.isTrending);
  useEffect(()=>{
   const supabase=getSupabaseBrowserClient();if(!supabase||!authUser||(activeTab!=="tickets"&&activeTab!=="notifications"))return;
