@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { getSupabaseBrowserClient } from "../lib/supabase";
 import { QRCodeSVG as QrCodeSVG } from "qrcode.react";
 import { ArrowLeft, Bell, CalendarDays, CheckCircle2, House, MapPin, Settings, Sparkles, Ticket, UserRound, ChevronLeft, Share2, ExternalLink, CreditCard, Download } from "lucide-react";
@@ -19,6 +19,36 @@ export default function Home(){
  const [ticketCount,setTicketCount]=useState(1),[paymentMethod,setPaymentMethod]=useState("bankak"),[receipt,setReceipt]=useState<File|null>(null),[bookingDone,setBookingDone]=useState(false);
  const [showWelcome,setShowWelcome]=useState(false);
  const trendingEvents=events.filter(e=>e.isTrending);
+ useEffect(()=>{
+  if(activeTab!=="home"||trendingEvents.length<2)return;
+  const carousel=document.querySelector<HTMLElement>(".trending-carousel");
+  if(!carousel)return;
+  const cards=Array.from(carousel.querySelectorAll<HTMLElement>(".trending-card"));
+  if(cards.length<2)return;
+  let paused=false;
+  const pause=()=>{paused=true;};
+  const resume=()=>{paused=false;};
+  carousel.addEventListener("pointerenter",pause);
+  carousel.addEventListener("pointerleave",resume);
+  carousel.addEventListener("focusin",pause);
+  carousel.addEventListener("focusout",resume);
+  const timer=window.setInterval(()=>{
+   if(paused||document.hidden||window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+   const current=cards.reduce((best,card,index)=>{
+    const distance=Math.abs(card.offsetLeft-carousel.offsetLeft-carousel.scrollLeft);
+    return distance<best.distance?{index,distance}:best;
+   },{index:0,distance:Number.POSITIVE_INFINITY}).index;
+   const next=(current+1)%cards.length;
+   carousel.scrollTo({left:cards[next].offsetLeft-carousel.offsetLeft,behavior:"smooth"});
+  },4000);
+  return()=>{
+   window.clearInterval(timer);
+   carousel.removeEventListener("pointerenter",pause);
+   carousel.removeEventListener("pointerleave",resume);
+   carousel.removeEventListener("focusin",pause);
+   carousel.removeEventListener("focusout",resume);
+  };
+ },[activeTab,trendingEvents.length]);
  useEffect(()=>{const saved=window.localStorage.getItem("haddir-theme");const prefersDark=window.matchMedia?.("(prefers-color-scheme: dark)").matches;setDarkMode(saved?saved==="dark":!!prefersDark);},[]);
  useEffect(()=>{document.documentElement.dataset.theme=darkMode?"dark":"light";document.documentElement.style.colorScheme=darkMode?"dark":"light";window.localStorage.setItem("haddir-theme",darkMode?"dark":"light");},[darkMode]);
  useEffect(()=>{const key="haddir-welcome-seen";if(!sessionStorage.getItem(key)){setShowWelcome(true);sessionStorage.setItem(key,"1");const timer=window.setTimeout(()=>setShowWelcome(false),3600);return()=>window.clearTimeout(timer);}},[]);
@@ -45,7 +75,7 @@ export default function Home(){
  <section className="home-discovery redesigned-home" id="events"><div className="container">
   {eventsLoading?<div className="empty-state"><strong>جاري تحميل الفعاليات...</strong></div>:eventsError?<div className="empty-state" role="alert"><strong>ما قدرنا نحمّل الفعاليات</strong><p>{eventsError}</p><button className="btn btn-outline" onClick={()=>window.location.reload()}>إعادة المحاولة</button></div>:<>
    <section className="trending-section">
-    <div className="redesign-section-head"><div className="redesign-title"><h2>رائج الآن</h2><span className="trending-dot" aria-hidden="true"/></div></div>
+    <div className="redesign-section-head"><div className="redesign-title"><h2>رائج الآن</h2><span className="trending-dot" aria-hidden="true"/><span className="live-pill">مُباشر</span></div></div>
     {events.some(e=>e.isTrending)?<div className="trending-carousel hide-scrollbar" dir="ltr"><div className="trending-track">{trendingEvents.map(e=><article className="trending-card snap-item" key={e.id} role="button" tabIndex={0} aria-label={"عرض تفاصيل "+e.title} onClick={()=>openEvent(e.id)} onKeyDown={event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openEvent(e.id);}}}><div className={"trending-card-media "+e.cover}>{e.coverImageUrl?<img src={e.coverImageUrl} alt={e.title} loading="lazy"/>:<span className="trending-placeholder">✦</span>}<div className="trending-overlay"/><span className="trending-category">{e.category}</span><span className="trending-price">{e.price}{e.price==="مجاناً"?"":" ج.س"}</span><div className="trending-card-copy"><h3>{e.title}</h3><div><CalendarDays size={14}/><span>{e.date} · {e.time}</span></div><div><MapPin size={14}/><span>{e.venue||e.place}</span></div></div></div></article>)}</div></div>:<div className="empty-state">ما في فعاليات رائجة حالياً.</div>}
    </section>
    <section className="more-events redesigned-more">
