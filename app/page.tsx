@@ -26,7 +26,7 @@ export default function Home(){
   const row=trendingRowRef.current;
   if(!row)return;
   const cards=()=>Array.from(row.querySelectorAll<HTMLElement>(".trending-card"));
-  const total=cards().length;
+  const total=Math.floor(cards().length/2);
   if(!total)return;
   trendingIndex.current=0;
   const centerCard=(index:number,behavior:ScrollBehavior="smooth")=>{
@@ -37,15 +37,15 @@ export default function Home(){
   centerCard(0,"auto");
   const timer=window.setInterval(()=>{
    if(trendingPaused.current)return;
-   const next=trendingIndex.current+1;
-   if(next>=total){
-    // انتهت النسخة المكررة؛ ارجع لنفس البطاقة الأولى دون حركة عكسية.
+   if(trendingIndex.current===total){
+    // نحن على نسخة البطاقة الأولى بعد الثالثة؛ نعيد المؤشر للأصلية
+    // في نفس الموضع بصرياً، ثم نواصل إلى الثانية دون رجوع ظاهر.
     trendingIndex.current=0;
     centerCard(0,"auto");
-   }else{
-    trendingIndex.current=next;
-    centerCard(next);
+    return;
    }
+   trendingIndex.current+=1;
+   centerCard(trendingIndex.current);
   },3700);
   return()=>window.clearInterval(timer);
  },[events,category,search,activeTab,selectedEvent]);
