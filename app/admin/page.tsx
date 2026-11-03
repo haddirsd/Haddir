@@ -292,6 +292,31 @@ export default function AdminPage() {
         </article>)}
       </div>;
     }
+    if(section==="bookings"){
+      return <div className="admin-booking-cards">
+        {rows.length===0?<p className="admin-no-data">لا توجد حجوزات حتى الآن.</p>:rows.map((r,i)=>{
+          const items=(r.booking_items||[]).map((x:any)=>`${x.ticket_types?.name||"تذكرة"} × ${x.quantity}`).join("، ")||"—";
+          const payment=(r.payment_submissions||[]).find((x:any)=>x.payment_account_name||x.payment_account_number||x.transfer_reference);
+          return <article className="admin-booking-card" key={r.id||i}>
+            <div className="admin-booking-card-head">
+              <div><small>رقم الحجز</small><h4>{r.booking_number||"—"}</h4></div>
+              <span className={"admin-event-status status-"+(r.status||"pending_payment")}>{statusLabels[r.status]||fmt(r.status)}</span>
+            </div>
+            <div className="admin-booking-card-event"><Ticket size={17}/><strong>{r.events?.title||"فعالية غير محددة"}</strong></div>
+            <div className="admin-booking-card-grid">
+              <div><small>العميل</small><strong>{fmt(r.customer_name)}</strong></div>
+              <div><small>رقم الهاتف</small><strong dir="ltr">{fmt(r.customer_phone)}</strong></div>
+              <div><small>التذاكر</small><strong>{items}</strong></div>
+              <div><small>إجمالي المبلغ</small><strong>{money(r.subtotal,r.currency)}</strong></div>
+              <div><small>حساب التحويل</small><strong>{payment?`${payment.payment_account_name||"—"} · ${payment.payment_account_number||"—"}`:"لم يُرسل إثبات دفع بعد"}</strong></div>
+              <div><small>مرجع التحويل</small><strong>{payment?.transfer_reference||"—"}</strong></div>
+              <div><small>تاريخ الحجز</small><strong>{r.created_at?new Date(r.created_at).toLocaleString("ar-SD"):"—"}</strong></div>
+              {r.expires_at&&r.status!=="confirmed"&&<div><small>انتهاء الحجز</small><strong>{new Date(r.expires_at).toLocaleString("ar-SD")}</strong></div>}
+            </div>
+          </article>;
+        })}
+      </div>;
+    }
     return <div className="admin-table-wrap"><table className="admin-data-table"><thead><tr>{cols.map(c=><th key={c.key}>{c.label}</th>)}{section==="payments"&&<th>قرار المراجعة</th>}</tr></thead><tbody>{rows.map((r,i)=><tr key={r.id||i}>{cols.map(c=><td key={c.key}>{section==="payments"&&c.key==="receipt_url"&&r.receipt_url?<a className="admin-create-button" href={r.receipt_url} target="_blank" rel="noreferrer">عرض الإيصال</a>:c.format?c.format(r):fmt(r[c.key])}</td>)}{section==="payments"&&<td>{r.status==="submitted"?<><button className="admin-create-button" type="button" disabled={sectionLoading||!r.receipt_url} onClick={()=>void reviewPayment(r,"approve")}>قبول وإصدار التذاكر</button> <button className="admin-delete-button" type="button" disabled={sectionLoading} onClick={()=>void reviewPayment(r,"reject")}>رفض</button></>:<span>{statusLabels[r.status]||fmt(r.status)}</span>}</td>}</tr>)}</tbody></table>{rows.length===0&&<p className="admin-no-data">لا توجد سجلات حتى الآن.</p>}</div>;
   };
 
