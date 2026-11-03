@@ -53,7 +53,6 @@ export default function Home(){
    </section>
   </>}
  </div></section>
- </div></section>
  </>}
  {activeTab==="tickets"&&<section className="screen container"><div className="empty-state"><Ticket size={28}/><strong>ما عندك تذاكر معتمدة حالياً</strong><p>التذاكر الحقيقية حتظهر هنا بعد اعتماد الدفع. أزلنا البطاقة التجريبية القديمة.</p></div></section>}
  {activeTab==="notifications"&&<section className="screen container"><div className="notification-list">{bookingDone&&<article className="notification-item"><span className="notification-icon"><CheckCircle2 size={19}/></span><div><strong>تم استلام طلب حجزك</strong><p>طلبك لفعالية {selected?.title||"الفعالية"} مسجل للمراجعة. تابع حالة الطلب من هنا.</p><small>طلب حجز جديد · قيد المراجعة</small></div></article>}<article className="notification-item"><span className="notification-icon"><Sparkles size={19}/></span><div><strong>أهلاً بيك في حاضر!</strong><p>من هنا حتوصلك تحديثات الفعاليات وحالة حجوزاتك وأي تنبيهات مهمة.</p><small>رسالة ترحيبية</small></div></article><article className="notification-item"><span className="notification-icon"><Ticket size={19}/></span><div><strong>تذكرتك في مكان آمن</strong><p>بعد مراجعة طلب الحجز واعتماد الدفع، حنضيف تذكرتك ورمز QR في قسم «تذاكري».</p><small>معلومات الحجز</small></div></article></div></section>}
