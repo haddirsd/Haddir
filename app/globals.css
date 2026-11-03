@@ -946,3 +946,32 @@ body{font-size:16px}
 .theme-dark .admin-booking-card-event{background:var(--bg);color:var(--fg)}
 @media(max-width:520px){.admin-booking-cards{grid-template-columns:1fr}.admin-booking-card{padding:15px}.admin-booking-card-grid{gap:12px 9px}}
 @media(max-width:350px){.admin-booking-card-grid{grid-template-columns:1fr}}
+
+
+/* Admin payment review cards */
+.admin-payment-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:15px;padding-top:8px}
+.admin-payment-card{min-width:0;padding:19px;border:1px solid #e9e1ef;border-radius:18px;background:#fff;box-shadow:0 5px 18px #2f164908}
+.admin-payment-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:1px solid #f0eaf3}
+.admin-payment-card-head>div{min-width:0}
+.admin-payment-card-head small,.admin-payment-card-grid small{display:block;margin-bottom:5px;color:#887d90;font-size:10px;font-weight:700}
+.admin-payment-card-head h4{margin:0;color:#30213b;font-size:16px;font-weight:900;overflow-wrap:anywhere}
+.admin-payment-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 12px;padding:16px 0}
+.admin-payment-card-grid>div{min-width:0}
+.admin-payment-card-grid strong{display:block;color:#44364e;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.admin-payment-receipt{display:inline-flex;color:#67408a;font-size:12px;font-weight:800;text-decoration:underline}
+.admin-payment-note{grid-column:1/-1;padding:10px;border-radius:10px;background:#f8f5fa}
+.admin-payment-actions{display:grid;gap:12px;padding-top:14px;border-top:1px solid #f0eaf3}
+.admin-payment-approve,.admin-payment-reject{min-height:43px;padding:10px 15px;border:0;border-radius:11px;font-size:12px;font-weight:900;cursor:pointer}
+.admin-payment-approve{background:#dcf5e5;color:#176b39}
+.admin-payment-reject{background:#fff0b8;color:#805700}
+.admin-payment-approve:disabled,.admin-payment-reject:disabled{opacity:.5;cursor:not-allowed}
+.admin-payment-reject-box{display:grid;gap:9px}
+.admin-payment-reject-box label{display:grid;gap:7px;color:#51445b;font-size:11px;font-weight:800}
+.admin-payment-reject-box textarea{width:100%;min-height:68px;padding:11px;border:1px solid #e4dce9;border-radius:10px;background:#fff;color:#30213b;font:inherit;font-size:12px;resize:vertical}
+.theme-dark .admin-payment-card{background:var(--surface);border-color:var(--line);box-shadow:none}
+.theme-dark .admin-payment-card-head{border-color:var(--line)}
+.theme-dark .admin-payment-card-head h4,.theme-dark .admin-payment-card-grid strong,.theme-dark .admin-payment-reject-box label{color:var(--fg)}
+.theme-dark .admin-payment-note,.theme-dark .admin-payment-reject-box textarea{background:var(--bg);border-color:var(--line);color:var(--fg)}
+.theme-dark .admin-payment-actions{border-color:var(--line)}
+@media(max-width:520px){.admin-payment-cards{grid-template-columns:1fr}.admin-payment-card{padding:15px}.admin-payment-card-grid{gap:12px 9px}}
+@media(max-width:350px){.admin-payment-card-grid{grid-template-columns:1fr}}
