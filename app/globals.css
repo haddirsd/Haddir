@@ -898,3 +898,31 @@ body{font-size:16px}
  .haddir-ticket-qr svg{width:190px!important;height:190px!important}
  .haddir-ticket-meta{grid-template-columns:1fr}
 }
+
+
+/* Admin events card management */
+.admin-event-add{order:-1;min-height:44px;padding-inline:20px;font-size:14px}
+.admin-event-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:14px;padding-top:8px}
+.admin-event-card{display:flex;flex-direction:column;justify-content:space-between;gap:18px;min-width:0;padding:19px;border:1px solid #e9e1ef;border-radius:17px;background:#fff;box-shadow:0 5px 18px #2f164908}
+.admin-event-card-title{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.admin-event-card-title h4{margin:0;color:#30213b;font-size:16px;line-height:1.7;overflow-wrap:anywhere}
+.admin-event-status{flex:none;padding:5px 9px;border-radius:99px;background:#f1edf5;color:#65536f;font-size:10px;font-weight:800}
+.admin-event-status.status-published{background:#e8f7ed;color:#237442}
+.admin-event-status.status-cancelled{background:#fff1e5;color:#9b5a17}
+.admin-event-card-meta{display:grid;grid-template-columns:1fr 1fr;gap:9px 13px;margin-top:15px;color:#756b7d;font-size:11px;line-height:1.7}
+.admin-event-card-meta span{min-width:0;overflow-wrap:anywhere}
+.admin-event-card-meta b{color:#44364e}
+.admin-event-card-actions{display:flex;align-items:center;flex-wrap:wrap;gap:9px;padding-top:14px;border-top:1px solid #f0eaf3}
+.admin-event-card-actions button{min-height:39px;padding:8px 17px;border:0;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer}
+.admin-event-card-actions button:disabled{opacity:.55;cursor:not-allowed}
+.admin-event-edit{background:#dcf5e5;color:#176b39}
+.admin-event-edit:hover{background:#c9efd7}
+.admin-event-delete{background:#fff0b8;color:#805700}
+.admin-event-delete:hover{background:#ffe69a}
+.admin-event-card-actions small{margin-inline-start:auto;color:#85619e;font-size:10px;font-weight:700}
+.theme-dark .admin-event-card{background:var(--surface);border-color:var(--line);box-shadow:none}
+.theme-dark .admin-event-card-title h4,.theme-dark .admin-event-card-meta b{color:var(--fg)}
+.theme-dark .admin-event-card-meta{color:var(--muted)}
+.theme-dark .admin-event-card-actions{border-color:var(--line)}
+@media(max-width:520px){.admin-event-cards{grid-template-columns:1fr}.admin-event-card{padding:16px}.admin-event-card-meta{grid-template-columns:1fr 1fr}.admin-event-card-actions button{flex:1}}
+@media(max-width:360px){.admin-event-card-meta{grid-template-columns:1fr}}
