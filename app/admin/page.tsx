@@ -213,7 +213,21 @@ export default function AdminPage() {
         if((count||0)>0) await supabase.from("ticket_types").update({is_active:false}).eq("id",old.id);
         else await supabase.from("ticket_types").delete().eq("id",old.id);
       }
-      const {error:clearAccountsError}=await supabase.from("event_payment_accounts").delete().eq("event_id",editingEventId);if(clearAccountsError){setEventMessage("تم تحديث الفعالية لكن تعذر تحديث حساباتها: "+clearAccountsError.message);setSavingEvent(false);return;}if(eventAccountForms.length){const {error:accountSaveError}=await supabase.from("event_payment_accounts").insert(eventAccountForms.map((a,i)=>({event_id:editingEventId,account_name:a.account_name.trim(),account_number:a.account_number.trim(),beneficiary:a.beneficiary.trim(),is_active:a.is_active,beneficiary:a.beneficiary.trim(),sort_order:a.sort_order??(i+1)*10})));if(accountSaveError){setEventMessage("تم تحديث الفعالية لكن تعذر حفظ حساباتها: "+accountSaveError.message);setSavingEvent(false);return;}}
+      const {data:existingAccounts,error:existingAccountsError}=await supabase.from("event_payment_accounts").select("id").eq("event_id",editingEventId);
+      if(existingAccountsError){setEventMessage("تم تحديث الفعالية لكن تعذر تحميل حساباتها الحالية: "+existingAccountsError.message);setSavingEvent(false);return;}
+      const retainedAccountIds=eventAccountForms.map(a=>a.id).filter(Boolean) as string[];
+      for(const oldAccount of (existingAccounts||[]).filter((a:any)=>!retainedAccountIds.includes(a.id))){
+        const {error:deleteAccountError}=await supabase.from("event_payment_accounts").delete().eq("id",oldAccount.id).eq("event_id",editingEventId);
+        if(deleteAccountError){setEventMessage("تم تحديث الفعالية لكن تعذر إزالة حساب دفع: "+deleteAccountError.message);setSavingEvent(false);return;}
+      }
+      for(let i=0;i<eventAccountForms.length;i++){
+        const a=eventAccountForms[i];
+        const accountPayload={account_name:a.account_name.trim(),account_number:a.account_number.trim(),beneficiary:a.beneficiary.trim(),is_active:a.is_active,sort_order:a.sort_order??(i+1)*10};
+        const accountResult=a.id
+          ? await supabase.from("event_payment_accounts").update(accountPayload).eq("id",a.id).eq("event_id",editingEventId)
+          : await supabase.from("event_payment_accounts").insert({...accountPayload,event_id:editingEventId});
+        if(accountResult.error){setEventMessage("تم تحديث الفعالية لكن تعذر حفظ حساباتها: "+accountResult.error.message);setSavingEvent(false);return;}
+      }
       setEventMessage("تم تحديث الفعالية وجميع أنواع التذاكر وحسابات الدفع.");setEditingEventId(null);setEventForm(emptyEventForm);setTicketForms([emptyTicket()]);setEventAccountForms([]);setCoverFile(null);setCoverPreview("");setShowEventForm(false);setSavingEvent(false);await loadSection();return;
     }
     const slug = eventForm.title.trim().toLowerCase().normalize("NFKD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9\\u0600-\\u06ff]+/g,"-").replace(/^-|-$/g,"") + "-" + Math.random().toString(36).slice(2,7);
