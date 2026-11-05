@@ -154,11 +154,12 @@ export default function AdminPage() {
 
   useEffect(() => {
     const supabase=getSupabaseBrowserClient();
-    if(!supabase||(section!=="bookings"&&section!=="payments")||!role)return;
+    if(!supabase||!["bookings","payments","activity"].includes(section)||!role)return;
     const channel=supabase.channel("admin-live-"+section)
       .on("postgres_changes",{event:"*",schema:"public",table:"bookings"},()=>{void loadSection();})
       .on("postgres_changes",{event:"*",schema:"public",table:"booking_items"},()=>{void loadSection();})
       .on("postgres_changes",{event:"*",schema:"public",table:"payment_submissions"},()=>{void loadSection();})
+      .on("postgres_changes",{event:"INSERT",schema:"public",table:"admin_activity_log"},()=>{void loadSection();})
       .subscribe();
     return()=>{void supabase.removeChannel(channel);};
   },[section,role]);
@@ -323,7 +324,7 @@ export default function AdminPage() {
 
   const renderRows = () => {
     if (section === "activity") {
-      const actionNames:Record<string,string>={"events.created":"أضاف فعالية","events.updated":"عدّل بيانات فعالية","events.deleted":"حذف فعالية","user.created":"أضاف عميلاً / مستخدماً","user.role_changed":"غيّر دور مستخدم","bookings.created":"أنشأ حجزاً","booking.confirmed":"وافق على الحجز","booking.rejected":"رفض الحجز","booking.pending_payment":"غيّر حالة الحجز إلى انتظار الدفع","booking.under_review":"حوّل الحجز للمراجعة","payment.approved":"اعتمد إثبات الدفع","payment.rejected":"رفض إثبات الدفع","ticket.checked_in":"أكد دخول التذكرة","ticket.checkin_reversed":"ألغى تأكيد دخول التذكرة","ticket.status_changed":"عدّل حالة التذكرة","ticket_type.created":"أضاف فئة تذاكر","ticket_type.updated":"عدّل فئة تذاكر","ticket_type.deleted":"حذف فئة تذاكر","payment_account.created":"أضاف حساب دفع","payment_account.updated":"عدّل حساب دفع","payment_account.deleted":"حذف حساب دفع"};
+      const actionNames:Record<string,string>={"events.created":"أضاف فعالية","events.updated":"عدّل بيانات فعالية","events.deleted":"حذف فعالية","profiles.created":"أضاف عميلاً / مستخدماً","user.role_changed":"غيّر دور مستخدم","bookings.created":"أنشأ حجزاً","booking.confirmed":"وافق على الحجز","booking.rejected":"رفض الحجز","payment.approved":"اعتمد إثبات الدفع","payment.rejected":"رفض إثبات الدفع","ticket.checked_in":"أكد دخول التذكرة","ticket.checkin_reversed":"ألغى تأكيد دخول التذكرة","ticket.status_changed":"عدّل حالة التذكرة","ticket_types.created":"أضاف فئة تذاكر","ticket_types.updated":"عدّل فئة تذاكر","ticket_types.deleted":"حذف فئة تذاكر","event_payment_accounts.created":"أضاف حساب دفع","event_payment_accounts.updated":"عدّل حساب دفع","event_payment_accounts.deleted":"حذف حساب دفع"};
       const roleNames:Record<string,string>={owner:"مالك المنصة",admin:"مشرف",supervisor:"موظف حاضر",gatekeeper:"بواب",organizer:"بواب",advertiser:"معلن",customer:"عميل",unknown:"غير معروف"};
       const fieldNames:Record<string,string>={title:"اسم الفعالية",status:"الحالة",description:"الوصف",venue:"المكان",city:"المدينة",starts_at:"موعد البداية",ends_at:"موعد النهاية",platform_fee_percent:"نسبة العمولة",role:"الدور",full_name:"الاسم",is_trending:"رائج الآن",price:"السعر",quantity_total:"الكمية",name:"الاسم",is_active:"التفعيل"};
       const detailText=(details:Row)=>Object.entries(details||{}).map(([key,value]:[string,any])=>{const v=value&&typeof value==="object"&&("before" in value||"after" in value)?`من ${JSON.stringify(value.before)} إلى ${JSON.stringify(value.after)}`:JSON.stringify(value);return `${fieldNames[key]||key}: ${v}`;}).join(" · ");
