@@ -58,27 +58,31 @@ export default function Home(){
  },[authUser,assignedEvent?.event_id,userRole]);
 
  useEffect(()=>{
-  const supabase=getSupabaseBrowserClient();if(!supabase||!authUser||(activeTab!=="tickets"&&activeTab!=="notifications"))return;
-  let alive=true;setAccountDataLoading(true);setAccountDataError("");
+  const supabase=getSupabaseBrowserClient();if(!supabase||!authUser)return;
+  let alive=true;let firstLoad=true;setAccountDataLoading(true);setAccountDataError("");
   const loadAccountData=async()=>{
-   const jobs:any[]=[];
-   if(activeTab==="tickets")jobs.push(supabase.from("tickets").select("id,booking_item_id,ticket_code,status,issued_at,events(title,starts_at,venue,cover_image_url),ticket_types(name),bookings!inner(booking_number,user_id),booking_items(quantity)").eq("bookings.user_id",authUser.id).order("issued_at",{ascending:false}));
-   if(activeTab==="notifications")jobs.push(supabase.from("notifications").select("id,title,message,type,is_read,created_at,booking_id").order("created_at",{ascending:false}).limit(100));
-   const results=await Promise.all(jobs);if(!alive)return;
-   if(results.some((x:any)=>x.error)){setAccountDataError(results.find((x:any)=>x.error)?.error?.message||"تعذر تحميل بيانات الحساب.");}
-   else if(activeTab==="tickets")setMyTickets(results[0].data||[]);
-   else setMyNotifications(results[0].data||[]);
-   setAccountDataLoading(false);
+   const [ticketsResult,notificationsResult]=await Promise.all([
+    supabase.from("tickets").select("id,booking_item_id,ticket_code,status,issued_at,events(title,starts_at,venue,cover_image_url),ticket_types(name),bookings!inner(booking_number,user_id),booking_items(quantity)").eq("bookings.user_id",authUser.id).order("issued_at",{ascending:false}),
+    supabase.from("notifications").select("id,title,message,type,is_read,created_at,booking_id").eq("user_id",authUser.id).order("created_at",{ascending:false}).limit(100)
+   ]);
+   if(!alive)return;
+   const failure=ticketsResult.error||notificationsResult.error;
+   if(failure)setAccountDataError(failure.message||"تعذر تحميل بيانات الحساب.");
+   else{setMyTickets(ticketsResult.data||[]);setMyNotifications(notificationsResult.data||[]);setAccountDataError("");}
+   if(firstLoad){setAccountDataLoading(false);firstLoad=false;}
   };
   void loadAccountData();
-  const table=activeTab==="tickets"?"tickets":"notifications";
-  const channel=supabase.channel("customer-"+table+"-"+authUser.id).on("postgres_changes",{event:"*",schema:"public",table,...(table==="notifications"?{filter:"user_id=eq."+authUser.id}:{})},()=>{void loadAccountData();}).subscribe();
+  const channel=supabase.channel("customer-live-"+authUser.id)
+   .on("postgres_changes",{event:"*",schema:"public",table:"tickets"},()=>{void loadAccountData();})
+   .on("postgres_changes",{event:"*",schema:"public",table:"notifications",filter:"user_id=eq."+authUser.id},()=>{void loadAccountData();})
+   .on("postgres_changes",{event:"UPDATE",schema:"public",table:"bookings",filter:"user_id=eq."+authUser.id},()=>{void loadAccountData();})
+   .subscribe();
   return()=>{alive=false;void supabase.removeChannel(channel);};
- },[authUser,activeTab]);
+ },[authUser]);
  useEffect(()=>{const saved=window.localStorage.getItem("haddir-theme");const prefersDark=window.matchMedia?.("(prefers-color-scheme: dark)").matches;setDarkMode(saved?saved==="dark":!!prefersDark);},[]);
  useEffect(()=>{document.documentElement.dataset.theme=darkMode?"dark":"light";document.documentElement.style.colorScheme=darkMode?"dark":"light";window.localStorage.setItem("haddir-theme",darkMode?"dark":"light");},[darkMode]);
  useEffect(()=>{const key="haddir-welcome-seen";if(!sessionStorage.getItem(key)){setShowWelcome(true);sessionStorage.setItem(key,"1");const timer=window.setTimeout(()=>setShowWelcome(false),3600);return()=>window.clearTimeout(timer);}},[]);
- useEffect(()=>{const supabase=getSupabaseBrowserClient();if(!supabase){setEventsError("إعدادات الاتصال بقاعدة البيانات غير مكتملة.");setEventsLoading(false);return;}let alive=true;const loadEvents=async()=>{setEventsLoading(true);setEventsError("");const {data,error}=await supabase.from("events").select("id,title,category,city,venue,starts_at,description,status,is_trending,cover_image_url,location_url").eq("status","published").order("starts_at",{ascending:true});if(error){console.error("Could not load events",error);if(alive){setEventsError(error.message||"تعذر تحميل الفعاليات.");setEventsLoading(false);}return;}if(!alive)return;const eventRows=data||[];const eventIds=eventRows.map((e:any)=>e.id);let ticketRows:any[]=[];if(eventIds.length){const {data:ticketData,error:ticketError}=await supabase.from("ticket_types").select("id,event_id,name,description,price,currency,quantity_total,quantity_sold,sales_start_at,sales_end_at,is_active").in("event_id",eventIds);if(ticketError){console.error("Could not load ticket types",ticketError);if(alive)setTicketTypesError("تعذر تحميل فئات وأسعار التذاكر من قاعدة البيانات. "+(ticketError.message||""));}else{ticketRows=ticketData||[];if(alive)setTicketTypesError("");}}if(!alive)return;const mapped=eventRows.map((e:any,index:number)=>{const now=Date.now();const tiers=ticketRows.filter((t:any)=>t.event_id===e.id&&t.is_active).map((t:any)=>{const total=Math.max(0,Number(t.quantity_total)||0),sold=Math.max(0,Number(t.quantity_sold)||0),available=Math.max(0,total-sold),starts=t.sales_start_at?new Date(t.sales_start_at).getTime():0,ends=t.sales_end_at?new Date(t.sales_end_at).getTime():Infinity;return {id:t.id,name:t.name,description:t.description||"",priceValue:Number(t.price),currency:String(t.currency||"SDG").trim(),price:Number(t.price)===0?"مجاناً":formatMoney(Number(t.price),String(t.currency||"SDG")),quantityTotal:total,quantitySold:sold,available,availableNow:available>0&&now>=starts&&now<=ends};});const eventEnded=new Date(e.starts_at).getTime()<=now;const status=eventEnded?"انتهت":tiers.length===0?"غير متاح":tiers.every((t:any)=>t.available<=0)?"تم البيع بالكامل":tiers.every((t:any)=>!t.availableNow)?"البيع غير متاح حالياً":"متوفر";return {id:e.id,date:formatEventDate(e.starts_at),title:e.title,place:e.city||"",category:e.category||"فعاليات",price:tiers[0]?.price||"—",cover:["cover-one","cover-two","cover-three"][index%3],coverImageUrl:e.cover_image_url||null,tag:e.category||"فعالية",time:new Intl.DateTimeFormat("ar-SD",{hour:"numeric",minute:"2-digit"}).format(new Date(e.starts_at)),venue:e.venue||e.city||"",status,map:e.location_url||"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent((e.venue||"")+" "+(e.city||"")),about:e.description||"تفاصيل الفعالية ستُضاف قريباً.",isTrending:!!e.is_trending,tiers};});setEvents(mapped);setEventsLoading(false);const requested=new URLSearchParams(window.location.search).get("event");if(requested&&mapped.some(e=>e.id===requested))setSelectedEvent(requested);};void loadEvents();return()=>{alive=false;};},[]);
+ useEffect(()=>{const supabase=getSupabaseBrowserClient();if(!supabase){setEventsError("إعدادات الاتصال بقاعدة البيانات غير مكتملة.");setEventsLoading(false);return;}let alive=true;const loadEvents=async()=>{setEventsLoading(true);setEventsError("");const {data,error}=await supabase.from("events").select("id,title,category,city,venue,starts_at,description,status,is_trending,cover_image_url,location_url").eq("status","published").order("starts_at",{ascending:true});if(error){console.error("Could not load events",error);if(alive){setEventsError(error.message||"تعذر تحميل الفعاليات.");setEventsLoading(false);}return;}if(!alive)return;const eventRows=data||[];const eventIds=eventRows.map((e:any)=>e.id);let ticketRows:any[]=[];if(eventIds.length){const {data:ticketData,error:ticketError}=await supabase.from("ticket_types").select("id,event_id,name,description,price,currency,quantity_total,quantity_sold,sales_start_at,sales_end_at,is_active").in("event_id",eventIds);if(ticketError){console.error("Could not load ticket types",ticketError);if(alive)setTicketTypesError("تعذر تحميل فئات وأسعار التذاكر من قاعدة البيانات. "+(ticketError.message||""));}else{ticketRows=ticketData||[];if(alive)setTicketTypesError("");}}if(!alive)return;const mapped=eventRows.map((e:any,index:number)=>{const now=Date.now();const tiers=ticketRows.filter((t:any)=>t.event_id===e.id&&t.is_active).map((t:any)=>{const total=Math.max(0,Number(t.quantity_total)||0),sold=Math.max(0,Number(t.quantity_sold)||0),available=Math.max(0,total-sold),starts=t.sales_start_at?new Date(t.sales_start_at).getTime():0,ends=t.sales_end_at?new Date(t.sales_end_at).getTime():Infinity;return {id:t.id,name:t.name,description:t.description||"",priceValue:Number(t.price),currency:String(t.currency||"SDG").trim(),price:Number(t.price)===0?"مجاناً":formatMoney(Number(t.price),String(t.currency||"SDG")),quantityTotal:total,quantitySold:sold,available,availableNow:available>0&&now>=starts&&now<=ends};});const eventEnded=new Date(e.starts_at).getTime()<=now;const status=eventEnded?"انتهت":tiers.length===0?"غير متاح":tiers.every((t:any)=>t.available<=0)?"تم البيع بالكامل":tiers.every((t:any)=>!t.availableNow)?"البيع غير متاح حالياً":"متوفر";return {id:e.id,date:formatEventDate(e.starts_at),title:e.title,place:e.city||"",category:e.category||"فعاليات",price:tiers[0]?.price||"—",cover:["cover-one","cover-two","cover-three"][index%3],coverImageUrl:e.cover_image_url||null,tag:e.category||"فعالية",time:new Intl.DateTimeFormat("ar-SD",{hour:"numeric",minute:"2-digit"}).format(new Date(e.starts_at)),venue:e.venue||e.city||"",status,map:e.location_url||"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent((e.venue||"")+" "+(e.city||"")),about:e.description||"تفاصيل الفعالية ستُضاف قريباً.",isTrending:!!e.is_trending,tiers};});setEvents(mapped);setEventsLoading(false);const requested=new URLSearchParams(window.location.search).get("event");if(requested&&mapped.some(e=>e.id===requested))setSelectedEvent(requested);};void loadEvents();const channel=supabase.channel("public-events-live").on("postgres_changes",{event:"*",schema:"public",table:"events"},()=>{void loadEvents();}).on("postgres_changes",{event:"*",schema:"public",table:"ticket_types"},()=>{void loadEvents();}).subscribe();return()=>{alive=false;void supabase.removeChannel(channel);};},[]);
  useEffect(()=>{const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("تسجيل الدخول يحتاج إعداد مفاتيح Supabase في بيئة الموقع.");return;}let alive=true;const load=async(user:{id:string;email?:string;user_metadata?:Record<string,unknown>}|null)=>{if(!alive)return;setAuthUser(user as typeof authUser);if(user){const {data}=await supabase.from("profiles").select("role,full_name,phone").eq("id",user.id).maybeSingle();if(!alive)return;setUserRole(data?.role||"customer");const {data:assignmentRows}=await supabase.from("event_role_assignments").select("event_id,assignment_role,events(id,title,venue,city,starts_at,status)").eq("user_id",user.id).in("assignment_role",["gatekeeper","organizer","advertiser"]).limit(1);if(!alive)return;setAssignedEvent(assignmentRows?.[0]||null);const metadataName=String(user.user_metadata?.full_name||user.user_metadata?.name||"");const metadataAvatar=String(user.user_metadata?.avatar_url||user.user_metadata?.picture||"");setFullName(String(data?.full_name||metadataName||""));setPhone(String(data?.phone||""));setEmail(user.email||"");setAvatarUrl(metadataAvatar);setProfileEditing(false);setSaved(false);}else{setUserRole("customer");setAssignedEvent(null);setGatekeeperResult(null);setGatekeeperCode("");setFullName("");setEmail("");setPhone("");setAvatarUrl("");setProfileEditing(false);setSaved(false);setActiveWorkspace(null);}};supabase.auth.getSession().then(({data})=>load(data.session?.user??null));const {data:{subscription}}=supabase.auth.onAuthStateChange((_event,session)=>{void load(session?.user??null);});return()=>{alive=false;subscription.unsubscribe();};},[]);
  const openAdvertiserStats=async()=>{
   if(!authUser||userRole!=="advertiser")return;
@@ -118,8 +122,23 @@ export default function Home(){
   if(entryMethod==="manual")await loadGatekeeperManualHistory();
  };
  useEffect(()=>{
-  if(!isGatekeeperPage||!authUser||!assignedEvent?.event_id||(userRole!=="gatekeeper"&&userRole!=="organizer"))return;
-  void loadGatekeeperManualHistory();
+  const supabase=getSupabaseBrowserClient();
+  if(!isGatekeeperPage||!authUser||!assignedEvent?.event_id||(userRole!=="gatekeeper"&&userRole!=="organizer")||!supabase)return;
+  let alive=true;
+  const refreshGatekeeperData=async()=>{
+   const [{data:stats},{data:history,error}]=await Promise.all([
+    supabase.rpc("get_gatekeeper_scan_stats",{p_event_id:assignedEvent.event_id}),
+    supabase.rpc("get_gatekeeper_manual_history",{p_event_id:assignedEvent.event_id})
+   ]);
+   if(!alive)return;
+   if(stats)setGatekeeperCounts({accepted:Number(stats.accepted||0),used:Number(stats.used||0),forged:Number(stats.forged||0)});
+   if(!error&&Array.isArray(history))setGatekeeperManualHistory(history);
+  };
+  void refreshGatekeeperData();
+  const channel=supabase.channel("gatekeeper-live-"+assignedEvent.event_id)
+   .on("postgres_changes",{event:"*",schema:"public",table:"gatekeeper_scan_logs",filter:"event_id=eq."+assignedEvent.event_id},()=>{void refreshGatekeeperData();})
+   .subscribe();
+  return()=>{alive=false;void supabase.removeChannel(channel);};
  },[isGatekeeperPage,authUser,assignedEvent?.event_id,userRole]);
  useEffect(()=>{
   const update=()=>setGatekeeperOnline(typeof navigator!=="undefined"?navigator.onLine:true);
