@@ -1936,3 +1936,53 @@ body{font-size:16px}
  padding:0!important;border-radius:50%!important;flex:none!important;
 }
 .event-detail-layout.payment-sheet .checkout-back-group>span{white-space:nowrap}
+
+
+/* Keep checkout submission at the bottom edge of the viewport. */
+.event-detail-layout.payment-sheet .checkout-form{
+  padding-bottom:calc(94px + env(safe-area-inset-bottom))!important;
+}
+.event-detail-layout.payment-sheet .checkout-submit-dock{
+  position:fixed!important;
+  inset-inline:0!important;
+  bottom:0!important;
+  z-index:120!important;
+  width:min(620px,calc(100% - 32px))!important;
+  margin:0 auto!important;
+  padding:12px 0 calc(12px + env(safe-area-inset-bottom))!important;
+  background:var(--bg)!important;
+}
+.event-detail-layout.payment-sheet .checkout-submit-dock .pay-button{
+  width:100%!important;
+  min-height:54px!important;
+  margin:0!important;
+  box-shadow:0 -2px 14px rgba(24,12,35,.08);
+}
+
+/* Event details finish naturally after quantity and the booking action. */
+.event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer{
+  position:relative!important;
+  inset:auto!important;
+  z-index:1!important;
+  width:100%!important;
+  margin:22px 0 0!important;
+  padding:14px!important;
+  border:1px solid var(--line)!important;
+  border-radius:16px!important;
+  box-shadow:none!important;
+}
+.event-detail-layout:not(.payment-sheet) .detail-content{
+  padding-bottom:24px!important;
+}
+@media(max-width:600px){
+  .event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer{
+    margin-top:18px!important;
+    padding:12px!important;
+  }
+  .event-detail-layout:not(.payment-sheet) .detail-content{
+    padding-bottom:18px!important;
+  }
+  .event-detail-layout.payment-sheet .checkout-form{
+    padding-bottom:calc(88px + env(safe-area-inset-bottom))!important;
+  }
+}
