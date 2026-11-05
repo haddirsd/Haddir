@@ -33,6 +33,8 @@ export default function Home(){
  const [advertiserStatsError,setAdvertiserStatsError]=useState("");
  const [myTickets,setMyTickets]=useState<any[]>([]),[myNotifications,setMyNotifications]=useState<any[]>([]),[accountDataLoading,setAccountDataLoading]=useState(false),[accountDataError,setAccountDataError]=useState("");
  const [notificationFilter,setNotificationFilter]=useState<"all"|"unread"|"read">("all");
+ const [ticketFilter,setTicketFilter]=useState<"new"|"used">("new");
+ const [expandedTicketId,setExpandedTicketId]=useState<string|null>(null);
  const trendingEvents=events.filter(e=>e.isTrending);
   useEffect(()=>{const tab=new URLSearchParams(window.location.search).get("tab");if(tab==="tickets"||tab==="notifications")setActiveTab(tab);},[]);
  useEffect(()=>{
@@ -40,7 +42,7 @@ export default function Home(){
   let alive=true;setAccountDataLoading(true);setAccountDataError("");
   const loadAccountData=async()=>{
    const jobs:any[]=[];
-   if(activeTab==="tickets")jobs.push(supabase.from("tickets").select("id,ticket_code,status,issued_at,events(title,starts_at,venue),ticket_types(name),bookings(booking_number)").order("issued_at",{ascending:false}));
+   if(activeTab==="tickets")jobs.push(supabase.from("tickets").select("id,booking_item_id,ticket_code,status,issued_at,events(title,starts_at,venue,cover_image_url),ticket_types(name),bookings!inner(booking_number,user_id),booking_items(quantity)").eq("bookings.user_id",authUser.id).order("issued_at",{ascending:false}));
    if(activeTab==="notifications")jobs.push(supabase.from("notifications").select("id,title,message,type,is_read,created_at,booking_id").order("created_at",{ascending:false}).limit(100));
    const results=await Promise.all(jobs);if(!alive)return;
    if(results.some((x:any)=>x.error)){setAccountDataError(results.find((x:any)=>x.error)?.error?.message||"تعذر تحميل بيانات الحساب.");}
@@ -191,7 +193,28 @@ export default function Home(){
   </>}
  </div></section>
  </>}
- {activeTab==="tickets"&&<section className="screen container">{accountDataLoading?<div className="empty-state">جاري تحميل تذاكرك...</div>:accountDataError?<div className="empty-state" role="alert">{accountDataError}</div>:myTickets.length===0?<div className="empty-state"><Ticket size={28}/><strong>ما عندك تذاكر صادرة حالياً</strong><p>بعد قبول إثبات الدفع، حتظهر تذاكرك هنا ومع كل تذكرة كود دخول من 10 أرقام.</p></div>:<div className="ticket-list">{myTickets.map((ticket:any)=><div className="ticket-card-wrap" key={ticket.id} data-ticket-id={ticket.id}><article className="haddir-ticket"><div className="haddir-ticket-head"><strong>حاضر <span>HADDIR</span></strong><span className="ticket-confirmed">{ticket.status==="valid"?"تذكرة صالحة":ticket.status==="used"?"تم استخدامها":ticket.status}</span></div><div className="haddir-ticket-event"><small>تذكرة دخول</small><h2>{ticket.events?.title||"فعالية"}</h2></div><div className="haddir-ticket-meta"><div><small>نوع التذكرة</small><strong>{ticket.ticket_types?.name||"تذكرة"}</strong></div><div><small>رقم الحجز</small><strong>{ticket.bookings?.booking_number||"—"}</strong></div><div><small>الموقع</small><strong>{ticket.events?.venue||"—"}</strong></div><div><small>التاريخ</small><strong>{ticket.events?.starts_at?formatEventDate(ticket.events.starts_at):"—"}</strong></div></div><div className="haddir-ticket-qr"><QrCodeSVG value={ticket.ticket_code} size={220} level="H" includeMargin/><small>امسح الرمز للتحقق من التذكرة، أو أدخل الكود يدوياً عند البوابة</small></div><div className="haddir-ticket-code"><small>كود الدخول · 10 أرقام</small><strong dir="ltr">{ticket.ticket_code}</strong></div><div className="haddir-ticket-footer">احتفظ بتذكرتك وأبرزها عند الدخول</div></article><button className="btn btn-outline pay-button" type="button" onClick={()=>void downloadTicket(ticket)}><Download size={17}/> حفظ التذكرة كصورة</button></div>)}</div>}</section>}
+ {activeTab==="tickets"&&<section className="screen container tickets-screen">{accountDataLoading?<div className="empty-state">جاري تحميل تذاكرك...</div>:accountDataError?<div className="empty-state" role="alert">{accountDataError}</div>:<>
+   <div className="ticket-tabs" role="tablist" aria-label="حالة التذاكر">
+    <button type="button" role="tab" aria-selected={ticketFilter==="new"} className={ticketFilter==="new"?"active":""} onClick={()=>{setTicketFilter("new");setExpandedTicketId(null);}}>تذاكر جديدة <span>{myTickets.filter((t:any)=>t.status==="valid").length}</span></button>
+    <button type="button" role="tab" aria-selected={ticketFilter==="used"} className={ticketFilter==="used"?"active":""} onClick={()=>{setTicketFilter("used");setExpandedTicketId(null);}}>تذاكر مستخدمة <span>{myTickets.filter((t:any)=>t.status==="used").length}</span></button>
+   </div>
+   {(()=>{const visibleTickets=myTickets.filter((t:any)=>t.status===(ticketFilter==="new"?"valid":"used"));return visibleTickets.length===0?<div className="empty-state"><Ticket size={28}/><strong>{ticketFilter==="new"?"ما عندك تذاكر جديدة حالياً":"ما عندك تذاكر مستخدمة حالياً"}</strong><p>{ticketFilter==="new"?"بعد قبول إثبات الدفع، حتظهر تذاكرك هنا.":"التذاكر التي يتم تأكيد دخولها عند البوابة حتظهر هنا."}</p></div>:<div className="ticket-list">{visibleTickets.map((ticket:any)=><div className="ticket-card-wrap" key={ticket.id} data-ticket-id={ticket.id}>
+    <button type="button" className="ticket-preview-card" aria-expanded={expandedTicketId===ticket.id} onClick={()=>setExpandedTicketId(current=>current===ticket.id?null:ticket.id)}>
+     <span className="ticket-preview-image">{ticket.events?.cover_image_url?<img src={ticket.events.cover_image_url} alt={ticket.events?.title||"صورة الفعالية"} loading="lazy"/>:<span className="ticket-preview-fallback"><Ticket size={25}/></span>}</span>
+     <span className="ticket-preview-copy"><strong>{ticket.events?.title||"فعالية"}</strong><span><CalendarDays size={13}/>{ticket.events?.starts_at?formatEventDate(ticket.events.starts_at):"التاريخ غير محدد"}</span><span><UserRound size={13}/>عدد الأشخاص: {ticket.booking_items?.quantity||1}</span></span>
+     <span className={"ticket-preview-status "+(ticket.status==="used"?"used":"")}>{ticket.status==="used"?"مستخدمة":"جديدة"}</span>
+    </button>
+    {expandedTicketId===ticket.id&&<div className="ticket-expanded-panel">
+     <article className="haddir-ticket"><div className="haddir-ticket-head"><strong>حاضر <span>HADDIR</span></strong><span className="ticket-confirmed">{ticket.status==="valid"?"تذكرة صالحة":ticket.status==="used"?"تم استخدامها":ticket.status}</span></div>
+      <div className="haddir-ticket-event"><small>تذكرة دخول</small><h2>{ticket.events?.title||"فعالية"}</h2></div>
+      <div className="haddir-ticket-meta"><div><small>نوع التذكرة</small><strong>{ticket.ticket_types?.name||"تذكرة"}</strong></div><div><small>رقم الحجز</small><strong>{ticket.bookings?.booking_number||"—"}</strong></div><div><small>الموقع</small><strong>{ticket.events?.venue||"—"}</strong></div><div><small>التاريخ</small><strong>{ticket.events?.starts_at?formatEventDate(ticket.events.starts_at):"—"}</strong></div><div><small>عدد الأشخاص</small><strong>{ticket.booking_items?.quantity||1} أشخاص</strong></div></div>
+      <div className="haddir-ticket-qr"><QrCodeSVG value={ticket.ticket_code} size={220} level="H" includeMargin/><small>امسح الرمز للتحقق من التذكرة، أو أدخل الكود يدوياً عند البوابة</small></div>
+      <div className="haddir-ticket-code"><small>كود الدخول · 10 أرقام</small><strong dir="ltr">{ticket.ticket_code}</strong></div><div className="haddir-ticket-footer">احتفظ بتذكرتك وأبرزها عند الدخول</div>
+     </article>
+     <button className="btn btn-outline pay-button" type="button" onClick={()=>void downloadTicket(ticket)}><Download size={17}/> حفظ التذكرة كصورة</button>
+    </div>}
+   </div>)}</div>})()}
+  </>}</section>}
  {activeTab==="notifications"&&<section className="screen container notifications-screen">
   {accountDataLoading?<div className="empty-state">جاري تحميل الإشعارات...</div>:accountDataError?<div className="empty-state" role="alert">{accountDataError}</div>:<>
    <div className="notifications-toolbar">
