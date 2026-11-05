@@ -1905,3 +1905,26 @@ body{font-size:16px}
     height:72px!important;min-height:72px!important;
   }
 }
+
+
+/* Fixed booking dock anchored to the viewport, independent of page scrolling. */
+.event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer{
+ position:fixed!important;inset-inline:0!important;bottom:0!important;z-index:100!important;
+ width:100%!important;margin:0!important;border:0!important;border-top:1px solid var(--line)!important;
+ border-radius:0!important;padding:12px max(16px,calc((100vw - 1000px)/2 + 40px)) calc(12px + env(safe-area-inset-bottom))!important;
+ background:var(--surface,#fff)!important;box-shadow:0 -8px 28px rgba(24,12,35,.12)!important;
+}
+.event-detail-layout:not(.payment-sheet) .detail-content{padding-bottom:calc(150px + env(safe-area-inset-bottom))!important}
+.checkout-topbar{display:flex;align-items:center;justify-content:space-between;width:min(620px,calc(100% - 32px));margin:0 auto 4px}
+.checkout-wallet-icon{display:grid;place-items:center;width:44px;height:44px;flex:none;border:1px solid var(--line);border-radius:14px;background:var(--surface,#fff);color:var(--green)}
+.event-detail-layout.payment-sheet .payment-screen{display:flex;flex-direction:column;min-height:calc(100dvh - 100px);padding-bottom:calc(24px + env(safe-area-inset-bottom))!important}
+.event-detail-layout.payment-sheet .checkout-form{display:flex;flex-direction:column;flex:1;min-height:calc(100dvh - 160px)}
+.event-detail-layout.payment-sheet .checkout-submit-dock{position:sticky;bottom:0;z-index:5;margin-top:auto;padding:14px 0 calc(12px + env(safe-area-inset-bottom));background:var(--bg)}
+.event-detail-layout.payment-sheet .checkout-submit-dock .pay-button{width:100%;min-height:54px;margin:0}
+@media(max-width:600px){
+ .event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer{padding:10px 14px calc(10px + env(safe-area-inset-bottom))!important}
+ .event-detail-layout:not(.payment-sheet) .detail-content{padding-bottom:calc(145px + env(safe-area-inset-bottom))!important}
+ .event-detail-layout.payment-sheet .checkout-topbar{margin-bottom:2px}
+ .event-detail-layout.payment-sheet .payment-screen{min-height:calc(100dvh - 82px)}
+ .event-detail-layout.payment-sheet .checkout-form{min-height:calc(100dvh - 130px)}
+}
