@@ -31,6 +31,21 @@ export default function Home(){
  const [gatekeeperManualHistory,setGatekeeperManualHistory]=useState<any[]>([]),[gatekeeperHistoryLoading,setGatekeeperHistoryLoading]=useState(false);
  const [scannerOpen,setScannerOpen]=useState(false);
  const videoRef=useRef<HTMLVideoElement|null>(null);
+ useEffect(()=>{
+  const handleBrowserBack=(event:PopStateEvent)=>{
+   const pageState=(event.state as {haddirPage?:string}|null)?.haddirPage;
+   if(pageState==="event-detail"){
+    setShowPayment(false);
+    return;
+   }
+   setSelectedEvent(null);
+   setShowPayment(false);
+   setSelectedTier(0);
+   setTierChosen(false);
+  };
+  window.addEventListener("popstate",handleBrowserBack);
+  return()=>window.removeEventListener("popstate",handleBrowserBack);
+ },[]);
  const [advertiserStats,setAdvertiserStats]=useState<any|null>(null);
  const [advertiserStatsLoading,setAdvertiserStatsLoading]=useState(false);
  const [advertiserStatsError,setAdvertiserStatsError]=useState("");
@@ -226,9 +241,9 @@ export default function Home(){
   window.history.replaceState({}, "", url.pathname+url.search+url.hash);
   window.scrollTo({top:0,behavior:"smooth"});
  }; const downloadTicket=async(ticket:any)=>{try{const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1350;const ctx=canvas.getContext("2d");if(!ctx)return;await document.fonts.ready;ctx.fillStyle="#f7f1fb";ctx.fillRect(0,0,1080,1350);ctx.fillStyle="#fff";ctx.fillRect(48,48,984,1254);ctx.strokeStyle="#e7d9f1";ctx.lineWidth=3;ctx.strokeRect(48,48,984,1254);ctx.direction="rtl";ctx.textAlign="right";const right=950;ctx.fillStyle="#5b2e82";ctx.font="bold 48px Alexandria,Arial";ctx.fillText("حاضر  HADDIR",right,135);ctx.fillStyle="#8b7897";ctx.font="26px Alexandria,Arial";ctx.fillText("تذكرة دخول إلكترونية",right,190);ctx.strokeStyle="#dfd1e9";ctx.setLineDash([10,9]);ctx.beginPath();ctx.moveTo(100,230);ctx.lineTo(980,230);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle="#8b7897";ctx.font="26px Alexandria,Arial";ctx.fillText("الفعالية",right,300);ctx.fillStyle="#30213b";ctx.font="bold 44px Alexandria,Arial";const eventTitle=String(ticket.events?.title||"فعالية");ctx.fillText(eventTitle.length>32?eventTitle.slice(0,32)+"…":eventTitle,right,365);ctx.fillStyle="#8b7897";ctx.font="24px Alexandria,Arial";ctx.fillText("نوع التذكرة",right,455);ctx.fillText("رقم الحجز",520,455);ctx.fillStyle="#3d3047";ctx.font="bold 27px Alexandria,Arial";ctx.fillText(String(ticket.ticket_types?.name||"تذكرة"),right,500);ctx.fillText(String(ticket.bookings?.booking_number||"—"),520,500);ctx.fillStyle="#8b7897";ctx.font="24px Alexandria,Arial";ctx.fillText("الموقع",right,575);ctx.fillText("التاريخ",520,575);ctx.fillStyle="#3d3047";ctx.font="bold 25px Alexandria,Arial";ctx.fillText(String(ticket.events?.venue||"—"),right,620);ctx.fillText(ticket.events?.starts_at?formatEventDate(ticket.events.starts_at):"—",520,620);ctx.strokeStyle="#e5d9ed";ctx.setLineDash([10,9]);ctx.beginPath();ctx.moveTo(100,675);ctx.lineTo(980,675);ctx.stroke();ctx.setLineDash([]);const qr=document.querySelector('[data-ticket-id="'+String(ticket.id)+'"] .haddir-ticket-qr svg');if(!qr)throw new Error("QR unavailable");const svg=new XMLSerializer().serializeToString(qr);const img=new Image();const loaded=new Promise<void>((resolve,reject)=>{img.onload=()=>resolve();img.onerror=()=>reject(new Error("QR image failed"));});img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);await loaded;ctx.drawImage(img,330,700,420,420);ctx.fillStyle="#8e8297";ctx.font="23px Alexandria,Arial";ctx.textAlign="center";ctx.fillText("امسح الرمز للتحقق من التذكرة",540,1045);ctx.fillStyle="#5c2e82";ctx.font="bold 48px Arial";ctx.fillText(String(ticket.ticket_code||""),540,1120);ctx.fillStyle="#f6f0fa";ctx.fillRect(48,1190,984,112);ctx.fillStyle="#76558d";ctx.font="bold 23px Alexandria,Arial";ctx.fillText("احتفظ بالتذكرة وأبرزها عند الدخول",540,1255);const link=document.createElement("a");link.download="haddir-ticket-"+String(ticket.ticket_code||ticket.id)+".png";link.href=canvas.toDataURL("image/png");link.click();}catch(error){console.error("Ticket image export failed",error);alert("تعذر حفظ التذكرة كصورة. حاول مرة أخرى.");}};
- const openEvent=(id:string)=>{resetBooking();setSelectedEvent(id);window.scrollTo({top:0,behavior:"smooth"});};
- const openPayment=async()=>{if(!tierChosen)return;if(!authUser){setAuthMessage("سجّل الدخول أولاً عشان نكمل حجزك. الفعاليات متاحة للتصفح بدون حساب.");setSelectedEvent(null);setShowPayment(false);setActiveTab("profile");window.scrollTo({top:0,behavior:"smooth"});return;}setAuthMessage("");const supabase=getSupabaseBrowserClient();if(supabase&&selected){const {data,error}=await supabase.from("event_payment_accounts").select("id,account_name,account_number,beneficiary").eq("event_id",selected.id).eq("is_active",true).order("sort_order");if(error){setBookingError("تعذر تحميل حسابات الدفع لهذه الفعالية: "+error.message);return;}const accounts=(data||[]) as EventPaymentAccount[];setEventPaymentAccounts(accounts);setPaymentMethod(accounts[0]?.id||"");}setShowPayment(true);window.scrollTo({top:0,behavior:"smooth"});};
- const backToDetails=()=>{setShowPayment(false);window.scrollTo({top:0,behavior:"smooth"});};
+ const openEvent=(id:string)=>{resetBooking();window.history.pushState({...window.history.state,haddirPage:"event-detail"},"",window.location.href);setSelectedEvent(id);window.scrollTo({top:0,behavior:"smooth"});};
+ const openPayment=async()=>{if(!tierChosen)return;if(!authUser){setAuthMessage("سجّل الدخول أولاً عشان نكمل حجزك. الفعاليات متاحة للتصفح بدون حساب.");setSelectedEvent(null);setShowPayment(false);setActiveTab("profile");window.scrollTo({top:0,behavior:"smooth"});return;}setAuthMessage("");const supabase=getSupabaseBrowserClient();if(supabase&&selected){const {data,error}=await supabase.from("event_payment_accounts").select("id,account_name,account_number,beneficiary").eq("event_id",selected.id).eq("is_active",true).order("sort_order");if(error){setBookingError("تعذر تحميل حسابات الدفع لهذه الفعالية: "+error.message);return;}const accounts=(data||[]) as EventPaymentAccount[];setEventPaymentAccounts(accounts);setPaymentMethod(accounts[0]?.id||"");}window.history.pushState({...window.history.state,haddirPage:"event-payment"},"",window.location.href);setShowPayment(true);window.scrollTo({top:0,behavior:"smooth"});};
+ const backToDetails=()=>{if((window.history.state as {haddirPage?:string}|null)?.haddirPage==="event-payment"){window.history.back();return;}setShowPayment(false);window.scrollTo({top:0,behavior:"smooth"});};
  const submitBooking=async(e:any)=>{
   e.preventDefault();
   if(!receipt){setBookingError("ارفع صورة إيصال التحويل أولاً.");return;}
@@ -381,7 +396,7 @@ export default function Home(){
    {selected.coverImageUrl&&<img className="event-cover-image" src={selected.coverImageUrl} alt={selected.title}/>}
    <div className="detail-cover-shade"/>
    <div className="detail-cover-controls">
-    <button className="detail-glass-button" aria-label="إغلاق التفاصيل" onClick={()=>{setSelectedEvent(null);setShowPayment(false);}}><ArrowLeft size={20}/></button>
+    <button className="detail-glass-button" aria-label="إغلاق التفاصيل" onClick={()=>{if((window.history.state as {haddirPage?:string}|null)?.haddirPage==="event-detail"||(window.history.state as {haddirPage?:string}|null)?.haddirPage==="event-payment"){window.history.back();}else{setSelectedEvent(null);setShowPayment(false);}}}><ArrowLeft size={20}/></button>
     <div className="detail-cover-actions"><span className="detail-category-badge">{selected.category||"فعالية"}</span><button className="detail-glass-button" aria-label="مشاركة الفعالية" onClick={async()=>{const eventUrl=new URL(window.location.pathname,window.location.origin);eventUrl.searchParams.set("event",String(selected.id));try{if(navigator.share)await navigator.share({title:selected.title,text:"شوف الفعالية دي على حاضر",url:eventUrl.toString()});else{await navigator.clipboard.writeText(eventUrl.toString());alert("تم نسخ رابط الفعالية");}}catch(error){if(error instanceof Error&&error.name!=="AbortError")alert("تعذر مشاركة الفعالية حالياً.");}}}><Share2 size={18}/></button></div>
    </div>
    <div className="detail-cover-title"><span>تجربة تستحق الحضور</span><h1>{selected.title}</h1></div>
