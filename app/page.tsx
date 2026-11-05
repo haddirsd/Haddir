@@ -58,7 +58,6 @@ export default function Home(){
   if(!data?.event){setAdvertiserStatsError("ما لقينا فعالية مرتبطة بحسابك.");return;}
   setAdvertiserStats(data);
  };
- const advertiserMoney=(rows:any[],key:string)=>rows?.length?rows.map((row:any)=>formatMoney(Number(row[key]||0),String(row.currency||"SDG"))).join(" · "):formatMoney(0,"SDG");
  const signInWithGoogle=async()=>{const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("إعدادات تسجيل الدخول غير مكتملة على الموقع.");return;}const {error}=await supabase.auth.signInWithOAuth({provider:"google",options:{redirectTo:window.location.origin}});if(error)setAuthMessage(error.message);};
  const signInWithEmail=async()=>{const supabase=getSupabaseBrowserClient();if(!supabase||!loginEmail.trim()){setAuthMessage("أدخل بريدك الإلكتروني أولاً.");return;}const {error}=await supabase.auth.signInWithOtp({email:loginEmail.trim(),options:{emailRedirectTo:window.location.origin}});setAuthMessage(error?error.message:"أرسلنا رابط تسجيل الدخول إلى بريدك الإلكتروني. افتح الرسالة للمتابعة.");};
  const saveProfile=async()=>{if(!authUser){setAuthMessage("سجّل الدخول أولاً لحفظ بياناتك.");return;}const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("تعذر الاتصال بقاعدة البيانات حالياً.");return;}setProfileSaving(true);setSaved(false);setAuthMessage("");const {data,error}=await supabase.from("profiles").update({full_name:fullName.trim(),phone:phone.trim()||null}).eq("id",authUser.id).select("full_name,phone").single();setProfileSaving(false);if(error){setAuthMessage("ما قدرنا نحفظ بياناتك. تأكد من الاتصال وحاول مرة تانية.");return;}setFullName(data.full_name||"");setPhone(data.phone||"");setSaved(true);};
@@ -142,6 +141,7 @@ export default function Home(){
     <div className="advertiser-metric-grid">
      <article><small>الحاجزون المعتمدون</small><strong>{Number(advertiserStats.totals?.bookers||0).toLocaleString("ar-SD")}</strong></article>
      <article><small>الحجوزات المؤكدة</small><strong>{Number(advertiserStats.totals?.confirmed_bookings||0).toLocaleString("ar-SD")}</strong></article>
+     <article><small>الحجوزات المرفوضة</small><strong>{Number(advertiserStats.totals?.rejected_bookings||0).toLocaleString("ar-SD")}</strong></article>
      <article><small>التذاكر المباعة</small><strong>{Number(advertiserStats.totals?.confirmed_tickets||0).toLocaleString("ar-SD")}</strong></article>
      <article><small>التذاكر ضمن طلبات مرفوضة</small><strong>{Number(advertiserStats.totals?.rejected_tickets||0).toLocaleString("ar-SD")}</strong></article>
     </div>
