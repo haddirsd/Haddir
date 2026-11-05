@@ -23,6 +23,8 @@ export default function Home(){
  const [gatekeeperCode,setGatekeeperCode]=useState("");
  const [gatekeeperResult,setGatekeeperResult]=useState<any|null>(null);
  const [gatekeeperLoading,setGatekeeperLoading]=useState(false);
+ const [gatekeeperOnline,setGatekeeperOnline]=useState(true);
+ const [gatekeeperCounts,setGatekeeperCounts]=useState({accepted:0,used:0,forged:0});
  const [scannerOpen,setScannerOpen]=useState(false);
  const videoRef=useRef<HTMLVideoElement|null>(null);
  const [advertiserStats,setAdvertiserStats]=useState<any|null>(null);
@@ -72,7 +74,15 @@ export default function Home(){
   setGatekeeperLoading(false);
   if(error){setGatekeeperResult({ok:false,status:"error",message:error.message||"تعذر التحقق من التذكرة."});return;}
   setGatekeeperResult(data);
+  if(data?.status==="checked_in")setGatekeeperCounts(v=>({...v,accepted:v.accepted+1}));
+  else if(data?.status==="used")setGatekeeperCounts(v=>({...v,used:v.used+1}));
+  else if(data?.status==="not_found")setGatekeeperCounts(v=>({...v,forged:v.forged+1}));
  };
+ useEffect(()=>{
+  const update=()=>setGatekeeperOnline(typeof navigator!=="undefined"?navigator.onLine:true);
+  update();window.addEventListener("online",update);window.addEventListener("offline",update);
+  return()=>{window.removeEventListener("online",update);window.removeEventListener("offline",update);};
+ },[]);
  useEffect(()=>{
   if(!scannerOpen||activeWorkspace!=="gatekeeper")return;
   let stopped=false;let raf=0;let stream:MediaStream|null=null;
@@ -84,7 +94,7 @@ export default function Home(){
     stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false});
     video.srcObject=stream;await video.play();
     const detector=new Detector({formats:["qr_code"]});
-    const scan=async()=>{if(stopped)return;try{const codes=await detector.detect(video);if(codes?.length&&codes[0].rawValue){const value=String(codes[0].rawValue).trim();setGatekeeperCode(value);setScannerOpen(false);setGatekeeperResult(null);void runGatekeeperAction(false);return;}}catch{}raf=requestAnimationFrame(scan);};
+    const scan=async()=>{if(stopped)return;try{const codes=await detector.detect(video);if(codes?.length&&codes[0].rawValue){const value=String(codes[0].rawValue).trim();setGatekeeperCode(value);setScannerOpen(false);setGatekeeperResult(null);void runGatekeeperAction(true);return;}}catch{}raf=requestAnimationFrame(scan);};
     raf=requestAnimationFrame(scan);
    }catch{setGatekeeperResult({ok:false,status:"error",message:"تعذر تشغيل الكاميرا. تحقق من إذن الكاميرا أو أدخل الكود يدوياً."});}
   };
@@ -168,17 +178,17 @@ export default function Home(){
  {authUser&&<section className="role-workspace-section" aria-label="واجهات العمل">
   {(userRole==="owner"||userRole==="admin")&&<button type="button" className="role-workspace-button" onClick={()=>window.location.assign("/admin")}><span className="role-workspace-icon"><ShieldCheck size={21}/></span><span><strong>لوحة الإدارة</strong><small>إدارة المنصة والموظفين والفعاليات والحجوزات</small></span><ChevronLeft size={18}/></button>}
   {userRole==="supervisor"&&<button type="button" className="role-workspace-button" onClick={()=>window.location.assign("/admin")}><span className="role-workspace-icon"><ClipboardList size={21}/></span><span><strong>لوحة الإشراف</strong><small>مراجعة الحجوزات وإثباتات الدفع واتخاذ قرار القبول أو الرفض</small></span><ChevronLeft size={18}/></button>}
-  {(userRole==="gatekeeper"||userRole==="organizer")&&<button type="button" className="role-workspace-button" onClick={()=>{setGatekeeperResult(null);setGatekeeperCode("");setScannerOpen(false);setActiveWorkspace(activeWorkspace==="gatekeeper"?null:"gatekeeper");}}><span className="role-workspace-icon"><ScanLine size={21}/></span><span><strong>مسح التذاكر</strong><small>فحص تذاكر الفعالية وتأكيد دخول الحضور</small></span><ChevronLeft size={18}/></button>}
+   {(userRole==="gatekeeper"||userRole==="organizer")&&<button type="button" className="role-workspace-button" onClick={()=>{setGatekeeperResult(null);setGatekeeperCode("");setScannerOpen(false);setGatekeeperCounts({accepted:0,used:0,forged:0});setActiveWorkspace(activeWorkspace==="gatekeeper"?null:"gatekeeper");}}><span className="role-workspace-icon"><ScanLine size={21}/></span><span><strong>مسح التذاكر</strong><small>فحص تذاكر الفعالية وتأكيد دخول الحضور</small></span><ChevronLeft size={18}/></button>}
   {userRole==="advertiser"&&<button type="button" className="role-workspace-button" onClick={()=>void openAdvertiserStats()}><span className="role-workspace-icon"><Ticket size={21}/></span><span><strong>تفاصيل الفعالية</strong><small>عرض المبيعات والتذاكر والمستحقات للفعالية المرتبطة بك</small></span><ChevronLeft size={18}/></button>}
   {activeWorkspace==="gatekeeper"&&(userRole==="gatekeeper"||userRole==="organizer")&&<div className="gatekeeper-workspace">
-   <div className="gatekeeper-workspace-head"><div><small>مساحة البواب</small><h2>فحص تذاكر الدخول</h2><p>{assignedEvent?.events?.title||"لم يتم ربط فعالية بحسابك"}</p></div><button type="button" className="btn btn-outline" onClick={()=>{setActiveWorkspace(null);setScannerOpen(false);setGatekeeperResult(null);}}>إغلاق</button></div>
-   <div className="gatekeeper-task-grid"><article><ScanLine size={19}/><strong>امسح رمز QR</strong><small>أو أدخل كود التذكرة يدوياً</small></article><article><ShieldCheck size={19}/><strong>تحقق من الصلاحية</strong><small>لن يتم قبول تذكرة غير صالحة أو مستخدمة</small></article></div>
+   <div className="gatekeeper-workspace-head"><div><small>مساحة البواب</small><h2>فحص تذاكر الدخول</h2><p>{assignedEvent?.events?.title||"لم يتم ربط فعالية بحسابك"}</p></div><div className="gatekeeper-head-actions"><span className={"gatekeeper-network "+(gatekeeperOnline?"online":"offline")}><i/>{gatekeeperOnline?"متصل بالشبكة":"غير متصل"}</span><button type="button" className="btn btn-outline" onClick={()=>{setActiveWorkspace(null);setScannerOpen(false);setGatekeeperResult(null);}}>إغلاق</button></div></div>
+   <div className="gatekeeper-counter-grid"><article className="accepted"><small>مقبولة</small><strong>{gatekeeperCounts.accepted}</strong></article><article className="used"><small>مستخدمة</small><strong>{gatekeeperCounts.used}</strong></article><article className="forged"><small>مزوّرة</small><strong>{gatekeeperCounts.forged}</strong></article></div>
    {assignedEvent?.events&&<div className="gatekeeper-assigned-event"><small>الفعالية المصرح لك بها</small><strong>{assignedEvent.events.title}</strong><span>{assignedEvent.events.venue||assignedEvent.events.city||"الموقع غير محدد"} · {assignedEvent.events.starts_at?formatEventDate(assignedEvent.events.starts_at):"موعد غير محدد"}</span></div>}
    {!assignedEvent&&<p className="gatekeeper-inline-error">حسابك غير مربوط بفعالية حالياً. راجع إدارة حاضر لتعيين الفعالية.</p>}
-   <label className="gatekeeper-input">كود التذكرة<input value={gatekeeperCode} onChange={e=>setGatekeeperCode(e.target.value.toUpperCase())} placeholder="أدخل كود التذكرة" dir="ltr" autoComplete="off"/></label>
+   <form className="gatekeeper-manual-form" onSubmit={e=>{e.preventDefault();setScannerOpen(false);void runGatekeeperAction(true);}}><label className="gatekeeper-input" htmlFor="gatekeeper-manual-code">كود التذكرة</label><div><input id="gatekeeper-manual-code" value={gatekeeperCode} onChange={e=>setGatekeeperCode(e.target.value.toUpperCase())} placeholder="أدخل أو الصق كود التذكرة" dir="ltr" autoComplete="off"/><button type="submit" className="btn btn-outline" disabled={!assignedEvent||gatekeeperLoading||!gatekeeperCode.trim()}>{gatekeeperLoading?"جاري الفحص...":"تحقق ودخول"}</button></div></form>
    <div className="gatekeeper-actions"><button type="button" className="btn btn-outline" disabled={!assignedEvent||gatekeeperLoading} onClick={()=>setScannerOpen(v=>!v)}><ScanLine size={17}/>{scannerOpen?"إغلاق الكاميرا":"فتح كاميرا المسح"}</button><button type="button" className="btn btn-primary" disabled={!assignedEvent||gatekeeperLoading||!gatekeeperCode.trim()} onClick={()=>void runGatekeeperAction(false)}>{gatekeeperLoading?"جاري الفحص...":"فحص التذكرة"}</button></div>
    {scannerOpen&&<div className="gatekeeper-camera"><video ref={videoRef} autoPlay playsInline muted/><p>وجّه الكاميرا نحو رمز QR. إذا لم تعمل الكاميرا، أدخل الكود يدوياً.</p></div>}
-   {gatekeeperResult&&<div className={"gatekeeper-result "+(gatekeeperResult.ok?"valid":gatekeeperResult.status==="used"?"used":"invalid")}><strong>{gatekeeperResult.message}</strong>{gatekeeperResult.ticket_code&&<div className="gatekeeper-result-details"><span>الاسم: {gatekeeperResult.attendee_name||"—"}</span><span>الفعالية: {gatekeeperResult.event_title||"—"}</span><span>الفئة: {gatekeeperResult.ticket_type||"—"}</span><span>الكود: {gatekeeperResult.ticket_code}</span></div>}{gatekeeperResult.ok&&gatekeeperResult.status==="valid"&&<button type="button" className="btn btn-primary" disabled={gatekeeperLoading} onClick={()=>void runGatekeeperAction(true)}>تأكيد دخول التذكرة</button>}</div>}
+   {gatekeeperResult&&<div className={"gatekeeper-result "+(gatekeeperResult.status==="checked_in"?"valid":gatekeeperResult.status==="used"?"used":gatekeeperResult.status==="not_found"?"invalid":"error")}><strong>{gatekeeperResult.status==="checked_in"?"مقبولة — تم تسجيل استخدامها بنجاح":gatekeeperResult.status==="used"?"مستخدمة — تم استخدام هذه التذكرة من قبل":gatekeeperResult.status==="not_found"?"مزوّرة — هذا الكود غير صادر من نظام حاضر":gatekeeperResult.message}</strong>{gatekeeperResult.ticket_code&&<div className="gatekeeper-result-details"><span>اسم المشتري: {gatekeeperResult.buyer_name||gatekeeperResult.attendee_name||"—"}</span><span>الفعالية: {gatekeeperResult.event_title||"—"}</span><span>فئة التذكرة: {gatekeeperResult.ticket_type||"—"}</span>{gatekeeperResult.attendee_count!=null&&<span>عدد الأفراد في الحجز: {gatekeeperResult.attendee_count}</span>}<span>الكود: {gatekeeperResult.ticket_code}</span></div>}{gatekeeperResult.status==="checked_in"&&<p>تم تحديث حالة التذكرة في النظام إلى «مستخدمة»، ولن تُقبل مرة أخرى.</p>}</div>}
   </div>}
  </section>}
  {authUser&&userRole==="advertiser"&&<section className="detail-section advertiser-profile-stats">
