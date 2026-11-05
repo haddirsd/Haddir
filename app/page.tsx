@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { getSupabaseBrowserClient } from "../lib/supabase";
+import { getGatekeeperScanStats, getGatekeeperScanHistory, submitGatekeeperTicketAction } from "../features/gatekeeper/gatekeeper.service";
 import { QRCodeSVG as QrCodeSVG } from "qrcode.react";
 import { BrowserQRCodeReader } from "@zxing/browser";
 import { ArrowLeft, Copy, Wallet, Bell, CalendarDays, CheckCircle2, House, MapPin, Settings, Sparkles, Ticket, UserRound, ChevronLeft, Share2, ExternalLink, CreditCard, Download, ScanLine, ShieldCheck, ClipboardList } from "lucide-react";
@@ -102,8 +103,7 @@ export default function Home(){
   if(!authUser||!assignedEvent?.event_id||(userRole!=="gatekeeper"&&userRole!=="organizer"))return;
   let alive=true;
   const loadGatekeeperCounts=async()=>{
-   const supabase=getSupabaseBrowserClient();if(!supabase)return;
-   const {data,error}=await supabase.rpc("get_gatekeeper_scan_stats",{p_event_id:assignedEvent.event_id});
+   const {data,error}=await getGatekeeperScanStats(assignedEvent.event_id);
    if(alive&&!error&&data)setGatekeeperCounts({accepted:Number(data.accepted||0),used:Number(data.used||0),forged:Number(data.forged||0),invalid:Number(data.invalid||0)});
   };
   void loadGatekeeperCounts();
@@ -150,9 +150,8 @@ export default function Home(){
  };
  const loadGatekeeperScanHistory=async()=>{
   if(!assignedEvent?.event_id)return;
-  const supabase=getSupabaseBrowserClient();if(!supabase)return;
   setGatekeeperHistoryLoading(true);
-  const {data,error}=await supabase.rpc("get_gatekeeper_scan_history",{p_event_id:assignedEvent.event_id});
+  const {data,error}=await getGatekeeperScanHistory(assignedEvent.event_id);
   setGatekeeperHistoryLoading(false);
   if(!error&&Array.isArray(data))setGatekeeperManualHistory(data);
  };
@@ -162,14 +161,13 @@ export default function Home(){
   if(entryMethod==="manual"&&!/^[0-9]{10}$/.test(code)){
    setGatekeeperResult({ok:false,status:"error",message:"كود التذكرة يجب أن يتكون من 10 أرقام فقط."});return;
   }
-  const supabase=getSupabaseBrowserClient();if(!supabase)return;
   setGatekeeperLoading(true);
-  const {data,error}=await supabase.rpc(entryMethod==="manual"?"gatekeeper_manual_ticket_action":"gatekeeper_ticket_action",{p_ticket_code:code,p_confirm:confirm});
+  const {data,error}=await submitGatekeeperTicketAction(code,confirm,entryMethod);
   setGatekeeperLoading(false);
   if(error){setGatekeeperResult({ok:false,status:"error",message:error.message||"تعذر التحقق من التذكرة."});}
   else setGatekeeperResult(data);
   if(assignedEvent?.event_id){
-   const {data:stats}=await supabase.rpc("get_gatekeeper_scan_stats",{p_event_id:assignedEvent.event_id});
+   const {data:stats}=await getGatekeeperScanStats(assignedEvent.event_id);
    if(stats)setGatekeeperCounts({accepted:Number(stats.accepted||0),used:Number(stats.used||0),forged:Number(stats.forged||0),invalid:Number(stats.invalid||0)});
   }
   await loadGatekeeperScanHistory();
@@ -180,8 +178,8 @@ export default function Home(){
   let alive=true;
   const refreshGatekeeperData=async()=>{
    const [{data:stats},{data:history,error}]=await Promise.all([
-    supabase.rpc("get_gatekeeper_scan_stats",{p_event_id:assignedEvent.event_id}),
-    supabase.rpc("get_gatekeeper_scan_history",{p_event_id:assignedEvent.event_id})
+    getGatekeeperScanStats(assignedEvent.event_id),
+    getGatekeeperScanHistory(assignedEvent.event_id)
    ]);
    if(!alive)return;
    if(stats)setGatekeeperCounts({accepted:Number(stats.accepted||0),used:Number(stats.used||0),forged:Number(stats.forged||0),invalid:Number(stats.invalid||0)});
