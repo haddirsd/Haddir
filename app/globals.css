@@ -1779,3 +1779,55 @@ body{font-size:16px}
 .gatekeeper-history-meta small{font-size:10px;color:var(--muted)}
 .gatekeeper-manual-form>small{font-size:10px;color:var(--muted)}
 .theme-dark .gatekeeper-manual-history,.theme-dark .gatekeeper-history-item{background:#211a2a;border-color:var(--line)}
+
+
+/* Event details and checkout are full pages, never floating sheets or dialogs. */
+.app-content:has(+ .event-detail-page){display:none!important}
+.event-detail-page{
+ position:relative!important;z-index:auto!important;inset:auto!important;
+ display:block!important;width:100%;min-height:100dvh;height:auto!important;
+ overflow:visible!important;padding:0!important;margin:0!important;
+ background:var(--bg)!important;backdrop-filter:none!important;
+ -webkit-backdrop-filter:none!important;animation:none!important;
+}
+.event-detail-layout{
+ position:relative!important;inset:auto!important;
+ display:flex!important;flex-direction:column!important;
+ width:100%!important;max-width:none!important;
+ height:auto!important;max-height:none!important;min-height:100dvh!important;
+ margin:0!important;padding:0!important;overflow:visible!important;
+ border:0!important;border-radius:0!important;
+ background:var(--bg)!important;color:var(--fg)!important;
+ box-shadow:none!important;animation:none!important;
+}
+.event-detail-layout:before{display:none!important;content:none!important}
+.event-detail-layout .detail-cover{
+ width:100%!important;height:clamp(280px,48vh,480px)!important;
+ min-height:280px!important;border-radius:0!important;
+}
+.event-detail-layout .detail-content{
+ width:100%!important;max-width:1000px!important;
+ margin:0 auto!important;padding:26px clamp(16px,4vw,40px) 56px!important;
+}
+.event-detail-layout .detail-main{max-width:760px!important}
+.event-detail-layout .actionable-footer{
+ margin-inline:calc(-1 * clamp(16px,4vw,40px))!important;
+ padding-inline:clamp(16px,4vw,40px)!important;
+}
+.event-detail-layout.payment-sheet{
+ display:block!important;min-height:100dvh!important;
+ padding:28px 0 56px!important;border-radius:0!important;
+}
+.event-detail-layout.payment-sheet:before{display:none!important}
+.event-detail-layout.payment-sheet .payment-screen{
+ width:min(620px,calc(100% - 32px))!important;
+ padding:28px 0 48px!important;
+}
+@media(max-width:600px){
+ .event-detail-layout .detail-cover{height:clamp(270px,42dvh,390px)!important;min-height:270px!important}
+ .event-detail-layout .detail-content{padding:18px 16px 48px!important}
+ .event-detail-layout .actionable-footer{
+  margin-inline:-16px!important;padding-inline:16px!important;
+ }
+ .event-detail-layout.payment-sheet{padding-top:18px!important}
+}
