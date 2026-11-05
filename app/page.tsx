@@ -104,7 +104,7 @@ export default function Home(){
   const loadGatekeeperCounts=async()=>{
    const supabase=getSupabaseBrowserClient();if(!supabase)return;
    const {data,error}=await supabase.rpc("get_gatekeeper_scan_stats",{p_event_id:assignedEvent.event_id});
-   if(alive&&!error&&data)setGatekeeperCounts({accepted:Number(data.accepted||0),used:Number(data.used||0),forged:Number(data.forged||0)});
+   if(alive&&!error&&data)setGatekeeperCounts({accepted:Number(data.accepted||0),used:Number(data.used||0),forged:Number(data.forged||0),invalid:Number(data.invalid||0)});
   };
   void loadGatekeeperCounts();
   return()=>{alive=false;};
@@ -148,7 +148,7 @@ export default function Home(){
   if(!data?.event){setAdvertiserStatsError("ما لقينا فعالية مرتبطة بحسابك.");return;}
   setAdvertiserStats(data);
  };
- const loadGatekeeperManualHistory=async()=>{
+ const loadGatekeeperScanHistory=async()=>{
   if(!assignedEvent?.event_id)return;
   const supabase=getSupabaseBrowserClient();if(!supabase)return;
   setGatekeeperHistoryLoading(true);
@@ -172,7 +172,7 @@ export default function Home(){
    const {data:stats}=await supabase.rpc("get_gatekeeper_scan_stats",{p_event_id:assignedEvent.event_id});
    if(stats)setGatekeeperCounts({accepted:Number(stats.accepted||0),used:Number(stats.used||0),forged:Number(stats.forged||0),invalid:Number(stats.invalid||0)});
   }
-  await loadGatekeeperManualHistory();
+  await loadGatekeeperScanHistory();
  };
  useEffect(()=>{
   const supabase=getSupabaseBrowserClient();
@@ -181,10 +181,10 @@ export default function Home(){
   const refreshGatekeeperData=async()=>{
    const [{data:stats},{data:history,error}]=await Promise.all([
     supabase.rpc("get_gatekeeper_scan_stats",{p_event_id:assignedEvent.event_id}),
-    supabase.rpc("get_gatekeeper_manual_history",{p_event_id:assignedEvent.event_id})
+    supabase.rpc("get_gatekeeper_scan_history",{p_event_id:assignedEvent.event_id})
    ]);
    if(!alive)return;
-   if(stats)setGatekeeperCounts({accepted:Number(stats.accepted||0),used:Number(stats.used||0),forged:Number(stats.forged||0)});
+   if(stats)setGatekeeperCounts({accepted:Number(stats.accepted||0),used:Number(stats.used||0),forged:Number(stats.forged||0),invalid:Number(stats.invalid||0)});
    if(!error&&Array.isArray(history))setGatekeeperManualHistory(history);
   };
   void refreshGatekeeperData();
