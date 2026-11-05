@@ -40,6 +40,9 @@ export default function AdminPage() {
   const [rejectionReasons,setRejectionReasons]=useState<Record<string,string>>({});
   const [updatingUserId,setUpdatingUserId]=useState<string|null>(null);
   const [userMessage,setUserMessage]=useState("");
+  const [eventOptions,setEventOptions]=useState<Row[]>([]);
+  const [roleDrafts,setRoleDrafts]=useState<Record<string,string>>({});
+  const [assignmentEventIds,setAssignmentEventIds]=useState<Record<string,string>>({});
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
@@ -83,7 +86,21 @@ export default function AdminPage() {
     if (section === "events") result = await supabase.from("events").select("id,title,category,city,venue,starts_at,status,created_at,is_trending,description,address,location_url,ends_at,cover_image_url").order("created_at",{ascending:false}).limit(100);
     if (section === "bookings") result = await supabase.from("bookings").select("id,booking_number,customer_name,customer_email,customer_phone,event_id,subtotal,currency,status,expires_at,created_at,events(title,city,venue,starts_at),booking_items(quantity,unit_price,line_total,ticket_types(name)),payment_submissions(id,payment_account_name,payment_account_number,payment_account_beneficiary,transfer_reference,receipt_path,status,created_at)").order("created_at",{ascending:false}).limit(100);
     if (section === "payments") result = await supabase.from("payment_submissions").select("id,booking_id,transfer_reference,receipt_path,amount,currency,status,review_note,created_at,payment_account_id,payment_account_name,payment_account_number,payment_account_beneficiary,bookings(booking_number,customer_name,customer_email,customer_phone,subtotal,currency,events(title,city,venue,starts_at),booking_items(quantity,ticket_types(name)))").order("created_at",{ascending:false}).limit(100);
-    if (section === "users" && role !== "supervisor") result = await supabase.from("profiles").select("id,full_name,phone,role,created_at").order("created_at",{ascending:false}).limit(100);
+    if (section === "users" && role !== "supervisor") {
+      result = await supabase.from("profiles").select("id,full_name,phone,role,created_at").order("created_at",{ascending:false}).limit(100);
+      if (!result.error) {
+        const [{data:assignments,error:assignmentError},{data:events,error:eventError}] = await Promise.all([
+          supabase.from("event_role_assignments").select("user_id,event_id,assignment_role"),
+          supabase.from("events").select("id,title,status").order("created_at",{ascending:false}).limit(200)
+        ]);
+        if (assignmentError || eventError) { result = {data:null,error:assignmentError||eventError}; }
+        else {
+          setEventOptions(events||[]);
+          const byUser = new Map((assignments||[]).map((a:any)=>[a.user_id,a.event_id]));
+          result = {data:(result.data||[]).map((u:any)=>({...u,assignment_event_id:byUser.get(u.id)||""})),error:null};
+        }
+      }
+    }
     if (section === "reports" && role !== "supervisor") result = await supabase.from("bookings").select("subtotal,currency,status,created_at").order("created_at",{ascending:false}).limit(500);
     if (result.error) { setSectionLoading(false);setError("تعذر تحميل بيانات هذا القسم: " + result.error.message); return; }
     let loadedRows=result.data||[];
@@ -133,19 +150,22 @@ export default function AdminPage() {
     await loadSection();
   };
 
-  const updateUserRole = async (userRow:Row, nextRole:string) => {
+  const updateUserRole = async (userRow:Row, nextRole:string, eventId:string|null) => {
     const supabase=getSupabaseBrowserClient();
     if(!supabase||!role||!["owner","admin"].includes(role)||updatingUserId)return;
     if(["owner","admin"].includes(userRow.role)){setError("لا يمكن تغيير صلاحية مالك المنصة أو مدير الإدارة من هذه الشاشة.");return;}
-    if(!["supervisor","organizer","gatekeeper","advertiser","customer"].includes(nextRole))return;
+    if(!["supervisor","gatekeeper","advertiser","customer"].includes(nextRole))return;
+    if((nextRole==="gatekeeper"||nextRole==="advertiser")&&!eventId){setError("اختار الفعالية أولاً لهذا المستخدم.");return;}
     const {data:{user}}=await supabase.auth.getUser();
     if(user?.id===userRow.id){setError("لا يمكنك تغيير دور حسابك الحالي من هنا.");return;}
     if(!window.confirm("تأكيد تغيير دور "+(userRow.full_name||"هذا المستخدم")+"؟"))return;
     setUpdatingUserId(userRow.id);setError("");setUserMessage("");
-    const {error:updateError}=await supabase.rpc("admin_update_profile_role",{p_user_id:userRow.id,p_role:nextRole});
+    const {error:updateError}=await supabase.rpc("admin_update_profile_role",{p_user_id:userRow.id,p_role:nextRole,p_event_id:eventId});
     setUpdatingUserId(null);
     if(updateError){setError("تعذر تعديل دور المستخدم: "+updateError.message);return;}
-    setRows(current=>current.map(item=>item.id===userRow.id?{...item,role:nextRole}:item));
+    setRows(current=>current.map(item=>item.id===userRow.id?{...item,role:nextRole,assignment_event_id:eventId||""}:item));
+    setRoleDrafts(v=>({...v,[userRow.id]:nextRole}));
+    setAssignmentEventIds(v=>({...v,[userRow.id]:eventId||""}));
     setUserMessage("تم تحديث دور المستخدم بنجاح.");
   };
 
@@ -269,7 +289,7 @@ export default function AdminPage() {
   if (!role) return <main className="admin-denied" dir="rtl"><Shield size={34}/><h1>الوصول غير متاح</h1><p>{error || "هذه الصفحة مخصصة لفريق إدارة حاضر."}</p><button onClick={() => router.replace("/")}>العودة للرئيسية</button></main>;
 
   const supervisor = role === "supervisor";
-  const roleLabel = role === "owner" ? "مالك المنصة" : role === "admin" ? "مدير الإدارة" : "المشرف الإداري";
+  const roleLabel = role === "owner" ? "مالك المنصة" : role === "admin" ? "المشرف الإداري" : "موظف حاضر";
   const metrics = supervisor
     ? [{title:"إثباتات بانتظار المراجعة",value:counts.pending,icon:ClipboardCheck},{title:"الحجوزات",value:counts.bookings,icon:Ticket}]
     : [{title:"الفعاليات",value:counts.events,icon:CalendarDays},{title:"الحجوزات",value:counts.bookings,icon:Ticket},{title:"إثباتات بانتظار المراجعة",value:counts.pending,icon:ClipboardCheck},{title:"حسابات المستخدمين",value:counts.users,icon:Users}];
@@ -290,20 +310,36 @@ export default function AdminPage() {
     };
     const cols=columns[section]||[];
     if(section==="users"){
-      const roleNames:Record<string,string>={owner:"مالك المنصة",admin:"مدير الإدارة",supervisor:"مشرف",organizer:"منظم",gatekeeper:"بواب",advertiser:"مُعلن",customer:"عميل عادي"};
+      const roleNames:Record<string,string>={owner:"مالك المنصة",admin:"مشرف إداري",supervisor:"موظف حاضر",organizer:"منظم حاضر",gatekeeper:"منظم حاضر",advertiser:"مُعلن",customer:"عميل"};
       return <div className="admin-users-table-wrap">
         <table className="admin-users-table">
-          <thead><tr><th>الإسم</th><th>رقم الهاتف</th><th>الدور</th><th>تاريخ التسجيل</th><th>تعديل الدور</th></tr></thead>
-          <tbody>{rows.map((r,i)=><tr key={r.id||i}>
-            <td data-label="الإسم"><strong>{fmt(r.full_name)}</strong></td>
-            <td data-label="رقم الهاتف"><span dir="ltr">{fmt(r.phone)}</span></td>
-            <td data-label="الدور"><span className="admin-user-role">{roleNames[r.role]||fmt(r.role)}</span></td>
-            <td data-label="تاريخ التسجيل">{r.created_at?new Date(r.created_at).toLocaleDateString("ar-SD"):"—"}</td>
-            <td data-label="تعديل الدور"><select aria-label={"تعديل دور "+(r.full_name||"المستخدم")} value={r.role||"customer"} disabled={updatingUserId===r.id||["owner","admin"].includes(r.role)} onChange={e=>void updateUserRole(r,e.target.value)}>
-              <option value="customer">عميل عادي</option><option value="supervisor">مشرف</option><option value="organizer">منظم</option><option value="gatekeeper">بواب</option><option value="advertiser">مُعلن</option>
-              {!["customer","supervisor","organizer","gatekeeper","advertiser"].includes(r.role)&&<option value={r.role}>{roleNames[r.role]||r.role}</option>}
-            </select>{updatingUserId===r.id&&<small className="admin-user-saving">جاري الحفظ…</small>}</td>
-          </tr>)}</tbody>
+          <thead><tr><th>الإسم</th><th>رقم الهاتف</th><th>الدور</th><th>تاريخ التسجيل</th><th>تعديل الدور / الفعالية</th></tr></thead>
+          <tbody>{rows.map((r,i)=>{
+            const draftRole=roleDrafts[r.id]||r.role||"customer";
+            const selectedEvent=assignmentEventIds[r.id]??r.assignment_event_id??"";
+            const protectedUser=["owner","admin"].includes(r.role);
+            return <tr key={r.id||i}>
+              <td data-label="الإسم"><strong>{fmt(r.full_name)}</strong></td>
+              <td data-label="رقم الهاتف"><span dir="ltr">{fmt(r.phone)}</span></td>
+              <td data-label="الدور"><span className="admin-user-role">{roleNames[r.role]||fmt(r.role)}</span></td>
+              <td data-label="تاريخ التسجيل">{r.created_at?new Date(r.created_at).toLocaleDateString("ar-SD"):"—"}</td>
+              <td data-label="تعديل الدور / الفعالية">
+                <div className="admin-user-role-editor">
+                  <select aria-label={"تعديل دور "+(r.full_name||"المستخدم")} value={draftRole} disabled={updatingUserId===r.id||protectedUser} onChange={e=>setRoleDrafts(v=>({...v,[r.id]:e.target.value}))}>
+                    <option value="customer">عميل</option><option value="admin" disabled>مشرف إداري</option><option value="supervisor">موظف حاضر</option><option value="gatekeeper">منظم حاضر (بواب)</option><option value="advertiser">مُعلن</option>
+                    {r.role==="organizer"&&<option value="organizer">منظم حاضر</option>}
+                    {protectedUser&&<option value={r.role}>{roleNames[r.role]||r.role}</option>}
+                  </select>
+                  {(draftRole==="gatekeeper"||draftRole==="advertiser"||draftRole==="organizer")&&<select aria-label="اختيار الفعالية" value={selectedEvent} disabled={updatingUserId===r.id} onChange={e=>setAssignmentEventIds(v=>({...v,[r.id]:e.target.value}))}>
+                    <option value="">اختر الفعالية (تشمل المسودات)</option>
+                    {eventOptions.map((ev:any)=><option key={ev.id} value={ev.id}>{ev.title} · {ev.status==="draft"?"مسودة":ev.status==="published"?"منشورة":ev.status}</option>)}
+                  </select>}
+                  {!protectedUser&&<button type="button" className="admin-user-save-role" disabled={updatingUserId===r.id||draftRole==="organizer"||((draftRole==="gatekeeper"||draftRole==="advertiser")&&!selectedEvent)||draftRole===r.role&&((draftRole!=="gatekeeper"&&draftRole!=="advertiser")||selectedEvent===(r.assignment_event_id||""))} onClick={()=>void updateUserRole(r,draftRole,(draftRole==="gatekeeper"||draftRole==="advertiser")?selectedEvent:null)}>{updatingUserId===r.id?"جاري الحفظ…":"حفظ"}</button>}
+                </div>
+                {updatingUserId===r.id&&<small className="admin-user-saving">جاري الحفظ…</small>}
+              </td>
+            </tr>;
+          })}</tbody>
         </table>
         {rows.length===0&&<p className="admin-no-data">لا يوجد مستخدمون مسجلون حتى الآن.</p>}
       </div>;
