@@ -1635,3 +1635,98 @@ body{font-size:16px}
   .tickets-screen .ticket-preview-copy>span{font-size:9px}
   .tickets-screen .ticket-preview-status{top:6px;left:6px;font-size:7px}
 }
+
+
+/* Customer tickets: use the available viewport instead of a narrow centered column. */
+.tickets-screen{
+  width:min(1080px,calc(100% - 32px));
+  max-width:1080px;
+  margin-inline:auto;
+  padding-top:18px;
+  gap:16px;
+}
+.tickets-screen .ticket-tabs{
+  display:flex;
+  align-self:stretch;
+  width:100%;
+  justify-content:flex-start;
+  gap:26px;
+  margin:0;
+}
+.tickets-screen .ticket-list{
+  width:100%;
+  max-width:none;
+  gap:14px;
+}
+.tickets-screen .ticket-card-wrap{width:100%}
+.tickets-screen .ticket-preview-card{
+  width:100%;
+  grid-template-columns:minmax(150px, 36%) minmax(0,1fr);
+  min-height:148px;
+  border-radius:17px;
+}
+.tickets-screen .ticket-preview-image,
+.tickets-screen .ticket-preview-image img,
+.tickets-screen .ticket-preview-fallback{min-height:148px}
+.tickets-screen .ticket-preview-copy{
+  justify-content:center;
+  gap:9px;
+  padding:16px 20px 16px 24px;
+}
+.tickets-screen .ticket-preview-copy>strong{font-size:16px;line-height:1.55}
+.tickets-screen .ticket-preview-copy>span{font-size:13px}
+.tickets-screen .ticket-preview-status{font-size:10px;padding:4px 9px}
+.tickets-screen .empty-state{max-width:none;width:100%}
+@media(max-width:520px){
+  .tickets-screen{
+    width:calc(100% - 28px);
+    max-width:none;
+    padding-top:14px;
+    padding-bottom:24px;
+    gap:14px;
+  }
+  .tickets-screen .ticket-tabs{
+    width:100%;
+    gap:22px;
+    justify-content:flex-start;
+  }
+  .tickets-screen .ticket-tabs button{
+    font-size:13px;
+    padding:0 1px 10px;
+  }
+  .tickets-screen .ticket-tabs button span{
+    min-width:20px;
+    height:20px;
+    font-size:10px;
+  }
+  .tickets-screen .ticket-list{gap:13px}
+  .tickets-screen .ticket-preview-card{
+    grid-template-columns:minmax(124px,38%) minmax(0,1fr);
+    min-height:136px;
+    border-radius:16px;
+  }
+  .tickets-screen .ticket-preview-image,
+  .tickets-screen .ticket-preview-image img,
+  .tickets-screen .ticket-preview-fallback{min-height:136px}
+  .tickets-screen .ticket-preview-copy{
+    justify-content:center;
+    gap:8px;
+    padding:15px 13px 13px 19px;
+  }
+  .tickets-screen .ticket-preview-copy>strong{font-size:14px;line-height:1.5}
+  .tickets-screen .ticket-preview-copy>span{font-size:11px;gap:5px}
+  .tickets-screen .ticket-preview-status{
+    top:8px;
+    left:8px;
+    font-size:9px;
+    padding:3px 8px;
+  }
+  .tickets-screen .ticket-expanded-panel{padding-top:12px}
+}
+@media(min-width:521px) and (max-width:900px){
+  .tickets-screen{width:calc(100% - 40px)}
+  .tickets-screen .ticket-preview-card{min-height:142px}
+  .tickets-screen .ticket-preview-image,
+  .tickets-screen .ticket-preview-image img,
+  .tickets-screen .ticket-preview-fallback{min-height:142px}
+}
