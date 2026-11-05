@@ -1377,3 +1377,14 @@ body{font-size:16px}
   .gatekeeper-counter-grid strong { font-size: 18px; }
   .gatekeeper-head-actions .btn { min-height: 40px; padding-inline: 10px; }
 }
+
+
+/* Admin search and user count */
+.admin-search-box{display:flex;flex-direction:column;gap:5px;min-width:min(280px,100%);flex:1;max-width:390px}
+.admin-search-box>span{font-size:12px;font-weight:700;color:var(--muted,#64748b)}
+.admin-search-box input{width:100%;min-height:42px;padding:9px 12px;border:1px solid var(--border,#dbe2ea);border-radius:12px;background:var(--surface,#fff);color:inherit;font:inherit;outline:none}
+.admin-search-box input:focus{border-color:var(--primary,#2563eb);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.admin-user-total{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:8px 13px;border-radius:11px;background:var(--surface-soft,#f1f5f9);font-weight:800;white-space:nowrap}
+.admin-user-email{display:block;margin-top:4px;color:var(--muted,#64748b);font-size:12px;overflow-wrap:anywhere}
+.admin-panel-actions{flex-wrap:wrap;align-items:flex-end}
+@media(max-width:700px){.admin-search-box{max-width:none;min-width:100%}.admin-user-total{width:100%;justify-content:flex-start}.admin-panel-actions{width:100%;align-items:stretch}.admin-panel-actions>*{max-width:none}}
