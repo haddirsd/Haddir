@@ -66,11 +66,12 @@ export default function Home(){
   if(!data?.event){setAdvertiserStatsError("ما لقينا فعالية مرتبطة بحسابك.");return;}
   setAdvertiserStats(data);
  };
- const runGatekeeperAction=async(confirm:boolean)=>{
-  if(!authUser||!assignedEvent||!gatekeeperCode.trim())return;
+ const runGatekeeperAction=async(confirm:boolean,codeOverride?:string)=>{
+  const code=(codeOverride??gatekeeperCode).trim();
+  if(!authUser||!assignedEvent||!code)return;
   const supabase=getSupabaseBrowserClient();if(!supabase)return;
   setGatekeeperLoading(true);
-  const {data,error}=await supabase.rpc("gatekeeper_ticket_action",{p_ticket_code:gatekeeperCode.trim(),p_confirm:confirm});
+  const {data,error}=await supabase.rpc("gatekeeper_ticket_action",{p_ticket_code:code,p_confirm:confirm});
   setGatekeeperLoading(false);
   if(error){setGatekeeperResult({ok:false,status:"error",message:error.message||"تعذر التحقق من التذكرة."});return;}
   setGatekeeperResult(data);
@@ -94,7 +95,7 @@ export default function Home(){
     stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false});
     video.srcObject=stream;await video.play();
     const detector=new Detector({formats:["qr_code"]});
-    const scan=async()=>{if(stopped)return;try{const codes=await detector.detect(video);if(codes?.length&&codes[0].rawValue){const value=String(codes[0].rawValue).trim();setGatekeeperCode(value);setScannerOpen(false);setGatekeeperResult(null);void runGatekeeperAction(true);return;}}catch{}raf=requestAnimationFrame(scan);};
+    const scan=async()=>{if(stopped)return;try{const codes=await detector.detect(video);if(codes?.length&&codes[0].rawValue){const value=String(codes[0].rawValue).trim();setGatekeeperCode(value);setScannerOpen(false);setGatekeeperResult(null);void runGatekeeperAction(true,value);return;}}catch{}raf=requestAnimationFrame(scan);};
     raf=requestAnimationFrame(scan);
    }catch{setGatekeeperResult({ok:false,status:"error",message:"تعذر تشغيل الكاميرا. تحقق من إذن الكاميرا أو أدخل الكود يدوياً."});}
   };
