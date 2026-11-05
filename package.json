@@ -14,7 +14,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "qrcode.react": "^4.2.0",
-    "@supabase/supabase-js": "^2.57.0"
+    "@supabase/supabase-js": "^2.57.0",
+    "@zxing/browser": "^0.1.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.6",
