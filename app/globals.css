@@ -1117,3 +1117,263 @@ body{font-size:16px}
 .theme-dark .gatekeeper-network.offline{background:#3a2022;color:#ffaaaa;border-color:#633235}
 .theme-dark .gatekeeper-counter-grid article,.theme-dark .gatekeeper-manual-form input{background:#2b2235;border-color:var(--line);color:var(--fg)}
 @media(max-width:520px){.gatekeeper-head-actions{width:100%;justify-content:space-between}.gatekeeper-counter-grid{gap:7px}.gatekeeper-counter-grid article{padding:10px}.gatekeeper-counter-grid strong{font-size:22px}.gatekeeper-manual-form>div{flex-direction:column}.gatekeeper-manual-form .btn{width:100%}}
+
+
+/* Unified responsive pass: administration and staff workspaces */
+.admin-shell,
+.admin-main,
+.admin-content,
+.admin-panel,
+.admin-statistics,
+.admin-table-wrap,
+.admin-event-cards,
+.admin-booking-cards,
+.admin-payment-cards,
+.advertiser-profile-stats,
+.advertiser-statistics-panel,
+.gatekeeper-workspace {
+  min-width: 0;
+  max-width: 100%;
+}
+.admin-content { width: min(100%, 1240px); }
+.admin-panel { overflow: hidden; }
+.admin-panel-head { min-width: 0; }
+.admin-panel-head > div:first-child { min-width: 0; }
+.admin-panel-actions { flex-wrap: wrap; }
+.admin-refresh { min-height: 40px; }
+.admin-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid #eee7f4;
+  border-radius: 13px;
+  background: #fff;
+}
+.admin-data-table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: auto;
+  text-align: right;
+}
+.admin-data-table th,
+.admin-data-table td {
+  padding: 12px 13px;
+  border-bottom: 1px solid #f0eaf5;
+  vertical-align: top;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.admin-data-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #faf7fd;
+  color: #746580;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.admin-data-table td {
+  color: #493d55;
+  font-size: 12px;
+}
+.admin-data-table tbody tr:last-child td { border-bottom: 0; }
+.admin-data-table tbody tr:hover { background: #fdfbff; }
+.admin-no-data { overflow-wrap: anywhere; line-height: 1.9; }
+.admin-event-form,
+.admin-ticket-editor,
+.admin-ticket-row { min-width: 0; max-width: 100%; }
+.admin-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.admin-event-form input,
+.admin-event-form textarea,
+.admin-event-form select,
+.admin-users-table select,
+.admin-payment-reject-box textarea { min-width: 0; max-width: 100%; }
+.admin-event-stat-select { width: 100%; }
+.admin-stat-tabs button { min-height: 44px; }
+.admin-metric { min-width: 0; overflow-wrap: anywhere; }
+.admin-metric strong { overflow-wrap: anywhere; }
+.admin-event-card,
+.admin-booking-card,
+.admin-payment-card { min-width: 0; }
+.admin-event-card-actions button,
+.admin-payment-actions button,
+.admin-user-save-role { min-height: 44px; }
+.advertiser-profile-stats { width: 100%; }
+.advertiser-metric-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); }
+.advertiser-metric-grid article { min-width: 0; overflow-wrap: anywhere; }
+.advertiser-ticket-table {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.advertiser-ticket-table table { min-width: 680px; }
+.gatekeeper-workspace { width: 100%; }
+.gatekeeper-workspace-head > div:first-child { min-width: 0; }
+.gatekeeper-workspace-head p,
+.gatekeeper-assigned-event strong,
+.gatekeeper-assigned-event span { overflow-wrap: anywhere; }
+.gatekeeper-counter-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.gatekeeper-counter-grid article { min-width: 0; }
+.gatekeeper-actions button { min-width: 0; white-space: normal; line-height: 1.5; }
+.gatekeeper-manual-form,
+.gatekeeper-manual-form > div { min-width: 0; }
+.gatekeeper-manual-form input { width: 100%; min-width: 0; }
+.gatekeeper-result,
+.gatekeeper-result-details { min-width: 0; overflow-wrap: anywhere; }
+
+@media (max-width: 1024px) and (min-width: 621px) {
+  .admin-shell { display: flex; flex-direction: column; }
+  .admin-sidebar {
+    position: sticky;
+    z-index: 35;
+    top: 0;
+    width: 100%;
+    height: auto;
+    padding: 10px 18px 8px;
+    border: 0;
+    border-bottom: 1px solid #eee7f4;
+  }
+  .admin-brand { padding: 0 5px 8px; }
+  .admin-side-caption,
+  .admin-side-bottom { display: none; }
+  .admin-sidebar nav {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 3px 0 5px;
+    justify-content: flex-start;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+  .admin-sidebar nav button {
+    flex: 0 0 auto;
+    min-height: 43px;
+    padding: 9px 13px;
+    white-space: nowrap;
+  }
+  .admin-sidebar nav button > span { width: auto; }
+  .admin-main { width: 100%; }
+  .admin-topbar { min-height: 72px; height: auto; padding: 13px 22px; }
+  .admin-content { padding: 22px; }
+  .admin-metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 700px) {
+  .admin-content { padding: 17px 14px; }
+  .admin-welcome { gap: 12px; }
+  .admin-welcome > div:first-child { min-width: 0; }
+  .admin-welcome h2 { overflow-wrap: anywhere; }
+  .admin-panel { padding: 15px; }
+  .admin-panel-head { align-items: flex-start; }
+  .admin-panel-actions { width: 100%; }
+  .admin-panel-actions button { flex: 1 1 auto; }
+  .admin-form-grid { grid-template-columns: minmax(0, 1fr); }
+  .admin-event-stat-select { grid-template-columns: minmax(0, 1fr); }
+  .admin-stat-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-stat-tabs button { min-width: 0; padding-inline: 8px; line-height: 1.5; }
+  .admin-footer { flex-wrap: wrap; gap: 8px; }
+  .advertiser-stats-heading { align-items: flex-start; }
+  .advertiser-finance-card > div { align-items: flex-start; flex-wrap: wrap; }
+}
+
+@media (max-width: 620px) {
+  .admin-shell { display: block; padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+  .admin-sidebar {
+    position: fixed;
+    z-index: 50;
+    inset: auto 0 0;
+    width: 100%;
+    height: auto;
+    padding: 7px 8px calc(7px + env(safe-area-inset-bottom));
+    border: 0;
+    border-top: 1px solid #eee7f4;
+    box-shadow: 0 -8px 24px rgba(35, 20, 48, .08);
+  }
+  .admin-brand,
+  .admin-side-caption,
+  .admin-side-bottom { display: none; }
+  .admin-sidebar nav {
+    display: flex;
+    justify-content: flex-start;
+    gap: 5px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+  }
+  .admin-sidebar nav::-webkit-scrollbar { display: none; }
+  .admin-sidebar nav button {
+    flex: 0 0 78px;
+    min-width: 78px;
+    min-height: 54px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 5px 3px;
+    border-radius: 11px;
+    font-size: 10px;
+    line-height: 1.25;
+    white-space: normal;
+    text-align: center;
+    scroll-snap-align: start;
+  }
+  .admin-sidebar nav button > span { width: auto; }
+  .admin-sidebar nav svg { width: 18px; height: 18px; }
+  .admin-topbar { min-height: 66px; height: auto; padding: 10px 15px; }
+  .admin-topbar h1 { font-size: 17px; }
+  .admin-top-user > span:first-child { display: none; }
+  .admin-content { padding: 15px 12px 22px; }
+  .admin-welcome { padding: 17px; }
+  .admin-welcome h2 { font-size: 19px; }
+  .admin-welcome-mark { width: 44px; height: 44px; flex: none; }
+  .admin-metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .admin-metric { padding: 12px; }
+  .admin-metric strong { font-size: 19px; }
+  .admin-shortcuts { grid-template-columns: minmax(0, 1fr); }
+  .admin-event-card-meta,
+  .admin-booking-card-grid,
+  .admin-payment-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-event-card-actions button { flex: 1 1 120px; }
+  .admin-panel-actions button { min-width: 0; }
+  .admin-table-wrap { border-radius: 11px; }
+  .admin-data-table { min-width: 860px; }
+  .admin-data-table th,
+  .admin-data-table td { padding: 10px; }
+  .admin-users-table-wrap { overflow: visible; }
+  .advertiser-profile-stats { padding: 14px; }
+  .advertiser-metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .advertiser-metric-grid article { padding: 12px; }
+  .advertiser-finance-card > div { flex-direction: column; align-items: flex-start; gap: 5px; }
+  .gatekeeper-workspace { padding: 14px; gap: 13px; }
+  .gatekeeper-workspace-head { flex-direction: column; }
+  .gatekeeper-head-actions { width: 100%; display: flex; align-items: center; justify-content: space-between; }
+  .gatekeeper-counter-grid { gap: 7px; }
+  .gatekeeper-counter-grid article { padding: 10px; }
+  .gatekeeper-counter-grid strong { font-size: 21px; }
+  .gatekeeper-actions { flex-direction: column; }
+  .gatekeeper-actions button { width: 100%; min-height: 48px; }
+  .gatekeeper-manual-form > div { flex-direction: column; }
+  .gatekeeper-manual-form .btn { width: 100%; }
+}
+
+@media (max-width: 380px) {
+  .admin-metric-grid,
+  .admin-event-card-meta,
+  .admin-booking-card-grid,
+  .admin-payment-card-grid { grid-template-columns: minmax(0, 1fr); }
+  .admin-stat-tabs { grid-template-columns: minmax(0, 1fr); }
+  .admin-sidebar nav button { flex-basis: 72px; min-width: 72px; font-size: 9px; }
+  .advertiser-metric-grid { grid-template-columns: minmax(0, 1fr); }
+  .gatekeeper-counter-grid strong { font-size: 18px; }
+  .gatekeeper-head-actions .btn { min-height: 40px; padding-inline: 10px; }
+}
