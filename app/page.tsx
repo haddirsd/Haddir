@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { getSupabaseBrowserClient } from "../lib/supabase";
+import { getEventPaymentAccounts, createBooking, uploadPaymentReceipt, submitPayment, removePaymentReceipt } from "../features/booking/booking.service";
+import type { EventPaymentAccount } from "../features/booking/booking.types";
 import { useGatekeeper } from "../features/gatekeeper/useGatekeeper";
 import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
 import { QRCodeSVG as QrCodeSVG } from "qrcode.react";
@@ -8,7 +10,6 @@ import { ArrowLeft, Copy, Wallet, Bell, CalendarDays, CheckCircle2, House, MapPi
 type EventItem = {id:string;date:string;title:string;place:string;category:string;price:string;cover:string;coverImageUrl:string|null;tag:string;time:string;venue:string;status:string;map:string;about:string;isTrending:boolean;tiers:{id:string;name:string;description:string;price:string;priceValue:number;currency:string;quantityTotal:number;quantitySold:number;available:number;availableNow:boolean}[]};
 const formatEventDate=(value:string)=>new Intl.DateTimeFormat("ar-SD",{weekday:"long",day:"numeric",month:"long"}).format(new Date(value));
 
-type EventPaymentAccount={id:string;account_name:string;account_number:string;beneficiary:string};
 const toNumber=(value:string)=>{const digits=value.replace(/[٠-٩]/g,d=>String("٠١٢٣٤٥٦٧٨٩".indexOf(d)));const n=Number(digits.replace(/[^0-9]/g,""));return Number.isFinite(n)?n:0};
 const currencyLabel=(currency:string)=>({SDG:"ج.س",SAR:"ر.س",AED:"د.إ",USD:"$",EGP:"ج.م"}[currency.trim().toUpperCase()]||currency.trim().toUpperCase());
 const formatMoney=(value:number,currency="SDG")=>new Intl.NumberFormat("ar-SD").format(value)+" "+currencyLabel(currency);
@@ -178,7 +179,7 @@ export default function Home(){
   window.scrollTo({top:0,behavior:"smooth"});
  }; const downloadTicket=async(ticket:any)=>{try{const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1350;const ctx=canvas.getContext("2d");if(!ctx)return;await document.fonts.ready;ctx.fillStyle="#f7f1fb";ctx.fillRect(0,0,1080,1350);ctx.fillStyle="#fff";ctx.fillRect(48,48,984,1254);ctx.strokeStyle="#e7d9f1";ctx.lineWidth=3;ctx.strokeRect(48,48,984,1254);ctx.direction="rtl";ctx.textAlign="right";const right=950;ctx.fillStyle="#5b2e82";ctx.font="bold 48px Alexandria,Arial";ctx.fillText("حاضر  HADDIR",right,135);ctx.fillStyle="#8b7897";ctx.font="26px Alexandria,Arial";ctx.fillText("تذكرة دخول إلكترونية",right,190);ctx.strokeStyle="#dfd1e9";ctx.setLineDash([10,9]);ctx.beginPath();ctx.moveTo(100,230);ctx.lineTo(980,230);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle="#8b7897";ctx.font="26px Alexandria,Arial";ctx.fillText("الفعالية",right,300);ctx.fillStyle="#30213b";ctx.font="bold 44px Alexandria,Arial";const eventTitle=String(ticket.events?.title||"فعالية");ctx.fillText(eventTitle.length>32?eventTitle.slice(0,32)+"…":eventTitle,right,365);ctx.fillStyle="#8b7897";ctx.font="24px Alexandria,Arial";ctx.fillText("نوع التذكرة",right,455);ctx.fillText("رقم الحجز",520,455);ctx.fillStyle="#3d3047";ctx.font="bold 27px Alexandria,Arial";ctx.fillText(String(ticket.ticket_types?.name||"تذكرة"),right,500);ctx.fillText(String(ticket.bookings?.booking_number||"—"),520,500);ctx.fillStyle="#8b7897";ctx.font="24px Alexandria,Arial";ctx.fillText("الموقع",right,575);ctx.fillText("التاريخ",520,575);ctx.fillStyle="#3d3047";ctx.font="bold 25px Alexandria,Arial";ctx.fillText(String(ticket.events?.venue||"—"),right,620);ctx.fillText(ticket.events?.starts_at?formatEventDate(ticket.events.starts_at):"—",520,620);ctx.strokeStyle="#e5d9ed";ctx.setLineDash([10,9]);ctx.beginPath();ctx.moveTo(100,675);ctx.lineTo(980,675);ctx.stroke();ctx.setLineDash([]);const qr=document.querySelector('[data-ticket-id="'+String(ticket.id)+'"] .haddir-ticket-qr svg');if(!qr)throw new Error("QR unavailable");const svg=new XMLSerializer().serializeToString(qr);const img=new Image();const loaded=new Promise<void>((resolve,reject)=>{img.onload=()=>resolve();img.onerror=()=>reject(new Error("QR image failed"));});img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);await loaded;ctx.drawImage(img,330,700,420,420);ctx.fillStyle="#8e8297";ctx.font="23px Alexandria,Arial";ctx.textAlign="center";ctx.fillText("امسح الرمز للتحقق من التذكرة",540,1045);ctx.fillStyle="#5c2e82";ctx.font="bold 48px Arial";ctx.fillText(String(ticket.ticket_code||""),540,1120);ctx.fillStyle="#f6f0fa";ctx.fillRect(48,1190,984,112);ctx.fillStyle="#76558d";ctx.font="bold 23px Alexandria,Arial";ctx.fillText("احتفظ بالتذكرة وأبرزها عند الدخول",540,1255);const link=document.createElement("a");link.download="haddir-ticket-"+String(ticket.ticket_code||ticket.id)+".png";link.href=canvas.toDataURL("image/png");link.click();}catch(error){console.error("Ticket image export failed",error);alert("تعذر حفظ التذكرة كصورة. حاول مرة أخرى.");}};
  const openEvent=(id:string)=>{resetBooking();const url=new URL(window.location.href);url.searchParams.set("event",id);url.searchParams.delete("checkout");url.searchParams.delete("tier");url.searchParams.delete("qty");window.history.pushState({...window.history.state,haddirPage:"event-detail"},"",url.pathname+url.search+url.hash);setSelectedEvent(id);window.scrollTo({top:0,behavior:"smooth"});};
- const openPayment=async()=>{if(!tierChosen)return;if(!authUser){setAuthMessage("سجّل الدخول أولاً عشان نكمل حجزك. الفعاليات متاحة للتصفح بدون حساب.");setSelectedEvent(null);setShowPayment(false);setActiveTab("profile");window.scrollTo({top:0,behavior:"smooth"});return;}setAuthMessage("");const supabase=getSupabaseBrowserClient();if(supabase&&selected){const {data,error}=await supabase.from("event_payment_accounts").select("id,account_name,account_number,beneficiary").eq("event_id",selected.id).eq("is_active",true).order("sort_order");if(error){setBookingError("تعذر تحميل حسابات الدفع لهذه الفعالية: "+error.message);return;}const accounts=(data||[]) as EventPaymentAccount[];setEventPaymentAccounts(accounts);setPaymentMethod("");setAccountCopied(false);}const url=new URL(window.location.href);url.searchParams.set("checkout","1");url.searchParams.set("tier",String(selectedTier));url.searchParams.set("qty",String(ticketCount));window.history.pushState({...window.history.state,haddirPage:"event-payment"},"",url.pathname+url.search+url.hash);setShowPayment(true);window.scrollTo({top:0,behavior:"smooth"});};
+ const openPayment=async()=>{if(!tierChosen)return;if(!authUser){setAuthMessage("سجّل الدخول أولاً عشان نكمل حجزك. الفعاليات متاحة للتصفح بدون حساب.");setSelectedEvent(null);setShowPayment(false);setActiveTab("profile");window.scrollTo({top:0,behavior:"smooth"});return;}setAuthMessage("");if(selected){const {data,error}=await getEventPaymentAccounts(selected.id);if(error){setBookingError("تعذر تحميل حسابات الدفع لهذه الفعالية: "+(error.message||""));return;}setEventPaymentAccounts(data||[]);setPaymentMethod("");setAccountCopied(false);}const url=new URL(window.location.href);url.searchParams.set("checkout","1");url.searchParams.set("tier",String(selectedTier));url.searchParams.set("qty",String(ticketCount));window.history.pushState({...window.history.state,haddirPage:"event-payment"},"",url.pathname+url.search+url.hash);setShowPayment(true);window.scrollTo({top:0,behavior:"smooth"});};
  const backToDetails=()=>{if((window.history.state as {haddirPage?:string}|null)?.haddirPage==="event-payment"){window.history.back();return;}const url=new URL(window.location.href);url.searchParams.delete("checkout");window.history.replaceState({...window.history.state,haddirPage:"event-detail"},"",url.pathname+url.search+url.hash);setShowPayment(false);window.scrollTo({top:0,behavior:"smooth"});};
  const submitBooking=async(e:any)=>{
   e.preventDefault();
@@ -187,28 +188,24 @@ export default function Home(){
   if(!eventPaymentAccounts.some(a=>a.id===paymentMethod)){setBookingError("اختر حساب دفع متاح لهذه الفعالية.");return;}
   if(!["image/jpeg","image/png","image/webp"].includes(receipt.type)){setBookingError("الصيغ المدعومة: JPG أو PNG أو WebP.");return;}
   if(receipt.size>5*1024*1024){setBookingError("حجم الإيصال يجب ألا يتجاوز 5 ميجابايت.");return;}
-  const supabase=getSupabaseBrowserClient();
-  if(!supabase){setBookingError("تعذر الاتصال بقاعدة البيانات حالياً.");return;}
+  if(!getSupabaseBrowserClient()){setBookingError("تعذر الاتصال بقاعدة البيانات حالياً.");return;}
   setBookingSubmitting(true);setBookingError("");
   let activeBookingId=bookingId;
   if(!activeBookingId){
-   const {data,error}=await supabase.rpc("create_booking",{p_event_id:selected.id,p_ticket_type_id:selected.tiers[selectedTier].id,p_quantity:ticketCount});
+   const {data:created,error}=await createBooking(selected.id,selected.tiers[selectedTier].id,ticketCount);
    if(error){setBookingSubmitting(false);setBookingError(error.message||"ما قدرنا ننشئ الحجز.");return;}
-   const created=Array.isArray(data)?data[0]:data;
    if(!created?.booking_id){setBookingSubmitting(false);setBookingError("لم نستلم تأكيد إنشاء الحجز.");return;}
    activeBookingId=created.booking_id;setBookingId(activeBookingId);setBookingNumber(created.booking_number||"");
   }
-  const ext=receipt.type==="image/png"?"png":receipt.type==="image/webp"?"webp":"jpg";
-  const receiptPath=authUser.id+"/"+activeBookingId+"/"+crypto.randomUUID()+"."+ext;
-  const {error:uploadError}=await supabase.storage.from("payment-receipts").upload(receiptPath,receipt,{contentType:receipt.type,upsert:false,cacheControl:"3600"});
-  if(uploadError){setBookingSubmitting(false);setBookingError("تم حفظ الحجز لكن تعذر رفع الإيصال: "+uploadError.message+". يمكنك المحاولة مرة أخرى.");return;}
-  const {data:submissionId,error:submitError}=await supabase.rpc("submit_payment",{p_booking_id:activeBookingId,p_payment_method_id:paymentMethod,p_receipt_path:receiptPath,p_transfer_reference:null});
+  const {path:receiptPath,error:uploadError}=await uploadPaymentReceipt(authUser.id,activeBookingId,receipt);
+  if(uploadError||!receiptPath){setBookingSubmitting(false);setBookingError("تم حفظ الحجز لكن تعذر رفع الإيصال: "+(uploadError?.message||"تعذر تحديد مسار الإيصال")+". يمكنك المحاولة مرة أخرى.");return;}
+  const {data:submissionId,error:submitError}=await submitPayment(activeBookingId,paymentMethod,receiptPath);
   if(submitError||!submissionId){
-   await supabase.storage.from("payment-receipts").remove([receiptPath]);
+   await removePaymentReceipt(receiptPath);
    setBookingSubmitting(false);setBookingError(submitError?.message||"تعذر إرسال إثبات الدفع للمراجعة. حاول مرة أخرى.");return;
   }
   setBookingSubmitting(false);setBookingDone(true);setActiveTab("notifications");
- };
+};
  return <main dir="rtl" lang="ar" className={"app-shell"+(darkMode?" theme-dark":"")}>
  <>
  {!selected&&(isGatekeeperPage?<header className="screen-topbar gatekeeper-page-topbar"><button type="button" className="btn btn-outline" onClick={()=>{setIsGatekeeperPage(false);setActiveWorkspace(null);const url=new URL(window.location.href);url.searchParams.delete("workspace");window.location.assign(url.pathname+url.search+url.hash);}}>العودة للملف الشخصي</button><strong>مسح التذاكر</strong><span className="screen-icon"><ScanLine/></span></header>:activeTab==="home"?<header className="topbar"><div className="container header-inner"><button className="brand brand-button" onClick={()=>go("home")}><span className="brand-mark">ح</span> حاضر</button><div className="desktop-greeting">من السودان، لكل لحظة تستاهل الحضور.</div><button className="header-icon theme-toggle" type="button" aria-label={darkMode?"تفعيل الوضع النهاري":"تفعيل الوضع الليلي"} aria-pressed={darkMode} onClick={()=>setDarkMode(v=>!v)}>{<span className="theme-toggle-track" aria-hidden="true"><span className="theme-toggle-knob">{darkMode?"☾":"☀"}</span></span>}</button></div></header>:<header className="screen-topbar"><span className="screen-topbar-spacer" aria-hidden="true"/><strong>{({tickets:"تذاكري",notifications:"الإشعارات",profile:"الملف الشخصي"} as Record<string,string>)[activeTab]}</strong><span className="screen-icon">{activeTab==="tickets"?<Ticket/>:activeTab==="notifications"?<Bell/>:<UserRound/>}</span></header>)}
