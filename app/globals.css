@@ -1928,3 +1928,11 @@ body{font-size:16px}
  .event-detail-layout.payment-sheet .payment-screen{min-height:calc(100dvh - 82px)}
  .event-detail-layout.payment-sheet .checkout-form{min-height:calc(100dvh - 130px)}
 }
+
+
+.checkout-back-group{display:flex;align-items:center;gap:10px;color:var(--fg);font-size:13px;font-weight:800}
+.event-detail-layout.payment-sheet .checkout-back-group .checkout-back-icon{
+ display:grid!important;place-items:center!important;width:42px!important;height:42px!important;
+ padding:0!important;border-radius:50%!important;flex:none!important;
+}
+.event-detail-layout.payment-sheet .checkout-back-group>span{white-space:nowrap}
