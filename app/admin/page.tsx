@@ -6,9 +6,9 @@ import { getSupabaseBrowserClient } from "../../lib/supabase";
 import { Activity, ArrowRight, BadgeCheck, Banknote, CalendarDays, ClipboardCheck, LayoutDashboard, LogOut, Shield, Ticket, Users, Wallet, RefreshCw } from "lucide-react";
 
 type AdminRole = "owner" | "admin" | "supervisor";
-type Section = "overview" | "events" | "bookings" | "payments" | "users" | "reports";
+type Section = "overview" | "events" | "bookings" | "payments" | "users" | "reports" | "activity";
 type Row = Record<string, any>;
-const labels: Record<Section, string> = { overview: "نظرة عامة", events: "الفعاليات", bookings: "الحجوزات", payments: "مراجعة المدفوعات", users: "المستخدمون", reports: "الإحصائيات" };
+const labels: Record<Section, string> = { overview: "نظرة عامة", events: "الفعاليات", bookings: "الحجوزات", payments: "مراجعة المدفوعات", users: "المستخدمون", reports: "الإحصائيات", activity: "سجل الإجراءات" };
 const statusLabels: Record<string, string> = { draft:"مسودة", published:"منشورة", cancelled:"ملغاة", completed:"مكتملة", pending_payment:"بانتظار الدفع", under_review:"قيد المراجعة", confirmed:"مؤكد", rejected:"مرفوض", expired:"منتهي", submitted:"بانتظار المراجعة", approved:"مقبول", valid:"صالح", used:"مستخدم" };
 const fmt = (v: unknown) => v == null || v === "" ? "—" : String(v);
 const money = (v: unknown, currency = "SDG") => v == null ? "—" : `${Number(v).toLocaleString("ar-SD")} ${currency}`;
@@ -79,13 +79,14 @@ export default function AdminPage() {
     return () => { alive = false; };
   }, [router]);
 
-  const nav = useMemo(() => role === "supervisor" ? (["overview","bookings","payments"] as Section[]) : (["overview","events","bookings","payments","users","reports"] as Section[]), [role]);
+  const nav = useMemo(() => role === "supervisor" ? (["overview","bookings","payments","activity"] as Section[]) : (["overview","events","bookings","payments","users","reports","activity"] as Section[]), [role]);
 
   const loadSection = async () => {
     const supabase = getSupabaseBrowserClient();
     if (!supabase || !role || section === "overview") return;
     setSectionLoading(true); setError(""); setRows([]);
     let result: {data:any[]|null,error:any} = {data:[],error:null};
+    if (section === "activity") result = await supabase.from("admin_activity_log").select("id,actor_name,actor_role,action,entity_type,entity_label,event_id,booking_id,details,created_at").order("created_at",{ascending:false}).limit(500);
     if (section === "events") result = await supabase.from("events").select("id,title,category,city,venue,starts_at,status,created_at,is_trending,description,address,location_url,ends_at,cover_image_url,platform_fee_percent").order("created_at",{ascending:false}).limit(100);
     if (section === "bookings") result = await supabase.from("bookings").select("id,booking_number,customer_name,customer_email,customer_phone,event_id,subtotal,currency,status,expires_at,created_at,events(title,city,venue,starts_at),booking_items(quantity,unit_price,line_total,ticket_types(name)),payment_submissions(id,payment_account_name,payment_account_number,payment_account_beneficiary,transfer_reference,receipt_path,status,created_at)").order("created_at",{ascending:false}).limit(100);
     if (section === "payments") result = await supabase.from("payment_submissions").select("id,booking_id,transfer_reference,receipt_path,amount,currency,status,review_note,created_at,payment_account_id,payment_account_name,payment_account_number,payment_account_beneficiary,bookings(booking_number,customer_name,customer_email,customer_phone,subtotal,currency,events(title,city,venue,starts_at),booking_items(quantity,ticket_types(name)))").order("created_at",{ascending:false}).limit(100);
@@ -321,6 +322,13 @@ export default function AdminPage() {
     : [{title:"الفعاليات",value:counts.events,icon:CalendarDays},{title:"الحجوزات",value:counts.bookings,icon:Ticket},{title:"إثباتات بانتظار المراجعة",value:counts.pending,icon:ClipboardCheck},{title:"حسابات المستخدمين",value:counts.users,icon:Users}];
 
   const renderRows = () => {
+    if (section === "activity") {
+      const actionNames:Record<string,string>={"events.created":"أضاف فعالية","events.updated":"عدّل بيانات فعالية","events.deleted":"حذف فعالية","user.created":"أضاف عميلاً / مستخدماً","user.role_changed":"غيّر دور مستخدم","bookings.created":"أنشأ حجزاً","booking.confirmed":"وافق على الحجز","booking.rejected":"رفض الحجز","booking.pending_payment":"غيّر حالة الحجز إلى انتظار الدفع","booking.under_review":"حوّل الحجز للمراجعة","payment.approved":"اعتمد إثبات الدفع","payment.rejected":"رفض إثبات الدفع","ticket.checked_in":"أكد دخول التذكرة","ticket.checkin_reversed":"ألغى تأكيد دخول التذكرة","ticket.status_changed":"عدّل حالة التذكرة","ticket_type.created":"أضاف فئة تذاكر","ticket_type.updated":"عدّل فئة تذاكر","ticket_type.deleted":"حذف فئة تذاكر","payment_account.created":"أضاف حساب دفع","payment_account.updated":"عدّل حساب دفع","payment_account.deleted":"حذف حساب دفع"};
+      const roleNames:Record<string,string>={owner:"مالك المنصة",admin:"مشرف",supervisor:"موظف حاضر",gatekeeper:"بواب",organizer:"بواب",advertiser:"معلن",customer:"عميل",unknown:"غير معروف"};
+      const fieldNames:Record<string,string>={title:"اسم الفعالية",status:"الحالة",description:"الوصف",venue:"المكان",city:"المدينة",starts_at:"موعد البداية",ends_at:"موعد النهاية",platform_fee_percent:"نسبة العمولة",role:"الدور",full_name:"الاسم",is_trending:"رائج الآن",price:"السعر",quantity_total:"الكمية",name:"الاسم",is_active:"التفعيل"};
+      const detailText=(details:Row)=>Object.entries(details||{}).map(([key,value]:[string,any])=>{const v=value&&typeof value==="object"&&("before" in value||"after" in value)?`من ${JSON.stringify(value.before)} إلى ${JSON.stringify(value.after)}`:JSON.stringify(value);return `${fieldNames[key]||key}: ${v}`;}).join(" · ");
+      return <div className="admin-table-wrap"><table className="admin-data-table"><thead><tr><th>المنفّذ</th><th>دوره</th><th>الإجراء</th><th>العنصر</th><th>التفاصيل</th><th>التاريخ والوقت</th></tr></thead><tbody>{rows.map((r,i)=><tr key={r.id||i}><td><strong>{r.actor_name||"مستخدم غير معروف"}</strong></td><td>{roleNames[r.actor_role]||r.actor_role}</td><td>{actionNames[r.action]||r.action}</td><td>{r.entity_label||r.entity_type||"—"}</td><td>{detailText(r.details)||"—"}</td><td>{r.created_at?new Date(r.created_at).toLocaleString("ar-SD"):"—"}</td></tr>)}</tbody></table>{rows.length===0&&<p className="admin-no-data">لا توجد إجراءات مسجلة حتى الآن. ستظهر الإجراءات الجديدة هنا تلقائياً.</p>}<p className="admin-stats-note">يعرض السجل آخر 500 إجراء. اسم المنفّذ ودوره محفوظان وقت تنفيذ الإجراء ولا يتغيران بتغيير بيانات الحساب لاحقاً.</p></div>;
+    }
     if (section === "reports") {
       const data=statistics;
       if(!data)return <p className="admin-no-data">جاري تجهيز الإحصائيات...</p>;
