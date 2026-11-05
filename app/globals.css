@@ -1831,3 +1831,19 @@ body{font-size:16px}
  }
  .event-detail-layout.payment-sheet{padding-top:18px!important}
 }
+
+
+/* Keep the event booking total and action dock fully opaque while scrolling. */
+.event-detail-layout .detail-booking-dock.actionable-footer{
+  background-color:var(--surface,#fff)!important;
+  background-image:none!important;
+  opacity:1!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  isolation:isolate;
+  border-top:1px solid var(--line)!important;
+}
+.event-detail-layout .detail-booking-dock .detail-dock-summary,
+.event-detail-layout .detail-booking-dock .pay-button{
+  opacity:1!important;
+}
