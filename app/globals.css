@@ -1730,3 +1730,24 @@ body{font-size:16px}
   .tickets-screen .ticket-preview-image img,
   .tickets-screen .ticket-preview-fallback{min-height:142px}
 }
+
+
+/* Remove nested container gutters on the customer ticket page.
+   The screen already sits inside .container; break out once and keep only a 12px mobile gutter. */
+.tickets-screen.container{
+  width:min(1080px,calc(100vw - 40px));
+  max-width:none;
+  margin-inline:calc(50% - 50vw + 20px);
+  padding-inline:0;
+}
+.tickets-screen .ticket-list,
+.tickets-screen .ticket-card-wrap,
+.tickets-screen .ticket-preview-card{width:100%;max-width:none}
+@media(max-width:520px){
+  .tickets-screen.container{
+    width:calc(100vw - 24px);
+    margin-inline:calc(50% - 50vw + 12px);
+    padding-inline:0;
+  }
+  .tickets-screen .ticket-preview-card{width:100%}
+}
