@@ -91,7 +91,7 @@ export default function AdminPage() {
       if (!result.error) {
         const [{data:assignments,error:assignmentError},{data:events,error:eventError}] = await Promise.all([
           supabase.from("event_role_assignments").select("user_id,event_id,assignment_role"),
-          supabase.from("events").select("id,title,status").order("created_at",{ascending:false}).limit(200)
+          supabase.from("events").select("id,title,status").in("status",["draft","published"]).order("created_at",{ascending:false}).limit(200)
         ]);
         if (assignmentError || eventError) { result = {data:null,error:assignmentError||eventError}; }
         else {
