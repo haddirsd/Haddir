@@ -8,7 +8,7 @@ import { Activity, ArrowRight, BadgeCheck, Banknote, CalendarDays, ClipboardChec
 type AdminRole = "owner" | "admin" | "supervisor";
 type Section = "overview" | "events" | "bookings" | "payments" | "users" | "reports";
 type Row = Record<string, any>;
-const labels: Record<Section, string> = { overview: "نظرة عامة", events: "الفعاليات", bookings: "الحجوزات", payments: "مراجعة المدفوعات", users: "المستخدمون", reports: "التقارير" };
+const labels: Record<Section, string> = { overview: "نظرة عامة", events: "الفعاليات", bookings: "الحجوزات", payments: "مراجعة المدفوعات", users: "المستخدمون", reports: "الإحصائيات" };
 const statusLabels: Record<string, string> = { draft:"مسودة", published:"منشورة", cancelled:"ملغاة", completed:"مكتملة", pending_payment:"بانتظار الدفع", under_review:"قيد المراجعة", confirmed:"مؤكد", rejected:"مرفوض", expired:"منتهي", submitted:"بانتظار المراجعة", approved:"مقبول", valid:"صالح", used:"مستخدم" };
 const fmt = (v: unknown) => v == null || v === "" ? "—" : String(v);
 const money = (v: unknown, currency = "SDG") => v == null ? "—" : `${Number(v).toLocaleString("ar-SD")} ${currency}`;
@@ -28,7 +28,7 @@ export default function AdminPage() {
   const [savingEvent, setSavingEvent] = useState(false);
   const [eventMessage, setEventMessage] = useState("");
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
-  const emptyEventForm = {title:"",description:"",category:"",city:"",venue:"",address:"",location_url:"",starts_at:"",ends_at:"",cover_image_url:"",is_trending:false};
+  const emptyEventForm = {title:"",description:"",category:"",city:"",venue:"",address:"",location_url:"",starts_at:"",ends_at:"",cover_image_url:"",is_trending:false,platform_fee_percent:"0"};
   type TicketForm = {id?:string;name:string;description:string;price:string;currency:string;quantity_total:string;quantity_sold:number;sales_start_at:string;sales_end_at:string;is_active:boolean};
   const emptyTicket = ():TicketForm => ({name:"تذكرة عامة",description:"",price:"",currency:"SDG",quantity_total:"",quantity_sold:0,sales_start_at:"",sales_end_at:"",is_active:true});
   const [ticketForms,setTicketForms] = useState<TicketForm[]>([emptyTicket()]);
@@ -43,6 +43,9 @@ export default function AdminPage() {
   const [eventOptions,setEventOptions]=useState<Row[]>([]);
   const [roleDrafts,setRoleDrafts]=useState<Record<string,string>>({});
   const [assignmentEventIds,setAssignmentEventIds]=useState<Record<string,string>>({});
+  const [statistics,setStatistics]=useState<{events:Row[];profiles:Row[];bookings:Row[];tickets:Row[]}|null>(null);
+  const [statsView,setStatsView]=useState<"general"|"event">("general");
+  const [statsEventId,setStatsEventId]=useState("");
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
@@ -83,7 +86,7 @@ export default function AdminPage() {
     if (!supabase || !role || section === "overview") return;
     setSectionLoading(true); setError(""); setRows([]);
     let result: {data:any[]|null,error:any} = {data:[],error:null};
-    if (section === "events") result = await supabase.from("events").select("id,title,category,city,venue,starts_at,status,created_at,is_trending,description,address,location_url,ends_at,cover_image_url").order("created_at",{ascending:false}).limit(100);
+    if (section === "events") result = await supabase.from("events").select("id,title,category,city,venue,starts_at,status,created_at,is_trending,description,address,location_url,ends_at,cover_image_url,platform_fee_percent").order("created_at",{ascending:false}).limit(100);
     if (section === "bookings") result = await supabase.from("bookings").select("id,booking_number,customer_name,customer_email,customer_phone,event_id,subtotal,currency,status,expires_at,created_at,events(title,city,venue,starts_at),booking_items(quantity,unit_price,line_total,ticket_types(name)),payment_submissions(id,payment_account_name,payment_account_number,payment_account_beneficiary,transfer_reference,receipt_path,status,created_at)").order("created_at",{ascending:false}).limit(100);
     if (section === "payments") result = await supabase.from("payment_submissions").select("id,booking_id,transfer_reference,receipt_path,amount,currency,status,review_note,created_at,payment_account_id,payment_account_name,payment_account_number,payment_account_beneficiary,bookings(booking_number,customer_name,customer_email,customer_phone,subtotal,currency,events(title,city,venue,starts_at),booking_items(quantity,ticket_types(name)))").order("created_at",{ascending:false}).limit(100);
     if (section === "users" && role !== "supervisor") {
@@ -101,7 +104,30 @@ export default function AdminPage() {
         }
       }
     }
-    if (section === "reports" && role !== "supervisor") result = await supabase.from("bookings").select("subtotal,currency,status,created_at").order("created_at",{ascending:false}).limit(500);
+    if (section === "reports" && role !== "supervisor") {
+      const fetchAll = async (table:string, columns:string, sort:string) => {
+        const all:Row[]=[]; let offset=0;
+        while(true){
+          const {data,error}=await supabase.from(table).select(columns).order(sort,{ascending:false}).range(offset,offset+999);
+          if(error)return {data:null,error};
+          all.push(...(data||[]));
+          if((data||[]).length<1000)break;
+          offset+=1000;
+        }
+        return {data:all,error:null};
+      };
+      const [events,profiles,bookings,tickets]=await Promise.all([
+        fetchAll("events","id,title,status,starts_at,ends_at,platform_fee_percent,ticket_types(id,name,price,currency,quantity_total,quantity_sold)","created_at"),
+        fetchAll("profiles","id,role","created_at"),
+        fetchAll("bookings","id,event_id,user_id,customer_email,customer_phone,subtotal,currency,status,created_at,booking_items(id,ticket_type_id,quantity,unit_price,line_total,ticket_types(name,currency))","created_at"),
+        fetchAll("tickets","id,event_id,ticket_type_id,status","issued_at")
+      ]);
+      const failed=[events,profiles,bookings,tickets].find(x=>x.error);
+      if(failed){setSectionLoading(false);setError("تعذر تحميل الإحصائيات: "+failed.error.message);return;}
+      setStatistics({events:events.data||[],profiles:profiles.data||[],bookings:bookings.data||[],tickets:tickets.data||[]});
+      setSectionLoading(false);
+      return;
+    }
     if (result.error) { setSectionLoading(false);setError("تعذر تحميل بيانات هذا القسم: " + result.error.message); return; }
     let loadedRows=result.data||[];
     if(section==="payments"||section==="bookings"){
@@ -204,7 +230,7 @@ export default function AdminPage() {
   const editEvent = (r: Row) => {
     setEditingEventId(r.id);
     const localDate=(v:string|null)=>v?new Date(new Date(v).getTime()-new Date(v).getTimezoneOffset()*60000).toISOString().slice(0,16):"";
-    setEventForm({...emptyEventForm,title:r.title||"",description:r.description||"",category:r.category||"",city:r.city||"",venue:r.venue||"",address:r.address||"",location_url:r.location_url||"",starts_at:localDate(r.starts_at),ends_at:localDate(r.ends_at),cover_image_url:r.cover_image_url||"",is_trending:!!r.is_trending});
+    setEventForm({...emptyEventForm,title:r.title||"",description:r.description||"",category:r.category||"",city:r.city||"",venue:r.venue||"",address:r.address||"",location_url:r.location_url||"",starts_at:localDate(r.starts_at),ends_at:localDate(r.ends_at),cover_image_url:r.cover_image_url||"",is_trending:!!r.is_trending,platform_fee_percent:String(r.platform_fee_percent??0)});
     setCoverFile(null);setCoverPreview(r.cover_image_url||"");
     const supabase=getSupabaseBrowserClient();
     void (async()=>{if(!supabase)return;const {data:accounts,error:accountsError}=await supabase.from("event_payment_accounts").select("id,account_name,account_number,beneficiary,is_active,sort_order").eq("event_id",r.id).order("sort_order");if(accountsError){setEventMessage("تعذر تحميل حسابات الفعالية: "+accountsError.message);return;}setEventAccountForms((accounts||[]).map((a:any)=>({id:a.id,account_name:a.account_name,account_number:a.account_number,beneficiary:a.beneficiary||"",is_active:a.is_active,sort_order:a.sort_order})));const {data,error}=await supabase.from("ticket_types").select("id,name,description,price,currency,quantity_total,quantity_sold,sales_start_at,sales_end_at,is_active").eq("event_id",r.id).order("created_at",{ascending:true});if(error){setEventMessage("تعذر تحميل أنواع التذاكر: "+error.message);return;}setTicketForms((data||[]).map((t:any)=>({id:t.id,name:t.name,description:t.description||"",price:String(t.price),currency:String(t.currency||"SDG").trim(),quantity_total:String(t.quantity_total),quantity_sold:Number(t.quantity_sold||0),sales_start_at:t.sales_start_at?new Date(new Date(t.sales_start_at).getTime()-new Date(t.sales_start_at).getTimezoneOffset()*60000).toISOString().slice(0,16):"",sales_end_at:t.sales_end_at?new Date(new Date(t.sales_end_at).getTime()-new Date(t.sales_end_at).getTimezoneOffset()*60000).toISOString().slice(0,16):"",is_active:t.is_active!==false})));if(!data?.length)setTicketForms([emptyTicket()]);})();
@@ -232,7 +258,7 @@ export default function AdminPage() {
       if (uploadError) { setEventMessage("تعذر رفع صورة الغلاف: "+uploadError.message); setSavingEvent(false); return; }
       coverUrl = supabase.storage.from("event-covers").getPublicUrl(path).data.publicUrl;
     }
-    const eventPayload = {title:eventForm.title.trim(),description:eventForm.description.trim()||null,category:eventForm.category.trim()||null,city:eventForm.city.trim()||null,venue:eventForm.venue.trim()||null,address:eventForm.address.trim()||null,location_url:eventForm.location_url.trim()||null,starts_at:new Date(eventForm.starts_at).toISOString(),ends_at:eventForm.ends_at?new Date(eventForm.ends_at).toISOString():null,cover_image_url:coverUrl,is_trending:eventForm.is_trending};
+    const eventPayload = {title:eventForm.title.trim(),description:eventForm.description.trim()||null,category:eventForm.category.trim()||null,city:eventForm.city.trim()||null,venue:eventForm.venue.trim()||null,address:eventForm.address.trim()||null,location_url:eventForm.location_url.trim()||null,starts_at:new Date(eventForm.starts_at).toISOString(),ends_at:eventForm.ends_at?new Date(eventForm.ends_at).toISOString():null,cover_image_url:coverUrl,is_trending:eventForm.is_trending,platform_fee_percent:Math.min(100,Math.max(0,Number(eventForm.platform_fee_percent)||0))};
     if(editingEventId){
       const {error:updateError}=await supabase.from("events").update(eventPayload).eq("id",editingEventId);
       if(updateError){setEventMessage("تعذر تحديث الفعالية: "+updateError.message);setSavingEvent(false);return;}
@@ -296,10 +322,61 @@ export default function AdminPage() {
 
   const renderRows = () => {
     if (section === "reports") {
-      const confirmed = rows.filter(x=>x.status==="confirmed");
-      const total = confirmed.reduce((s,x)=>s+Number(x.subtotal||0),0);
-      return <div className="admin-metric-grid">
-        {[{title:"إجمالي الحجوزات",value:rows.length},{title:"الحجوزات المؤكدة",value:confirmed.length},{title:"إجمالي المبيعات المؤكدة",value:money(total,confirmed[0]?.currency||"SDG")}].map(x=><article className="admin-metric" key={x.title}><small>{x.title}</small><strong>{typeof x.value==="number"?x.value.toLocaleString("ar-SD"):x.value}</strong></article>)}
+      const data=statistics;
+      if(!data)return <p className="admin-no-data">جاري تجهيز الإحصائيات...</p>;
+      const fmtCount=(v:number)=>v.toLocaleString("ar-SD");
+      const sum=(items:Row[],field:string)=>items.reduce((n,x)=>n+Number(x[field]||0),0);
+      const moneyLines=(items:Row[],field:string)=>{const grouped=new Map<string,number>();items.forEach(x=>{const c=String(x.currency||"SDG").trim();grouped.set(c,(grouped.get(c)||0)+Number(x[field]||0));});return grouped.size?Array.from(grouped.entries()).map(([c,v])=>money(v,c)).join(" · "):money(0,"SDG");};
+      const confirmed=data.bookings.filter(x=>x.status==="confirmed");
+      const rejected=data.bookings.filter(x=>x.status==="rejected");
+      const pending=data.bookings.filter(x=>["pending_payment","under_review"].includes(x.status));
+      const totalCapacity=sum(data.events.flatMap(e=>e.ticket_types||[]),"quantity_total");
+      const soldTickets=data.tickets.filter(t=>["valid","used"].includes(t.status));
+      const rejectedQty=sum(rejected.flatMap(b=>b.booking_items||[]),"quantity");
+      const currentEvents=data.events.filter(e=>e.status==="published"&&(!e.ends_at||new Date(e.ends_at).getTime()>=Date.now()));
+      const pastEvents=data.events.filter(e=>e.status==="completed"||(!!e.ends_at&&new Date(e.ends_at).getTime()<Date.now()));
+      const roleCounts=(r:string)=>data.profiles.filter(p=>p.role===r||(r==="gatekeeper"&&p.role==="organizer")).length;
+      const revenueRows=confirmed.map(b=>({currency:b.currency,value:Number(b.subtotal||0)}));
+      const commissionRows=confirmed.map(b=>({currency:b.currency,value:Number(b.subtotal||0)*Number(data.events.find(e=>e.id===b.event_id)?.platform_fee_percent||0)/100}));
+      const event=data.events.find(e=>e.id===statsEventId);
+      const eventBookings=event?data.bookings.filter(b=>b.event_id===event.id):[];
+      const eventConfirmed=eventBookings.filter(b=>b.status==="confirmed");
+      const eventRejected=eventBookings.filter(b=>b.status==="rejected");
+      const eventPeople=new Set(eventBookings.filter(b=>!["rejected","cancelled","expired"].includes(b.status)).map(b=>b.user_id||b.customer_email||b.customer_phone||b.id)).size;
+      const eventTicketRows=(event?.ticket_types||[]).map((type:Row)=>{
+        const items=eventConfirmed.flatMap(b=>b.booking_items||[]).filter(i=>i.ticket_type_id===type.id);
+        const rejectedItems=eventRejected.flatMap(b=>b.booking_items||[]).filter(i=>i.ticket_type_id===type.id);
+        const sold=sum(items,"quantity");
+        const revenue=items.reduce((n,i)=>n+Number(i.line_total||Number(i.unit_price||0)*Number(i.quantity||0)),0);
+        return {...type,sold,rejectedCount:sum(rejectedItems,"quantity"),revenue,remaining:Math.max(0,Number(type.quantity_total||0)-sold)};
+      });
+      const eventRevenueRows=eventConfirmed.flatMap(b=>(b.booking_items||[]).map(i=>({currency:i.ticket_types?.currency||b.currency,value:Number(i.line_total||Number(i.unit_price||0)*Number(i.quantity||0))})));
+      const eventCommissionRows=eventRevenueRows.map(x=>({currency:x.currency,value:x.value*Number(event?.platform_fee_percent||0)/100}));
+      const metricCards=(items:{title:string;value:string|number;hint?:string}[]) => <div className="admin-metric-grid">{items.map(x=><article className="admin-metric" key={x.title}><small>{x.title}</small><strong>{typeof x.value==="number"?fmtCount(x.value):x.value}</strong>{x.hint&&<span className="admin-stat-hint">{x.hint}</span>}</article>)}</div>;
+      return <div className="admin-statistics">
+        <div className="admin-stat-tabs">
+          <button className={statsView==="general"?"active":""} onClick={()=>setStatsView("general")}>الإحصائيات العامة</button>
+          <button className={statsView==="event"?"active":""} onClick={()=>setStatsView("event")}>إحصائيات الفعالية</button>
+        </div>
+        {statsView==="general"?<>
+          <h3 className="admin-stats-heading">ملخص الفعاليات</h3>
+          {metricCards([{title:"كل الفعاليات",value:data.events.length},{title:"الفعاليات الحالية",value:currentEvents.length},{title:"الفعاليات السابقة",value:pastEvents.length},{title:"المسودات",value:data.events.filter(e=>e.status==="draft").length},{title:"الفعاليات الملغاة",value:data.events.filter(e=>e.status==="cancelled").length}])}
+          <h3 className="admin-stats-heading">المستخدمون والأدوار</h3>
+          {metricCards([{title:"إجمالي المستخدمين",value:data.profiles.length},{title:"العملاء",value:roleCounts("customer")},{title:"البوابون",value:roleCounts("gatekeeper")},{title:"الموظفون",value:roleCounts("supervisor")},{title:"المشرفون",value:roleCounts("admin")},{title:"المعلنون",value:roleCounts("advertiser")}])}
+          <h3 className="admin-stats-heading">التذاكر والحجوزات</h3>
+          {metricCards([{title:"إجمالي سعة التذاكر",value:totalCapacity},{title:"التذاكر الصادرة",value:soldTickets.length},{title:"التذاكر المستخدمة",value:data.tickets.filter(t=>t.status==="used").length},{title:"التذاكر المتبقية",value:Math.max(0,totalCapacity-soldTickets.length)},{title:"ضمن حجوزات مرفوضة",value:rejectedQty},{title:"الحجوزات المؤكدة",value:confirmed.length},{title:"الحجوزات المرفوضة",value:rejected.length},{title:"بانتظار الدفع/المراجعة",value:pending.length}])}
+          <h3 className="admin-stats-heading">المبيعات وأرباح المنصة</h3>
+          {metricCards([{title:"إجمالي المبيعات المعتمدة",value:moneyLines(revenueRows,"value")},{title:"صافي عمولة المنصة",value:moneyLines(commissionRows,"value"),hint:"محسوبة حسب نسبة العمولة المحددة لكل فعالية"}])}
+          <p className="admin-stats-note">المبيعات تشمل الحجوزات المؤكدة فقط. الطلبات المرفوضة والمعلقة لا تدخل في الإيرادات.</p>
+        </>:<>
+          <div className="admin-event-stat-select"><label htmlFor="stats-event-select">اختار الفعالية</label><select id="stats-event-select" value={statsEventId} onChange={e=>setStatsEventId(e.target.value)}><option value="">اختر فعالية...</option>{data.events.map(e=><option key={e.id} value={e.id}>{e.title} — {statusLabels[e.status]||e.status}</option>)}</select></div>
+          {!event?<p className="admin-no-data">اختار فعالية عشان تظهر إحصائياتها.</p>:<>
+            <div className="admin-selected-event"><div><small>الفعالية المحددة</small><h3>{event.title}</h3><span>{statusLabels[event.status]||event.status} · عمولة المنصة {Number(event.platform_fee_percent||0)}%</span></div></div>
+            {metricCards([{title:"عدد الحاجزين",value:eventPeople},{title:"الحجوزات المؤكدة",value:eventConfirmed.length},{title:"الحجوزات المرفوضة",value:eventRejected.length},{title:"التذاكر المتاحة",value:sum(eventTicketRows,"quantity_total")},{title:"التذاكر المباعة",value:sum(eventTicketRows,"sold")},{title:"التذاكر المرفوضة",value:sum(eventTicketRows,"rejectedCount")},{title:"التذاكر المتبقية",value:sum(eventTicketRows,"remaining")},{title:"إجمالي المبيعات",value:moneyLines(eventRevenueRows,"value")},{title:"صافي ربح المنصة",value:moneyLines(eventCommissionRows,"value")}])}
+            <h3 className="admin-stats-heading">تفاصيل فئات التذاكر</h3>
+            <div className="admin-table-wrap"><table className="admin-data-table"><thead><tr><th>الفئة</th><th>السعر</th><th>الإجمالي</th><th>المباع</th><th>المرفوض</th><th>المتبقي</th><th>قيمة المبيعات</th></tr></thead><tbody>{eventTicketRows.map((t:Row)=><tr key={t.id}><td>{t.name}</td><td>{money(t.price,t.currency)}</td><td>{fmtCount(Number(t.quantity_total||0))}</td><td>{fmtCount(t.sold)}</td><td>{fmtCount(t.rejectedCount)}</td><td>{fmtCount(t.remaining)}</td><td>{money(t.revenue,t.currency)}</td></tr>)}</tbody></table></div>
+          </>}
+        </>}
       </div>;
     }
     const columns: Record<string,{key:string,label:string,format?:(r:Row)=>string}[]> = {
