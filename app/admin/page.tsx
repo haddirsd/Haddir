@@ -344,13 +344,13 @@ export default function AdminPage() {
       const eventRejected=eventBookings.filter(b=>b.status==="rejected");
       const eventPeople=new Set(eventBookings.filter(b=>!["rejected","cancelled","expired"].includes(b.status)).map(b=>b.user_id||b.customer_email||b.customer_phone||b.id)).size;
       const eventTicketRows=(event?.ticket_types||[]).map((type:Row)=>{
-        const items=eventConfirmed.flatMap(b=>b.booking_items||[]).filter(i=>i.ticket_type_id===type.id);
-        const rejectedItems=eventRejected.flatMap(b=>b.booking_items||[]).filter(i=>i.ticket_type_id===type.id);
+        const items=eventConfirmed.flatMap(b=>b.booking_items||[]).filter((i:any)=>i.ticket_type_id===type.id);
+        const rejectedItems=eventRejected.flatMap(b=>b.booking_items||[]).filter((i:any)=>i.ticket_type_id===type.id);
         const sold=sum(items,"quantity");
-        const revenue=items.reduce((n,i)=>n+Number(i.line_total||Number(i.unit_price||0)*Number(i.quantity||0)),0);
+        const revenue=items.reduce((n,i:any)=>n+Number(i.line_total||Number(i.unit_price||0)*Number(i.quantity||0)),0);
         return {...type,sold,rejectedCount:sum(rejectedItems,"quantity"),revenue,remaining:Math.max(0,Number(type.quantity_total||0)-sold)};
       });
-      const eventRevenueRows=eventConfirmed.flatMap(b=>(b.booking_items||[]).map(i=>({currency:i.ticket_types?.currency||b.currency,value:Number(i.line_total||Number(i.unit_price||0)*Number(i.quantity||0))})));
+      const eventRevenueRows=eventConfirmed.flatMap(b=>(b.booking_items||[]).map((i:any)=>({currency:i.ticket_types?.currency||b.currency,value:Number(i.line_total||Number(i.unit_price||0)*Number(i.quantity||0))})));
       const eventCommissionRows=eventRevenueRows.map(x=>({currency:x.currency,value:x.value*Number(event?.platform_fee_percent||0)/100}));
       const metricCards=(items:{title:string;value:string|number;hint?:string}[]) => <div className="admin-metric-grid">{items.map(x=><article className="admin-metric" key={x.title}><small>{x.title}</small><strong>{typeof x.value==="number"?fmtCount(x.value):x.value}</strong>{x.hint&&<span className="admin-stat-hint">{x.hint}</span>}</article>)}</div>;
       return <div className="admin-statistics">
