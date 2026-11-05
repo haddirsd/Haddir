@@ -28,6 +28,7 @@ export default function Home(){
  const [gatekeeperOnline,setGatekeeperOnline]=useState(true);
  const [manualEntryOpen,setManualEntryOpen]=useState(false);
  const [gatekeeperCounts,setGatekeeperCounts]=useState({accepted:0,used:0,forged:0});
+ const [gatekeeperManualHistory,setGatekeeperManualHistory]=useState<any[]>([]),[gatekeeperHistoryLoading,setGatekeeperHistoryLoading]=useState(false);
  const [scannerOpen,setScannerOpen]=useState(false);
  const videoRef=useRef<HTMLVideoElement|null>(null);
  const [advertiserStats,setAdvertiserStats]=useState<any|null>(null);
@@ -90,20 +91,36 @@ export default function Home(){
   if(!data?.event){setAdvertiserStatsError("ما لقينا فعالية مرتبطة بحسابك.");return;}
   setAdvertiserStats(data);
  };
- const runGatekeeperAction=async(confirm:boolean,codeOverride?:string)=>{
+ const loadGatekeeperManualHistory=async()=>{
+  if(!assignedEvent?.event_id)return;
+  const supabase=getSupabaseBrowserClient();if(!supabase)return;
+  setGatekeeperHistoryLoading(true);
+  const {data,error}=await supabase.rpc("get_gatekeeper_manual_history",{p_event_id:assignedEvent.event_id});
+  setGatekeeperHistoryLoading(false);
+  if(!error&&Array.isArray(data))setGatekeeperManualHistory(data);
+ };
+ const runGatekeeperAction=async(confirm:boolean,codeOverride?:string,entryMethod:"qr"|"manual"="qr")=>{
   const code=(codeOverride??gatekeeperCode).trim();
   if(!authUser||!assignedEvent||!code)return;
+  if(entryMethod==="manual"&&!/^[0-9]{10}$/.test(code)){
+   setGatekeeperResult({ok:false,status:"error",message:"كود التذكرة يجب أن يتكون من 10 أرقام فقط."});return;
+  }
   const supabase=getSupabaseBrowserClient();if(!supabase)return;
   setGatekeeperLoading(true);
-  const {data,error}=await supabase.rpc("gatekeeper_ticket_action",{p_ticket_code:code,p_confirm:confirm});
+  const {data,error}=await supabase.rpc(entryMethod==="manual"?"gatekeeper_manual_ticket_action":"gatekeeper_ticket_action",{p_ticket_code:code,p_confirm:confirm});
   setGatekeeperLoading(false);
-  if(error){setGatekeeperResult({ok:false,status:"error",message:error.message||"تعذر التحقق من التذكرة."});return;}
-  setGatekeeperResult(data);
+  if(error){setGatekeeperResult({ok:false,status:"error",message:error.message||"تعذر التحقق من التذكرة."});}
+  else setGatekeeperResult(data);
   if(assignedEvent?.event_id){
    const {data:stats}=await supabase.rpc("get_gatekeeper_scan_stats",{p_event_id:assignedEvent.event_id});
    if(stats)setGatekeeperCounts({accepted:Number(stats.accepted||0),used:Number(stats.used||0),forged:Number(stats.forged||0)});
   }
+  if(entryMethod==="manual")await loadGatekeeperManualHistory();
  };
+ useEffect(()=>{
+  if(!isGatekeeperPage||!authUser||!assignedEvent?.event_id||(userRole!=="gatekeeper"&&userRole!=="organizer"))return;
+  void loadGatekeeperManualHistory();
+ },[isGatekeeperPage,authUser,assignedEvent?.event_id,userRole]);
  useEffect(()=>{
   const update=()=>setGatekeeperOnline(typeof navigator!=="undefined"?navigator.onLine:true);
   update();window.addEventListener("online",update);window.addEventListener("offline",update);
@@ -333,8 +350,9 @@ export default function Home(){
    {!assignedEvent&&<p className="gatekeeper-inline-error">حسابك غير مربوط بفعالية حالياً. راجع إدارة حاضر لتعيين الفعالية.</p>}
     <div className="gatekeeper-actions"><button type="button" className="btn btn-primary" disabled={!assignedEvent||gatekeeperLoading||!gatekeeperOnline} onClick={()=>{setGatekeeperResult(null);setManualEntryOpen(false);setScannerOpen(v=>!v);}}><ScanLine size={18}/>{scannerOpen?"إغلاق الكاميرا":"مسح بالكاميرا"}</button><button type="button" className="btn btn-outline" disabled={!assignedEvent||gatekeeperLoading} onClick={()=>{setScannerOpen(false);setGatekeeperResult(null);setManualEntryOpen(true);}}><ClipboardList size={18}/>إدخال يدوي</button></div>
    {scannerOpen&&<div className="gatekeeper-camera"><video ref={videoRef} autoPlay playsInline muted/><p>وجّه الكاميرا نحو رمز QR. إذا لم تعمل الكاميرا، أدخل الكود يدوياً.</p></div>}
-   {manualEntryOpen&&<form className="gatekeeper-manual-form" onSubmit={e=>{e.preventDefault();setScannerOpen(false);setManualEntryOpen(false);void runGatekeeperAction(true);}}><label className="gatekeeper-input" htmlFor="gatekeeper-manual-code">كود التذكرة</label><div><input id="gatekeeper-manual-code" value={gatekeeperCode} onChange={e=>setGatekeeperCode(e.target.value.toUpperCase())} placeholder="أدخل أو الصق كود التذكرة" dir="ltr" autoComplete="off"/><button type="submit" className="btn btn-outline" disabled={!assignedEvent||gatekeeperLoading||!gatekeeperCode.trim()}>{gatekeeperLoading?"جاري الفحص...":"تحقق ودخول"}</button></div></form>}
+   {manualEntryOpen&&<form className="gatekeeper-manual-form" onSubmit={e=>{e.preventDefault();setScannerOpen(false);setManualEntryOpen(false);void runGatekeeperAction(true,gatekeeperCode,"manual");}}><label className="gatekeeper-input" htmlFor="gatekeeper-manual-code">كود التذكرة — 10 أرقام فقط</label><div><input id="gatekeeper-manual-code" type="text" inputMode="numeric" pattern="[0-9]{10}" maxLength={10} minLength={10} value={gatekeeperCode} onChange={e=>setGatekeeperCode(e.target.value.replace(/[٠-٩]/g,d=>String("٠١٢٣٤٥٦٧٨٩".indexOf(d))).replace(/[^0-9]/g,"").slice(0,10))} placeholder="0000000000" dir="ltr" autoComplete="off" aria-describedby="gatekeeper-manual-hint"/><button type="submit" className="btn btn-outline" disabled={!assignedEvent||gatekeeperLoading||!/^[0-9]{10}$/.test(gatekeeperCode)}>{gatekeeperLoading?"جاري الفحص...":"تحقق ودخول"}</button></div><small id="gatekeeper-manual-hint">أدخل عشرة أرقام متتالية دون حروف أو رموز.</small></form>}
    {gatekeeperResult&&<div className={"gatekeeper-result "+(gatekeeperResult.status==="checked_in"?"valid":gatekeeperResult.status==="used"?"used":gatekeeperResult.status==="not_found"?"invalid":"error")}><strong>{gatekeeperResult.status==="checked_in"?"مقبولة — تم تسجيل استخدامها بنجاح":gatekeeperResult.status==="used"?"مستخدمة — تم استخدام هذه التذكرة من قبل":gatekeeperResult.status==="not_found"?"مزوّرة — هذا الكود غير صادر من نظام حاضر":gatekeeperResult.message}</strong>{gatekeeperResult.ticket_code&&<div className="gatekeeper-result-details"><span>اسم المشتري: {gatekeeperResult.buyer_name||gatekeeperResult.attendee_name||"—"}</span><span>الفعالية: {gatekeeperResult.event_title||"—"}</span><span>فئة التذكرة: {gatekeeperResult.ticket_type||"—"}</span>{gatekeeperResult.attendee_count!=null&&<span>عدد الأفراد في الحجز: {gatekeeperResult.attendee_count}</span>}<span>الكود: {gatekeeperResult.ticket_code}</span></div>}{gatekeeperResult.status==="checked_in"&&<p>تم تحديث حالة التذكرة في النظام إلى «مستخدمة»، ولن تُقبل مرة أخرى.</p>}</div>}
+   <section className="gatekeeper-manual-history" aria-label="سجل الإدخال اليدوي"><div className="gatekeeper-manual-history-head"><strong>سجل الإدخال اليدوي</strong><span>{gatekeeperManualHistory.length} عملية</span></div>{gatekeeperHistoryLoading?<p className="gatekeeper-history-empty">جاري تحميل السجل...</p>:gatekeeperManualHistory.length===0?<p className="gatekeeper-history-empty">ما في عمليات إدخال يدوي مسجلة حتى الآن.</p>:<div className="gatekeeper-history-list">{gatekeeperManualHistory.map((item:any)=><article className="gatekeeper-history-item" key={item.id}><div className="gatekeeper-history-code" dir="ltr">{item.ticket_code||"—"}</div><div className="gatekeeper-history-meta"><strong className={item.outcome==="accepted"?"accepted":item.outcome==="used"?"used":item.outcome==="forged"?"forged":"invalid"}>{item.outcome==="accepted"?"مقبولة — تم الدخول":item.outcome==="used"?"مستخدمة مسبقاً":item.outcome==="forged"?"كود غير صحيح":"تذكرة غير صالحة"}</strong><small>{item.scanned_at?new Date(item.scanned_at).toLocaleString("ar-SD"):"—"}</small></div></article>)}</div>}</section>
   </div>:<div className="empty-state" role="alert"><strong>ما عندك صلاحية لواجهة البواب</strong><p>الواجهة دي مخصصة لحسابات البواب والمنظم المعتمدة فقط.</p><button className="btn btn-outline" type="button" onClick={()=>window.location.assign("/?tab=profile")}>العودة للملف الشخصي</button></div>}
  </section>}
  </div>
