@@ -1764,3 +1764,18 @@ body{font-size:16px}
 .gatekeeper-page-topbar>button{min-height:38px;padding:8px 12px;font-size:13px}
 .gatekeeper-page-screen{width:100%;max-width:900px;margin:0 auto;padding-top:20px;padding-bottom:32px}
 .gatekeeper-page-screen .gatekeeper-workspace{width:100%;margin:0}
+
+/* Gatekeeper manual-entry audit history */
+.gatekeeper-manual-history{display:grid;gap:10px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--card-bg,#fff)}
+.gatekeeper-manual-history-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.gatekeeper-manual-history-head strong{font-size:14px;font-weight:900}
+.gatekeeper-manual-history-head span,.gatekeeper-history-empty{font-size:11px;color:var(--muted)}
+.gatekeeper-history-list{display:grid;gap:8px;max-height:340px;overflow:auto}
+.gatekeeper-history-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px;border:1px solid var(--line);border-radius:11px;background:var(--surface,#faf8fc)}
+.gatekeeper-history-code{font-size:13px;font-weight:900;letter-spacing:1px;font-variant-numeric:tabular-nums}
+.gatekeeper-history-meta{display:grid;gap:3px;text-align:left}
+.gatekeeper-history-meta strong{font-size:11px}
+.gatekeeper-history-meta strong.accepted{color:#21824b}.gatekeeper-history-meta strong.used{color:#a16b1b}.gatekeeper-history-meta strong.forged,.gatekeeper-history-meta strong.invalid{color:#b83d3d}
+.gatekeeper-history-meta small{font-size:10px;color:var(--muted)}
+.gatekeeper-manual-form>small{font-size:10px;color:var(--muted)}
+.theme-dark .gatekeeper-manual-history,.theme-dark .gatekeeper-history-item{background:#211a2a;border-color:var(--line)}
