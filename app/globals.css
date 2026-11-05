@@ -1008,3 +1008,26 @@ body{font-size:16px}
 
 .admin-user-role-editor{display:flex;flex-direction:column;gap:7px;min-width:0}.admin-user-save-role{min-height:34px;padding:6px 13px;border:0;border-radius:8px;background:#5b2ca0;color:#fff;font:inherit;font-size:11px;font-weight:700;cursor:pointer}.admin-user-save-role:disabled{opacity:.45;cursor:not-allowed}
 @media(max-width:700px){.admin-user-role-editor{width:100%}.admin-user-role-editor select,.admin-user-save-role{width:100%}}
+
+
+/* Admin statistics dashboard */
+.admin-statistics{display:grid;gap:18px;padding-top:8px}
+.admin-stat-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.admin-stat-tabs button{min-height:40px;padding:9px 17px;border:1px solid #e7ddec;border-radius:11px;background:#fff;color:#695878;font:inherit;font-size:12px;font-weight:800;cursor:pointer}
+.admin-stat-tabs button.active{border-color:#68409a;background:#68409a;color:#fff}
+.admin-stats-heading{margin:8px 0 -5px;color:#352441;font-size:14px;font-weight:900}
+.admin-stat-hint{display:block;margin-top:7px;color:#887b92;font-size:10px;line-height:1.6}
+.admin-stats-note{margin:0;padding:12px 14px;border-radius:11px;background:#f7f3fa;color:#786987;font-size:11px;line-height:1.8}
+.admin-event-stat-select{display:grid;grid-template-columns:minmax(110px,160px) minmax(0,1fr);align-items:center;gap:12px;max-width:650px}
+.admin-event-stat-select label{color:#594968;font-size:12px;font-weight:800}
+.admin-event-stat-select select{width:100%;min-width:0;min-height:42px;padding:8px 12px;border:1px solid #e5dbea;border-radius:10px;background:#fff;color:#382747;font:inherit;font-size:12px}
+.admin-selected-event{padding:17px 19px;border:1px solid #e9e0ef;border-radius:14px;background:#faf7fc}
+.admin-selected-event small{color:#8c7d98;font-size:10px;font-weight:800}
+.admin-selected-event h3{margin:5px 0;color:#352441;font-size:17px;font-weight:900}
+.admin-selected-event span{color:#796a86;font-size:11px}
+.theme-dark .admin-stat-tabs button,.theme-dark .admin-event-stat-select select{border-color:var(--line);background:var(--surface);color:var(--fg)}
+.theme-dark .admin-stat-tabs button.active{border-color:#8d63b4;background:#68409a;color:#fff}
+.theme-dark .admin-stats-heading,.theme-dark .admin-selected-event h3{color:var(--fg)}
+.theme-dark .admin-stats-note,.theme-dark .admin-selected-event{border-color:var(--line);background:var(--surface);color:var(--fg)}
+.theme-dark .admin-selected-event span,.theme-dark .admin-stat-hint{color:var(--muted)}
+@media(max-width:520px){.admin-event-stat-select{grid-template-columns:1fr;gap:7px}.admin-stat-tabs button{flex:1;padding-inline:10px}.admin-selected-event{padding:14px}}
