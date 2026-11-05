@@ -2322,3 +2322,79 @@ body{font-size:16px}
 .theme-dark .advertiser-ticket-table th{background:#30253b}
 .theme-dark .admin-search-box input,
 .theme-dark .admin-event-form select{color-scheme:dark}
+
+
+/* Keep semantic states readable and consistent in the dark palette */
+.app-shell .btn-outline{
+  border-color:var(--line);
+  color:var(--green);
+  background:var(--surface,#fff);
+}
+.theme-dark .event-status{
+  border-color:#28563a;
+  background:#173323;
+  color:#a5e6b8;
+}
+.theme-dark .event-status.status-low{
+  border-color:#6d542e;
+  background:#382b1c;
+  color:#f1d49a;
+}
+.theme-dark .admin-event-status{
+  border:1px solid #493a55;
+  background:#30253b;
+  color:#d5c8df;
+}
+.theme-dark .admin-event-status.status-published{
+  border-color:#28563a;
+  background:#173323;
+  color:#a5e6b8;
+}
+.theme-dark .admin-event-status.status-cancelled{
+  border-color:#6d542e;
+  background:#382b1c;
+  color:#f1d49a;
+}
+.theme-dark .gatekeeper-result.valid{
+  background:#173323;
+  color:#a5e6b8;
+}
+.theme-dark .gatekeeper-result.used{
+  background:#3b3018;
+  color:#f4d78b;
+}
+.theme-dark .gatekeeper-result.invalid{
+  background:#3b2022;
+  color:#ffaaaa;
+}
+.theme-dark .gatekeeper-result.error{
+  background:#382b1c;
+  color:#f1d49a;
+}
+.theme-dark .notification-icon.booking{
+  background:#173323;
+  color:#a5e6b8;
+}
+.theme-dark .notification-icon.event{
+  background:#3b3018;
+  color:#f4d78b;
+}
+.theme-dark .notification-icon.system{
+  background:#39284b;
+  color:#dfc8f7;
+}
+.theme-dark .notification-state{
+  background:#30253b;
+  color:#c9bad5;
+}
+.theme-dark .is-unread .notification-state{
+  background:#49345c;
+  color:#eadcf8;
+}
+.theme-dark .save-confirm{
+  color:#a5e6b8;
+}
+.theme-dark .guest-label{
+  background:#39284b;
+  color:#dfc8f7;
+}
