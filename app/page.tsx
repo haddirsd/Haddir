@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getSupabaseBrowserClient } from "../lib/supabase";
 import { QRCodeSVG as QrCodeSVG } from "qrcode.react";
-import { ArrowLeft, Bell, CalendarDays, CheckCircle2, House, MapPin, Settings, Sparkles, Ticket, UserRound, ChevronLeft, Share2, ExternalLink, CreditCard, Download } from "lucide-react";
+import { ArrowLeft, Bell, CalendarDays, CheckCircle2, House, MapPin, Settings, Sparkles, Ticket, UserRound, ChevronLeft, Share2, ExternalLink, CreditCard, Download, ScanLine, ShieldCheck, ClipboardList } from "lucide-react";
 type EventItem = {id:string;date:string;title:string;place:string;category:string;price:string;cover:string;coverImageUrl:string|null;tag:string;time:string;venue:string;status:string;map:string;about:string;isTrending:boolean;tiers:{id:string;name:string;description:string;price:string;priceValue:number;currency:string;quantityTotal:number;quantitySold:number;available:number;availableNow:boolean}[]};
 const formatEventDate=(value:string)=>new Intl.DateTimeFormat("ar-SD",{weekday:"long",day:"numeric",month:"long"}).format(new Date(value));
 
@@ -18,7 +18,7 @@ export default function Home(){
  const [authUser,setAuthUser]=useState<{id:string;email?:string;user_metadata?:Record<string,unknown>}|null>(null),[userRole,setUserRole]=useState("customer"),[authMessage,setAuthMessage]=useState(""),[activeWorkspace,setActiveWorkspace]=useState<"customer"|"organizer"|"gatekeeper"|"advertiser"|"admin"|"owner"|null>(null);
  const [ticketCount,setTicketCount]=useState(1),[eventPaymentAccounts,setEventPaymentAccounts]=useState<EventPaymentAccount[]>([]),[paymentMethod,setPaymentMethod]=useState(""),[receipt,setReceipt]=useState<File|null>(null),[bookingDone,setBookingDone]=useState(false),[bookingId,setBookingId]=useState<string|null>(null),[bookingNumber,setBookingNumber]=useState(""),[bookingError,setBookingError]=useState(""),[bookingSubmitting,setBookingSubmitting]=useState(false);
  const [showWelcome,setShowWelcome]=useState(false);
- const [showAdvertiserStats,setShowAdvertiserStats]=useState(false);
+ const [showAdvertiserStats,setShowAdvertiserStats]=useState(false);\n const [assignedEvent,setAssignedEvent]=useState<any|null>(null);\n const [gatekeeperCode,setGatekeeperCode]=useState("");\n const [gatekeeperResult,setGatekeeperResult]=useState<any|null>(null);\n const [gatekeeperLoading,setGatekeeperLoading]=useState(false);\n const [scannerOpen,setScannerOpen]=useState(false);\n const videoRef=useRef<HTMLVideoElement|null>(null);\n const cameraStreamRef=useRef<MediaStream|null>(null);
  const [advertiserStats,setAdvertiserStats]=useState<any|null>(null);
  const [advertiserStatsLoading,setAdvertiserStatsLoading]=useState(false);
  const [advertiserStatsError,setAdvertiserStatsError]=useState("");
@@ -46,7 +46,7 @@ export default function Home(){
  useEffect(()=>{document.documentElement.dataset.theme=darkMode?"dark":"light";document.documentElement.style.colorScheme=darkMode?"dark":"light";window.localStorage.setItem("haddir-theme",darkMode?"dark":"light");},[darkMode]);
  useEffect(()=>{const key="haddir-welcome-seen";if(!sessionStorage.getItem(key)){setShowWelcome(true);sessionStorage.setItem(key,"1");const timer=window.setTimeout(()=>setShowWelcome(false),3600);return()=>window.clearTimeout(timer);}},[]);
  useEffect(()=>{const supabase=getSupabaseBrowserClient();if(!supabase){setEventsError("إعدادات الاتصال بقاعدة البيانات غير مكتملة.");setEventsLoading(false);return;}let alive=true;const loadEvents=async()=>{setEventsLoading(true);setEventsError("");const {data,error}=await supabase.from("events").select("id,title,category,city,venue,starts_at,description,status,is_trending,cover_image_url,location_url").eq("status","published").order("starts_at",{ascending:true});if(error){console.error("Could not load events",error);if(alive){setEventsError(error.message||"تعذر تحميل الفعاليات.");setEventsLoading(false);}return;}if(!alive)return;const eventRows=data||[];const eventIds=eventRows.map((e:any)=>e.id);let ticketRows:any[]=[];if(eventIds.length){const {data:ticketData,error:ticketError}=await supabase.from("ticket_types").select("id,event_id,name,description,price,currency,quantity_total,quantity_sold,sales_start_at,sales_end_at,is_active").in("event_id",eventIds);if(ticketError){console.error("Could not load ticket types",ticketError);if(alive)setTicketTypesError("تعذر تحميل فئات وأسعار التذاكر من قاعدة البيانات. "+(ticketError.message||""));}else{ticketRows=ticketData||[];if(alive)setTicketTypesError("");}}if(!alive)return;const mapped=eventRows.map((e:any,index:number)=>{const now=Date.now();const tiers=ticketRows.filter((t:any)=>t.event_id===e.id&&t.is_active).map((t:any)=>{const total=Math.max(0,Number(t.quantity_total)||0),sold=Math.max(0,Number(t.quantity_sold)||0),available=Math.max(0,total-sold),starts=t.sales_start_at?new Date(t.sales_start_at).getTime():0,ends=t.sales_end_at?new Date(t.sales_end_at).getTime():Infinity;return {id:t.id,name:t.name,description:t.description||"",priceValue:Number(t.price),currency:String(t.currency||"SDG").trim(),price:Number(t.price)===0?"مجاناً":formatMoney(Number(t.price),String(t.currency||"SDG")),quantityTotal:total,quantitySold:sold,available,availableNow:available>0&&now>=starts&&now<=ends};});const eventEnded=new Date(e.starts_at).getTime()<=now;const status=eventEnded?"انتهت":tiers.length===0?"غير متاح":tiers.every((t:any)=>t.available<=0)?"تم البيع بالكامل":tiers.every((t:any)=>!t.availableNow)?"البيع غير متاح حالياً":"متوفر";return {id:e.id,date:formatEventDate(e.starts_at),title:e.title,place:e.city||"",category:e.category||"فعاليات",price:tiers[0]?.price||"—",cover:["cover-one","cover-two","cover-three"][index%3],coverImageUrl:e.cover_image_url||null,tag:e.category||"فعالية",time:new Intl.DateTimeFormat("ar-SD",{hour:"numeric",minute:"2-digit"}).format(new Date(e.starts_at)),venue:e.venue||e.city||"",status,map:e.location_url||"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent((e.venue||"")+" "+(e.city||"")),about:e.description||"تفاصيل الفعالية ستُضاف قريباً.",isTrending:!!e.is_trending,tiers};});setEvents(mapped);setEventsLoading(false);const requested=new URLSearchParams(window.location.search).get("event");if(requested&&mapped.some(e=>e.id===requested))setSelectedEvent(requested);};void loadEvents();return()=>{alive=false;};},[]);
- useEffect(()=>{const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("تسجيل الدخول يحتاج إعداد مفاتيح Supabase في بيئة الموقع.");return;}let alive=true;const load=async(user:{id:string;email?:string;user_metadata?:Record<string,unknown>}|null)=>{if(!alive)return;setAuthUser(user as typeof authUser);if(user){const {data}=await supabase.from("profiles").select("role,full_name,phone").eq("id",user.id).maybeSingle();if(!alive)return;setUserRole(data?.role||"customer");const metadataName=String(user.user_metadata?.full_name||user.user_metadata?.name||"");setFullName(String(data?.full_name||metadataName||""));setPhone(String(data?.phone||""));setEmail(user.email||"");setSaved(false);}else{setUserRole("customer");setFullName("");setEmail("");setPhone("");setSaved(false);setActiveWorkspace(null);}};supabase.auth.getSession().then(({data})=>load(data.session?.user??null));const {data:{subscription}}=supabase.auth.onAuthStateChange((_event,session)=>{void load(session?.user??null);});return()=>{alive=false;subscription.unsubscribe();};},[]);
+ useEffect(()=>{const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("تسجيل الدخول يحتاج إعداد مفاتيح Supabase في بيئة الموقع.");return;}let alive=true;const load=async(user:{id:string;email?:string;user_metadata?:Record<string,unknown>}|null)=>{if(!alive)return;setAuthUser(user as typeof authUser);if(user){const {data}=await supabase.from("profiles").select("role,full_name,phone").eq("id",user.id).maybeSingle();if(!alive)return;setUserRole(data?.role||"customer");const {data:assignmentRows}=await supabase.from("event_role_assignments").select("event_id,assignment_role,events(id,title,venue,city,starts_at,status)").eq("user_id",user.id).in("assignment_role",["gatekeeper","organizer","advertiser"]).limit(1);if(!alive)return;setAssignedEvent(assignmentRows?.[0]||null);const metadataName=String(user.user_metadata?.full_name||user.user_metadata?.name||"");setFullName(String(data?.full_name||metadataName||""));setPhone(String(data?.phone||""));setEmail(user.email||"");setSaved(false);}else{setUserRole("customer");setAssignedEvent(null);setGatekeeperResult(null);setGatekeeperCode("");setFullName("");setEmail("");setPhone("");setSaved(false);setActiveWorkspace(null);}};supabase.auth.getSession().then(({data})=>load(data.session?.user??null));const {data:{subscription}}=supabase.auth.onAuthStateChange((_event,session)=>{void load(session?.user??null);});return()=>{alive=false;subscription.unsubscribe();};},[]);
  const openAdvertiserStats=async()=>{
   if(!authUser||userRole!=="advertiser")return;
   const supabase=getSupabaseBrowserClient();
@@ -58,6 +58,33 @@ export default function Home(){
   if(!data?.event){setAdvertiserStatsError("ما لقينا فعالية مرتبطة بحسابك.");return;}
   setAdvertiserStats(data);
  };
+ const runGatekeeperAction=async(confirm:boolean)=>{
+  if(!authUser||!assignedEvent||!gatekeeperCode.trim())return;
+  const supabase=getSupabaseBrowserClient();if(!supabase)return;
+  setGatekeeperLoading(true);
+  const {data,error}=await supabase.rpc("gatekeeper_ticket_action",{p_ticket_code:gatekeeperCode.trim(),p_confirm:confirm});
+  setGatekeeperLoading(false);
+  if(error){setGatekeeperResult({ok:false,status:"error",message:error.message||"تعذر التحقق من التذكرة."});return;}
+  setGatekeeperResult(data);
+ };
+ useEffect(()=>{
+  if(!scannerOpen||activeWorkspace!=="gatekeeper")return;
+  let stopped=false;let raf=0;let stream:MediaStream|null=null;
+  const start=async()=>{
+   try{
+    const video=videoRef.current as any;if(!video)return;
+    const Detector=(window as any).BarcodeDetector;
+    if(!Detector){setGatekeeperResult({ok:false,status:"error",message:"المتصفح لا يدعم مسح QR بالكاميرا. أدخل كود التذكرة يدوياً."});return;}
+    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false});
+    video.srcObject=stream;await video.play();
+    const detector=new Detector({formats:["qr_code"]});
+    const scan=async()=>{if(stopped)return;try{const codes=await detector.detect(video);if(codes?.length&&codes[0].rawValue){const value=String(codes[0].rawValue).trim();setGatekeeperCode(value);setScannerOpen(false);setGatekeeperResult(null);void runGatekeeperAction(false);return;}}catch{}raf=requestAnimationFrame(scan);};
+    raf=requestAnimationFrame(scan);
+   }catch{setGatekeeperResult({ok:false,status:"error",message:"تعذر تشغيل الكاميرا. تحقق من إذن الكاميرا أو أدخل الكود يدوياً."});}
+  };
+  void start();
+  return()=>{stopped=true;cancelAnimationFrame(raf);stream?.getTracks().forEach(track=>track.stop());};
+ },[scannerOpen,activeWorkspace]);
  const signInWithGoogle=async()=>{const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("إعدادات تسجيل الدخول غير مكتملة على الموقع.");return;}const {error}=await supabase.auth.signInWithOAuth({provider:"google",options:{redirectTo:window.location.origin}});if(error)setAuthMessage(error.message);};
  const signInWithEmail=async()=>{const supabase=getSupabaseBrowserClient();if(!supabase||!loginEmail.trim()){setAuthMessage("أدخل بريدك الإلكتروني أولاً.");return;}const {error}=await supabase.auth.signInWithOtp({email:loginEmail.trim(),options:{emailRedirectTo:window.location.origin}});setAuthMessage(error?error.message:"أرسلنا رابط تسجيل الدخول إلى بريدك الإلكتروني. افتح الرسالة للمتابعة.");};
  const saveProfile=async()=>{if(!authUser){setAuthMessage("سجّل الدخول أولاً لحفظ بياناتك.");return;}const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("تعذر الاتصال بقاعدة البيانات حالياً.");return;}setProfileSaving(true);setSaved(false);setAuthMessage("");const {data,error}=await supabase.from("profiles").update({full_name:fullName.trim(),phone:phone.trim()||null}).eq("id",authUser.id).select("full_name,phone").single();setProfileSaving(false);if(error){setAuthMessage("ما قدرنا نحفظ بياناتك. تأكد من الاتصال وحاول مرة تانية.");return;}setFullName(data.full_name||"");setPhone(data.phone||"");setSaved(true);};
@@ -132,8 +159,24 @@ export default function Home(){
  {authMessage&&<p className="profile-save-error" role="alert">{authMessage}</p>}
  </form>}
  </div>
+ {authUser&&<section className="role-workspace-section" aria-label="واجهات العمل">
+  {(userRole==="owner"||userRole==="admin")&&<button type="button" className="role-workspace-button" onClick={()=>window.location.assign("/admin")}><span className="role-workspace-icon"><ShieldCheck size={21}/></span><span><strong>لوحة الإدارة</strong><small>إدارة المنصة والموظفين والفعاليات والحجوزات</small></span><ChevronLeft size={18}/></button>}
+  {userRole==="supervisor"&&<button type="button" className="role-workspace-button" onClick={()=>window.location.assign("/admin")}><span className="role-workspace-icon"><ClipboardList size={21}/></span><span><strong>لوحة الإشراف</strong><small>مراجعة الحجوزات وإثباتات الدفع واتخاذ قرار القبول أو الرفض</small></span><ChevronLeft size={18}/></button>}
+  {(userRole==="gatekeeper"||userRole==="organizer")&&<button type="button" className="role-workspace-button" onClick={()=>{setGatekeeperResult(null);setGatekeeperCode("");setScannerOpen(false);setActiveWorkspace(activeWorkspace==="gatekeeper"?null:"gatekeeper");}}><span className="role-workspace-icon"><ScanLine size={21}/></span><span><strong>مسح التذاكر</strong><small>فحص تذاكر الفعالية وتأكيد دخول الحضور</small></span><ChevronLeft size={18}/></button>}
+  {userRole==="advertiser"&&<button type="button" className="role-workspace-button" onClick={()=>void openAdvertiserStats()}><span className="role-workspace-icon"><Ticket size={21}/></span><span><strong>تفاصيل الفعالية</strong><small>عرض المبيعات والتذاكر والمستحقات للفعالية المرتبطة بك</small></span><ChevronLeft size={18}/></button>}
+  {activeWorkspace==="gatekeeper"&&(userRole==="gatekeeper"||userRole==="organizer")&&<div className="gatekeeper-workspace">
+   <div className="gatekeeper-workspace-head"><div><small>مساحة البواب</small><h2>فحص تذاكر الدخول</h2><p>{assignedEvent?.events?.title||"لم يتم ربط فعالية بحسابك"}</p></div><button type="button" className="btn btn-outline" onClick={()=>{setActiveWorkspace(null);setScannerOpen(false);setGatekeeperResult(null);}}>إغلاق</button></div>
+   <div className="gatekeeper-task-grid"><article><ScanLine size={19}/><strong>امسح رمز QR</strong><small>أو أدخل كود التذكرة يدوياً</small></article><article><ShieldCheck size={19}/><strong>تحقق من الصلاحية</strong><small>لن يتم قبول تذكرة غير صالحة أو مستخدمة</small></article></div>
+   {assignedEvent?.events&&<div className="gatekeeper-assigned-event"><small>الفعالية المصرح لك بها</small><strong>{assignedEvent.events.title}</strong><span>{assignedEvent.events.venue||assignedEvent.events.city||"الموقع غير محدد"} · {assignedEvent.events.starts_at?formatEventDate(assignedEvent.events.starts_at):"موعد غير محدد"}</span></div>}
+   {!assignedEvent&&<p className="gatekeeper-inline-error">حسابك غير مربوط بفعالية حالياً. راجع إدارة حاضر لتعيين الفعالية.</p>}
+   <label className="gatekeeper-input">كود التذكرة<input value={gatekeeperCode} onChange={e=>setGatekeeperCode(e.target.value.toUpperCase())} placeholder="أدخل كود التذكرة" dir="ltr" autoComplete="off"/></label>
+   <div className="gatekeeper-actions"><button type="button" className="btn btn-outline" disabled={!assignedEvent||gatekeeperLoading} onClick={()=>setScannerOpen(v=>!v)}><ScanLine size={17}/>{scannerOpen?"إغلاق الكاميرا":"فتح كاميرا المسح"}</button><button type="button" className="btn btn-primary" disabled={!assignedEvent||gatekeeperLoading||!gatekeeperCode.trim()} onClick={()=>void runGatekeeperAction(false)}>{gatekeeperLoading?"جاري الفحص...":"فحص التذكرة"}</button></div>
+   {scannerOpen&&<div className="gatekeeper-camera"><video ref={videoRef} autoPlay playsInline muted/><p>وجّه الكاميرا نحو رمز QR. إذا لم تعمل الكاميرا، أدخل الكود يدوياً.</p></div>}
+   {gatekeeperResult&&<div className={"gatekeeper-result "+(gatekeeperResult.ok?"valid":gatekeeperResult.status==="used"?"used":"invalid")}><strong>{gatekeeperResult.message}</strong>{gatekeeperResult.ticket_code&&<div className="gatekeeper-result-details"><span>الاسم: {gatekeeperResult.attendee_name||"—"}</span><span>الفعالية: {gatekeeperResult.event_title||"—"}</span><span>الفئة: {gatekeeperResult.ticket_type||"—"}</span><span>الكود: {gatekeeperResult.ticket_code}</span></div>}{gatekeeperResult.ok&&gatekeeperResult.status==="valid"&&<button type="button" className="btn btn-primary" disabled={gatekeeperLoading} onClick={()=>void runGatekeeperAction(true)}>تأكيد دخول التذكرة</button>}</div>}
+  </div>}
+ </section>}
  {authUser&&userRole==="advertiser"&&<section className="detail-section advertiser-profile-stats">
-  <button type="button" className="btn btn-primary pay-button" onClick={()=>void openAdvertiserStats()}><span>الإحصائيات</span><ChevronLeft size={18}/></button>
+  <button type="button" className="btn btn-primary pay-button" onClick={()=>void openAdvertiserStats()}><span>تفاصيل الفعالية</span><ChevronLeft size={18}/></button>
   {showAdvertiserStats&&<div className="advertiser-statistics-panel">
    <div className="advertiser-stats-heading"><div><small>لوحة المعلن</small><h2>إحصائيات فعاليتك</h2></div><button type="button" className="btn btn-outline" onClick={()=>setShowAdvertiserStats(false)}>إغلاق</button></div>
    {advertiserStatsLoading?<div className="empty-state">جاري تحميل الإحصائيات...</div>:advertiserStatsError?<div className="empty-state" role="alert">{advertiserStatsError}</div>:advertiserStats&&<>
@@ -158,7 +201,6 @@ export default function Home(){
   </div>}
  </section>}
  <div className="profile-settings-panel"><div><strong>إعدادات العرض</strong><p>غيّر مظهر التطبيق في كل الصفحات.</p></div><button className="btn btn-outline" type="button" onClick={()=>setDarkMode(v=>!v)}>{darkMode?"☀ الوضع النهاري":"☾ الوضع الليلي"}</button></div>
- {authUser&&userRole==="owner"&&<div className="detail-section owner-workspaces" style={{marginBottom:18}}><h2>مساحات العمل</h2><div className="hero-actions" style={{flexWrap:"wrap"}}>{([{id:"admin",label:"الإدارة"},{id:"organizer",label:"المنظم"},{id:"gatekeeper",label:"البواب"},{id:"advertiser",label:"المعلن"}] as const).map(x=><button key={x.id} className="btn btn-outline" onClick={()=>setActiveWorkspace(x.id)}>{x.label}</button>)}</div>{activeWorkspace&&<div className="notification-item" style={{marginTop:14,display:"block"}}><strong>{({organizer:"واجهة المنظم",gatekeeper:"واجهة البواب",advertiser:"واجهة المعلن",admin:"لوحة الإدارة"} as Record<string,string>)[activeWorkspace]}</strong><p>هذه مساحة مخصصة للدور المحدد.</p><button className="btn btn-outline" onClick={()=>setActiveWorkspace(null)}>إغلاق</button></div>}</div>}
  {authMessage&&<p className="save-confirm">{authMessage}</p>}
  </section>}
  </div>
