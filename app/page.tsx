@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { getSupabaseBrowserClient } from "../lib/supabase";
-import { getGatekeeperScanStats, getGatekeeperScanHistory, submitGatekeeperTicketAction } from "../features/gatekeeper/gatekeeper.service";
+import { useGatekeeper } from "../features/gatekeeper/useGatekeeper";
+import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
 import { QRCodeSVG as QrCodeSVG } from "qrcode.react";
-import { BrowserQRCodeReader } from "@zxing/browser";
 import { ArrowLeft, Copy, Wallet, Bell, CalendarDays, CheckCircle2, House, MapPin, Settings, Sparkles, Ticket, UserRound, ChevronLeft, Share2, ExternalLink, CreditCard, Download, ScanLine, ShieldCheck, ClipboardList } from "lucide-react";
 type EventItem = {id:string;date:string;title:string;place:string;category:string;price:string;cover:string;coverImageUrl:string|null;tag:string;time:string;venue:string;status:string;map:string;about:string;isTrending:boolean;tiers:{id:string;name:string;description:string;price:string;priceValue:number;currency:string;quantityTotal:number;quantitySold:number;available:number;availableNow:boolean}[]};
 const formatEventDate=(value:string)=>new Intl.DateTimeFormat("ar-SD",{weekday:"long",day:"numeric",month:"long"}).format(new Date(value));
@@ -23,15 +23,6 @@ export default function Home(){
  const [showWelcome,setShowWelcome]=useState(false);
  const [showAdvertiserStats,setShowAdvertiserStats]=useState(false);
  const [assignedEvent,setAssignedEvent]=useState<any|null>(null);
- const [gatekeeperCode,setGatekeeperCode]=useState("");
- const [gatekeeperResult,setGatekeeperResult]=useState<any|null>(null);
- const [gatekeeperLoading,setGatekeeperLoading]=useState(false);
- const [gatekeeperOnline,setGatekeeperOnline]=useState(true);
- const [manualEntryOpen,setManualEntryOpen]=useState(false);
- const [gatekeeperCounts,setGatekeeperCounts]=useState({accepted:0,used:0,forged:0,invalid:0});
- const [gatekeeperManualHistory,setGatekeeperManualHistory]=useState<any[]>([]),[gatekeeperHistoryLoading,setGatekeeperHistoryLoading]=useState(false);
- const [scannerOpen,setScannerOpen]=useState(false);
- const videoRef=useRef<HTMLVideoElement|null>(null);
  useEffect(()=>{
   const handleBrowserBack=(event:PopStateEvent)=>{
    const pageState=(event.state as {haddirPage?:string}|null)?.haddirPage;
@@ -100,17 +91,6 @@ export default function Home(){
   if(params.get("workspace")==="gatekeeper"){setActiveWorkspace("gatekeeper");setIsGatekeeperPage(true);}
  },[]);
  useEffect(()=>{
-  if(!authUser||!assignedEvent?.event_id||(userRole!=="gatekeeper"&&userRole!=="organizer"))return;
-  let alive=true;
-  const loadGatekeeperCounts=async()=>{
-   const {data,error}=await getGatekeeperScanStats(assignedEvent.event_id);
-   if(alive&&!error&&data)setGatekeeperCounts({accepted:Number(data.accepted||0),used:Number(data.used||0),forged:Number(data.forged||0),invalid:Number(data.invalid||0)});
-  };
-  void loadGatekeeperCounts();
-  return()=>{alive=false;};
- },[authUser,assignedEvent?.event_id,userRole]);
-
- useEffect(()=>{
   const supabase=getSupabaseBrowserClient();if(!supabase||!authUser)return;
   let alive=true;let firstLoad=true;setAccountDataLoading(true);setAccountDataError("");
   const loadAccountData=async()=>{
@@ -137,6 +117,13 @@ export default function Home(){
  useEffect(()=>{const key="haddir-welcome-seen";if(!sessionStorage.getItem(key)){setShowWelcome(true);sessionStorage.setItem(key,"1");const timer=window.setTimeout(()=>setShowWelcome(false),3600);return()=>window.clearTimeout(timer);}},[]);
  useEffect(()=>{const supabase=getSupabaseBrowserClient();if(!supabase){setEventsError("إعدادات الاتصال بقاعدة البيانات غير مكتملة.");setEventsLoading(false);return;}let alive=true;const loadEvents=async()=>{setEventsLoading(true);setEventsError("");const {data,error}=await supabase.from("events").select("id,title,category,city,venue,starts_at,description,status,is_trending,cover_image_url,location_url").eq("status","published").order("starts_at",{ascending:true});if(error){console.error("Could not load events",error);if(alive){setEventsError(error.message||"تعذر تحميل الفعاليات.");setEventsLoading(false);}return;}if(!alive)return;const eventRows=data||[];const eventIds=eventRows.map((e:any)=>e.id);let ticketRows:any[]=[];if(eventIds.length){const {data:ticketData,error:ticketError}=await supabase.from("ticket_types").select("id,event_id,name,description,price,currency,quantity_total,quantity_sold,sales_start_at,sales_end_at,is_active").in("event_id",eventIds);if(ticketError){console.error("Could not load ticket types",ticketError);if(alive)setTicketTypesError("تعذر تحميل فئات وأسعار التذاكر من قاعدة البيانات. "+(ticketError.message||""));}else{ticketRows=ticketData||[];if(alive)setTicketTypesError("");}}if(!alive)return;const mapped=eventRows.map((e:any,index:number)=>{const now=Date.now();const tiers=ticketRows.filter((t:any)=>t.event_id===e.id&&t.is_active).map((t:any)=>{const total=Math.max(0,Number(t.quantity_total)||0),sold=Math.max(0,Number(t.quantity_sold)||0),available=Math.max(0,total-sold),starts=t.sales_start_at?new Date(t.sales_start_at).getTime():0,ends=t.sales_end_at?new Date(t.sales_end_at).getTime():Infinity;return {id:t.id,name:t.name,description:t.description||"",priceValue:Number(t.price),currency:String(t.currency||"SDG").trim(),price:Number(t.price)===0?"مجاناً":formatMoney(Number(t.price),String(t.currency||"SDG")),quantityTotal:total,quantitySold:sold,available,availableNow:available>0&&now>=starts&&now<=ends};});const eventEnded=new Date(e.starts_at).getTime()<=now;const status=eventEnded?"انتهت":tiers.length===0?"غير متاح":tiers.every((t:any)=>t.available<=0)?"تم البيع بالكامل":tiers.every((t:any)=>!t.availableNow)?"البيع غير متاح حالياً":"متوفر";return {id:e.id,date:formatEventDate(e.starts_at),title:e.title,place:e.city||"",category:e.category||"فعاليات",price:tiers[0]?.price||"—",cover:["cover-one","cover-two","cover-three"][index%3],coverImageUrl:e.cover_image_url||null,tag:e.category||"فعالية",time:new Intl.DateTimeFormat("ar-SD",{hour:"numeric",minute:"2-digit"}).format(new Date(e.starts_at)),venue:e.venue||e.city||"",status,map:e.location_url||"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent((e.venue||"")+" "+(e.city||"")),about:e.description||"تفاصيل الفعالية ستُضاف قريباً.",isTrending:!!e.is_trending,tiers};});setEvents(mapped);setEventsLoading(false);const params=new URLSearchParams(window.location.search);const requested=params.get("event");if(requested&&mapped.some(e=>e.id===requested)){setSelectedEvent(requested);const idx=Number(params.get("tier")||0);const ev=mapped.find(e=>e.id===requested);if(ev?.tiers[idx]){setSelectedTier(idx);setTierChosen(params.has("tier"));}setTicketCount(Math.min(5,Math.max(1,Number(params.get("qty")||1))));setShowPayment(params.get("checkout")==="1");}};void loadEvents();const channel=supabase.channel("public-events-live").on("postgres_changes",{event:"*",schema:"public",table:"events"},()=>{void loadEvents();}).on("postgres_changes",{event:"*",schema:"public",table:"ticket_types"},()=>{void loadEvents();}).subscribe();return()=>{alive=false;void supabase.removeChannel(channel);};},[]);
  useEffect(()=>{const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("تسجيل الدخول يحتاج إعداد مفاتيح Supabase في بيئة الموقع.");return;}let alive=true;const load=async(user:{id:string;email?:string;user_metadata?:Record<string,unknown>}|null)=>{if(!alive)return;setAuthUser(user as typeof authUser);if(user){const {data}=await supabase.from("profiles").select("role,full_name,phone").eq("id",user.id).maybeSingle();if(!alive)return;setUserRole(data?.role||"customer");const {data:assignmentRows}=await supabase.from("event_role_assignments").select("event_id,assignment_role,events(id,title,venue,city,starts_at,status)").eq("user_id",user.id).in("assignment_role",["gatekeeper","organizer","advertiser"]).limit(1);if(!alive)return;setAssignedEvent(assignmentRows?.[0]||null);const metadataName=String(user.user_metadata?.full_name||user.user_metadata?.name||"");const metadataAvatar=String(user.user_metadata?.avatar_url||user.user_metadata?.picture||"");setFullName(String(data?.full_name||metadataName||""));setPhone(String(data?.phone||""));setEmail(user.email||"");setAvatarUrl(metadataAvatar);setProfileEditing(false);setSaved(false);}else{setUserRole("customer");setAssignedEvent(null);setGatekeeperResult(null);setGatekeeperCode("");setFullName("");setEmail("");setPhone("");setAvatarUrl("");setProfileEditing(false);setSaved(false);setActiveWorkspace(null);}};supabase.auth.getSession().then(({data})=>load(data.session?.user??null));const {data:{subscription}}=supabase.auth.onAuthStateChange((_event,session)=>{void load(session?.user??null);});return()=>{alive=false;subscription.unsubscribe();};},[]);
+ const gatekeeper = useGatekeeper({ authUser, assignedEvent, userRole, isGatekeeperPage, activeWorkspace });
+ const {
+  gatekeeperCode, setGatekeeperCode, gatekeeperResult, setGatekeeperResult,
+  gatekeeperLoading, gatekeeperOnline, manualEntryOpen, setManualEntryOpen,
+  gatekeeperCounts, gatekeeperHistory: gatekeeperManualHistory, gatekeeperHistoryLoading,
+  scannerOpen, setScannerOpen, videoRef, runGatekeeperAction, openScanner, openManualEntry,
+ } = gatekeeper;
  const openAdvertiserStats=async()=>{
   if(!authUser||userRole!=="advertiser")return;
   const supabase=getSupabaseBrowserClient();
@@ -148,93 +135,6 @@ export default function Home(){
   if(!data?.event){setAdvertiserStatsError("ما لقينا فعالية مرتبطة بحسابك.");return;}
   setAdvertiserStats(data);
  };
- const loadGatekeeperScanHistory=async()=>{
-  if(!assignedEvent?.event_id)return;
-  setGatekeeperHistoryLoading(true);
-  const {data,error}=await getGatekeeperScanHistory(assignedEvent.event_id);
-  setGatekeeperHistoryLoading(false);
-  if(!error&&Array.isArray(data))setGatekeeperManualHistory(data);
- };
- const runGatekeeperAction=async(confirm:boolean,codeOverride?:string,entryMethod:"qr"|"manual"="qr")=>{
-  const code=(codeOverride??gatekeeperCode).trim();
-  if(!authUser||!assignedEvent||!code)return;
-  if(entryMethod==="manual"&&!/^[0-9]{10}$/.test(code)){
-   setGatekeeperResult({ok:false,status:"error",message:"كود التذكرة يجب أن يتكون من 10 أرقام فقط."});return;
-  }
-  setGatekeeperLoading(true);
-  const {data,error}=await submitGatekeeperTicketAction(code,confirm,entryMethod);
-  setGatekeeperLoading(false);
-  if(error){setGatekeeperResult({ok:false,status:"error",message:error.message||"تعذر التحقق من التذكرة."});}
-  else setGatekeeperResult(data);
-  if(assignedEvent?.event_id){
-   const {data:stats}=await getGatekeeperScanStats(assignedEvent.event_id);
-   if(stats)setGatekeeperCounts({accepted:Number(stats.accepted||0),used:Number(stats.used||0),forged:Number(stats.forged||0),invalid:Number(stats.invalid||0)});
-  }
-  await loadGatekeeperScanHistory();
- };
- useEffect(()=>{
-  const supabase=getSupabaseBrowserClient();
-  if(!isGatekeeperPage||!authUser||!assignedEvent?.event_id||(userRole!=="gatekeeper"&&userRole!=="organizer")||!supabase)return;
-  let alive=true;
-  const refreshGatekeeperData=async()=>{
-   const [{data:stats},{data:history,error}]=await Promise.all([
-    getGatekeeperScanStats(assignedEvent.event_id),
-    getGatekeeperScanHistory(assignedEvent.event_id)
-   ]);
-   if(!alive)return;
-   if(stats)setGatekeeperCounts({accepted:Number(stats.accepted||0),used:Number(stats.used||0),forged:Number(stats.forged||0),invalid:Number(stats.invalid||0)});
-   if(!error&&Array.isArray(history))setGatekeeperManualHistory(history);
-  };
-  void refreshGatekeeperData();
-  const channel=supabase.channel("gatekeeper-live-"+assignedEvent.event_id)
-   .on("postgres_changes",{event:"*",schema:"public",table:"gatekeeper_scan_logs",filter:"event_id=eq."+assignedEvent.event_id},()=>{void refreshGatekeeperData();})
-   .subscribe();
-  return()=>{alive=false;void supabase.removeChannel(channel);};
- },[isGatekeeperPage,authUser,assignedEvent?.event_id,userRole]);
- useEffect(()=>{
-  const update=()=>setGatekeeperOnline(typeof navigator!=="undefined"?navigator.onLine:true);
-  update();window.addEventListener("online",update);window.addEventListener("offline",update);
-  return()=>{window.removeEventListener("online",update);window.removeEventListener("offline",update);};
- },[]);
- useEffect(()=>{
-  if(!scannerOpen||activeWorkspace!=="gatekeeper")return;
-  let stopped=false;
-  let scannerControls:{stop:()=>void}|undefined;
-  const start=async()=>{
-   const video=videoRef.current;
-   if(!video)return;
-   try{
-    const reader=new BrowserQRCodeReader(undefined,{delayBetweenScanAttempts:120,delayBetweenScanSuccess:500});
-    scannerControls=await reader.decodeFromConstraints(
-     {audio:false,video:{facingMode:{ideal:"environment"}}},
-     video,
-     (result,_error,controls)=>{
-      if(stopped||!result)return;
-      const value=result.getText().trim();
-      if(!/^[A-Za-z0-9]{10}$/.test(value)){
-       setGatekeeperResult({ok:false,status:"error",message:"الرمز مقروء، لكن محتواه لا يطابق كود تذكرة حاضر المكوّن من 10 خانات."});
-       return;
-      }
-      stopped=true;
-      controls.stop();
-      setGatekeeperCode(value.toUpperCase());
-      setScannerOpen(false);
-      setGatekeeperResult(null);
-      void runGatekeeperAction(true,value);
-     }
-    );
-   }catch(error){
-    if(stopped)return;
-    const message=error instanceof Error?error.message:"";
-    setGatekeeperResult({ok:false,status:"error",message:message.toLowerCase().includes("permission")||message.toLowerCase().includes("denied")?"إذن الكاميرا مرفوض. اسمح للمتصفح باستخدام الكاميرا ثم أعد المحاولة.":"تعذر تشغيل قارئ QR أو الكاميرا. تأكد من إذن الكاميرا واتصال HTTPS، أو أدخل كود التذكرة يدوياً."});
-   }
-  };
-  void start();
-  return()=>{
-   stopped=true;
-   scannerControls?.stop();
-  };
- },[scannerOpen,activeWorkspace]);
  const signInWithGoogle=async()=>{const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("إعدادات تسجيل الدخول غير مكتملة على الموقع.");return;}const {error}=await supabase.auth.signInWithOAuth({provider:"google",options:{redirectTo:window.location.origin}});if(error)setAuthMessage(error.message);};
  const signInWithEmail=async()=>{const supabase=getSupabaseBrowserClient();if(!supabase||!loginEmail.trim()){setAuthMessage("أدخل بريدك الإلكتروني أولاً.");return;}const {error}=await supabase.auth.signInWithOtp({email:loginEmail.trim(),options:{emailRedirectTo:window.location.origin}});setAuthMessage(error?error.message:"أرسلنا رابط تسجيل الدخول إلى بريدك الإلكتروني. افتح الرسالة للمتابعة.");};
  const saveProfile=async()=>{if(!authUser){setAuthMessage("سجّل الدخول أولاً لحفظ بياناتك.");return;}const normalizedPhone=phone.replace(/[٠-٩]/g,d=>String("٠١٢٣٤٥٦٧٨٩".indexOf(d))).replace(/\s+/g,"");if(!/^0\d{9}$/.test(normalizedPhone)){setAuthMessage("رقم الهاتف لازم يكون 10 خانات بالضبط ويبدأ بصفر، مثال: 09XXXXXXXX.");return;}const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("تعذر الاتصال بقاعدة البيانات حالياً.");return;}setProfileSaving(true);setSaved(false);setAuthMessage("");const {data,error}=await supabase.from("profiles").update({phone:normalizedPhone}).eq("id",authUser.id).select("phone").single();setProfileSaving(false);if(error){setAuthMessage("ما قدرنا نحفظ رقمك. تأكد من الاتصال وحاول مرة تانية.");return;}setPhone(data.phone||normalizedPhone);setProfileEditing(false);setSaved(true);};
@@ -412,19 +312,25 @@ export default function Home(){
  <div className="profile-settings-panel"><div><strong>إعدادات العرض</strong><p>غيّر مظهر التطبيق في كل الصفحات.</p></div><button className="btn btn-outline" type="button" onClick={()=>setDarkMode(v=>!v)}>{darkMode?"☀ الوضع النهاري":"☾ الوضع الليلي"}</button></div>
  {authMessage&&<p className="save-confirm">{authMessage}</p>}
  </section>}
-  {isGatekeeperPage&&<section className="screen container gatekeeper-page-screen" aria-label="واجهة البواب">
-  {(userRole==="gatekeeper"||userRole==="organizer")?<div className="gatekeeper-workspace">
-   <div className="gatekeeper-workspace-head"><div><small>مساحة البواب</small><h2>فحص تذاكر الدخول</h2><p>{assignedEvent?.events?.title||"لم يتم ربط فعالية بحسابك"}</p></div><div className="gatekeeper-head-actions"><span className={"gatekeeper-network "+(gatekeeperOnline?"online":"offline")}><i/>{gatekeeperOnline?"متصل بالشبكة":"غير متصل"}</span><button type="button" className="btn btn-outline" onClick={()=>{const url=new URL(window.location.href);url.searchParams.delete("workspace");url.searchParams.set("tab","profile");window.location.assign(url.pathname+url.search+url.hash);}}>إغلاق</button></div></div>
-   <div className="gatekeeper-counter-grid"><article className="accepted"><small>دخول ناجح</small><strong>{gatekeeperCounts.accepted}</strong></article><article className="used"><small>محاولات مكررة</small><strong>{gatekeeperCounts.used}</strong></article><article className="forged"><small>كود غير موجود</small><strong>{gatekeeperCounts.forged}</strong></article><article className="invalid"><small>غير صالحة</small><strong>{gatekeeperCounts.invalid}</strong></article></div>
-   {assignedEvent?.events&&<div className="gatekeeper-assigned-event"><small>الفعالية المصرح لك بها</small><strong>{assignedEvent.events.title}</strong><span>{assignedEvent.events.venue||assignedEvent.events.city||"الموقع غير محدد"} · {assignedEvent.events.starts_at?formatEventDate(assignedEvent.events.starts_at):"موعد غير محدد"}</span></div>}
-   {!assignedEvent&&<p className="gatekeeper-inline-error">حسابك غير مربوط بفعالية حالياً. راجع إدارة حاضر لتعيين الفعالية.</p>}
-    <div className="gatekeeper-actions"><button type="button" className="btn btn-primary" disabled={!assignedEvent||gatekeeperLoading||!gatekeeperOnline} onClick={()=>{setGatekeeperResult(null);setManualEntryOpen(false);setScannerOpen(v=>!v);}}><ScanLine size={18}/>{scannerOpen?"إغلاق الكاميرا":"مسح بالكاميرا"}</button><button type="button" className="btn btn-outline" disabled={!assignedEvent||gatekeeperLoading} onClick={()=>{setScannerOpen(false);setGatekeeperResult(null);setManualEntryOpen(true);}}><ClipboardList size={18}/>إدخال يدوي</button></div>
-   {scannerOpen&&<div className="gatekeeper-camera"><video ref={videoRef} autoPlay playsInline muted/><p>وجّه الكاميرا نحو رمز QR. إذا لم تعمل الكاميرا، أدخل الكود يدوياً.</p></div>}
-   {manualEntryOpen&&<form className="gatekeeper-manual-form" onSubmit={e=>{e.preventDefault();setScannerOpen(false);setManualEntryOpen(false);void runGatekeeperAction(true,gatekeeperCode,"manual");}}><label className="gatekeeper-input" htmlFor="gatekeeper-manual-code">كود التذكرة — 10 أرقام فقط</label><div><input id="gatekeeper-manual-code" type="text" inputMode="numeric" pattern="[0-9]{10}" maxLength={10} minLength={10} value={gatekeeperCode} onChange={e=>setGatekeeperCode(e.target.value.replace(/[٠-٩]/g,d=>String("٠١٢٣٤٥٦٧٨٩".indexOf(d))).replace(/[^0-9]/g,"").slice(0,10))} placeholder="0000000000" dir="ltr" autoComplete="off" aria-describedby="gatekeeper-manual-hint"/><button type="submit" className="btn btn-outline" disabled={!assignedEvent||gatekeeperLoading||!/^[0-9]{10}$/.test(gatekeeperCode)}>{gatekeeperLoading?"جاري الفحص...":"تحقق ودخول"}</button></div><small id="gatekeeper-manual-hint">أدخل عشرة أرقام متتالية دون حروف أو رموز.</small></form>}
-   {gatekeeperResult&&<div className={"gatekeeper-result "+(gatekeeperResult.status==="checked_in"?"valid":gatekeeperResult.status==="used"?"used":gatekeeperResult.status==="not_found"?"invalid":"error")}><strong>{gatekeeperResult.status==="checked_in"?"مقبولة — تم تسجيل استخدامها بنجاح":gatekeeperResult.status==="used"?"مستخدمة — تم استخدام هذه التذكرة من قبل":gatekeeperResult.status==="not_found"?"مزوّرة — هذا الكود غير صادر من نظام حاضر":gatekeeperResult.message}</strong>{gatekeeperResult.ticket_code&&<div className="gatekeeper-result-details"><span>اسم المشتري: {gatekeeperResult.buyer_name||gatekeeperResult.attendee_name||"—"}</span><span>الفعالية: {gatekeeperResult.event_title||"—"}</span><span>فئة التذكرة: {gatekeeperResult.ticket_type||"—"}</span>{gatekeeperResult.attendee_count!=null&&<span>عدد الأفراد في الحجز: {gatekeeperResult.attendee_count}</span>}<span>الكود: {gatekeeperResult.ticket_code}</span></div>}{gatekeeperResult.status==="checked_in"&&<p>تم تحديث حالة التذكرة في النظام إلى «مستخدمة»، ولن تُقبل مرة أخرى.</p>}</div>}
-   <section className="gatekeeper-manual-history" aria-label="سجل عمليات الدخول"><div className="gatekeeper-manual-history-head"><strong>سجل عمليات الدخول</strong><span>{gatekeeperManualHistory.length} عملية</span></div>{gatekeeperHistoryLoading?<p className="gatekeeper-history-empty">جاري تحميل السجل...</p>:gatekeeperManualHistory.length===0?<p className="gatekeeper-history-empty">ما في عمليات مسح أو إدخال مسجلة حتى الآن.</p>:<div className="gatekeeper-history-list">{gatekeeperManualHistory.map((item:any)=><article className="gatekeeper-history-item" key={item.id}><div className="gatekeeper-history-code" dir="ltr">{item.ticket_code||"—"}<small className="gatekeeper-history-method">{item.entry_method==="manual"?"إدخال يدوي":"QR"}</small></div><div className="gatekeeper-history-meta"><strong className={item.outcome==="accepted"?"accepted":item.outcome==="used"?"used":item.outcome==="forged"?"forged":"invalid"}>{item.outcome==="accepted"?"مقبولة — تم الدخول":item.outcome==="used"?"محاولة دخول مكررة":item.outcome==="forged"?"كود غير موجود":"تذكرة غير صالحة"}</strong><small>{item.gatekeeper_name||"بواب الفعالية"} · {item.scanned_at?new Date(item.scanned_at).toLocaleString("ar-SD"):"—"}</small></div></article>)}</div>}</section>
-  </div>:<div className="empty-state" role="alert"><strong>ما عندك صلاحية لواجهة البواب</strong><p>الواجهة دي مخصصة لحسابات البواب والمنظم المعتمدة فقط.</p><button className="btn btn-outline" type="button" onClick={()=>window.location.assign("/?tab=profile")}>العودة للملف الشخصي</button></div>}
- </section>}
+  {isGatekeeperPage&&<GatekeeperWorkspace
+   userRole={userRole}
+   assignedEvent={assignedEvent}
+   online={gatekeeperOnline}
+   counts={gatekeeperCounts}
+   loading={gatekeeperLoading}
+   code={gatekeeperCode}
+   result={gatekeeperResult}
+   manualEntryOpen={manualEntryOpen}
+   scannerOpen={scannerOpen}
+   history={gatekeeperManualHistory}
+   historyLoading={gatekeeperHistoryLoading}
+   videoRef={videoRef}
+   onOpenScanner={openScanner}
+   onOpenManual={openManualEntry}
+   onCodeChange={setGatekeeperCode}
+   onManualSubmit={()=>{setScannerOpen(false);setManualEntryOpen(false);void runGatekeeperAction(true,gatekeeperCode,"manual");}}
+   onClose={()=>{const url=new URL(window.location.href);url.searchParams.delete("workspace");url.searchParams.set("tab","profile");window.location.assign(url.pathname+url.search+url.hash);}}
+  />}
  </div>
  {selected&&<section className="event-detail-page" aria-label={"تفاصيل "+selected.title}>
  {!showPayment?<div className="detail-sheet event-detail-layout" aria-label={"تفاصيل "+selected.title}>
