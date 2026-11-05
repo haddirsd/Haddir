@@ -54,6 +54,42 @@ export default function Home(){
  const [ticketFilter,setTicketFilter]=useState<"new"|"used">("new");
  const [expandedTicketId,setExpandedTicketId]=useState<string|null>(null);
  const trendingEvents=events.filter(e=>e.isTrending);
+ const trendingCarouselRef=useRef<HTMLDivElement|null>(null);
+ const [trendingPaused,setTrendingPaused]=useState(false);
+ const trendingLoopEvents=trendingEvents.length>1?[...trendingEvents,...trendingEvents,...trendingEvents]:trendingEvents;
+ useEffect(()=>{
+  const count=trendingEvents.length;
+  const carousel=trendingCarouselRef.current;
+  if(count<2||!carousel||trendingPaused)return;
+  let index=count;
+  let resetTimer:number|undefined;
+  const centerCard=(cardIndex:number,behavior:ScrollBehavior)=>{
+   const cards=carousel.querySelectorAll<HTMLElement>(".trending-card");
+   const card=cards[cardIndex];
+   if(!card)return;
+   const box=carousel.getBoundingClientRect();
+   const rect=card.getBoundingClientRect();
+   const left=rect.left-box.left+carousel.scrollLeft-(carousel.clientWidth-card.clientWidth)/2;
+   carousel.scrollTo({left,behavior});
+  };
+  const initialFrame=window.requestAnimationFrame(()=>centerCard(index,"auto"));
+  const interval=window.setInterval(()=>{
+   index+=1;
+   centerCard(index,"smooth");
+   if(index>=count*2){
+    resetTimer=window.setTimeout(()=>{
+     index=count;
+     centerCard(index,"auto");
+    },720);
+   }
+  },3000);
+  return()=>{
+   window.cancelAnimationFrame(initialFrame);
+   window.clearInterval(interval);
+   if(resetTimer!==undefined)window.clearTimeout(resetTimer);
+  };
+ },[trendingEvents.length,trendingPaused]);
+
   useEffect(()=>{
   const params=new URLSearchParams(window.location.search);
   const tab=params.get("tab");
@@ -283,7 +319,7 @@ export default function Home(){
   {eventsLoading?<div className="empty-state"><strong>جاري تحميل الفعاليات...</strong></div>:eventsError?<div className="empty-state" role="alert"><strong>ما قدرنا نحمّل الفعاليات</strong><p>{eventsError}</p><button className="btn btn-outline" onClick={()=>window.location.reload()}>إعادة المحاولة</button></div>:<>
    <section className="trending-section">
     <div className="redesign-section-head"><div className="redesign-title"><h2>رائج الآن</h2><span className="trending-dot" aria-hidden="true"/></div></div>
-    {events.some(e=>e.isTrending)?<div className="trending-carousel hide-scrollbar" dir="ltr"><div className="trending-track"><div className="trending-group">{trendingEvents.map(e=><article className="trending-card snap-item" key={e.id} role="button" tabIndex={0} aria-label={"عرض تفاصيل "+e.title} onClick={()=>openEvent(e.id)} onKeyDown={event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openEvent(e.id);}}}><div className={"trending-card-media "+e.cover}>{e.coverImageUrl?<img src={e.coverImageUrl} alt={e.title} loading="lazy"/>:<span className="trending-placeholder">✦</span>}<div className="trending-overlay"/><span className="trending-category">{e.category}</span><span className="trending-price">{e.price}</span><div className="trending-card-copy"><h3>{e.title}</h3><div><CalendarDays size={14}/><span>{e.date} · {e.time}</span></div><div><MapPin size={14}/><span>{e.venue||e.place}</span></div></div></div></article>)}</div><div className="trending-group" aria-hidden="true" inert>{trendingEvents.map(e=><article className="trending-card snap-item" key={e.id+"-loop"} tabIndex={-1}><div className={"trending-card-media "+e.cover}>{e.coverImageUrl?<img src={e.coverImageUrl} alt="" loading="lazy"/>:<span className="trending-placeholder">✦</span>}<div className="trending-overlay"/><span className="trending-category">{e.category}</span><span className="trending-price">{e.price}</span><div className="trending-card-copy"><h3>{e.title}</h3><div><CalendarDays size={14}/><span>{e.date} · {e.time}</span></div><div><MapPin size={14}/><span>{e.venue||e.place}</span></div></div></div></article>)}</div></div></div>:<div className="empty-state">ما في فعاليات رائجة حالياً.</div>}
+    {events.some(e=>e.isTrending)?<div ref={trendingCarouselRef} className="trending-carousel hide-scrollbar" dir="ltr" onMouseEnter={()=>setTrendingPaused(true)} onMouseLeave={()=>setTrendingPaused(false)} onTouchStart={()=>setTrendingPaused(true)} onTouchEnd={()=>setTrendingPaused(false)} onTouchCancel={()=>setTrendingPaused(false)}>{trendingLoopEvents.map((e,index)=><article className="trending-card snap-item" key={e.id+"-loop-"+index} role="button" tabIndex={index>=trendingEvents.length?-1:0} aria-hidden={index>=trendingEvents.length} aria-label={"عرض تفاصيل "+e.title} onClick={()=>openEvent(e.id)} onKeyDown={event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openEvent(e.id);}}}><div className={"trending-card-media "+e.cover}>{e.coverImageUrl?<img src={e.coverImageUrl} alt={index>=trendingEvents.length?"":e.title} loading="lazy"/>:<span className="trending-placeholder">✦</span>}<div className="trending-overlay"/><span className="trending-category">{e.category}</span><span className="trending-price">{e.price}</span><div className="trending-card-copy"><h3>{e.title}</h3><div><CalendarDays size={14}/><span>{e.date} · {e.time}</span></div><div><MapPin size={14}/><span>{e.venue||e.place}</span></div></div></div></article>)}</div>:<div className="empty-state">ما في فعاليات رائجة حالياً.</div>}
    </section>
    <section className="more-events redesigned-more">
     <div className="redesign-section-head"><h2>فعاليات أخرى</h2><span>{events.filter(e=>!e.isTrending).length} فعاليات</span></div>
