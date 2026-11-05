@@ -2086,3 +2086,239 @@ body{font-size:16px}
 .theme-dark .theme-toggle-knob{transform:translateX(-28px);background:#514064;color:#f5e8a7}
 .header-icon.theme-toggle:focus-visible{outline:3px solid #a77bd1;outline-offset:3px}
 @media(prefers-reduced-motion:reduce){.theme-toggle-knob,.header-icon.theme-toggle{transition:none}}
+
+
+/* Full dark-mode coverage: shared tokens, admin, staff and account controls */
+.theme-dark{
+  --card-bg:#211a2a;
+  --border-color:#3a3044;
+  --border:#3a3044;
+  --primary:#b58be0;
+}
+
+/* Administration workspace follows the same saved theme as the customer app */
+.admin-shell.theme-dark{
+  background:#15111b;
+  color:#f4edf9;
+}
+.theme-dark.admin-loading,
+.theme-dark.admin-denied{
+  background:#15111b;
+  color:#f4edf9;
+}
+.admin-shell.theme-dark .admin-sidebar,
+.admin-shell.theme-dark .admin-topbar,
+.admin-shell.theme-dark .admin-panel,
+.admin-shell.theme-dark .admin-metric,
+.admin-shell.theme-dark .admin-shortcuts button,
+.admin-shell.theme-dark .admin-users-table-wrap{
+  background:#211a2a;
+  color:#f4edf9;
+  border-color:#3a3044;
+}
+.admin-shell.theme-dark .admin-sidebar{border-left-color:#3a3044}
+.admin-shell.theme-dark .admin-topbar{border-bottom-color:#3a3044}
+.admin-shell.theme-dark .admin-sidebar nav button{color:#b6a9c1}
+.admin-shell.theme-dark .admin-sidebar nav button.active{
+  background:#39284b;
+  color:#eadcf8;
+}
+.admin-shell.theme-dark .admin-brand{color:#d9c5ed}
+.admin-shell.theme-dark .admin-brand small,
+.admin-shell.theme-dark .admin-side-caption,
+.admin-shell.theme-dark .admin-mini-profile small,
+.admin-shell.theme-dark .admin-topbar>div:first-child>span,
+.admin-shell.theme-dark .admin-top-user,
+.admin-shell.theme-dark .admin-metric small,
+.admin-shell.theme-dark .admin-panel-head p,
+.admin-shell.theme-dark .admin-footer,
+.admin-shell.theme-dark .admin-empty-panel p,
+.admin-shell.theme-dark .admin-empty-panel small,
+.admin-shell.theme-dark .admin-event-card-meta,
+.admin-shell.theme-dark .admin-booking-card-grid small,
+.admin-shell.theme-dark .admin-booking-card-head small,
+.admin-shell.theme-dark .admin-payment-card-grid small,
+.admin-shell.theme-dark .admin-payment-card-head small,
+.admin-shell.theme-dark .admin-form-hint,
+.admin-shell.theme-dark .admin-stat-hint,
+.admin-shell.theme-dark .admin-user-email{
+  color:#b6a9c1;
+}
+.admin-shell.theme-dark .admin-mini-profile{border-top-color:#3a3044}
+.admin-shell.theme-dark .admin-mini-profile>span,
+.admin-shell.theme-dark .admin-avatar,
+.admin-shell.theme-dark .admin-metric>span,
+.admin-shell.theme-dark .admin-shortcuts button>span,
+.admin-shell.theme-dark .admin-empty-icon{
+  background:#39284b;
+  color:#dfc8f7;
+}
+.admin-shell.theme-dark .admin-metric strong,
+.admin-shell.theme-dark .admin-panel-head h3,
+.admin-shell.theme-dark .admin-empty-panel h3,
+.admin-shell.theme-dark .admin-event-form h3,
+.admin-shell.theme-dark .admin-ticket-heading h3,
+.admin-shell.theme-dark .admin-ticket-row-head b,
+.admin-shell.theme-dark .admin-event-card-title h4,
+.admin-shell.theme-dark .admin-booking-card-head h4,
+.admin-shell.theme-dark .admin-booking-card-grid strong,
+.admin-shell.theme-dark .admin-payment-card-head h4,
+.admin-shell.theme-dark .admin-payment-card-grid strong,
+.admin-shell.theme-dark .admin-stats-heading,
+.admin-shell.theme-dark .admin-selected-event h3{
+  color:#f4edf9;
+}
+.admin-shell.theme-dark .admin-shortcuts button{border-color:#3a3044}
+.admin-shell.theme-dark .admin-shortcuts button>svg{color:#b6a9c1}
+.admin-shell.theme-dark .admin-empty-panel{background:transparent}
+.admin-shell.theme-dark .admin-event-form,
+.admin-shell.theme-dark .admin-ticket-editor,
+.admin-shell.theme-dark .admin-ticket-row,
+.admin-shell.theme-dark .admin-selected-event,
+.admin-shell.theme-dark .admin-stats-note,
+.admin-shell.theme-dark .admin-payment-note{
+  background:#211a2a;
+  border-color:#3a3044;
+  color:#f4edf9;
+}
+.admin-shell.theme-dark .admin-event-form label,
+.admin-shell.theme-dark .admin-event-stat-select label,
+.admin-shell.theme-dark .admin-payment-reject-box label{
+  color:#d5c8df;
+}
+.admin-shell.theme-dark .admin-event-form input,
+.admin-shell.theme-dark .admin-event-form textarea,
+.admin-shell.theme-dark .admin-event-form select,
+.admin-shell.theme-dark .admin-users-table select,
+.admin-shell.theme-dark .admin-search-box input,
+.admin-shell.theme-dark .admin-event-stat-select select,
+.admin-shell.theme-dark .admin-payment-reject-box textarea{
+  background:#17121e;
+  border-color:#493a55;
+  color:#f4edf9;
+  color-scheme:dark;
+}
+.admin-shell.theme-dark .admin-event-form input::placeholder,
+.admin-shell.theme-dark .admin-event-form textarea::placeholder,
+.admin-shell.theme-dark .admin-search-box input::placeholder{
+  color:#9688a2;
+}
+.admin-shell.theme-dark .admin-event-form input:focus,
+.admin-shell.theme-dark .admin-event-form textarea:focus,
+.admin-shell.theme-dark .admin-users-table select:focus,
+.admin-shell.theme-dark .admin-search-box input:focus,
+.admin-shell.theme-dark .admin-event-stat-select select:focus,
+.admin-shell.theme-dark .admin-payment-reject-box textarea:focus{
+  border-color:#a77bc9;
+}
+.admin-shell.theme-dark .admin-table-wrap,
+.admin-shell.theme-dark .admin-data-table,
+.admin-shell.theme-dark .admin-users-table{
+  background:#211a2a;
+  color:#f4edf9;
+}
+.admin-shell.theme-dark .admin-data-table th,
+.admin-shell.theme-dark .admin-users-table th{
+  background:#30253b;
+  color:#d5c8df;
+  border-color:#3a3044;
+}
+.admin-shell.theme-dark .admin-data-table td,
+.admin-shell.theme-dark .admin-users-table td{
+  background:#211a2a;
+  color:#e9e0ef;
+  border-color:#3a3044;
+}
+.admin-shell.theme-dark .admin-data-table tbody tr:hover,
+.admin-shell.theme-dark .admin-users-table tbody tr:hover{
+  background:#30253b;
+}
+.admin-shell.theme-dark .admin-users-table tr{
+  background:#211a2a;
+  border-color:#3a3044;
+}
+.admin-shell.theme-dark .admin-user-role{
+  background:#39284b;
+  color:#e2cdf5;
+}
+.admin-shell.theme-dark .admin-user-saving,
+.admin-shell.theme-dark .admin-payment-receipt{color:#d2b2ef}
+.admin-shell.theme-dark .admin-users-success{
+  background:#173323;
+  border-color:#28563a;
+  color:#a5e6b8;
+}
+.admin-shell.theme-dark .admin-notice{
+  background:#382b1c;
+  border-color:#6d542e;
+  color:#f1d49a;
+}
+.admin-shell.theme-dark .admin-payment-approve{
+  background:#173323;
+  color:#a5e6b8;
+}
+.admin-shell.theme-dark .admin-payment-reject{
+  background:#3b3018;
+  color:#f4d78b;
+}
+.admin-shell.theme-dark .admin-event-delete:hover{background:#57451e}
+.admin-shell.theme-dark .admin-stat-tabs button{
+  background:#211a2a;
+  border-color:#493a55;
+  color:#d5c8df;
+}
+.admin-shell.theme-dark .admin-stat-tabs button.active{
+  background:#68409a;
+  border-color:#8d63b4;
+  color:#fff;
+}
+.admin-shell.theme-dark .admin-event-card,
+.admin-shell.theme-dark .admin-booking-card,
+.admin-shell.theme-dark .admin-payment-card{
+  background:#211a2a;
+  border-color:#3a3044;
+}
+.admin-shell.theme-dark .admin-booking-card-event{background:#30253b;color:#e9e0ef}
+.admin-shell.theme-dark .admin-payment-actions,
+.admin-shell.theme-dark .admin-payment-card-head,
+.admin-shell.theme-dark .admin-booking-card-head{border-color:#3a3044}
+.admin-shell.theme-dark .admin-event-card-actions{border-color:#3a3044}
+.admin-shell.theme-dark .admin-selected-event span{color:#b6a9c1}
+.admin-shell.theme-dark .admin-spinner{border-color:#493a55;border-top-color:#d9c5ed}
+
+/* Customer profile forms and status surfaces */
+.theme-dark .profile-form,
+.theme-dark .profile-account-card,
+.theme-dark .profile-settings-panel,
+.theme-dark .settings-row,
+.theme-dark .notifications-toolbar,
+.theme-dark .gatekeeper-manual-history{
+  background:var(--surface);
+  border-color:var(--line);
+  color:var(--fg);
+}
+.theme-dark .profile-form label{color:#d5c8df}
+.theme-dark .profile-form input,
+.theme-dark .profile-form textarea,
+.theme-dark .profile-form select{
+  background:#17121e;
+  border-color:var(--line);
+  color:var(--fg);
+  color-scheme:dark;
+}
+.theme-dark .profile-form input::placeholder,
+.theme-dark .profile-form textarea::placeholder{color:#9688a2}
+.theme-dark .settings-row svg:last-child{color:var(--muted)}
+.theme-dark .advertiser-profile-stats,
+.theme-dark .advertiser-metric-grid article,
+.theme-dark .advertiser-finance-card{
+  background:var(--surface);
+  border-color:var(--line);
+  color:var(--fg);
+}
+.theme-dark .advertiser-ticket-table{border-color:var(--line)}
+.theme-dark .advertiser-ticket-table th,
+.theme-dark .advertiser-ticket-table td{border-color:var(--line);color:var(--fg)}
+.theme-dark .advertiser-ticket-table th{background:#30253b}
+.theme-dark .admin-search-box input,
+.theme-dark .admin-event-form select{color-scheme:dark}
