@@ -1098,7 +1098,7 @@ body{font-size:16px}
 .gatekeeper-network i{width:9px;height:9px;border-radius:50%;display:block}
 .gatekeeper-network.online{color:#207344;background:#eef9f1;border-color:#cfe8d6}.gatekeeper-network.online i{background:#20a454;box-shadow:0 0 0 3px #20a45422}
 .gatekeeper-network.offline{color:#a63838;background:#fff0f0;border-color:#f1cccc}.gatekeeper-network.offline i{background:#d93636;box-shadow:0 0 0 3px #d9363622}
-.gatekeeper-counter-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.gatekeeper-counter-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
 .gatekeeper-counter-grid article{display:grid;gap:5px;padding:13px;border:1px solid var(--line);border-radius:13px;background:var(--surface,#faf8fc)}
 .gatekeeper-counter-grid small{font-size:10px;font-weight:800;color:var(--muted)}
 .gatekeeper-counter-grid strong{font-size:25px;line-height:1.1;font-variant-numeric:tabular-nums}
@@ -1439,6 +1439,7 @@ body{font-size:16px}
 .theme-dark .notifications-toolbar,.theme-dark .notification-filters button{background:var(--surface);border-color:var(--line)}
 .theme-dark .notification-item.is-unread{background:#30253b;border-color:#74558e}
 .theme-dark .notification-filters button.active{background:#3a2b48;color:#dfc5f6}
+@media(max-width:520px){.gatekeeper-counter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.gatekeeper-history-item{align-items:flex-start}.gatekeeper-history-meta{max-width:62%}.gatekeeper-history-meta small{line-height:1.6}}
 @media(max-width:520px){.notifications-toolbar{align-items:flex-start;padding:13px}.notification-mark-all{max-width:125px;text-align:left;line-height:1.5}.notification-open{gap:9px;padding:14px 12px 7px}.notification-icon{width:37px;height:37px}.notification-state{font-size:8px;padding:4px 6px}.notification-toggle-read{margin-inline-start:58px}}
 
 
@@ -1769,6 +1770,7 @@ body{font-size:16px}
 .gatekeeper-history-list{display:grid;gap:8px;max-height:340px;overflow:auto}
 .gatekeeper-history-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px;border:1px solid var(--line);border-radius:11px;background:var(--surface,#faf8fc)}
 .gatekeeper-history-code{font-size:13px;font-weight:900;letter-spacing:1px;font-variant-numeric:tabular-nums}
+.gatekeeper-history-method{display:block;margin-top:4px;font-size:9px;font-weight:700;letter-spacing:0;color:var(--muted)}
 .gatekeeper-history-meta{display:grid;gap:3px;text-align:left}
 .gatekeeper-history-meta strong{font-size:11px}
 .gatekeeper-history-meta strong.accepted{color:#21824b}.gatekeeper-history-meta strong.used{color:#a16b1b}.gatekeeper-history-meta strong.forged,.gatekeeper-history-meta strong.invalid{color:#b83d3d}
