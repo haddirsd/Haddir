@@ -1,0 +1,1 @@
+update public.profiles set role='gatekeeper', updated_at=now() where role='organizer';
