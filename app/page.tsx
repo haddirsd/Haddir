@@ -25,7 +25,6 @@ export default function Home(){
  const [gatekeeperLoading,setGatekeeperLoading]=useState(false);
  const [scannerOpen,setScannerOpen]=useState(false);
  const videoRef=useRef<HTMLVideoElement|null>(null);
- const cameraStreamRef=useRef<MediaStream|null>(null);
  const [advertiserStats,setAdvertiserStats]=useState<any|null>(null);
  const [advertiserStatsLoading,setAdvertiserStatsLoading]=useState(false);
  const [advertiserStatsError,setAdvertiserStatsError]=useState("");
