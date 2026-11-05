@@ -153,8 +153,8 @@ export default function AdminPage() {
   const updateUserRole = async (userRow:Row, nextRole:string, eventId:string|null) => {
     const supabase=getSupabaseBrowserClient();
     if(!supabase||!role||!["owner","admin"].includes(role)||updatingUserId)return;
-    if(["owner","admin"].includes(userRow.role)){setError("لا يمكن تغيير صلاحية مالك المنصة أو مدير الإدارة من هذه الشاشة.");return;}
-    if(!["supervisor","gatekeeper","advertiser","customer"].includes(nextRole))return;
+    if(userRow.role==="owner"){setError("لا يمكن تغيير صلاحية مالك المنصة.");return;}
+    if(!["admin","supervisor","gatekeeper","advertiser","customer"].includes(nextRole))return;
     if((nextRole==="gatekeeper"||nextRole==="advertiser")&&!eventId){setError("اختار الفعالية أولاً لهذا المستخدم.");return;}
     const {data:{user}}=await supabase.auth.getUser();
     if(user?.id===userRow.id){setError("لا يمكنك تغيير دور حسابك الحالي من هنا.");return;}
@@ -310,14 +310,14 @@ export default function AdminPage() {
     };
     const cols=columns[section]||[];
     if(section==="users"){
-      const roleNames:Record<string,string>={owner:"مالك المنصة",admin:"مشرف إداري",supervisor:"موظف حاضر",organizer:"منظم حاضر",gatekeeper:"منظم حاضر",advertiser:"مُعلن",customer:"عميل"};
+      const roleNames:Record<string,string>={owner:"مالك المنصة",admin:"مشرف",supervisor:"موظف حاضر",organizer:"منظم حاضر",gatekeeper:"منظم حاضر",advertiser:"مُعلن",customer:"عميل"};
       return <div className="admin-users-table-wrap">
         <table className="admin-users-table">
           <thead><tr><th>الإسم</th><th>رقم الهاتف</th><th>الدور</th><th>تاريخ التسجيل</th><th>تعديل الدور / الفعالية</th></tr></thead>
           <tbody>{rows.map((r,i)=>{
             const draftRole=roleDrafts[r.id]||r.role||"customer";
             const selectedEvent=assignmentEventIds[r.id]??r.assignment_event_id??"";
-            const protectedUser=["owner","admin"].includes(r.role);
+            const protectedUser=r.role==="owner";
             return <tr key={r.id||i}>
               <td data-label="الإسم"><strong>{fmt(r.full_name)}</strong></td>
               <td data-label="رقم الهاتف"><span dir="ltr">{fmt(r.phone)}</span></td>
@@ -326,7 +326,7 @@ export default function AdminPage() {
               <td data-label="تعديل الدور / الفعالية">
                 <div className="admin-user-role-editor">
                   <select aria-label={"تعديل دور "+(r.full_name||"المستخدم")} value={draftRole} disabled={updatingUserId===r.id||protectedUser} onChange={e=>setRoleDrafts(v=>({...v,[r.id]:e.target.value}))}>
-                    <option value="customer">عميل</option><option value="admin" disabled>مشرف إداري</option><option value="supervisor">موظف حاضر</option><option value="gatekeeper">منظم حاضر (بواب)</option><option value="advertiser">مُعلن</option>
+                    <option value="customer">عميل</option><option value="admin">مشرف إداري</option><option value="supervisor">موظف حاضر</option><option value="gatekeeper">منظم حاضر (بواب)</option><option value="advertiser">مُعلن</option>
                     {r.role==="organizer"&&<option value="organizer">منظم حاضر</option>}
                     {protectedUser&&<option value={r.role}>{roleNames[r.role]||r.role}</option>}
                   </select>
