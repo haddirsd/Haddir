@@ -187,7 +187,8 @@ export default function AdminPage() {
     setSectionLoading(false);
     if(error){setError("تعذرت مراجعة إثبات الدفع: "+error.message);return;}
     setRejectionReasons(v=>{const next={...v};delete next[row.id];return next;});
-    setEventMessage(decision==="approve"?("تم اعتماد الدفع وإصدار "+Number(data?.tickets_created||0)+" تذكرة."):"تم رفض إثبات الدفع وإرسال السبب للعميل.");
+    setEventMessage(decision==="approve"?("تم اعتماد الدفع وإصدار "+Number(data?.tickets_created||0)+" تذكرة. حُفظ إشعار البريد في قائمة الانتظار، وسيُرسل بعد تفعيل إعدادات Resend."):"تم رفض إثبات الدفع وإرسال السبب للعميل. حُفظ إشعار البريد في قائمة الانتظار، وسيُرسل بعد تفعيل إعدادات Resend.");
+    if(data?.booking_id){void supabase.functions.invoke("send-booking-email",{body:{booking_id:data.booking_id,decision}}).then(({error}:any)=>{if(error)console.info("Booking email remains queued until Resend is configured.");});}
     await loadSection();
   };
 
