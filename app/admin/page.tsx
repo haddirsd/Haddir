@@ -165,17 +165,31 @@ export default function AdminPage() {
 
   useEffect(() => { void loadSection(); }, [section, role, searchTerm]);
 
-  useEffect(() => {
-    const supabase=getSupabaseBrowserClient();
-    if(!supabase||!["bookings","payments","activity"].includes(section)||!role)return;
-    const channel=supabase.channel("admin-live-"+section)
-      .on("postgres_changes",{event:"*",schema:"public",table:"bookings"},()=>{void loadSection();})
-      .on("postgres_changes",{event:"*",schema:"public",table:"booking_items"},()=>{void loadSection();})
-      .on("postgres_changes",{event:"*",schema:"public",table:"payment_submissions"},()=>{void loadSection();})
-      .on("postgres_changes",{event:"INSERT",schema:"public",table:"admin_activity_log"},()=>{void loadSection();})
-      .subscribe();
-    return()=>{void supabase.removeChannel(channel);};
-  },[section,role]);
+   useEffect(() => {
+     const supabase=getSupabaseBrowserClient();
+     if(!supabase||!role)return;
+     const refreshOverview=async()=>{
+       const [events,bookings,pending,users,confirmed]=await Promise.all([
+         role==="supervisor"?Promise.resolve({count:null,error:null}):supabase.from("events").select("id",{count:"exact",head:true}),
+         supabase.from("bookings").select("id",{count:"exact",head:true}),
+         supabase.from("payment_submissions").select("id",{count:"exact",head:true}).eq("status","submitted"),
+         role==="owner"||role==="admin"?supabase.from("profiles").select("id",{count:"exact",head:true}):Promise.resolve({count:null,error:null}),
+         supabase.from("bookings").select("subtotal").eq("status","confirmed")
+       ]);
+       setCounts({events:events.count||0,bookings:bookings.count||0,pending:pending.count||0,users:users.count||0,confirmed:confirmed.data?.length||0,revenue:(confirmed.data||[]).reduce((sum:any,row:any)=>sum+Number(row.subtotal||0),0)});
+     };
+     const tables=section==="overview"?["events","bookings","payment_submissions"]:section==="events"?["events","ticket_types"]:section==="bookings"?["bookings","booking_items","payment_submissions"]:section==="payments"?["payment_submissions","bookings","booking_items"]:section==="activity"?["admin_activity_log"]:[];
+     if(!tables.length)return;
+     let channel=supabase.channel("admin-live-"+section);
+     for(const table of tables){
+       channel=channel.on("postgres_changes",{event:"*",schema:"public",table},()=>{
+         if(section==="overview")void refreshOverview();
+         else void loadSection();
+       });
+     }
+     channel.subscribe();
+     return()=>{void supabase.removeChannel(channel);};
+   },[section,role,searchTerm]);
 
   const reviewPayment=async(row:Row,decision:"approve"|"reject")=>{
     const supabase=getSupabaseBrowserClient();if(!supabase||!role)return;
