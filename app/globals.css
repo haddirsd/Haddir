@@ -2023,3 +2023,14 @@ body{font-size:16px}
     padding-bottom:calc(76px + env(safe-area-inset-bottom))!important;
   }
 }
+
+
+/* Fix excess blank space on customer screens */
+.app-content {
+  min-height: 0;
+}
+
+.app-content > .screen,
+.app-content > .tickets-screen.container {
+  min-height: 0;
+}
