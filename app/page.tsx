@@ -18,7 +18,14 @@ export default function Home(){
  const [authUser,setAuthUser]=useState<{id:string;email?:string;user_metadata?:Record<string,unknown>}|null>(null),[userRole,setUserRole]=useState("customer"),[authMessage,setAuthMessage]=useState(""),[activeWorkspace,setActiveWorkspace]=useState<"customer"|"organizer"|"gatekeeper"|"advertiser"|"admin"|"owner"|null>(null);
  const [ticketCount,setTicketCount]=useState(1),[eventPaymentAccounts,setEventPaymentAccounts]=useState<EventPaymentAccount[]>([]),[paymentMethod,setPaymentMethod]=useState(""),[receipt,setReceipt]=useState<File|null>(null),[bookingDone,setBookingDone]=useState(false),[bookingId,setBookingId]=useState<string|null>(null),[bookingNumber,setBookingNumber]=useState(""),[bookingError,setBookingError]=useState(""),[bookingSubmitting,setBookingSubmitting]=useState(false);
  const [showWelcome,setShowWelcome]=useState(false);
- const [showAdvertiserStats,setShowAdvertiserStats]=useState(false);\n const [assignedEvent,setAssignedEvent]=useState<any|null>(null);\n const [gatekeeperCode,setGatekeeperCode]=useState("");\n const [gatekeeperResult,setGatekeeperResult]=useState<any|null>(null);\n const [gatekeeperLoading,setGatekeeperLoading]=useState(false);\n const [scannerOpen,setScannerOpen]=useState(false);\n const videoRef=useRef<HTMLVideoElement|null>(null);\n const cameraStreamRef=useRef<MediaStream|null>(null);
+ const [showAdvertiserStats,setShowAdvertiserStats]=useState(false);
+ const [assignedEvent,setAssignedEvent]=useState<any|null>(null);
+ const [gatekeeperCode,setGatekeeperCode]=useState("");
+ const [gatekeeperResult,setGatekeeperResult]=useState<any|null>(null);
+ const [gatekeeperLoading,setGatekeeperLoading]=useState(false);
+ const [scannerOpen,setScannerOpen]=useState(false);
+ const videoRef=useRef<HTMLVideoElement|null>(null);
+ const cameraStreamRef=useRef<MediaStream|null>(null);
  const [advertiserStats,setAdvertiserStats]=useState<any|null>(null);
  const [advertiserStatsLoading,setAdvertiserStatsLoading]=useState(false);
  const [advertiserStatsError,setAdvertiserStatsError]=useState("");
