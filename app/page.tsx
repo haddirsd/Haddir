@@ -33,6 +33,7 @@ export default function Home(){
  const [advertiserStatsError,setAdvertiserStatsError]=useState("");
  const [myTickets,setMyTickets]=useState<any[]>([]),[myNotifications,setMyNotifications]=useState<any[]>([]),[accountDataLoading,setAccountDataLoading]=useState(false),[accountDataError,setAccountDataError]=useState("");
  const trendingEvents=events.filter(e=>e.isTrending);
+  useEffect(()=>{const tab=new URLSearchParams(window.location.search).get("tab");if(tab==="tickets"||tab==="notifications")setActiveTab(tab);},[]);
  useEffect(()=>{
   const supabase=getSupabaseBrowserClient();if(!supabase||!authUser||(activeTab!=="tickets"&&activeTab!=="notifications"))return;
   let alive=true;setAccountDataLoading(true);setAccountDataError("");
