@@ -122,8 +122,8 @@ export default function AdminPage() {
         fetchAll("bookings","id,event_id,user_id,customer_email,customer_phone,subtotal,currency,status,created_at,booking_items(id,ticket_type_id,quantity,unit_price,line_total,ticket_types(name,currency))","created_at"),
         fetchAll("tickets","id,event_id,ticket_type_id,status","issued_at")
       ]);
-      const failed=[events,profiles,bookings,tickets].find(x=>x.error);
-      if(failed){setSectionLoading(false);setError("تعذر تحميل الإحصائيات: "+failed.error.message);return;}
+      const failure=events.error||profiles.error||bookings.error||tickets.error;
+      if(failure){setSectionLoading(false);setError("تعذر تحميل الإحصائيات: "+failure.message);return;}
       setStatistics({events:events.data||[],profiles:profiles.data||[],bookings:bookings.data||[],tickets:tickets.data||[]});
       setSectionLoading(false);
       return;
