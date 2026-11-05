@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { getSupabaseBrowserClient } from "../lib/supabase";
 import { QRCodeSVG as QrCodeSVG } from "qrcode.react";
+import { BrowserQRCodeReader } from "@zxing/browser";
 import { ArrowLeft, Bell, CalendarDays, CheckCircle2, House, MapPin, Settings, Sparkles, Ticket, UserRound, ChevronLeft, Share2, ExternalLink, CreditCard, Download, ScanLine, ShieldCheck, ClipboardList } from "lucide-react";
 type EventItem = {id:string;date:string;title:string;place:string;category:string;price:string;cover:string;coverImageUrl:string|null;tag:string;time:string;venue:string;status:string;map:string;about:string;isTrending:boolean;tiers:{id:string;name:string;description:string;price:string;priceValue:number;currency:string;quantityTotal:number;quantitySold:number;available:number;availableNow:boolean}[]};
 const formatEventDate=(value:string)=>new Intl.DateTimeFormat("ar-SD",{weekday:"long",day:"numeric",month:"long"}).format(new Date(value));
@@ -91,21 +92,42 @@ export default function Home(){
  },[]);
  useEffect(()=>{
   if(!scannerOpen||activeWorkspace!=="gatekeeper")return;
-  let stopped=false;let raf=0;let stream:MediaStream|null=null;
+  let stopped=false;
+  let scannerControls:{stop:()=>void}|undefined;
   const start=async()=>{
+   const video=videoRef.current;
+   if(!video)return;
    try{
-    const video=videoRef.current as any;if(!video)return;
-    const Detector=(window as any).BarcodeDetector;
-    if(!Detector){setGatekeeperResult({ok:false,status:"error",message:"المتصفح لا يدعم مسح QR بالكاميرا. أدخل كود التذكرة يدوياً."});return;}
-    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false});
-    video.srcObject=stream;await video.play();
-    const detector=new Detector({formats:["qr_code"]});
-    const scan=async()=>{if(stopped)return;try{const codes=await detector.detect(video);if(codes?.length&&codes[0].rawValue){const value=String(codes[0].rawValue).trim();setGatekeeperCode(value);setScannerOpen(false);setGatekeeperResult(null);void runGatekeeperAction(true,value);return;}}catch{}raf=requestAnimationFrame(scan);};
-    raf=requestAnimationFrame(scan);
-   }catch{setGatekeeperResult({ok:false,status:"error",message:"تعذر تشغيل الكاميرا. تحقق من إذن الكاميرا أو أدخل الكود يدوياً."});}
+    const reader=new BrowserQRCodeReader(undefined,{delayBetweenScanAttempts:120,delayBetweenScanSuccess:500});
+    scannerControls=await reader.decodeFromConstraints(
+     {audio:false,video:{facingMode:{ideal:"environment"}}},
+     video,
+     (result,_error,controls)=>{
+      if(stopped||!result)return;
+      const value=result.getText().trim();
+      if(!/^[A-Za-z0-9]{10}$/.test(value)){
+       setGatekeeperResult({ok:false,status:"error",message:"الرمز مقروء، لكن محتواه لا يطابق كود تذكرة حاضر المكوّن من 10 خانات."});
+       return;
+      }
+      stopped=true;
+      controls.stop();
+      setGatekeeperCode(value.toUpperCase());
+      setScannerOpen(false);
+      setGatekeeperResult(null);
+      void runGatekeeperAction(true,value);
+     }
+    );
+   }catch(error){
+    if(stopped)return;
+    const message=error instanceof Error?error.message:"";
+    setGatekeeperResult({ok:false,status:"error",message:message.toLowerCase().includes("permission")||message.toLowerCase().includes("denied")?"إذن الكاميرا مرفوض. اسمح للمتصفح باستخدام الكاميرا ثم أعد المحاولة.":"تعذر تشغيل قارئ QR أو الكاميرا. تأكد من إذن الكاميرا واتصال HTTPS، أو أدخل كود التذكرة يدوياً."});
+   }
   };
   void start();
-  return()=>{stopped=true;cancelAnimationFrame(raf);stream?.getTracks().forEach(track=>track.stop());};
+  return()=>{
+   stopped=true;
+   scannerControls?.stop();
+  };
  },[scannerOpen,activeWorkspace]);
  const signInWithGoogle=async()=>{const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("إعدادات تسجيل الدخول غير مكتملة على الموقع.");return;}const {error}=await supabase.auth.signInWithOAuth({provider:"google",options:{redirectTo:window.location.origin}});if(error)setAuthMessage(error.message);};
  const signInWithEmail=async()=>{const supabase=getSupabaseBrowserClient();if(!supabase||!loginEmail.trim()){setAuthMessage("أدخل بريدك الإلكتروني أولاً.");return;}const {error}=await supabase.auth.signInWithOtp({email:loginEmail.trim(),options:{emailRedirectTo:window.location.origin}});setAuthMessage(error?error.message:"أرسلنا رابط تسجيل الدخول إلى بريدك الإلكتروني. افتح الرسالة للمتابعة.");};
