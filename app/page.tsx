@@ -328,8 +328,8 @@ export default function Home(){
     <p className="advertiser-stats-note">المبيعات محسوبة من الحجوزات المؤكدة فقط. صافي المستحقات يساوي المبيعات بعد خصم عمولة حاضر، ولا يشمل مصروفات تشغيلية أو تسويات خارج المنصة.</p>
    </>}
   </div>}
-  {authUser&&<button className="btn profile-logout-button role-logout-button" type="button" onClick={signOut}>تسجيل الخروج</button>}
  </section>}
+ {authUser&&<button className="btn profile-logout-button role-logout-button" type="button" onClick={signOut}>تسجيل الخروج</button>}
  <div className="profile-settings-panel"><div><strong>إعدادات العرض</strong><p>غيّر مظهر التطبيق في كل الصفحات.</p></div><button className="btn btn-outline" type="button" onClick={()=>setDarkMode(v=>!v)}>{darkMode?"☀ الوضع النهاري":"☾ الوضع الليلي"}</button></div>
  {authMessage&&<p className="save-confirm">{authMessage}</p>}
  </section>}
