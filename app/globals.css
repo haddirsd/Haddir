@@ -1005,3 +1005,6 @@ body{font-size:16px}
 }
 
 .admin-users-success{margin:0 0 12px;padding:11px 13px;border:1px solid #d8eadc;border-radius:10px;background:#f3fbf4;color:#27613a;font-size:11px;font-weight:700}
+
+.admin-user-role-editor{display:flex;flex-direction:column;gap:7px;min-width:0}.admin-user-role-save{min-height:34px;padding:6px 13px;border:0;border-radius:8px;background:#5b2ca0;color:#fff;font:inherit;font-size:11px;font-weight:700;cursor:pointer}.admin-user-role-save:disabled{opacity:.45;cursor:not-allowed}
+@media(max-width:700px){.admin-user-role-editor{width:100%}.admin-user-role-editor select,.admin-user-role-save{width:100%}}
