@@ -56,12 +56,13 @@ export default function Home(){
  const trendingEvents=events.filter(e=>e.isTrending);
  const trendingCarouselRef=useRef<HTMLDivElement|null>(null);
  const [trendingPaused,setTrendingPaused]=useState(false);
- const trendingLoopEvents=trendingEvents.length>1?[...trendingEvents,...trendingEvents,...trendingEvents]:trendingEvents;
+ const trendingDisplayEvents=[...trendingEvents].reverse();
+ const trendingLoopEvents=trendingDisplayEvents.length>1?[...trendingDisplayEvents,...trendingDisplayEvents,...trendingDisplayEvents]:trendingDisplayEvents;
  useEffect(()=>{
   const count=trendingEvents.length;
   const carousel=trendingCarouselRef.current;
   if(count<2||!carousel||trendingPaused)return;
-  let index=count;
+  let index=count*2-1;
   let resetTimer:number|undefined;
   const centerCard=(cardIndex:number,behavior:ScrollBehavior)=>{
    const cards=carousel.querySelectorAll<HTMLElement>(".trending-card");
@@ -70,15 +71,16 @@ export default function Home(){
    const box=carousel.getBoundingClientRect();
    const rect=card.getBoundingClientRect();
    const left=rect.left-box.left+carousel.scrollLeft-(carousel.clientWidth-card.clientWidth)/2;
-   carousel.scrollTo({left,behavior});
+   if(behavior==="auto"){carousel.style.scrollBehavior="auto";carousel.scrollLeft=left;carousel.style.scrollBehavior="";}
+   else carousel.scrollTo({left,behavior});
   };
   const initialFrame=window.requestAnimationFrame(()=>centerCard(index,"auto"));
   const interval=window.setInterval(()=>{
-   index+=1;
+   index-=1;
    centerCard(index,"smooth");
-   if(index>=count*2){
+   if(index<=count-1){
     resetTimer=window.setTimeout(()=>{
-     index=count;
+     index=count*2-1;
      centerCard(index,"auto");
     },720);
    }
