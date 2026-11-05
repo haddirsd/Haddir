@@ -1758,3 +1758,9 @@ body{font-size:16px}
 .role-logout-button{display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;margin:4px 0 0;padding:12px 18px;border:1px solid #dc2626;border-radius:14px;background:#dc2626;color:#fff;font-weight:800;box-shadow:0 5px 14px #dc262626}
 .role-logout-button:hover{border-color:#b91c1c;background:#b91c1c;color:#fff}
 .role-logout-button:focus-visible{outline:3px solid #fca5a5;outline-offset:3px}
+
+/* Dedicated gatekeeper workspace, independent from the customer profile */
+.gatekeeper-page-topbar{justify-content:space-between;gap:12px}
+.gatekeeper-page-topbar>button{min-height:38px;padding:8px 12px;font-size:13px}
+.gatekeeper-page-screen{width:100%;max-width:900px;margin:0 auto;padding-top:20px;padding-bottom:32px}
+.gatekeeper-page-screen .gatekeeper-workspace{width:100%;margin:0}
