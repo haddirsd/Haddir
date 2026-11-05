@@ -12,8 +12,14 @@ create index if not exists gatekeeper_scan_logs_user_event_time_idx
 alter table public.gatekeeper_scan_logs enable row level security;
 revoke all on public.gatekeeper_scan_logs from anon, authenticated;
 
-alter function private.gatekeeper_ticket_action(text,boolean)
-  rename to gatekeeper_ticket_action_core;
+do $
+begin
+ if to_regprocedure('private.gatekeeper_ticket_action_core(text,boolean)') is null
+    and to_regprocedure('private.gatekeeper_ticket_action(text,boolean)') is not null then
+  alter function private.gatekeeper_ticket_action(text,boolean)
+    rename to gatekeeper_ticket_action_core;
+ end if;
+end $;
 
 create or replace function private.gatekeeper_ticket_action(p_ticket_code text, p_confirm boolean default false)
 returns jsonb language plpgsql security definer set search_path = '' as $$
