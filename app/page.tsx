@@ -4,7 +4,7 @@ import { getSupabaseBrowserClient } from "../lib/supabase";
 import { useGatekeeper } from "../features/gatekeeper/useGatekeeper";
 import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
 import { QRCodeSVG as QrCodeSVG } from "qrcode.react";
-import { ArrowLeft, Copy, Wallet, Bell, CalendarDays, CheckCircle2, House, MapPin, Settings, Sparkles, Ticket, UserRound, ChevronLeft, Share2, ExternalLink, CreditCard, Download, ScanLine, ShieldCheck, ClipboardList } from "lucide-react";
+import { ArrowLeft, Copy, Wallet, Bell, CalendarDays, CheckCircle2, House, MapPin, Settings, Sparkles, Ticket, UserRound, ChevronLeft, Share2, ExternalLink, CreditCard, Download, ScanLine, ShieldCheck } from "lucide-react";
 type EventItem = {id:string;date:string;title:string;place:string;category:string;price:string;cover:string;coverImageUrl:string|null;tag:string;time:string;venue:string;status:string;map:string;about:string;isTrending:boolean;tiers:{id:string;name:string;description:string;price:string;priceValue:number;currency:string;quantityTotal:number;quantitySold:number;available:number;availableNow:boolean}[]};
 const formatEventDate=(value:string)=>new Intl.DateTimeFormat("ar-SD",{weekday:"long",day:"numeric",month:"long"}).format(new Date(value));
 
@@ -119,7 +119,7 @@ export default function Home(){
  useEffect(()=>{const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("تسجيل الدخول يحتاج إعداد مفاتيح Supabase في بيئة الموقع.");return;}let alive=true;const load=async(user:{id:string;email?:string;user_metadata?:Record<string,unknown>}|null)=>{if(!alive)return;setAuthUser(user as typeof authUser);if(user){const {data}=await supabase.from("profiles").select("role,full_name,phone").eq("id",user.id).maybeSingle();if(!alive)return;setUserRole(data?.role||"customer");const {data:assignmentRows}=await supabase.from("event_role_assignments").select("event_id,assignment_role,events(id,title,venue,city,starts_at,status)").eq("user_id",user.id).in("assignment_role",["gatekeeper","organizer","advertiser"]).limit(1);if(!alive)return;setAssignedEvent(assignmentRows?.[0]||null);const metadataName=String(user.user_metadata?.full_name||user.user_metadata?.name||"");const metadataAvatar=String(user.user_metadata?.avatar_url||user.user_metadata?.picture||"");setFullName(String(data?.full_name||metadataName||""));setPhone(String(data?.phone||""));setEmail(user.email||"");setAvatarUrl(metadataAvatar);setProfileEditing(false);setSaved(false);}else{setUserRole("customer");setAssignedEvent(null);setGatekeeperResult(null);setGatekeeperCode("");setFullName("");setEmail("");setPhone("");setAvatarUrl("");setProfileEditing(false);setSaved(false);setActiveWorkspace(null);}};supabase.auth.getSession().then(({data})=>load(data.session?.user??null));const {data:{subscription}}=supabase.auth.onAuthStateChange((_event,session)=>{void load(session?.user??null);});return()=>{alive=false;subscription.unsubscribe();};},[]);
  const gatekeeper = useGatekeeper({ authUser, assignedEvent, userRole, isGatekeeperPage, activeWorkspace });
  const {
-  gatekeeperCode, setGatekeeperCode, gatekeeperResult, setGatekeeperResult,
+  gatekeeperCode, setGatekeeperCode, gatekeeperResult,
   gatekeeperLoading, gatekeeperOnline, manualEntryOpen, setManualEntryOpen,
   gatekeeperCounts, gatekeeperHistory: gatekeeperManualHistory, gatekeeperHistoryLoading,
   scannerOpen, setScannerOpen, videoRef, runGatekeeperAction, openScanner, openManualEntry,
