@@ -1847,3 +1847,61 @@ body{font-size:16px}
 .event-detail-layout .detail-booking-dock .pay-button{
   opacity:1!important;
 }
+
+
+/* Checkout screen: tighter return header and correctly sized event artwork. */
+.event-detail-layout.payment-sheet .checkout-back{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:9px!important;
+  margin:0 0 6px!important;
+  padding:6px 0!important;
+}
+.event-detail-layout.payment-sheet .payment-screen{
+  padding-top:8px!important;
+}
+.event-detail-layout.payment-sheet .checkout-thumb{
+  display:block!important;
+  position:relative!important;
+  flex:0 0 92px!important;
+  width:92px!important;
+  min-width:92px!important;
+  height:76px!important;
+  min-height:76px!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border-radius:12px!important;
+}
+.event-detail-layout.payment-sheet .checkout-thumb .event-cover-image{
+  position:absolute!important;
+  inset:0!important;
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  object-position:center!important;
+}
+.event-detail-layout.payment-sheet .checkout-thumb .cover-symbol{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+}
+.account-number-card{position:relative}
+.account-number-card strong{overflow-wrap:anywhere}
+.copy-account-button{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  justify-self:start;margin-top:3px;padding:7px 10px;
+  border:1px solid var(--line);border-radius:9px;
+  background:var(--surface,#fff);color:var(--green);
+  font:inherit;font-size:10px;font-weight:800;cursor:pointer;
+}
+.copy-account-button:disabled{opacity:.45;cursor:not-allowed}
+@media(max-width:600px){
+  .event-detail-layout.payment-sheet .payment-screen{padding-top:4px!important}
+  .event-detail-layout.payment-sheet .checkout-back{margin-bottom:4px!important}
+  .event-detail-layout.payment-sheet .checkout-thumb{
+    flex-basis:84px!important;width:84px!important;min-width:84px!important;
+    height:72px!important;min-height:72px!important;
+  }
+}
