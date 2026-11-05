@@ -2034,3 +2034,43 @@ body{font-size:16px}
 .app-content > .tickets-screen.container {
   min-height: 0;
 }
+
+
+/* Content-driven vertical sizing across customer, staff, gatekeeper and admin workspaces.
+   Keep the app-shell bottom padding: it reserves room for the fixed navigation bar. */
+.app-content,
+.app-content > .screen,
+.app-content > .tickets-screen.container,
+.app-content > .gatekeeper-page-screen {
+  min-height: 0 !important;
+  height: auto !important;
+}
+
+.screen,
+.tickets-screen.container,
+.gatekeeper-page-screen,
+.admin-content {
+  min-height: 0 !important;
+  height: auto !important;
+}
+
+.event-detail-page,
+.event-detail-layout,
+.event-detail-layout:not(.payment-sheet),
+.event-detail-layout.payment-sheet,
+.event-detail-layout .detail-content,
+.event-detail-layout.payment-sheet .payment-screen,
+.event-detail-layout.payment-sheet .checkout-form {
+  min-height: 0 !important;
+  height: auto !important;
+}
+
+.event-detail-layout.payment-sheet .checkout-form {
+  flex: 0 0 auto !important;
+}
+
+/* Admin workspace follows its rendered panels instead of filling the viewport. */
+.admin-shell {
+  min-height: 0 !important;
+  height: auto !important;
+}
