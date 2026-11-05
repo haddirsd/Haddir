@@ -1986,3 +1986,40 @@ body{font-size:16px}
     padding-bottom:calc(88px + env(safe-area-inset-bottom))!important;
   }
 }
+
+
+/* Remove the artificial viewport-height filler below the last content block. */
+.event-detail-page,
+.event-detail-layout:not(.payment-sheet){
+  min-height:0!important;
+}
+.event-detail-layout:not(.payment-sheet) .detail-content{
+  padding-bottom:8px!important;
+  flex:0 0 auto!important;
+}
+.event-detail-layout.payment-sheet{
+  min-height:0!important;
+  padding-bottom:0!important;
+}
+.event-detail-layout.payment-sheet .payment-screen{
+  min-height:0!important;
+  height:auto!important;
+  padding-bottom:12px!important;
+}
+.event-detail-layout.payment-sheet .checkout-form{
+  flex:0 0 auto!important;
+  min-height:0!important;
+  padding-bottom:calc(82px + env(safe-area-inset-bottom))!important;
+}
+@media(max-width:600px){
+  .event-detail-layout:not(.payment-sheet) .detail-content{
+    padding-bottom:8px!important;
+  }
+  .event-detail-layout.payment-sheet .payment-screen{
+    padding-bottom:8px!important;
+  }
+  .event-detail-layout.payment-sheet .checkout-form{
+    min-height:0!important;
+    padding-bottom:calc(76px + env(safe-area-inset-bottom))!important;
+  }
+}
