@@ -48,6 +48,20 @@ export default function AdminPage() {
   const [statsEventId,setStatsEventId]=useState("");
   const [searchTerm,setSearchTerm]=useState("");
   const [userTotal,setUserTotal]=useState(0);
+  const [darkMode,setDarkMode]=useState(false);
+
+  useEffect(() => {
+    const syncTheme = () => {
+      const saved = window.localStorage.getItem("haddir-theme");
+      const dark = saved ? saved === "dark" : !!window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+      setDarkMode(dark);
+      document.documentElement.dataset.theme = dark ? "dark" : "light";
+      document.documentElement.style.colorScheme = dark ? "dark" : "light";
+    };
+    syncTheme();
+    window.addEventListener("storage", syncTheme);
+    return () => window.removeEventListener("storage", syncTheme);
+  }, []);
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
@@ -341,8 +355,8 @@ export default function AdminPage() {
 
   const signOut = async () => { const supabase = getSupabaseBrowserClient(); if (supabase) await supabase.auth.signOut(); router.replace("/"); };
 
-  if (loading) return <main className="admin-loading" dir="rtl"><div className="admin-spinner"/><p>جاري التحقق من صلاحياتك...</p></main>;
-  if (!role) return <main className="admin-denied" dir="rtl"><Shield size={34}/><h1>الوصول غير متاح</h1><p>{error || "هذه الصفحة مخصصة لفريق إدارة حاضر."}</p><button onClick={() => router.replace("/")}>العودة للرئيسية</button></main>;
+  if (loading) return <main className={"admin-loading"+(darkMode?" theme-dark":"")} dir="rtl"><div className="admin-spinner"/><p>جاري التحقق من صلاحياتك...</p></main>;
+  if (!role) return <main className={"admin-denied"+(darkMode?" theme-dark":"")} dir="rtl"><Shield size={34}/><h1>الوصول غير متاح</h1><p>{error || "هذه الصفحة مخصصة لفريق إدارة حاضر."}</p><button onClick={() => router.replace("/")}>العودة للرئيسية</button></main>;
 
   const supervisor = role === "supervisor";
   const roleLabel = role === "owner" ? "مالك المنصة" : role === "admin" ? "المشرف الإداري" : "موظف حاضر";
@@ -546,7 +560,7 @@ export default function AdminPage() {
     return <div className="admin-table-wrap"><table className="admin-data-table"><thead><tr>{cols.map(c=><th key={c.key}>{c.label}</th>)}</tr></thead><tbody>{rows.map((r,i)=><tr key={r.id||i}>{cols.map(c=><td key={c.key}>{c.format?c.format(r):fmt(r[c.key])}</td>)}</tr>)}</tbody></table>{rows.length===0&&<p className="admin-no-data">لا توجد سجلات حتى الآن.</p>}</div>;
   };
 
-  return <main className="admin-shell" dir="rtl">
+  return <main className={"admin-shell"+(darkMode?" theme-dark":"")} dir="rtl">
     <aside className="admin-sidebar">
       <button className="admin-brand" onClick={() => router.push("/")}><span>ح</span><b>حاضر</b><small>الإدارة</small></button>
       <div className="admin-side-caption">مساحة العمل</div>
