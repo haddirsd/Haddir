@@ -191,20 +191,34 @@ export default function Home(){
   if(!getSupabaseBrowserClient()){setBookingError("تعذر الاتصال بقاعدة البيانات حالياً.");return;}
   setBookingSubmitting(true);setBookingError("");
   let activeBookingId=bookingId;
-  if(!activeBookingId){
-   const {data:created,error}=await createBooking(selected.id,selected.tiers[selectedTier].id,ticketCount);
-   if(error){setBookingSubmitting(false);setBookingError(error.message||"ما قدرنا ننشئ الحجز.");return;}
-   if(!created?.booking_id){setBookingSubmitting(false);setBookingError("لم نستلم تأكيد إنشاء الحجز.");return;}
-   activeBookingId=created.booking_id;setBookingId(activeBookingId);setBookingNumber(created.booking_number||"");
+  let uploadedReceiptPath:string|null=null;
+  try{
+   if(!activeBookingId){
+    const {data:created,error}=await createBooking(selected.id,selected.tiers[selectedTier].id,ticketCount);
+    if(error){setBookingError(error.message||"ما قدرنا ننشئ الحجز.");return;}
+    if(!created?.booking_id){setBookingError("لم نستلم تأكيد إنشاء الحجز.");return;}
+    activeBookingId=created.booking_id;setBookingId(activeBookingId);setBookingNumber(created.booking_number||"");
+   }
+   const {path:receiptPath,error:uploadError}=await uploadPaymentReceipt(authUser.id,activeBookingId,receipt);
+   if(uploadError||!receiptPath){setBookingError("تم حفظ الحجز لكن تعذر رفع الإيصال: "+(uploadError?.message||"تعذر تحديد مسار الإيصال")+". يمكنك المحاولة مرة أخرى.");return;}
+   uploadedReceiptPath=receiptPath;
+   const {data:submissionId,error:submitError}=await submitPayment(activeBookingId,paymentMethod,receiptPath);
+   if(submitError||!submissionId){
+    await removePaymentReceipt(receiptPath);
+    uploadedReceiptPath=null;
+    setBookingError(submitError?.message||"تعذر إرسال إثبات الدفع للمراجعة. حاول مرة أخرى.");return;
+   }
+   uploadedReceiptPath=null;
+   setBookingDone(true);setActiveTab("notifications");
+  }catch(error){
+   if(uploadedReceiptPath){
+    try{await removePaymentReceipt(uploadedReceiptPath);}catch(cleanupError){console.error("Could not remove unsubmitted payment receipt",cleanupError);}
+   }
+   console.error("Booking submission failed",error);
+   setBookingError(error instanceof Error&&error.message?error.message:"حصل خطأ غير متوقع أثناء إرسال الحجز. حاول مرة أخرى.");
+  }finally{
+   setBookingSubmitting(false);
   }
-  const {path:receiptPath,error:uploadError}=await uploadPaymentReceipt(authUser.id,activeBookingId,receipt);
-  if(uploadError||!receiptPath){setBookingSubmitting(false);setBookingError("تم حفظ الحجز لكن تعذر رفع الإيصال: "+(uploadError?.message||"تعذر تحديد مسار الإيصال")+". يمكنك المحاولة مرة أخرى.");return;}
-  const {data:submissionId,error:submitError}=await submitPayment(activeBookingId,paymentMethod,receiptPath);
-  if(submitError||!submissionId){
-   await removePaymentReceipt(receiptPath);
-   setBookingSubmitting(false);setBookingError(submitError?.message||"تعذر إرسال إثبات الدفع للمراجعة. حاول مرة أخرى.");return;
-  }
-  setBookingSubmitting(false);setBookingDone(true);setActiveTab("notifications");
 };
  return <main dir="rtl" lang="ar" className={"app-shell"+(darkMode?" theme-dark":"")}>
  <>
