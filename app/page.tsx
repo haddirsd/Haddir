@@ -5,7 +5,6 @@ import { useBooking } from "../features/booking/useBooking";
 import { useEvents } from "../features/events/useEvents";
 import { HomeEventsWorkspace } from "../features/events/components/HomeEventsWorkspace";
 import { EventDetailWorkspace } from "../features/events/components/EventDetailWorkspace";
-import type { EventItem } from "../features/events/events.types";
 import { TicketWorkspace } from "../features/customer-account/components/TicketWorkspace";
 import { NotificationsWorkspace } from "../features/customer-account/components/NotificationsWorkspace";
 import { useGatekeeper } from "../features/gatekeeper/useGatekeeper";
