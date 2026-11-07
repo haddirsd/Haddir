@@ -7,7 +7,7 @@ import type { AdminEventRow } from "./admin-events.types";
 
 export function useAdminEvents() {
   const [rows, setRows] = useState<AdminEventRow[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const latestRequest = useRef(0);
 
