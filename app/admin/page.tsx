@@ -143,14 +143,9 @@ export default function AdminPage() {
     let loadedRows=result.data||[];
     if(section==="payments"){
       loadedRows=await Promise.all(loadedRows.map(async(row:any)=>{
-        if(section==="payments"){
-          if(!row.receipt_path)return row;
-          const {data}=await supabase.storage.from("payment-receipts").createSignedUrl(row.receipt_path,900);
-          return {...row,receipt_url:data?.signedUrl||null};
-        }
-        return row;
-      }));
-        return {...row,payment_submissions:submissions};
+        if(!row.receipt_path)return row;
+        const {data}=await supabase.storage.from("payment-receipts").createSignedUrl(row.receipt_path,900);
+        return {...row,receipt_url:data?.signedUrl||null};
       }));
     }
     setSectionLoading(false);
