@@ -107,7 +107,7 @@ export default function Home(){
  const unreadNotificationCount=myNotifications.filter(n=>!n.is_read).length;
  const filteredNotifications=myNotifications.filter(n=>notificationFilter==="all"||(notificationFilter==="unread"?!n.is_read:n.is_read));
  const eventWorkspace=useEventWorkspace({events,authUser,onRequireLogin:()=>{setAuthMessage("سجّل الدخول أولاً عشان نكمل حجزك. الفعاليات متاحة للتصفح بدون حساب.");setActiveTab("profile");},onBookingSuccess:()=>setActiveTab("notifications")});
- const {selectedEvent:selected,selectedTier,tierChosen,showPayment,ticketCount,resetEventWorkspace:resetBooking,openEvent,closeEvent,selectTier,changeQuantity,continueToPayment,backToDetails,eventPaymentAccounts,paymentMethod,setPaymentMethod,receipt,setReceipt,bookingDone,bookingNumber,bookingError,bookingSubmitting,accountCopied,copyAccount,submitBooking}=eventWorkspace;
+ const {selectedEvent:selected,selectedTier,tierChosen,showPayment,ticketCount,resetEventWorkspace:resetBooking,openEvent,closeEvent,selectTier,changeQuantity,continueToPayment,backToDetails,eventPaymentAccounts,paymentMethod,setPaymentMethod,receipt,setReceipt,bookingDone,bookingNumber,bookingError,setBookingError,bookingSubmitting,accountCopied,setAccountCopied,copyAccount,submitBooking}=eventWorkspace;
  const go=(tab:Tab)=>{
   resetBooking();setActiveTab(tab);
   const url=new URL(window.location.href);
