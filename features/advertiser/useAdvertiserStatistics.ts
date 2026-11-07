@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getAdvertiserEventStatistics } from "./advertiser.service";
 import type { AdvertiserStatistics } from "./advertiser.types";
 
@@ -12,6 +12,11 @@ export function useAdvertiserStatistics(authUser: AuthUser, userRole: string) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const requestId = useRef(0);
+
+  useEffect(() => {
+    requestId.current += 1;
+    setShow(false); setStatistics(null); setLoading(false); setError("");
+  }, [authUser?.id, userRole]);
 
   const open = useCallback(async () => {
     if (!authUser || userRole !== "advertiser") return;
