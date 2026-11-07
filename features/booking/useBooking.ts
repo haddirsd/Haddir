@@ -36,6 +36,7 @@ export function useBooking({
   const [bookingDone, setBookingDone] = useState(false);
   const [bookingId, setBookingId] = useState<string | null>(null);
   const [bookingNumber, setBookingNumber] = useState("");
+  const [bookingContext, setBookingContext] = useState<{ eventId: string; ticketTypeId: string; quantity: number; createdAt: number } | null>(null);
   const [bookingError, setBookingError] = useState("");
   const [bookingSubmitting, setBookingSubmitting] = useState(false);
   const [accountCopied, setAccountCopied] = useState(false);
@@ -95,11 +96,24 @@ export function useBooking({
 
     setBookingSubmitting(true);
     setBookingError("");
-    let activeBookingId = bookingId;
+    const currentSelection = {
+      eventId: selected.id,
+      ticketTypeId: selected.tiers[selectedTier].id,
+      quantity: ticketCount,
+    };
+    const contextMatches = !!bookingContext &&
+      bookingContext.eventId === currentSelection.eventId &&
+      bookingContext.ticketTypeId === currentSelection.ticketTypeId &&
+      bookingContext.quantity === currentSelection.quantity &&
+      Date.now() - bookingContext.createdAt < 19 * 60 * 1000;
+    let activeBookingId = contextMatches ? bookingId : null;
     let uploadedReceiptPath: string | null = null;
 
     try {
       if (!activeBookingId) {
+        setBookingId(null);
+        setBookingNumber("");
+        setBookingContext(null);
         const { data: created, error } = await createBooking(
           selected.id,
           selected.tiers[selectedTier].id,
@@ -116,6 +130,7 @@ export function useBooking({
         activeBookingId = created.booking_id;
         setBookingId(activeBookingId);
         setBookingNumber(created.booking_number || "");
+        setBookingContext({ ...currentSelection, createdAt: Date.now() });
       }
 
       const { path: receiptPath, error: uploadError } = await uploadPaymentReceipt(
@@ -165,7 +180,7 @@ export function useBooking({
     } finally {
       setBookingSubmitting(false);
     }
-  }, [authUser, selected, selectedTier, ticketCount, receipt, eventPaymentAccounts, paymentMethod, bookingId, onSuccess]);
+  }, [authUser, selected, selectedTier, ticketCount, receipt, eventPaymentAccounts, paymentMethod, bookingId, bookingContext, onSuccess]);
 
   const resetBooking = useCallback(() => {
     setEventPaymentAccounts([]);
@@ -174,6 +189,7 @@ export function useBooking({
     setBookingDone(false);
     setBookingId(null);
     setBookingNumber("");
+    setBookingContext(null);
     setBookingError("");
     setBookingSubmitting(false);
     setAccountCopied(false);
