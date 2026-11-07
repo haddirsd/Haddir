@@ -20,19 +20,21 @@ export function useEvents() {
     }
 
     let alive = true;
+    let latestRequest = 0;
 
     const loadEvents = async () => {
+      const requestId = ++latestRequest;
       setEventsLoading(true);
       setEventsError("");
 
       try {
         const result = await getPublishedEvents();
-        if (!alive) return;
+        if (!alive || requestId !== latestRequest) return;
         setEvents(result.events);
         setTicketTypesError(result.ticketTypesError);
         setEventsLoading(false);
       } catch (error) {
-        if (!alive) return;
+        if (!alive || requestId !== latestRequest) return;
         setEventsError(
           error instanceof Error ? error.message : "تعذر تحميل الفعاليات."
         );
