@@ -1,8 +1,9 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { getSupabaseBrowserClient } from "../lib/supabase";
 import { useBooking } from "../features/booking/useBooking";
 import { useEvents } from "../features/events/useEvents";
+import { HomeEventsWorkspace } from "../features/events/components/HomeEventsWorkspace";
 import type { EventItem } from "../features/events/events.types";
 import { PaymentCheckout } from "../features/booking/components/PaymentCheckout";
 import { BookingSuccess } from "../features/booking/components/BookingSuccess";
@@ -51,45 +52,6 @@ export default function Home(){
  const [notificationFilter,setNotificationFilter]=useState<"all"|"unread"|"read">("all");
  const [ticketFilter,setTicketFilter]=useState<"new"|"used">("new");
  const [expandedTicketId,setExpandedTicketId]=useState<string|null>(null);
- const trendingEvents=events.filter(e=>e.isTrending);
- const trendingCarouselRef=useRef<HTMLDivElement|null>(null);
- const [trendingPaused,setTrendingPaused]=useState(false);
- const trendingDisplayEvents=[...trendingEvents].reverse();
- const trendingLoopEvents=trendingDisplayEvents.length>1?[...trendingDisplayEvents,...trendingDisplayEvents,...trendingDisplayEvents]:trendingDisplayEvents;
- useEffect(()=>{
-  const count=trendingEvents.length;
-  const carousel=trendingCarouselRef.current;
-  if(count<2||!carousel||trendingPaused)return;
-  let index=count*2-1;
-  let resetTimer:number|undefined;
-  const centerCard=(cardIndex:number,behavior:ScrollBehavior)=>{
-   const cards=carousel.querySelectorAll<HTMLElement>(".trending-card");
-   const card=cards[cardIndex];
-   if(!card)return;
-   const box=carousel.getBoundingClientRect();
-   const rect=card.getBoundingClientRect();
-   const left=rect.left-box.left+carousel.scrollLeft-(carousel.clientWidth-card.clientWidth)/2;
-   if(behavior==="auto"){carousel.style.scrollBehavior="auto";carousel.scrollLeft=left;carousel.style.scrollBehavior="";}
-   else carousel.scrollTo({left,behavior});
-  };
-  const initialFrame=window.requestAnimationFrame(()=>centerCard(index,"auto"));
-  const interval=window.setInterval(()=>{
-   index-=1;
-   centerCard(index,"smooth");
-   if(index<=count-1){
-    resetTimer=window.setTimeout(()=>{
-     index=count*2-1;
-     centerCard(index,"auto");
-    },720);
-   }
-  },3000);
-  return()=>{
-   window.cancelAnimationFrame(initialFrame);
-   window.clearInterval(interval);
-   if(resetTimer!==undefined)window.clearTimeout(resetTimer);
-  };
- },[trendingEvents.length,trendingPaused]);
-
   useEffect(()=>{
   const params=new URLSearchParams(window.location.search);
   const tab=params.get("tab");
@@ -204,18 +166,13 @@ export default function Home(){
  <div className="app-content">
  {!isGatekeeperPage&&activeTab==="home"&&<>
  {showWelcome&&<div className="welcome-motion" role="status"><span className="welcome-spark"><Sparkles size={19}/></span><div><strong>أهلاً بيك في حاضر</strong><p>لحظاتك الحلوة بتبدأ من هنا</p></div><span className="welcome-orbit">✦</span></div>}
- <section className="home-discovery redesigned-home" id="events"><div className="container">
-  {eventsLoading?<div className="empty-state"><strong>جاري تحميل الفعاليات...</strong></div>:eventsError?<div className="empty-state" role="alert"><strong>ما قدرنا نحمّل الفعاليات</strong><p>{eventsError}</p><button className="btn btn-outline" onClick={()=>window.location.reload()}>إعادة المحاولة</button></div>:<>
-   <section className="trending-section">
-    <div className="redesign-section-head"><div className="redesign-title"><h2>رائج الآن</h2><span className="trending-dot" aria-hidden="true"/></div></div>
-    {events.some(e=>e.isTrending)?<div ref={trendingCarouselRef} className="trending-carousel hide-scrollbar" dir="ltr" onMouseEnter={()=>setTrendingPaused(true)} onMouseLeave={()=>setTrendingPaused(false)} onTouchStart={()=>setTrendingPaused(true)} onTouchEnd={()=>setTrendingPaused(false)} onTouchCancel={()=>setTrendingPaused(false)}>{trendingLoopEvents.map((e,index)=><article className="trending-card snap-item" key={e.id+"-loop-"+index} role="button" tabIndex={index>=trendingEvents.length?-1:0} aria-hidden={index>=trendingEvents.length} aria-label={"عرض تفاصيل "+e.title} onClick={()=>openEvent(e.id)} onKeyDown={event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openEvent(e.id);}}}><div className={"trending-card-media "+e.cover}>{e.coverImageUrl?<img src={e.coverImageUrl} alt={index>=trendingEvents.length?"":e.title} loading="lazy"/>:<span className="trending-placeholder">✦</span>}<div className="trending-overlay"/><span className="trending-category">{e.category}</span><span className="trending-price">{e.price}</span><div className="trending-card-copy"><h3>{e.title}</h3><div><CalendarDays size={14}/><span>{e.date} · {e.time}</span></div><div><MapPin size={14}/><span>{e.venue||e.place}</span></div></div></div></article>)}</div>:<div className="empty-state">ما في فعاليات رائجة حالياً.</div>}
-   </section>
-   <section className="more-events redesigned-more">
-    <div className="redesign-section-head"><h2>فعاليات أخرى</h2><span>{events.filter(e=>!e.isTrending).length} فعاليات</span></div>
-    {events.some(e=>!e.isTrending)?<div className="event-list">{events.filter(e=>!e.isTrending).map(e=><article className="event-list-card event-card-clickable" key={e.id} role="button" tabIndex={0} aria-label={"عرض تفاصيل "+e.title} onClick={()=>openEvent(e.id)} onKeyDown={event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openEvent(e.id);}}}><div className={"event-list-thumb "+e.cover}>{e.coverImageUrl?<img src={e.coverImageUrl} alt={e.title} loading="lazy"/>:<span>✦</span>}</div><div className="event-list-info"><h3>{e.title}</h3><div className="event-list-top"><span>{e.category}</span><strong>{e.price}</strong></div><p><CalendarDays size={13}/>{e.date} · {e.time}</p><p><MapPin size={13}/>{e.venue||e.place}</p></div></article>)}</div>:<div className="empty-state">ما في فعاليات أخرى حالياً.</div>}
-   </section>
-  </>}
- </div></section>
+ <HomeEventsWorkspace
+  events={events}
+  loading={eventsLoading}
+  error={eventsError}
+  onOpenEvent={openEvent}
+  onRetry={()=>window.location.reload()}
+/>
  </>}
  {!isGatekeeperPage&&activeTab==="tickets"&&<TicketWorkspace
   loading={accountDataLoading}
