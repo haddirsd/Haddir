@@ -1,26 +1,26 @@
 "use client";
 
+import { useState } from "react";
 import { RefreshCw, Ticket } from "lucide-react";
 import { useAdminBookings } from "./useAdminBookings";
 import type { AdminBookingRow } from "./admin-bookings.types";
 
 const statusLabels: Record<string, string> = {
   pending_payment: "بانتظار الدفع", under_review: "قيد المراجعة", confirmed: "مؤكد",
-  rejected: "مرفوض", expired: "منتهي",
-};
+  rejected: "مرفوض", expired: "منتهي", submitted: "بانتظار المراجعة",
+  approved: "مقبول",
 const fmt = (value: unknown) => value == null || value === "" ? "—" : String(value);
 const money = (value: unknown, currency = "SDG") => value == null ? "—" : `${Number(value).toLocaleString("ar-SD")} ${currency}`;
 
-export default function AdminBookingsWorkspace({
-  searchTerm, onSearchTermChange,
-}: { searchTerm: string; onSearchTermChange: (value: string) => void }) {
+export default function AdminBookingsWorkspace() {
+  const [searchTerm, setSearchTerm] = useState("");
   const { rows, loading, error, refresh } = useAdminBookings(searchTerm);
 
   return <section className="admin-panel">
     <div className="admin-panel-head">
       <div><h3>الحجوزات</h3><p>متابعة الحجوزات وحالاتها وإثباتات الدفع المرتبطة بها</p></div>
       <div className="admin-panel-actions">
-        <label className="admin-search-box"><span>بحث برقم الحجز أو بريد العميل</span><input type="search" value={searchTerm} onChange={event => onSearchTermChange(event.target.value)} placeholder="رقم الحجز أو بريد العميل"/></label>
+        <label className="admin-search-box"><span>بحث برقم الحجز أو بريد العميل</span><input type="search" value={searchTerm} onChange={event => setSearchTerm(event.target.value)} placeholder="رقم الحجز أو بريد العميل"/></label>
         <button className="admin-refresh" type="button" onClick={() => void refresh()} disabled={loading}><RefreshCw size={16}/> تحديث</button>
       </div>
     </div>
