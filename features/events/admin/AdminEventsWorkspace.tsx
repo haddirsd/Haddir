@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import { CalendarDays, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import { getSupabaseBrowserClient } from "../../../lib/supabase";
 
 type AdminRole = "owner" | "admin" | "supervisor";
@@ -178,7 +178,7 @@ export default function AdminEventsWorkspace({ role }: { role: AdminRole }) {
             {r.is_trending?<small>رائج الآن</small>:null}
           </div>}
         </article>)}
-      </div>;;
+      </div>;
 
   return <section className="admin-panel">
     <div className="admin-panel-head">
