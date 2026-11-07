@@ -31,7 +31,6 @@ export function useAdminOverview(role: AdminOverviewRole) {
       .on("postgres_changes", { event: "*", schema: "public", table: "events" }, () => void refresh())
       .on("postgres_changes", { event: "*", schema: "public", table: "bookings" }, () => void refresh())
       .on("postgres_changes", { event: "*", schema: "public", table: "payment_submissions" }, () => void refresh())
-      .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, () => void refresh())
       .subscribe();
     return () => { latestRequest.current += 1; void supabase.removeChannel(channel); };
   }, [refresh]);
