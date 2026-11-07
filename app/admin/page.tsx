@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "../../lib/supabase";
 import AdminEventsWorkspace from "../../features/events/admin/AdminEventsWorkspace";
+import AdminBookingsWorkspace from "../../features/booking/admin/AdminBookingsWorkspace";
 import { Activity, ArrowRight, BadgeCheck, Banknote, CalendarDays, ClipboardCheck, LayoutDashboard, LogOut, Shield, Ticket, Users, Wallet, RefreshCw } from "lucide-react";
 
 type AdminRole = "owner" | "admin" | "supervisor";
@@ -88,16 +89,10 @@ export default function AdminPage() {
 
   const loadSection = async () => {
     const supabase = getSupabaseBrowserClient();
-    if (!supabase || !role || section === "overview" || section === "events") return;
+    if (!supabase || !role || section === "overview" || section === "events" || section === "bookings") return;
     setSectionLoading(true); setError(""); setRows([]);
     let result: {data:any[]|null,error:any} = {data:[],error:null};
     if (section === "activity") result = await supabase.from("admin_activity_log").select("id,actor_name,actor_role,action,entity_type,entity_label,event_id,booking_id,details,created_at,events(title)").order("created_at",{ascending:false}).limit(500);
-    if (section === "bookings") {
-      let query = supabase.from("bookings").select("id,booking_number,customer_name,customer_email,customer_phone,event_id,subtotal,currency,status,expires_at,created_at,events(title,city,venue,starts_at),booking_items(quantity,unit_price,line_total,ticket_types(name)),payment_submissions(id,payment_account_name,payment_account_number,payment_account_beneficiary,transfer_reference,receipt_path,status,created_at)").order("created_at",{ascending:false}).limit(100);
-      const term=searchTerm.trim().replace(/[(),]/g," ").replace(/[%_]/g,"");
-      if(term) query=query.or(`booking_number.ilike.%${term}%,customer_email.ilike.%${term}%`);
-      result=await query;
-    }
     if (section === "payments") result = await supabase.from("payment_submissions").select("id,booking_id,transfer_reference,receipt_path,amount,currency,status,review_note,created_at,payment_account_id,payment_account_name,payment_account_number,payment_account_beneficiary,bookings(booking_number,customer_name,customer_email,customer_phone,subtotal,currency,events(title,city,venue,starts_at),booking_items(quantity,ticket_types(name)))").eq("status","submitted").order("created_at",{ascending:false}).limit(100);
     if (section === "users" && role !== "supervisor") {
       const term=searchTerm.trim().replace(/[(),]/g," ").replace(/[%_]/g,"");
@@ -146,18 +141,15 @@ export default function AdminPage() {
     }
     if (result.error) { setSectionLoading(false);setError("تعذر تحميل بيانات هذا القسم: " + result.error.message); return; }
     let loadedRows=result.data||[];
-    if(section==="payments"||section==="bookings"){
+    if(section==="payments"){
       loadedRows=await Promise.all(loadedRows.map(async(row:any)=>{
         if(section==="payments"){
           if(!row.receipt_path)return row;
           const {data}=await supabase.storage.from("payment-receipts").createSignedUrl(row.receipt_path,900);
           return {...row,receipt_url:data?.signedUrl||null};
         }
-        const submissions=await Promise.all((row.payment_submissions||[]).map(async(payment:any)=>{
-          if(!payment.receipt_path)return payment;
-          const {data}=await supabase.storage.from("payment-receipts").createSignedUrl(payment.receipt_path,900);
-          return {...payment,receipt_url:data?.signedUrl||null};
-        }));
+        return row;
+      }));
         return {...row,payment_submissions:submissions};
       }));
     }
@@ -180,7 +172,7 @@ export default function AdminPage() {
        ]);
        setCounts({events:events.count||0,bookings:bookings.count||0,pending:pending.count||0,users:users.count||0,confirmed:confirmed.data?.length||0,revenue:(confirmed.data||[]).reduce((sum:any,row:any)=>sum+Number(row.subtotal||0),0)});
      };
-     const tables=section==="overview"?["events","bookings","payment_submissions"]:section==="bookings"?["bookings","booking_items","payment_submissions"]:section==="payments"?["payment_submissions","bookings","booking_items"]:section==="activity"?["admin_activity_log"]:[];
+     const tables=section==="overview"?["events","bookings","payment_submissions"]:section==="payments"?["payment_submissions","bookings","booking_items"]:section==="activity"?["admin_activity_log"]:[];
      if(!tables.length)return;
      let channel=supabase.channel("admin-live-"+section);
      for(const table of tables){
@@ -309,7 +301,6 @@ export default function AdminPage() {
     }
     const columns: Record<string,{key:string,label:string,format?:(r:Row)=>string}[]> = {
       events:[{key:"title",label:"الفعالية"},{key:"category",label:"التصنيف"},{key:"city",label:"المدينة"},{key:"venue",label:"الموقع"},{key:"starts_at",label:"الموعد",format:r=>r.starts_at?new Date(r.starts_at).toLocaleString("ar-SD"):"—"},{key:"status",label:"الحالة",format:r=>statusLabels[r.status]||fmt(r.status)}],
-      bookings:[{key:"booking_number",label:"رقم الحجز"},{key:"event",label:"الفعالية",format:r=>r.events?.title||"—"},{key:"ticket",label:"التذكرة / العدد",format:r=>(r.booking_items||[]).map((x:any)=>`${x.ticket_types?.name||"تذكرة"} × ${x.quantity}`).join("، ")||"—"},{key:"customer_name",label:"الزبون"},{key:"customer_phone",label:"الهاتف"},{key:"subtotal",label:"المبلغ",format:r=>money(r.subtotal,r.currency)},{key:"payment_account",label:"حساب التحويل",format:r=>{const p=(r.payment_submissions||[]).find((x:any)=>x.payment_account_name||x.payment_account_number);return p?`${p.payment_account_name||"—"} — ${p.payment_account_number||"—"}`:"لم يُرسل إثبات دفع بعد";}},{key:"transfer_reference",label:"مرجع التحويل",format:r=>(r.payment_submissions||[]).find((x:any)=>x.transfer_reference)?.transfer_reference||"—"},{key:"status",label:"الحالة",format:r=>statusLabels[r.status]||fmt(r.status)},{key:"created_at",label:"التاريخ",format:r=>new Date(r.created_at).toLocaleDateString("ar-SD")}],
       payments:[{key:"booking",label:"الحجز",format:r=>r.bookings?.booking_number||r.booking_id},{key:"customer",label:"الزبون",format:r=>r.bookings?.customer_name||"—"},{key:"transfer_reference",label:"مرجع التحويل"},{key:"receipt_url",label:"الإيصال",format:r=>r.receipt_url?"متاح":"—"},{key:"amount",label:"المبلغ",format:r=>money(r.amount,r.currency)},{key:"status",label:"الحالة",format:r=>statusLabels[r.status]||fmt(r.status)},{key:"review_note",label:"ملاحظة المراجعة"},{key:"created_at",label:"التاريخ",format:r=>new Date(r.created_at).toLocaleDateString("ar-SD")}],
       users:[{key:"full_name",label:"الاسم"},{key:"phone",label:"الهاتف"},{key:"role",label:"الدور"},{key:"created_at",label:"تاريخ التسجيل",format:r=>new Date(r.created_at).toLocaleDateString("ar-SD")}]
     };
@@ -385,36 +376,6 @@ export default function AdminPage() {
         })}
       </div>;
     }
-    if(section==="bookings"){
-      return <div className="admin-booking-cards">
-        {rows.length===0?<p className="admin-no-data">لا توجد حجوزات حتى الآن.</p>:rows.map((r,i)=>{
-          const items=(r.booking_items||[]).map((x:any)=>`${x.ticket_types?.name||"تذكرة"} × ${x.quantity}`).join("، ")||"—";
-          const payment=[...(r.payment_submissions||[])].sort((a:any,b:any)=>new Date(b.created_at||0).getTime()-new Date(a.created_at||0).getTime())[0];
-          return <article className="admin-booking-card" key={r.id||i}>
-            <div className="admin-booking-card-head">
-              <div><small>رقم الحجز</small><h4>{r.booking_number||"—"}</h4></div>
-              <span className={"admin-event-status status-"+(r.status||"pending_payment")}>{statusLabels[r.status]||fmt(r.status)}</span>
-            </div>
-            <div className="admin-booking-card-event"><Ticket size={17}/><strong>{r.events?.title||"فعالية غير محددة"}</strong></div>
-            <div className="admin-booking-card-grid">
-              <div><small>العميل</small><strong>{fmt(r.customer_name)}</strong></div>
-              <div><small>البريد الإلكتروني</small><strong>{fmt(r.customer_email)}</strong></div>
-              <div><small>رقم الهاتف</small><strong dir="ltr">{fmt(r.customer_phone)}</strong></div>
-              <div><small>التذاكر</small><strong>{items}</strong></div>
-              <div><small>إجمالي المبلغ</small><strong>{money(r.subtotal,r.currency)}</strong></div>
-              <div><small>وسيلة الدفع</small><strong>{payment?.payment_account_name||"لم يُرسل إثبات دفع بعد"}</strong></div>
-              <div><small>رقم الحساب</small><strong dir="ltr">{fmt(payment?.payment_account_number)}</strong></div>
-              <div><small>اسم المستفيد</small><strong>{fmt(payment?.payment_account_beneficiary)}</strong></div>
-              <div><small>إيصال التحويل</small>{payment?.receipt_url?<a className="admin-payment-receipt" href={payment.receipt_url} target="_blank" rel="noreferrer">عرض إيصال التحويل</a>:<strong>لا يوجد إيصال</strong>}</div>
-              <div><small>حالة إثبات الدفع</small><strong>{payment?.status?statusLabels[payment.status]||payment.status:"لم يُرسل"}</strong></div>
-              <div><small>مرجع التحويل</small><strong>{payment?.transfer_reference||"—"}</strong></div>
-              <div><small>تاريخ الحجز</small><strong>{r.created_at?new Date(r.created_at).toLocaleString("ar-SD"):"—"}</strong></div>
-              {r.expires_at&&r.status!=="confirmed"&&<div><small>انتهاء الحجز</small><strong>{new Date(r.expires_at).toLocaleString("ar-SD")}</strong></div>}
-            </div>
-          </article>;
-        })}
-      </div>;
-    }
     return <div className="admin-table-wrap"><table className="admin-data-table"><thead><tr>{cols.map(c=><th key={c.key}>{c.label}</th>)}</tr></thead><tbody>{rows.map((r,i)=><tr key={r.id||i}>{cols.map(c=><td key={c.key}>{c.format?c.format(r):fmt(r[c.key])}</td>)}</tr>)}</tbody></table>{rows.length===0&&<p className="admin-no-data">لا توجد سجلات حتى الآن.</p>}</div>;
   };
 
@@ -432,7 +393,7 @@ export default function AdminPage() {
         {error&&<div className="admin-notice" role="status">{error}</div>}
         {paymentActionMessage&&<div className="admin-notice" role="status">{paymentActionMessage}</div>}
         {section==="overview"&&<><div className="admin-metric-grid">{metrics.map(m=><article className="admin-metric" key={m.title}><span><m.icon size={20}/></span><small>{m.title}</small><strong>{dataReady?m.value.toLocaleString("ar-SD"):"—"}</strong></article>)}</div><div className="admin-panel"><div className="admin-panel-head"><div><h3>{supervisor?"المهام اليومية":"نظرة سريعة"}</h3><p>بيانات مباشرة من قاعدة بيانات حاضر</p></div></div><div className="admin-shortcuts">{(supervisor?["bookings","payments"] as Section[]:["events","bookings","payments","users","reports"] as Section[]).map(item=><button key={item} onClick={()=>setSection(item)}><span>{item==="events"?<CalendarDays/>:item==="bookings"?<Ticket/>:item==="payments"?<Wallet/>:item==="users"?<Users/>:<Activity/>}</span><b>{labels[item]}</b><ArrowRight size={16}/></button>)}</div></div></>}
-        {section==="events"?<AdminEventsWorkspace role={role}/>:section!=="overview"&&<div className="admin-panel"><div className="admin-panel-head"><div><h3>{labels[section]}</h3><p>"السجلات الفعلية المحفوظة في قاعدة البيانات"</p></div><div className="admin-panel-actions">{(section==="bookings"||section==="users")&&<label className="admin-search-box"><span>بحث بالرقم أو البريد أو الهاتف</span><input type="search" value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} placeholder={section==="bookings"?"رقم الحجز أو بريد العميل":"رقم الهاتف أو البريد الإلكتروني"}/></label>}{section==="users"&&<span className="admin-user-total">عدد المستخدمين: {userTotal.toLocaleString("ar-SD")}</span>}<button className="admin-refresh" onClick={()=>void loadSection()} disabled={sectionLoading}><RefreshCw size={16}/> تحديث</button></div></div>{sectionLoading?<p className="admin-no-data">جاري تحميل البيانات...</p>:renderRows()}</div>}
+        {section==="events"?<AdminEventsWorkspace role={role}/>:section==="bookings"?<AdminBookingsWorkspace searchTerm={searchTerm} onSearchTermChange={setSearchTerm}/>:section!=="overview"&&<div className="admin-panel"><div className="admin-panel-head"><div><h3>{labels[section]}</h3><p>"السجلات الفعلية المحفوظة في قاعدة البيانات"</p></div><div className="admin-panel-actions">{section==="users"&&<label className="admin-search-box"><span>بحث بالرقم أو البريد أو الهاتف</span><input type="search" value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} placeholder="رقم الهاتف أو البريد الإلكتروني"/></label>}{section==="users"&&<span className="admin-user-total">عدد المستخدمين: {userTotal.toLocaleString("ar-SD")}</span>}<button className="admin-refresh" onClick={()=>void loadSection()} disabled={sectionLoading}><RefreshCw size={16}/> تحديث</button></div></div>{sectionLoading?<p className="admin-no-data">جاري تحميل البيانات...</p>:renderRows()}</div>}
         <footer className="admin-footer">حاضر · نظام إدارة الفعاليات والتذاكر <span>{roleLabel}</span></footer>
       </div>
     </section>
