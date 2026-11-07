@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChangeEvent, FormEvent } from "react";
-import { ArrowLeft, CreditCard } from "lucide-react";
+import { ArrowLeft, Copy, CreditCard } from "lucide-react";
 import type { EventPaymentAccount } from "../booking.types";
 
 type CheckoutEvent = {
@@ -100,7 +100,7 @@ export function PaymentCheckout({
                   disabled={!selectedAccount?.account_number}
                   onClick={() => onCopyAccount(selectedAccount?.account_number || "")}
                 >
-                  <span aria-hidden="true">▣</span>{accountCopied ? "تم النسخ" : "نسخ الرقم"}
+                  <Copy size={15} />{accountCopied ? "تم النسخ" : "نسخ الرقم"}
                 </button>
               </div>
               <div>
