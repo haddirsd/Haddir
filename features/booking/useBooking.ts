@@ -23,11 +23,14 @@ export function useBooking({ authUser, selected, selectedTier, ticketCount, onSu
   const [bookingSubmitting, setBookingSubmitting] = useState(false);
   const [accountCopied, setAccountCopied] = useState(false);
   const submissionLock = useRef(false);
+  const paymentAccountsRequest = useRef(0);
   const pendingReceiptUpload = useRef<PendingReceiptUpload | null>(null);
 
   const loadPaymentAccounts = useCallback(async (eventId: string) => {
+    const requestId = ++paymentAccountsRequest.current;
     if (!getSupabaseBrowserClient()) return true;
     const { data, error } = await getEventPaymentAccounts(eventId);
+    if (requestId !== paymentAccountsRequest.current) return false;
     if (error) { setBookingError("تعذر تحميل حسابات الدفع لهذه الفعالية: " + (error.message || "")); return false; }
     setEventPaymentAccounts(data || []);
     setPaymentMethod("");
@@ -127,6 +130,7 @@ export function useBooking({ authUser, selected, selectedTier, ticketCount, onSu
   }, [authUser, selected, selectedTier, ticketCount, receipt, eventPaymentAccounts, paymentMethod, bookingId, bookingContext, onSuccess]);
 
   const resetBooking = useCallback(() => {
+    paymentAccountsRequest.current += 1;
     setEventPaymentAccounts([]); setPaymentMethod(""); setReceipt(null); setBookingDone(false);
     setBookingId(null); setBookingNumber(""); setBookingContext(null); setBookingError("");
     setBookingSubmitting(false); setAccountCopied(false); pendingReceiptUpload.current = null;
