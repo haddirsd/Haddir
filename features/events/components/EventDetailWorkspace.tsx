@@ -7,6 +7,7 @@ import type { EventPaymentAccount } from "../../booking/booking.types";
 import { PaymentCheckout } from "../../booking/components/PaymentCheckout";
 import { BookingSuccess } from "../../booking/components/BookingSuccess";
 import { TicketSelection } from "../../booking/components/TicketSelection";
+import { formatMoney } from "../events.formatters";
 
 type EventDetailWorkspaceProps = {
   event: EventItem;
@@ -35,8 +36,6 @@ type EventDetailWorkspaceProps = {
   onSubmitBooking: (event: FormEvent<HTMLFormElement>) => void;
   onGoNotifications: () => void;
 };
-
-import { formatMoney } from "../events.formatters";
 
 export function EventDetailWorkspace({
   event,
