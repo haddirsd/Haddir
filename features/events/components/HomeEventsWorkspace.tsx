@@ -66,8 +66,6 @@ export function HomeEventsWorkspace({
     const carousel = trendingCarouselRef.current;
     if (count < 2 || !carousel) return;
 
-    let resetTimer: number | undefined;
-
     const centerCard = (cardIndex: number, behavior: ScrollBehavior) => {
       const cards = carousel.querySelectorAll<HTMLElement>(".trending-card");
       const card = cards[cardIndex];
@@ -111,7 +109,6 @@ export function HomeEventsWorkspace({
     return () => {
       window.cancelAnimationFrame(initialFrame);
       window.clearInterval(interval);
-      if (resetTimer !== undefined) window.clearTimeout(resetTimer);
     };
   }, [trendingEvents.length]);
 
@@ -156,8 +153,8 @@ export function HomeEventsWorkspace({
                       className="trending-card snap-item"
                       key={event.id + "-loop-" + index}
                       role="button"
-                      tabIndex={index >= trendingEvents.length ? -1 : 0}
-                      aria-hidden={index >= trendingEvents.length}
+                      tabIndex={index < trendingEvents.length || index >= trendingEvents.length * 2 ? -1 : 0}
+                      aria-hidden={index < trendingEvents.length || index >= trendingEvents.length * 2}
                       aria-label={"عرض تفاصيل " + event.title}
                       onClick={() => onOpenEvent(event.id)}
                       onKeyDown={(keyboardEvent) => {
@@ -174,7 +171,7 @@ export function HomeEventsWorkspace({
                         {event.coverImageUrl ? (
                           <img
                             src={event.coverImageUrl}
-                            alt={index >= trendingEvents.length ? "" : event.title}
+                            alt={index < trendingEvents.length || index >= trendingEvents.length * 2 ? "" : event.title}
                             loading="lazy"
                           />
                         ) : (
