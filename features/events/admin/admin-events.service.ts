@@ -64,7 +64,6 @@ export async function publishDraftAdminEvent(eventId: string): Promise<{ error: 
 
 
 export type SaveAdminEventInput = {
-  userId: string;
   eventForm: AdminEventFormValues;
   ticketForms: AdminTicketForm[];
   eventAccountForms: AdminEventAccountForm[];
@@ -75,7 +74,9 @@ export type SaveAdminEventInput = {
 export async function saveAdminEvent(input: SaveAdminEventInput): Promise<{ message: string | null; error: string | null }> {
   const supabase = getSupabaseBrowserClient();
   if (!supabase) return { message: null, error: "تعذر الاتصال بقاعدة البيانات." };
-  const { eventForm, ticketForms, eventAccountForms, coverFile, editingEventId, userId } = input;
+  const { eventForm, ticketForms, eventAccountForms, coverFile, editingEventId } = input;
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { message: null, error: "انتهت الجلسة، سجل الدخول مرة أخرى." };
 
   if (!eventForm.title.trim() || !eventForm.city.trim() || !eventForm.venue.trim() || !eventForm.starts_at)
     return { message: null, error: "أكمل اسم الفعالية والمدينة والمكان وموعد البداية." };
@@ -96,7 +97,7 @@ export async function saveAdminEvent(input: SaveAdminEventInput): Promise<{ mess
     if (!coverFile.type.startsWith("image/")) return { message: null, error: "الملف المختار ليس صورة." };
     if (coverFile.size > 10 * 1024 * 1024) return { message: null, error: "حجم الصورة أكبر من 10 ميجابايت." };
     const extension = (coverFile.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
-    const path = userId + "/" + crypto.randomUUID() + "." + extension;
+    const path = user.id + "/" + crypto.randomUUID() + "." + extension;
     const { error } = await supabase.storage.from("event-covers").upload(path, coverFile, {
       contentType: coverFile.type, upsert: false, cacheControl: "31536000",
     });
@@ -176,7 +177,7 @@ export async function saveAdminEvent(input: SaveAdminEventInput): Promise<{ mess
     .replace(/[\\u0300-\\u036f]/g, "").replace(/[^a-z0-9\\u0600-\\u06ff]+/g, "-")
     .replace(/^-|-$/g, "") + "-" + Math.random().toString(36).slice(2, 7);
   const { data: event, error: eventError } = await supabase.from("events")
-    .insert({ ...eventPayload, slug, status: "draft", created_by: userId }).select("id").single();
+    .insert({ ...eventPayload, slug, status: "draft", created_by: user.id }).select("id").single();
   if (eventError || !event) return { message: null, error: "تعذر إنشاء الفعالية: " + (eventError?.message || "خطأ غير معروف") };
 
   const { error: ticketError } = await supabase.from("ticket_types").insert(ticketForms.map(ticket => ({
