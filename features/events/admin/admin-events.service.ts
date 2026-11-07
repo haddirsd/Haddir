@@ -61,3 +61,144 @@ export async function publishDraftAdminEvent(eventId: string): Promise<{ error: 
   const { error } = await supabase.from("events").update({ status: "published" }).eq("id", eventId).eq("status", "draft");
   return { error: error?.message ? "تعذر نشر الفعالية: " + error.message : null };
 }
+
+
+export type SaveAdminEventInput = {
+  userId: string;
+  eventForm: AdminEventFormValues;
+  ticketForms: AdminTicketForm[];
+  eventAccountForms: AdminEventAccountForm[];
+  coverFile: File | null;
+  editingEventId: string | null;
+};
+
+export async function saveAdminEvent(input: SaveAdminEventInput): Promise<{ message: string | null; error: string | null }> {
+  const supabase = getSupabaseBrowserClient();
+  if (!supabase) return { message: null, error: "تعذر الاتصال بقاعدة البيانات." };
+  const { eventForm, ticketForms, eventAccountForms, coverFile, editingEventId, userId } = input;
+
+  if (!eventForm.title.trim() || !eventForm.city.trim() || !eventForm.venue.trim() || !eventForm.starts_at)
+    return { message: null, error: "أكمل اسم الفعالية والمدينة والمكان وموعد البداية." };
+  if (eventForm.ends_at && new Date(eventForm.ends_at) <= new Date(eventForm.starts_at))
+    return { message: null, error: "موعد نهاية الفعالية لازم يكون بعد موعد البداية." };
+  if (eventAccountForms.some(account => !account.account_name.trim() || !account.account_number.trim() || !account.beneficiary.trim()))
+    return { message: null, error: "أكمل اسم ورقم كل حساب أو أزله من القائمة." };
+  if (!ticketForms.length || ticketForms.some(ticket =>
+    !ticket.name.trim() || ticket.price === "" || !ticket.quantity_total ||
+    !Number.isFinite(Number(ticket.price)) || Number(ticket.price) < 0 ||
+    !Number.isInteger(Number(ticket.quantity_total)) ||
+    Number(ticket.quantity_total) < Math.max(1, ticket.quantity_sold) ||
+    (ticket.sales_start_at && ticket.sales_end_at && new Date(ticket.sales_end_at) <= new Date(ticket.sales_start_at))
+  )) return { message: null, error: "راجع فئات التذاكر: الاسم والسعر والكمية مطلوبة، والكمية لا تقل عن المباع، ونهاية البيع بعد بدايته." };
+
+  let coverUrl = eventForm.cover_image_url.trim() || null;
+  if (coverFile) {
+    if (!coverFile.type.startsWith("image/")) return { message: null, error: "الملف المختار ليس صورة." };
+    if (coverFile.size > 10 * 1024 * 1024) return { message: null, error: "حجم الصورة أكبر من 10 ميجابايت." };
+    const extension = (coverFile.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+    const path = userId + "/" + crypto.randomUUID() + "." + extension;
+    const { error } = await supabase.storage.from("event-covers").upload(path, coverFile, {
+      contentType: coverFile.type, upsert: false, cacheControl: "31536000",
+    });
+    if (error) return { message: null, error: "تعذر رفع صورة الغلاف: " + error.message };
+    coverUrl = supabase.storage.from("event-covers").getPublicUrl(path).data.publicUrl;
+  }
+
+  const eventPayload = {
+    title: eventForm.title.trim(), description: eventForm.description.trim() || null,
+    category: eventForm.category.trim() || null, city: eventForm.city.trim() || null,
+    venue: eventForm.venue.trim() || null, address: eventForm.address.trim() || null,
+    location_url: eventForm.location_url.trim() || null,
+    starts_at: new Date(eventForm.starts_at).toISOString(),
+    ends_at: eventForm.ends_at ? new Date(eventForm.ends_at).toISOString() : null,
+    cover_image_url: coverUrl, is_trending: eventForm.is_trending,
+    platform_fee_percent: Math.min(100, Math.max(0, Number(eventForm.platform_fee_percent) || 0)),
+  };
+
+  if (editingEventId) {
+    const { error: updateError } = await supabase.from("events").update(eventPayload).eq("id", editingEventId);
+    if (updateError) return { message: null, error: "تعذر تحديث الفعالية: " + updateError.message };
+    const { data: existingTickets, error: existingError } = await supabase.from("ticket_types")
+      .select("id,quantity_sold").eq("event_id", editingEventId);
+    if (existingError) return { message: null, error: "تم تحديث الفعالية لكن تعذر تحميل التذاكر: " + existingError.message };
+
+    const keptIds = ticketForms.map(ticket => ticket.id).filter(Boolean) as string[];
+    for (const ticket of ticketForms) {
+      if (!ticket.name.trim() || !ticket.quantity_total || Number(ticket.price) < 0 || Number(ticket.quantity_total) < ticket.quantity_sold)
+        return { message: null, error: "راجع بيانات التذاكر: الكمية لا يمكن أن تقل عن المباع." };
+      const payload = {
+        name: ticket.name.trim(), description: ticket.description.trim() || null,
+        price: Number(ticket.price), currency: ticket.currency, quantity_total: Number(ticket.quantity_total),
+        sales_start_at: ticket.sales_start_at ? new Date(ticket.sales_start_at).toISOString() : null,
+        sales_end_at: ticket.sales_end_at ? new Date(ticket.sales_end_at).toISOString() : null,
+        is_active: ticket.is_active,
+      };
+      const result = ticket.id
+        ? await supabase.from("ticket_types").update(payload).eq("id", ticket.id)
+        : await supabase.from("ticket_types").insert({ ...payload, event_id: editingEventId, quantity_sold: 0 });
+      if (result.error) return { message: null, error: "تم تحديث بيانات الفعالية لكن تعذر حفظ التذاكر: " + result.error.message };
+    }
+
+    for (const oldTicket of (existingTickets || []).filter((ticket: any) => !keptIds.includes(ticket.id))) {
+      if (Number(oldTicket.quantity_sold) > 0) {
+        await supabase.from("ticket_types").update({ is_active: false }).eq("id", oldTicket.id);
+        continue;
+      }
+      const { count } = await supabase.from("booking_items").select("id", { count: "exact", head: true }).eq("ticket_type_id", oldTicket.id);
+      if ((count || 0) > 0) await supabase.from("ticket_types").update({ is_active: false }).eq("id", oldTicket.id);
+      else await supabase.from("ticket_types").delete().eq("id", oldTicket.id);
+    }
+
+    const { data: existingAccounts, error: existingAccountsError } = await supabase.from("event_payment_accounts")
+      .select("id").eq("event_id", editingEventId);
+    if (existingAccountsError) return { message: null, error: "تم تحديث الفعالية لكن تعذر تحميل حساباتها الحالية: " + existingAccountsError.message };
+    const retainedIds = eventAccountForms.map(account => account.id).filter(Boolean) as string[];
+    for (const oldAccount of (existingAccounts || []).filter((account: any) => !retainedIds.includes(account.id))) {
+      const { error } = await supabase.from("event_payment_accounts").delete().eq("id", oldAccount.id).eq("event_id", editingEventId);
+      if (error) return { message: null, error: "تم تحديث الفعالية لكن تعذر إزالة حساب دفع: " + error.message };
+    }
+    for (let index = 0; index < eventAccountForms.length; index++) {
+      const account = eventAccountForms[index];
+      const payload = {
+        account_name: account.account_name.trim(), account_number: account.account_number.trim(),
+        beneficiary: account.beneficiary.trim(), is_active: account.is_active,
+        sort_order: account.sort_order ?? (index + 1) * 10,
+      };
+      const result = account.id
+        ? await supabase.from("event_payment_accounts").update(payload).eq("id", account.id).eq("event_id", editingEventId)
+        : await supabase.from("event_payment_accounts").insert({ ...payload, event_id: editingEventId });
+      if (result.error) return { message: null, error: "تم تحديث الفعالية لكن تعذر حفظ حساباتها: " + result.error.message };
+    }
+    return { message: "تم تحديث الفعالية وجميع أنواع التذاكر وحسابات الدفع.", error: null };
+  }
+
+  const slug = eventForm.title.trim().toLowerCase().normalize("NFKD")
+    .replace(/[\\u0300-\\u036f]/g, "").replace(/[^a-z0-9\\u0600-\\u06ff]+/g, "-")
+    .replace(/^-|-$/g, "") + "-" + Math.random().toString(36).slice(2, 7);
+  const { data: event, error: eventError } = await supabase.from("events")
+    .insert({ ...eventPayload, slug, status: "draft", created_by: userId }).select("id").single();
+  if (eventError || !event) return { message: null, error: "تعذر إنشاء الفعالية: " + (eventError?.message || "خطأ غير معروف") };
+
+  const { error: ticketError } = await supabase.from("ticket_types").insert(ticketForms.map(ticket => ({
+    event_id: event.id, name: ticket.name.trim(), description: ticket.description.trim() || null,
+    price: Number(ticket.price), currency: ticket.currency, quantity_total: Number(ticket.quantity_total),
+    quantity_sold: 0, sales_start_at: ticket.sales_start_at ? new Date(ticket.sales_start_at).toISOString() : null,
+    sales_end_at: ticket.sales_end_at ? new Date(ticket.sales_end_at).toISOString() : null, is_active: ticket.is_active,
+  })));
+  if (ticketError) {
+    await supabase.from("events").delete().eq("id", event.id);
+    return { message: null, error: "لم يتم حفظ نوع التذكرة، وتم التراجع عن إنشاء الفعالية: " + ticketError.message };
+  }
+
+  if (eventAccountForms.length) {
+    const { error } = await supabase.from("event_payment_accounts").insert(eventAccountForms.map((account, index) => ({
+      event_id: event.id, account_name: account.account_name.trim(), account_number: account.account_number.trim(),
+      beneficiary: account.beneficiary.trim(), is_active: account.is_active, sort_order: account.sort_order ?? (index + 1) * 10,
+    })));
+    if (error) {
+      await supabase.from("events").delete().eq("id", event.id);
+      return { message: null, error: "تعذر حفظ حسابات الدفع، وتم التراجع عن إنشاء الفعالية: " + error.message };
+    }
+  }
+  return { message: "تم إنشاء الفعالية ونوع التذكرة كمسودة بنجاح.", error: null };
+}
