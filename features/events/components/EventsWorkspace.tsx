@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useEvents } from "../useEvents";
 import { useEventWorkspace } from "../useEventWorkspace";
 import { HomeEventsWorkspace } from "./HomeEventsWorkspace";
@@ -62,7 +62,12 @@ export function EventsWorkspace({
     resetEventWorkspace,
   } = workspace;
 
-  useEffect(() => { resetEventWorkspace(); }, [resetKey, resetEventWorkspace]);
+  const previousResetKey = useRef(resetKey);
+  useEffect(() => {
+    if (previousResetKey.current === resetKey) return;
+    previousResetKey.current = resetKey;
+    resetEventWorkspace();
+  }, [resetKey, resetEventWorkspace]);
   useEffect(() => { onEventOpenChange(!!selectedEvent); }, [selectedEvent?.id, onEventOpenChange]);
 
   const openPayment = useCallback(() => continueToPayment(), [continueToPayment]);
