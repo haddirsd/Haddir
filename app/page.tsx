@@ -5,10 +5,11 @@ import { useBooking } from "../features/booking/useBooking";
 import { PaymentCheckout } from "../features/booking/components/PaymentCheckout";
 import { BookingSuccess } from "../features/booking/components/BookingSuccess";
 import { TicketSelection } from "../features/booking/components/TicketSelection";
+import { TicketWorkspace } from "../features/customer-account/components/TicketWorkspace";
+import { NotificationsWorkspace } from "../features/customer-account/components/NotificationsWorkspace";
 import { useGatekeeper } from "../features/gatekeeper/useGatekeeper";
 import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
-import { QRCodeSVG as QrCodeSVG } from "qrcode.react";
-import { ArrowLeft, Wallet, Bell, CalendarDays, CheckCircle2, House, MapPin, Settings, Sparkles, Ticket, UserRound, ChevronLeft, Share2, ExternalLink, Download, ScanLine, ShieldCheck, ClipboardList } from "lucide-react";
+import { ArrowLeft, Wallet, Bell, CalendarDays, CheckCircle2, House, MapPin, Settings, Sparkles, Ticket, UserRound, ChevronLeft, Share2, ExternalLink, ScanLine, ShieldCheck, ClipboardList } from "lucide-react";
 type EventItem = {id:string;date:string;title:string;place:string;category:string;price:string;cover:string;coverImageUrl:string|null;tag:string;time:string;venue:string;status:string;map:string;about:string;isTrending:boolean;tiers:{id:string;name:string;description:string;price:string;priceValue:number;currency:string;quantityTotal:number;quantitySold:number;available:number;availableNow:boolean}[]};
 const formatEventDate=(value:string)=>new Intl.DateTimeFormat("ar-SD",{weekday:"long",day:"numeric",month:"long"}).format(new Date(value));
 
@@ -165,11 +166,6 @@ export default function Home(){
  };
  const unreadNotificationCount=myNotifications.filter(n=>!n.is_read).length;
  const filteredNotifications=myNotifications.filter(n=>notificationFilter==="all"||(notificationFilter==="unread"?!n.is_read:n.is_read));
- const notificationKind=(type:string)=>{
-  if(type==="ticket_approved"||type==="payment_rejected"||type==="booking_expired")return "booking";
-  if(String(type||"").startsWith("event_reminder_"))return "event";
-  return "system";
- };
  const selected=events.find(e=>e.id===selectedEvent);
  const booking=useBooking({authUser,selected:selected||null,selectedTier,ticketCount,onSuccess:()=>setActiveTab("notifications")});
  const {eventPaymentAccounts,paymentMethod,setPaymentMethod,receipt,setReceipt,bookingDone,bookingNumber,bookingError,setBookingError,bookingSubmitting,accountCopied,setAccountCopied,loadPaymentAccounts,copyAccount,submitBooking}=booking;
@@ -205,42 +201,29 @@ export default function Home(){
   </>}
  </div></section>
  </>}
- {!isGatekeeperPage&&activeTab==="tickets"&&<section className="screen container tickets-screen">{accountDataLoading?<div className="empty-state">جاري تحميل تذاكرك...</div>:accountDataError?<div className="empty-state" role="alert">{accountDataError}</div>:<>
-   <div className="ticket-tabs" role="tablist" aria-label="حالة التذاكر">
-    <button type="button" role="tab" aria-selected={ticketFilter==="new"} className={ticketFilter==="new"?"active":""} onClick={()=>{setTicketFilter("new");setExpandedTicketId(null);}}>تذاكر جديدة <span>{myTickets.filter((t:any)=>t.status==="valid").length}</span></button>
-    <button type="button" role="tab" aria-selected={ticketFilter==="used"} className={ticketFilter==="used"?"active":""} onClick={()=>{setTicketFilter("used");setExpandedTicketId(null);}}>تذاكر مستخدمة <span>{myTickets.filter((t:any)=>t.status==="used").length}</span></button>
-   </div>
-   {(()=>{const visibleTickets=myTickets.filter((t:any)=>t.status===(ticketFilter==="new"?"valid":"used"));return visibleTickets.length===0?<div className="empty-state"><Ticket size={28}/><strong>{ticketFilter==="new"?"ما عندك تذاكر جديدة حالياً":"ما عندك تذاكر مستخدمة حالياً"}</strong><p>{ticketFilter==="new"?"بعد قبول إثبات الدفع، حتظهر تذاكرك هنا.":"التذاكر التي يتم تأكيد دخولها عند البوابة حتظهر هنا."}</p></div>:<div className="ticket-list">{visibleTickets.map((ticket:any)=><div className="ticket-card-wrap" key={ticket.id} data-ticket-id={ticket.id}>
-    <button type="button" className="ticket-preview-card" aria-expanded={expandedTicketId===ticket.id} onClick={()=>setExpandedTicketId(current=>current===ticket.id?null:ticket.id)}>
-     <span className="ticket-preview-image">{ticket.events?.cover_image_url?<img src={ticket.events.cover_image_url} alt={ticket.events?.title||"صورة الفعالية"} loading="lazy"/>:<span className="ticket-preview-fallback"><Ticket size={25}/></span>}</span>
-     <span className="ticket-preview-copy"><strong>{ticket.events?.title||"فعالية"}</strong><span><CalendarDays size={13}/>{ticket.events?.starts_at?formatEventDate(ticket.events.starts_at):"التاريخ غير محدد"}</span><span><UserRound size={13}/>عدد الأشخاص: {ticket.booking_items?.quantity||1}</span></span>
-     <span className={"ticket-preview-status "+(ticket.status==="used"?"used":"")}>{ticket.status==="used"?"مستخدمة":"جديدة"}</span>
-    </button>
-    {expandedTicketId===ticket.id&&<div className="ticket-expanded-panel">
-     <article className="haddir-ticket"><div className="haddir-ticket-head"><strong>حاضر <span>HADDIR</span></strong><span className="ticket-confirmed">{ticket.status==="valid"?"تذكرة صالحة":ticket.status==="used"?"تم استخدامها":ticket.status}</span></div>
-      <div className="haddir-ticket-event"><small>تذكرة دخول</small><h2>{ticket.events?.title||"فعالية"}</h2></div>
-      <div className="haddir-ticket-meta"><div><small>نوع التذكرة</small><strong>{ticket.ticket_types?.name||"تذكرة"}</strong></div><div><small>رقم الحجز</small><strong>{ticket.bookings?.booking_number||"—"}</strong></div><div><small>الموقع</small><strong>{ticket.events?.venue||"—"}</strong></div><div><small>التاريخ</small><strong>{ticket.events?.starts_at?formatEventDate(ticket.events.starts_at):"—"}</strong></div><div><small>عدد الأشخاص</small><strong>{ticket.booking_items?.quantity||1} أشخاص</strong></div></div>
-      <div className="haddir-ticket-qr"><QrCodeSVG value={ticket.ticket_code} size={220} level="H" includeMargin/><small>امسح الرمز للتحقق من التذكرة، أو أدخل الكود يدوياً عند البوابة</small></div>
-      <div className="haddir-ticket-code"><small>كود الدخول · 10 أرقام</small><strong dir="ltr">{ticket.ticket_code}</strong></div><div className="haddir-ticket-footer">احتفظ بتذكرتك وأبرزها عند الدخول</div>
-     </article>
-     <button className="btn btn-outline pay-button" type="button" onClick={()=>void downloadTicket(ticket)}><Download size={17}/> حفظ التذكرة كصورة</button>
-    </div>}
-   </div>)}</div>})()}
-  </>}</section>}
- {!isGatekeeperPage&&activeTab==="notifications"&&<section className="screen container notifications-screen">
-  {accountDataLoading?<div className="empty-state">جاري تحميل الإشعارات...</div>:accountDataError?<div className="empty-state" role="alert">{accountDataError}</div>:<>
-   <div className="notifications-toolbar">
-    <div><strong>إشعاراتك</strong><small>{unreadNotificationCount} غير مقروء</small></div>
-    <button type="button" className="notification-mark-all" onClick={()=>void markAllNotificationsRead()} disabled={!unreadNotificationCount}>تعليم الكل كمقروء</button>
-   </div>
-   <div className="notification-filters" role="tablist" aria-label="تصفية الإشعارات">
-    <button type="button" className={notificationFilter==="all"?"active":""} onClick={()=>setNotificationFilter("all")}>الكل <span>{myNotifications.length}</span></button>
-    <button type="button" className={notificationFilter==="unread"?"active":""} onClick={()=>setNotificationFilter("unread")}>غير مقروءة <span>{unreadNotificationCount}</span></button>
-    <button type="button" className={notificationFilter==="read"?"active":""} onClick={()=>setNotificationFilter("read")}>مقروءة</button>
-   </div>
-   {filteredNotifications.length===0?<div className="empty-state"><Bell size={26}/><strong>{myNotifications.length===0?"ما عندك إشعارات حالياً":notificationFilter==="unread"?"ما عندك إشعارات غير مقروءة":"ما عندك إشعارات مقروءة"}</strong><p>حتظهر هنا تحديثات حجوزاتك والفعاليات ونظام حاضر.</p></div>:<div className="notification-list">{filteredNotifications.map((notification:any)=>{const kind=notificationKind(notification.type);return <article key={notification.id} className={`notification-item ${notification.is_read?"is-read":"is-unread"}`}><button type="button" className="notification-open" onClick={()=>void openNotification(notification)} aria-label={`فتح الإشعار: ${notification.title}`}><span className={`notification-icon ${kind}`}>{kind==="booking"?(notification.type==="ticket_approved"?<CheckCircle2 size={19}/>:<Bell size={19}/>):kind==="event"?<CalendarDays size={19}/>:<Sparkles size={19}/>}</span><span className="notification-copy"><strong>{notification.title}</strong><p>{notification.message}</p><small>{new Date(notification.created_at).toLocaleString("ar-SD")}</small></span><span className="notification-state">{notification.is_read?"مقروء":"جديد"}</span></button><button type="button" className="notification-toggle-read" onClick={()=>void markNotificationRead(notification,!notification.is_read)}>{notification.is_read?"تحديد كغير مقروء":"تحديد كمقروء"}</button></article>})}</div>}
-  </>}
- </section>}
+ {!isGatekeeperPage&&activeTab==="tickets"&&<TicketWorkspace
+  loading={accountDataLoading}
+  error={accountDataError}
+  tickets={myTickets}
+  filter={ticketFilter}
+  expandedTicketId={expandedTicketId}
+  onFilterChange={(filter)=>{setTicketFilter(filter);setExpandedTicketId(null);}}
+  onToggleTicket={(ticketId)=>setExpandedTicketId(current=>current===ticketId?null:ticketId)}
+  onDownloadTicket={(ticket)=>void downloadTicket(ticket)}
+  formatEventDate={formatEventDate}
+ />}
+ {!isGatekeeperPage&&activeTab==="notifications"&&<NotificationsWorkspace
+  loading={accountDataLoading}
+  error={accountDataError}
+  notifications={myNotifications}
+  filteredNotifications={filteredNotifications}
+  filter={notificationFilter}
+  unreadCount={unreadNotificationCount}
+  onFilterChange={setNotificationFilter}
+  onMarkAllRead={()=>void markAllNotificationsRead()}
+  onOpenNotification={(notification)=>void openNotification(notification)}
+  onToggleRead={(notification,isRead)=>void markNotificationRead(notification,isRead)}
+ />}
  {!isGatekeeperPage&&activeTab==="profile"&&<section className="screen container profile-screen">
    <div className="profile-card profile-account-card">
     <div className="profile-account-head">
