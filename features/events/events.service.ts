@@ -22,7 +22,7 @@ export async function getPublishedEvents(): Promise<PublicEventsResult> {
 
   const { data, error } = await supabase
     .from("events")
-    .select("id,title,category,city,venue,starts_at,description,status,is_trending,cover_image_url,location_url")
+    .select("id,title,category,city,venue,starts_at,ends_at,description,status,is_trending,cover_image_url,location_url")
     .eq("status", "published")
     .order("starts_at", { ascending: true });
 
@@ -40,7 +40,8 @@ export async function getPublishedEvents(): Promise<PublicEventsResult> {
     const { data: ticketData, error: ticketError } = await supabase
       .from("ticket_types")
       .select("id,event_id,name,description,price,currency,quantity_total,quantity_sold,sales_start_at,sales_end_at,is_active")
-      .in("event_id", eventIds);
+      .in("event_id", eventIds)
+      .order("created_at", { ascending: true });
 
     if (ticketError) {
       console.error("Could not load ticket types", ticketError);
@@ -80,14 +81,19 @@ export async function getPublishedEvents(): Promise<PublicEventsResult> {
           quantityTotal: total,
           quantitySold: sold,
           available,
-          availableNow: available > 0 && now >= starts && now <= ends,
+          availableNow: available > 0 && new Date(event.starts_at).getTime() > now && now >= starts && now <= ends,
         };
       });
 
-    const eventEnded = new Date(event.starts_at).getTime() <= now;
+    const eventStartsAt = new Date(event.starts_at).getTime();
+    const eventEndsAt = event.ends_at ? new Date(event.ends_at).getTime() : eventStartsAt;
+    const eventStarted = eventStartsAt <= now;
+    const eventEnded = eventEndsAt <= now;
     const status = eventEnded
       ? "انتهت"
-      : tiers.length === 0
+      : eventStarted
+        ? "بدأت"
+        : tiers.length === 0
         ? "غير متاح"
         : tiers.every((tier) => tier.available <= 0)
           ? "تم البيع بالكامل"
