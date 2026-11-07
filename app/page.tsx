@@ -4,6 +4,7 @@ import { getSupabaseBrowserClient } from "../lib/supabase";
 import { useBooking } from "../features/booking/useBooking";
 import { PaymentCheckout } from "../features/booking/components/PaymentCheckout";
 import { BookingSuccess } from "../features/booking/components/BookingSuccess";
+import { TicketSelection } from "../features/booking/components/TicketSelection";
 import { useGatekeeper } from "../features/gatekeeper/useGatekeeper";
 import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
 import { QRCodeSVG as QrCodeSVG } from "qrcode.react";
@@ -328,14 +329,20 @@ export default function Home(){
      <a className="quick-info-row quick-location-row" href={selected.map||"#"} target="_blank" rel="noreferrer"><span className="quick-info-icon location-icon"><MapPin size={21}/></span><div><small>المكان والموقع</small><strong>{selected.venue||selected.place||"يحدد لاحقاً"}</strong><span>{selected.place||"عرض الاتجاهات على الخريطة"} · اضغط لعرض الموقع</span></div><ExternalLink size={16}/></a>
     </section>
     <section className="detail-section detail-about"><h2>عن الفعالية</h2><p>{selected.about||"تفاصيل الفعالية ستُضاف قريباً."}</p></section>
-    <section className="detail-section detail-ticket-section">
-     <div className="tier-heading"><h2>فئات التذاكر</h2><span>اختر فئة للمتابعة</span></div>
-     {ticketTypesError?<div className="empty-state" role="alert"><strong>تعذر تحميل فئات التذاكر</strong><p>{ticketTypesError}</p><button className="btn btn-outline" onClick={()=>window.location.reload()}>إعادة المحاولة</button></div>:(selected.tiers||[]).length?<div className="tier-list">{selected.tiers.map((tier,index)=><button type="button" key={tier.name} className={"tier-card "+(selectedTier===index&&tierChosen?"tier-selected":"")} aria-pressed={selectedTier===index&&tierChosen} disabled={!tier.availableNow||tier.available<=0} onClick={()=>{setSelectedTier(index);setTierChosen(true);setTicketCount(1);const url=new URL(window.location.href);url.searchParams.set("tier",String(index));url.searchParams.set("qty","1");window.history.replaceState({...window.history.state,haddirPage:"event-detail"},"",url.pathname+url.search+url.hash);}}><span className="tier-radio">{selectedTier===index&&tierChosen?<CheckCircle2 size={17}/>:null}</span><span className="tier-copy"><strong className="tier-name">{tier.name}</strong>{tier.description&&<small>{tier.description}</small>}</span><strong className="tier-price">{tier.price}</strong><small className="tier-availability">{tier.availableNow?`متبقي ${tier.available} تذكرة`:tier.available<=0?"نفدت التذاكر":"البيع غير متاح حالياً"}</small></button>)}</div>:<div className="empty-state">لم تُضف فئات تذاكر لهذه الفعالية بعد.</div>}
-    </section>
-    {tierChosen&&<section className="detail-quantity quantity-reveal"><div className="quantity-heading"><h3>عدد التذاكر</h3><span>المتاح: {Math.min(5,selected.tiers[selectedTier].available)} تذاكر</span></div><div className="quantity-control"><button type="button" aria-label="تقليل عدد التذاكر" disabled={ticketCount<=1} onClick={()=>setTicketCount(n=>{const next=Math.max(1,n-1);const url=new URL(window.location.href);url.searchParams.set("qty",String(next));window.history.replaceState(window.history.state,"",url.pathname+url.search+url.hash);return next;})}>−</button><strong>{ticketCount}</strong><button type="button" aria-label="زيادة عدد التذاكر" disabled={ticketCount>=Math.min(5,selected.tiers[selectedTier].available)} onClick={()=>setTicketCount(n=>{const next=Math.min(5,n+1);const url=new URL(window.location.href);url.searchParams.set("qty",String(next));window.history.replaceState(window.history.state,"",url.pathname+url.search+url.hash);return next;})}>+</button></div></section>}
-    {tierChosen&&<div className="detail-booking-dock actionable-footer"><div className="detail-dock-summary"><small>المبلغ الإجمالي <span className="ticket-count-badge">{ticketCount} تذاكر</span></small><strong>{selected.tiers[selectedTier].price==="مجاناً"?"مجاناً":formatMoney(selected.tiers[selectedTier].priceValue*ticketCount,selected.tiers[selectedTier].currency)}</strong><span>{selected.tiers[selectedTier].name}</span></div><button className="btn btn-primary pay-button" disabled={!selected.tiers[selectedTier]?.availableNow||selected.tiers[selectedTier]?.available<ticketCount||["تم البيع بالكامل","انتهت","غير متاح","البيع غير متاح حالياً"].includes(selected.status)} onClick={openPayment}>ادفع الآن <ArrowLeft size={18}/></button></div>}
-   </div>
-  </div>
+    <TicketSelection
+       tiers={selected.tiers}
+       selectedTier={selectedTier}
+       tierChosen={tierChosen}
+       ticketCount={ticketCount}
+       eventStatus={selected.status}
+       ticketTypesError={ticketTypesError}
+       totalLabel={selected.tiers[selectedTier]?.price==="مجاناً"?"مجاناً":formatMoney((selected.tiers[selectedTier]?.priceValue||0)*ticketCount,selected.tiers[selectedTier]?.currency)}
+       onSelectTier={(index)=>{setSelectedTier(index);setTierChosen(true);setTicketCount(1);const url=new URL(window.location.href);url.searchParams.set("tier",String(index));url.searchParams.set("qty","1");window.history.replaceState({...window.history.state,haddirPage:"event-detail"},"",url.pathname+url.search+url.hash);}}
+       onQuantityChange={(quantity)=>{setTicketCount(quantity);const url=new URL(window.location.href);url.searchParams.set("qty",String(quantity));window.history.replaceState(window.history.state,"",url.pathname+url.search+url.hash);}}
+       onContinue={openPayment}
+       onRetry={()=>window.location.reload()}
+     />
+
  </div>:<div className="detail-sheet event-detail-layout payment-sheet">
     <div className="checkout-topbar">
      <div className="checkout-back-group"><button type="button" className="detail-glass-button checkout-back-icon" aria-label="العودة للتفاصيل" onClick={backToDetails}><ArrowLeft size={20}/></button><span>العودة للتفاصيل</span></div>
