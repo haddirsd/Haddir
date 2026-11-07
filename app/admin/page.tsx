@@ -23,7 +23,7 @@ export default function AdminPage() {
   const [section, setSection] = useState<Section>("overview");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [searchTerm,setSearchTerm]=useState("");
+  const [userSearchTerm,setUserSearchTerm]=useState("");
   const [darkMode,setDarkMode]=useState(false);
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export default function AdminPage() {
         <div className="admin-welcome"><div><span className="admin-eyebrow">لوحة التحكم</span><h2>مرحباً، {name}</h2><p>{supervisor?"راجع الحجوزات وإثباتات التحويل.":"تابع أداء منصة حاضر وأدر عملياتها من مكان واحد."}</p></div><div className="admin-welcome-mark"><LayoutDashboard size={30}/></div></div>
         {error&&<div className="admin-notice" role="status">{error}</div>}
         {section==="overview"&&<AdminOverviewWorkspace role={role} onNavigate={setSection}/>}
-        {section==="events"?<AdminEventsWorkspace role={role}/>:section==="bookings"?<AdminBookingsWorkspace searchTerm={searchTerm} onSearchTermChange={setSearchTerm}/>:section==="payments"?<AdminPaymentsWorkspace/>:section==="users"?<AdminUsersWorkspace role={role} searchTerm={searchTerm} onSearchTermChange={setSearchTerm}/>:section==="activity"?<AdminActivityWorkspace/>:section==="reports"?<AdminReportsWorkspace/>:null}
+        {section==="events"?<AdminEventsWorkspace role={role}/>:section==="bookings"?<AdminBookingsWorkspace/>:section==="payments"?<AdminPaymentsWorkspace/>:section==="users"?<AdminUsersWorkspace role={role} searchTerm={userSearchTerm} onSearchTermChange={setUserSearchTerm}/>:section==="activity"?<AdminActivityWorkspace/>:section==="reports"?<AdminReportsWorkspace/>:null}
         <footer className="admin-footer">حاضر · نظام إدارة الفعاليات والتذاكر <span>{roleLabel}</span></footer>
       </div>
     </section>
