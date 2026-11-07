@@ -1,10 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import { getSupabaseBrowserClient } from "../lib/supabase";
-import { useBooking } from "../features/booking/useBooking";
 import { useEvents } from "../features/events/useEvents";
 import { formatEventDate, formatMoney } from "../features/events/events.formatters";
-import { useEventNavigation } from "../features/events/useEventNavigation";
+import { useEventWorkspace } from "../features/events/useEventWorkspace";
 import { HomeEventsWorkspace } from "../features/events/components/HomeEventsWorkspace";
 import { EventDetailWorkspace } from "../features/events/components/EventDetailWorkspace";
 import { TicketWorkspace } from "../features/customer-account/components/TicketWorkspace";
@@ -107,11 +106,8 @@ export default function Home(){
  };
  const unreadNotificationCount=myNotifications.filter(n=>!n.is_read).length;
  const filteredNotifications=myNotifications.filter(n=>notificationFilter==="all"||(notificationFilter==="unread"?!n.is_read:n.is_read));
- const eventNavigation=useEventNavigation({events,authUser,onRequireLogin:()=>{setAuthMessage("سجّل الدخول أولاً عشان نكمل حجزك. الفعاليات متاحة للتصفح بدون حساب.");setActiveTab("profile");}});
- const {selectedEvent:selected,selectedTier,tierChosen,showPayment,ticketCount,resetEventNavigation,openEvent:openEventNavigation,closeEvent,selectTier,changeQuantity,continueToPayment,backToDetails}=eventNavigation;
- const booking=useBooking({authUser,selected,selectedTier,ticketCount,onSuccess:()=>setActiveTab("notifications")});
- const {eventPaymentAccounts,paymentMethod,setPaymentMethod,receipt,setReceipt,bookingDone,bookingNumber,bookingError,setBookingError,bookingSubmitting,accountCopied,setAccountCopied,loadPaymentAccounts,copyAccount,submitBooking}=booking;
- const resetBooking=()=>{resetEventNavigation();booking.resetBooking();};
+ const eventWorkspace=useEventWorkspace({events,authUser,onRequireLogin:()=>{setAuthMessage("سجّل الدخول أولاً عشان نكمل حجزك. الفعاليات متاحة للتصفح بدون حساب.");setActiveTab("profile");},onBookingSuccess:()=>setActiveTab("notifications")});
+ const {selectedEvent:selected,selectedTier,tierChosen,showPayment,ticketCount,resetEventWorkspace:resetBooking,openEvent,closeEvent,selectTier,changeQuantity,continueToPayment,backToDetails,eventPaymentAccounts,paymentMethod,setPaymentMethod,receipt,setReceipt,bookingDone,bookingNumber,bookingError,bookingSubmitting,accountCopied,copyAccount,submitBooking}=eventWorkspace;
  const go=(tab:Tab)=>{
   resetBooking();setActiveTab(tab);
   const url=new URL(window.location.href);
@@ -120,8 +116,7 @@ export default function Home(){
   window.history.replaceState({}, "", url.pathname+url.search+url.hash);
   window.scrollTo({top:0,behavior:"smooth"});
  }; const downloadTicket=async(ticket:any)=>{try{const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1350;const ctx=canvas.getContext("2d");if(!ctx)return;await document.fonts.ready;ctx.fillStyle="#f7f1fb";ctx.fillRect(0,0,1080,1350);ctx.fillStyle="#fff";ctx.fillRect(48,48,984,1254);ctx.strokeStyle="#e7d9f1";ctx.lineWidth=3;ctx.strokeRect(48,48,984,1254);ctx.direction="rtl";ctx.textAlign="right";const right=950;ctx.fillStyle="#5b2e82";ctx.font="bold 48px Alexandria,Arial";ctx.fillText("حاضر  HADDIR",right,135);ctx.fillStyle="#8b7897";ctx.font="26px Alexandria,Arial";ctx.fillText("تذكرة دخول إلكترونية",right,190);ctx.strokeStyle="#dfd1e9";ctx.setLineDash([10,9]);ctx.beginPath();ctx.moveTo(100,230);ctx.lineTo(980,230);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle="#8b7897";ctx.font="26px Alexandria,Arial";ctx.fillText("الفعالية",right,300);ctx.fillStyle="#30213b";ctx.font="bold 44px Alexandria,Arial";const eventTitle=String(ticket.events?.title||"فعالية");ctx.fillText(eventTitle.length>32?eventTitle.slice(0,32)+"…":eventTitle,right,365);ctx.fillStyle="#8b7897";ctx.font="24px Alexandria,Arial";ctx.fillText("نوع التذكرة",right,455);ctx.fillText("رقم الحجز",520,455);ctx.fillStyle="#3d3047";ctx.font="bold 27px Alexandria,Arial";ctx.fillText(String(ticket.ticket_types?.name||"تذكرة"),right,500);ctx.fillText(String(ticket.bookings?.booking_number||"—"),520,500);ctx.fillStyle="#8b7897";ctx.font="24px Alexandria,Arial";ctx.fillText("الموقع",right,575);ctx.fillText("التاريخ",520,575);ctx.fillStyle="#3d3047";ctx.font="bold 25px Alexandria,Arial";ctx.fillText(String(ticket.events?.venue||"—"),right,620);ctx.fillText(ticket.events?.starts_at?formatEventDate(ticket.events.starts_at):"—",520,620);ctx.strokeStyle="#e5d9ed";ctx.setLineDash([10,9]);ctx.beginPath();ctx.moveTo(100,675);ctx.lineTo(980,675);ctx.stroke();ctx.setLineDash([]);const qr=document.querySelector('[data-ticket-id="'+String(ticket.id)+'"] .haddir-ticket-qr svg');if(!qr)throw new Error("QR unavailable");const svg=new XMLSerializer().serializeToString(qr);const img=new Image();const loaded=new Promise<void>((resolve,reject)=>{img.onload=()=>resolve();img.onerror=()=>reject(new Error("QR image failed"));});img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);await loaded;ctx.drawImage(img,360,700,360,360);ctx.fillStyle="#8e8297";ctx.font="23px Alexandria,Arial";ctx.textAlign="center";ctx.fillText("امسح الرمز للتحقق من التذكرة",540,1100);ctx.fillStyle="#5c2e82";ctx.font="bold 48px Arial";ctx.fillText(String(ticket.ticket_code||""),540,1170);ctx.fillStyle="#f6f0fa";ctx.fillRect(48,1200,984,102);ctx.fillStyle="#76558d";ctx.font="bold 23px Alexandria,Arial";ctx.fillText("احتفظ بالتذكرة وأبرزها عند الدخول",540,1262);const link=document.createElement("a");link.download="haddir-ticket-"+String(ticket.ticket_code||ticket.id)+".png";link.href=canvas.toDataURL("image/png");link.click();}catch(error){console.error("Ticket image export failed",error);alert("تعذر حفظ التذكرة كصورة. حاول مرة أخرى.");}};
- const openEvent=(id:string)=>{booking.resetBooking();openEventNavigation(id);};
- const openPayment=()=>{setAuthMessage("");void continueToPayment(loadPaymentAccounts);};
+ const openPayment=()=>{setAuthMessage("");continueToPayment();};
 
  return <main dir="rtl" lang="ar" className={"app-shell"+(darkMode?" theme-dark":"")}>
  <>
