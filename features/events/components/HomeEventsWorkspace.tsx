@@ -26,14 +26,46 @@ export function HomeEventsWorkspace({
       ? [...trendingDisplayEvents, ...trendingDisplayEvents, ...trendingDisplayEvents]
       : trendingDisplayEvents;
   const trendingCarouselRef = useRef<HTMLDivElement | null>(null);
-  const [trendingPaused, setTrendingPaused] = useState(false);
+  const trendingPausedRef = useRef(false);
+  const trendingIndexRef = useRef(0);
+
+  const syncTrendingIndex = () => {
+    const carousel = trendingCarouselRef.current;
+    if (!carousel) return;
+    const cards = Array.from(
+      carousel.querySelectorAll<HTMLElement>(".trending-card")
+    );
+    const center = carousel.getBoundingClientRect().left + carousel.clientWidth / 2;
+    let nearestIndex = trendingIndexRef.current;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+
+    cards.forEach((card, index) => {
+      const rect = card.getBoundingClientRect();
+      const distance = Math.abs(rect.left + rect.width / 2 - center);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestIndex = index;
+      }
+    });
+
+    trendingIndexRef.current = nearestIndex;
+  };
+
+  const pauseTrending = () => {
+    syncTrendingIndex();
+    trendingPausedRef.current = true;
+  };
+
+  const resumeTrending = () => {
+    syncTrendingIndex();
+    trendingPausedRef.current = false;
+  };
 
   useEffect(() => {
     const count = trendingEvents.length;
     const carousel = trendingCarouselRef.current;
-    if (count < 2 || !carousel || trendingPaused) return;
+    if (count < 2 || !carousel) return;
 
-    let index = count * 2 - 1;
     let resetTimer: number | undefined;
 
     const centerCard = (cardIndex: number, behavior: ScrollBehavior) => {
@@ -57,18 +89,23 @@ export function HomeEventsWorkspace({
       }
     };
 
+    trendingIndexRef.current = count * 2 - 1;
     const initialFrame = window.requestAnimationFrame(() =>
-      centerCard(index, "auto")
+      centerCard(trendingIndexRef.current, "auto")
     );
+
     const interval = window.setInterval(() => {
-      index -= 1;
-      centerCard(index, "smooth");
-      if (index <= count - 1) {
-        resetTimer = window.setTimeout(() => {
-          index = count * 2 - 1;
-          centerCard(index, "auto");
-        }, 720);
+      if (trendingPausedRef.current) return;
+
+      const nextIndex = trendingIndexRef.current - 1;
+      if (nextIndex < count - 1) {
+        trendingIndexRef.current = count * 2 - 1;
+        centerCard(trendingIndexRef.current, "auto");
+        return;
       }
+
+      trendingIndexRef.current = nextIndex;
+      centerCard(nextIndex, "smooth");
     }, 3000);
 
     return () => {
@@ -76,7 +113,7 @@ export function HomeEventsWorkspace({
       window.clearInterval(interval);
       if (resetTimer !== undefined) window.clearTimeout(resetTimer);
     };
-  }, [trendingEvents.length, trendingPaused]);
+  }, [trendingEvents.length]);
 
   return (
     <section className="home-discovery redesigned-home" id="events">
@@ -107,11 +144,12 @@ export function HomeEventsWorkspace({
                   ref={trendingCarouselRef}
                   className="trending-carousel hide-scrollbar"
                   dir="ltr"
-                  onMouseEnter={() => setTrendingPaused(true)}
-                  onMouseLeave={() => setTrendingPaused(false)}
-                  onTouchStart={() => setTrendingPaused(true)}
-                  onTouchEnd={() => setTrendingPaused(false)}
-                  onTouchCancel={() => setTrendingPaused(false)}
+                  onMouseEnter={pauseTrending}
+                  onMouseLeave={resumeTrending}
+                  onTouchStart={pauseTrending}
+                  onTouchEnd={resumeTrending}
+                  onTouchCancel={resumeTrending}
+                  onScroll={syncTrendingIndex}
                 >
                   {trendingLoopEvents.map((event, index) => (
                     <article
