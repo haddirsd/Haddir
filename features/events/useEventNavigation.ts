@@ -8,7 +8,6 @@ type AuthUser = { id: string; email?: string; user_metadata?: Record<string, unk
 type UseEventNavigationOptions = {
   events: EventItem[];
   authUser: AuthUser;
-  loadPaymentAccounts: (eventId: string) => Promise<boolean>;
   onRequireLogin: () => void;
 };
 
@@ -20,7 +19,6 @@ const clampQuantity = (value: string | null) => {
 export function useEventNavigation({
   events,
   authUser,
-  loadPaymentAccounts,
   onRequireLogin,
 }: UseEventNavigationOptions) {
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
@@ -128,7 +126,7 @@ export function useEventNavigation({
     window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
   }, []);
 
-  const continueToPayment = useCallback(async () => {
+  const continueToPayment = useCallback(async (loadPaymentAccounts: (eventId: string) => Promise<boolean>) => {
     if (!tierChosen || !selectedEvent) return;
 
     if (!authUser) {
@@ -163,7 +161,7 @@ export function useEventNavigation({
     );
     setShowPayment(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [authUser, loadPaymentAccounts, onRequireLogin, selectedEvent, selectedEventId, selectedTier, ticketCount, tierChosen]);
+  }, [authUser, onRequireLogin, selectedEvent, selectedEventId, selectedTier, ticketCount, tierChosen]);
 
   const backToDetails = useCallback(() => {
     if ((window.history.state as { haddirPage?: string } | null)?.haddirPage === "event-payment") {
