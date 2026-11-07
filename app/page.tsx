@@ -4,15 +4,13 @@ import { getSupabaseBrowserClient } from "../lib/supabase";
 import { useBooking } from "../features/booking/useBooking";
 import { useEvents } from "../features/events/useEvents";
 import { HomeEventsWorkspace } from "../features/events/components/HomeEventsWorkspace";
+import { EventDetailWorkspace } from "../features/events/components/EventDetailWorkspace";
 import type { EventItem } from "../features/events/events.types";
-import { PaymentCheckout } from "../features/booking/components/PaymentCheckout";
-import { BookingSuccess } from "../features/booking/components/BookingSuccess";
-import { TicketSelection } from "../features/booking/components/TicketSelection";
 import { TicketWorkspace } from "../features/customer-account/components/TicketWorkspace";
 import { NotificationsWorkspace } from "../features/customer-account/components/NotificationsWorkspace";
 import { useGatekeeper } from "../features/gatekeeper/useGatekeeper";
 import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
-import { ArrowLeft, Wallet, Bell, CalendarDays, CheckCircle2, House, MapPin, Settings, Sparkles, Ticket, UserRound, ChevronLeft, Share2, ExternalLink, ScanLine, ShieldCheck, ClipboardList } from "lucide-react";
+import { Bell, CheckCircle2, House, Settings, Sparkles, Ticket, UserRound, ChevronLeft, ScanLine, ShieldCheck, ClipboardList } from "lucide-react";
 
 const formatEventDate=(value:string)=>new Intl.DateTimeFormat("ar-SD",{weekday:"long",day:"numeric",month:"long"}).format(new Date(value));
 
@@ -265,77 +263,33 @@ export default function Home(){
    onClose={()=>{const url=new URL(window.location.href);url.searchParams.delete("workspace");url.searchParams.set("tab","profile");window.location.assign(url.pathname+url.search+url.hash);}}
   />}
  </div>
- {selected&&<section className="event-detail-page" aria-label={"تفاصيل "+selected.title}>
- {!showPayment?<div className="detail-sheet event-detail-layout" aria-label={"تفاصيل "+selected.title}>
-  <div className={"detail-cover event-cover "+selected.cover}>
-   {selected.coverImageUrl&&<img className="event-cover-image" src={selected.coverImageUrl} alt={selected.title}/>}
-   <div className="detail-cover-shade"/>
-   <div className="detail-cover-controls">
-    <button className="detail-glass-button" aria-label="إغلاق التفاصيل" onClick={()=>{if((window.history.state as {haddirPage?:string}|null)?.haddirPage==="event-detail"||(window.history.state as {haddirPage?:string}|null)?.haddirPage==="event-payment"){window.history.back();}else{setSelectedEvent(null);setShowPayment(false);}}}><ArrowLeft size={20}/></button>
-    <div className="detail-cover-actions"><span className="detail-category-badge">{selected.category||"فعالية"}</span><button className="detail-glass-button" aria-label="مشاركة الفعالية" onClick={async()=>{const eventUrl=new URL(window.location.pathname,window.location.origin);eventUrl.searchParams.set("event",String(selected.id));try{if(navigator.share)await navigator.share({title:selected.title,text:"شوف الفعالية دي على حاضر",url:eventUrl.toString()});else{await navigator.clipboard.writeText(eventUrl.toString());alert("تم نسخ رابط الفعالية");}}catch(error){if(error instanceof Error&&error.name!=="AbortError")alert("تعذر مشاركة الفعالية حالياً.");}}}><Share2 size={18}/></button></div>
-   </div>
-   <div className="detail-cover-title"><span>تجربة تستحق الحضور</span><h1>{selected.title}</h1></div>
-   {!selected.coverImageUrl&&<span className="cover-symbol">✦</span>}
-  </div>
-  <div className="detail-content">
-   <div className="detail-main">
-    <section className="detail-quick-info" aria-label="معلومات الفعالية">
-     <div className="quick-info-row"><span className="quick-info-icon calendar-icon"><CalendarDays size={21}/></span><div><small>التاريخ والوقت</small><strong>{selected.date}</strong><span>{selected.time||"يحدد لاحقاً"}</span></div></div>
-     <div className="quick-info-divider"/>
-     <a className="quick-info-row quick-location-row" href={selected.map||"#"} target="_blank" rel="noreferrer"><span className="quick-info-icon location-icon"><MapPin size={21}/></span><div><small>المكان والموقع</small><strong>{selected.venue||selected.place||"يحدد لاحقاً"}</strong><span>{selected.place||"عرض الاتجاهات على الخريطة"} · اضغط لعرض الموقع</span></div><ExternalLink size={16}/></a>
-    </section>
-    <section className="detail-section detail-about"><h2>عن الفعالية</h2><p>{selected.about||"تفاصيل الفعالية ستُضاف قريباً."}</p></section>
-    <TicketSelection
-       tiers={selected.tiers}
-       selectedTier={selectedTier}
-       tierChosen={tierChosen}
-       ticketCount={ticketCount}
-       eventStatus={selected.status}
-       ticketTypesError={ticketTypesError}
-       totalLabel={selected.tiers[selectedTier]?.price==="مجاناً"?"مجاناً":formatMoney((selected.tiers[selectedTier]?.priceValue||0)*ticketCount,selected.tiers[selectedTier]?.currency)}
-       onSelectTier={(index)=>{setSelectedTier(index);setTierChosen(true);setTicketCount(1);const url=new URL(window.location.href);url.searchParams.set("tier",String(index));url.searchParams.set("qty","1");window.history.replaceState({...window.history.state,haddirPage:"event-detail"},"",url.pathname+url.search+url.hash);}}
-       onQuantityChange={(quantity)=>{setTicketCount(quantity);const url=new URL(window.location.href);url.searchParams.set("qty",String(quantity));window.history.replaceState(window.history.state,"",url.pathname+url.search+url.hash);}}
-       onContinue={openPayment}
-       onRetry={()=>window.location.reload()}
-     />
-    </div>
-   </div>
-  </div>:<div className="detail-sheet event-detail-layout payment-sheet">
-    <div className="checkout-topbar">
-     <div className="checkout-back-group"><button type="button" className="detail-glass-button checkout-back-icon" aria-label="العودة للتفاصيل" onClick={backToDetails}><ArrowLeft size={20}/></button><span>العودة للتفاصيل</span></div>
-     <span className="checkout-wallet-icon" aria-label="المحفظة"><Wallet size={23}/></span>
-    </div>
-    <div className="payment-screen">
-     <div className="booking-steps" aria-label="خطوات الحجز"><span className="step-done">١. اختيار الفئة</span><span className="step-done">٢. مراجعة الحجز</span><span className="step-current">٣. الدفع</span></div>
-     {!bookingDone
-      ? <PaymentCheckout
-          event={selected}
-          selectedTier={selectedTier}
-          ticketCount={ticketCount}
-          totalLabel={selected.tiers[selectedTier].price==="مجاناً"?"مجاناً":formatMoney(selected.tiers[selectedTier].priceValue*ticketCount,selected.tiers[selectedTier].currency)}
-          accounts={eventPaymentAccounts}
-          paymentMethod={paymentMethod}
-          onPaymentMethodChange={(value)=>{setPaymentMethod(value);setAccountCopied(false);setBookingError("");}}
-          accountCopied={accountCopied}
-          onCopyAccount={copyAccount}
-          receipt={receipt}
-          onReceiptChange={setReceipt}
-          bookingError={bookingError}
-          bookingSubmitting={bookingSubmitting}
-          onSubmit={submitBooking}
-        />
-      : <BookingSuccess
-          bookingNumber={bookingNumber}
-          eventTitle={selected.title}
-          ticketCount={ticketCount}
-          totalLabel={selected.tiers[selectedTier].price==="مجاناً"?"مجاناً":formatMoney(selected.tiers[selectedTier].priceValue*ticketCount)}
-          onGoNotifications={()=>{resetBooking();setActiveTab("notifications");}}
-        />
-     }
-    </div>
-   </div>
-  }
- </section>}
+ {selected&&<EventDetailWorkspace
+   event={selected}
+   showPayment={showPayment}
+   selectedTier={selectedTier}
+   tierChosen={tierChosen}
+   ticketCount={ticketCount}
+   ticketTypesError={ticketTypesError}
+   paymentAccounts={eventPaymentAccounts}
+   paymentMethod={paymentMethod}
+   receipt={receipt}
+   bookingDone={bookingDone}
+   bookingNumber={bookingNumber}
+   bookingError={bookingError}
+   bookingSubmitting={bookingSubmitting}
+   accountCopied={accountCopied}
+   onClose={()=>{if((window.history.state as {haddirPage?:string}|null)?.haddirPage==="event-detail"||(window.history.state as {haddirPage?:string}|null)?.haddirPage==="event-payment"){window.history.back();}else{setSelectedEvent(null);setShowPayment(false);}}}
+   onSelectTier={(index)=>{setSelectedTier(index);setTierChosen(true);setTicketCount(1);const url=new URL(window.location.href);url.searchParams.set("tier",String(index));url.searchParams.set("qty","1");window.history.replaceState({...window.history.state,haddirPage:"event-detail"},"",url.pathname+url.search+url.hash);}}
+   onQuantityChange={(quantity)=>{setTicketCount(quantity);const url=new URL(window.location.href);url.searchParams.set("qty",String(quantity));window.history.replaceState(window.history.state,"",url.pathname+url.search+url.hash);}}
+   onContinueToPayment={openPayment}
+   onRetryTicketTypes={()=>window.location.reload()}
+   onBackToDetails={backToDetails}
+   onPaymentMethodChange={(value)=>{setPaymentMethod(value);setAccountCopied(false);setBookingError("");}}
+   onCopyAccount={copyAccount}
+   onReceiptChange={setReceipt}
+   onSubmitBooking={submitBooking}
+   onGoNotifications={()=>{resetBooking();setActiveTab("notifications");}}
+/>}
  {!isGatekeeperPage&&!selected&&<nav className="bottom-nav" aria-label="التنقل الرئيسي"><button className={activeTab==="home"?"selected":""} onClick={()=>go("home")}><House size={21}/><span>الرئيسية</span></button><button className={activeTab==="tickets"?"selected":""} onClick={()=>go("tickets")}><Ticket size={21}/><span>تذاكري</span></button><button className={activeTab==="notifications"?"selected":""} onClick={()=>go("notifications")}><Bell size={21}/><span>الإشعارات</span></button><button className={activeTab==="profile"?"selected":""} onClick={()=>go("profile")}><UserRound size={21}/><span>حسابي</span></button></nav>}
  </>
  
