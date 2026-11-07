@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useEvents } from "../useEvents";
 import { useEventWorkspace } from "../useEventWorkspace";
 import { HomeEventsWorkspace } from "./HomeEventsWorkspace";
@@ -8,6 +8,8 @@ import { EventDetailWorkspace } from "./EventDetailWorkspace";
 
 type EventsWorkspaceProps = {
   showHome: boolean;
+  resetKey: number;
+  onEventOpenChange: (open: boolean) => void;
   authUser: { id: string; email?: string; user_metadata?: Record<string, unknown> } | null;
   onRequireLogin: () => void;
   onBookingSuccess: () => void;
@@ -17,6 +19,8 @@ type EventsWorkspaceProps = {
 /** Owns the complete public event experience: data, URLs, details and booking. */
 export function EventsWorkspace({
   showHome,
+  resetKey,
+  onEventOpenChange,
   authUser,
   onRequireLogin,
   onBookingSuccess,
@@ -57,6 +61,9 @@ export function EventsWorkspace({
     submitBooking,
     resetEventWorkspace,
   } = workspace;
+
+  useEffect(() => { resetEventWorkspace(); }, [resetKey, resetEventWorkspace]);
+  useEffect(() => { onEventOpenChange(!!selectedEvent); }, [selectedEvent?.id, onEventOpenChange]);
 
   const openPayment = useCallback(() => continueToPayment(), [continueToPayment]);
   const handlePaymentMethodChange = useCallback((value: string) => {
