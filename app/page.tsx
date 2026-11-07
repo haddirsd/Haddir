@@ -1,11 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { getSupabaseBrowserClient } from "../lib/supabase";
-import { useEvents } from "../features/events/useEvents";
 import { formatEventDate, formatMoney } from "../features/events/events.formatters";
-import { useEventWorkspace } from "../features/events/useEventWorkspace";
-import { HomeEventsWorkspace } from "../features/events/components/HomeEventsWorkspace";
-import { EventDetailWorkspace } from "../features/events/components/EventDetailWorkspace";
+import { EventsWorkspace } from "../features/events/components/EventsWorkspace";
 import { TicketWorkspace } from "../features/customer-account/components/TicketWorkspace";
 import { NotificationsWorkspace } from "../features/customer-account/components/NotificationsWorkspace";
 import { useGatekeeper } from "../features/gatekeeper/useGatekeeper";
@@ -14,8 +11,8 @@ import { Bell, CheckCircle2, House, Sparkles, Ticket, UserRound, ChevronLeft, Sc
 
 type Tab="home"|"tickets"|"notifications"|"profile";
 export default function Home(){
- const { events, eventsLoading, eventsError, ticketTypesError, refreshEvents } = useEvents();
  const [activeTab,setActiveTab]=useState<Tab>("home"),[darkMode,setDarkMode]=useState(false),[loginEmail,setLoginEmail]=useState("");
+ const [eventResetKey,setEventResetKey]=useState(0),[isEventDetailOpen,setIsEventDetailOpen]=useState(false);
  const [fullName,setFullName]=useState(""),[email,setEmail]=useState(""),[phone,setPhone]=useState(""),[avatarUrl,setAvatarUrl]=useState(""),[profileEditing,setProfileEditing]=useState(false),[saved,setSaved]=useState(false),[profileSaving,setProfileSaving]=useState(false);
  const [authUser,setAuthUser]=useState<{id:string;email?:string;user_metadata?:Record<string,unknown>}|null>(null),[userRole,setUserRole]=useState("customer"),[authMessage,setAuthMessage]=useState(""),[activeWorkspace,setActiveWorkspace]=useState<"customer"|"organizer"|"gatekeeper"|"advertiser"|"admin"|"owner"|null>(null);
  const [isGatekeeperPage,setIsGatekeeperPage]=useState(false);
@@ -106,10 +103,8 @@ export default function Home(){
  };
  const unreadNotificationCount=myNotifications.filter(n=>!n.is_read).length;
  const filteredNotifications=myNotifications.filter(n=>notificationFilter==="all"||(notificationFilter==="unread"?!n.is_read:n.is_read));
- const eventWorkspace=useEventWorkspace({events,authUser,onRequireLogin:()=>{setAuthMessage("سجّل الدخول أولاً عشان نكمل حجزك. الفعاليات متاحة للتصفح بدون حساب.");setActiveTab("profile");},onBookingSuccess:()=>setActiveTab("notifications")});
- const {selectedEvent:selected,selectedTier,tierChosen,showPayment,ticketCount,resetEventWorkspace:resetBooking,openEvent,closeEvent,selectTier,changeQuantity,continueToPayment,backToDetails,eventPaymentAccounts,paymentMethod,setPaymentMethod,receipt,setReceipt,bookingDone,bookingNumber,bookingError,setBookingError,bookingSubmitting,accountCopied,setAccountCopied,copyAccount,submitBooking}=eventWorkspace;
  const go=(tab:Tab)=>{
-  resetBooking();setActiveTab(tab);
+  setEventResetKey(value=>value+1);setActiveTab(tab);
   const url=new URL(window.location.href);
   if(tab==="home")url.searchParams.delete("tab");else url.searchParams.set("tab",tab);
   url.searchParams.delete("workspace");setIsGatekeeperPage(false);setActiveWorkspace(null);
@@ -120,18 +115,18 @@ export default function Home(){
 
  return <main dir="rtl" lang="ar" className={"app-shell"+(darkMode?" theme-dark":"")}>
  <>
- {!selected&&(isGatekeeperPage?<header className="screen-topbar gatekeeper-page-topbar"><button type="button" className="btn btn-outline" onClick={()=>{setIsGatekeeperPage(false);setActiveWorkspace(null);const url=new URL(window.location.href);url.searchParams.delete("workspace");window.location.assign(url.pathname+url.search+url.hash);}}>العودة للملف الشخصي</button><strong>مسح التذاكر</strong><span className="screen-icon"><ScanLine/></span></header>:activeTab==="home"?<header className="topbar"><div className="container header-inner"><button className="brand brand-button" onClick={()=>go("home")}><span className="brand-mark">ح</span> حاضر</button><div className="desktop-greeting">من السودان، لكل لحظة تستاهل الحضور.</div><button className="header-icon theme-toggle" type="button" aria-label={darkMode?"تفعيل الوضع النهاري":"تفعيل الوضع الليلي"} aria-pressed={darkMode} onClick={()=>setDarkMode(v=>!v)}>{<span className="theme-toggle-track" aria-hidden="true"><span className="theme-toggle-knob">{darkMode?"☾":"☀"}</span></span>}</button></div></header>:<header className="screen-topbar"><span className="screen-topbar-spacer" aria-hidden="true"/><strong>{({tickets:"تذاكري",notifications:"الإشعارات",profile:"الملف الشخصي"} as Record<string,string>)[activeTab]}</strong><span className="screen-icon">{activeTab==="tickets"?<Ticket/>:activeTab==="notifications"?<Bell/>:<UserRound/>}</span></header>)}
+ {!isEventDetailOpen&&(isGatekeeperPage?<header className="screen-topbar gatekeeper-page-topbar"><button type="button" className="btn btn-outline" onClick={()=>{setIsGatekeeperPage(false);setActiveWorkspace(null);const url=new URL(window.location.href);url.searchParams.delete("workspace");window.location.assign(url.pathname+url.search+url.hash);}}>العودة للملف الشخصي</button><strong>مسح التذاكر</strong><span className="screen-icon"><ScanLine/></span></header>:activeTab==="home"?<header className="topbar"><div className="container header-inner"><button className="brand brand-button" onClick={()=>go("home")}><span className="brand-mark">ح</span> حاضر</button><div className="desktop-greeting">من السودان، لكل لحظة تستاهل الحضور.</div><button className="header-icon theme-toggle" type="button" aria-label={darkMode?"تفعيل الوضع النهاري":"تفعيل الوضع الليلي"} aria-pressed={darkMode} onClick={()=>setDarkMode(v=>!v)}>{<span className="theme-toggle-track" aria-hidden="true"><span className="theme-toggle-knob">{darkMode?"☾":"☀"}</span></span>}</button></div></header>:<header className="screen-topbar"><span className="screen-topbar-spacer" aria-hidden="true"/><strong>{({tickets:"تذاكري",notifications:"الإشعارات",profile:"الملف الشخصي"} as Record<string,string>)[activeTab]}</strong><span className="screen-icon">{activeTab==="tickets"?<Ticket/>:activeTab==="notifications"?<Bell/>:<UserRound/>}</span></header>)}
  <div className="app-content">
- {!isGatekeeperPage&&activeTab==="home"&&<>
- {showWelcome&&<div className="welcome-motion" role="status"><span className="welcome-spark"><Sparkles size={19}/></span><div><strong>أهلاً بيك في حاضر</strong><p>لحظاتك الحلوة بتبدأ من هنا</p></div><span className="welcome-orbit">✦</span></div>}
- <HomeEventsWorkspace
-  events={events}
-  loading={eventsLoading}
-  error={eventsError}
-  onOpenEvent={openEvent}
-  onRetry={()=>void refreshEvents()}
-/>
- </>}
+ {!isGatekeeperPage&&activeTab==="home"&&showWelcome&&<div className="welcome-motion" role="status"><span className="welcome-spark"><Sparkles size={19}/></span><div><strong>أهلاً بيك في حاضر</strong><p>لحظاتك الحلوة بتبدأ من هنا</p></div><span className="welcome-orbit">✦</span></div>}
+ <EventsWorkspace
+  showHome={!isGatekeeperPage&&activeTab==="home"}
+  resetKey={eventResetKey}
+  authUser={authUser}
+  onEventOpenChange={setIsEventDetailOpen}
+  onRequireLogin={()=>{setAuthMessage("سجّل الدخول أولاً عشان نكمل حجزك. الفعاليات متاحة للتصفح بدون حساب.");setActiveTab("profile");}}
+  onBookingSuccess={()=>setActiveTab("notifications")}
+  onGoNotifications={()=>setActiveTab("notifications")}
+ />
  {!isGatekeeperPage&&activeTab==="tickets"&&<TicketWorkspace
   loading={accountDataLoading}
   error={accountDataError}
@@ -223,33 +218,6 @@ export default function Home(){
    onClose={()=>{const url=new URL(window.location.href);url.searchParams.delete("workspace");url.searchParams.set("tab","profile");window.location.assign(url.pathname+url.search+url.hash);}}
   />}
  </div>
- {selected&&<EventDetailWorkspace
-   event={selected}
-   showPayment={showPayment}
-   selectedTier={selectedTier}
-   tierChosen={tierChosen}
-   ticketCount={ticketCount}
-   ticketTypesError={ticketTypesError}
-   paymentAccounts={eventPaymentAccounts}
-   paymentMethod={paymentMethod}
-   receipt={receipt}
-   bookingDone={bookingDone}
-   bookingNumber={bookingNumber}
-   bookingError={bookingError}
-   bookingSubmitting={bookingSubmitting}
-   accountCopied={accountCopied}
-   onClose={closeEvent}
-   onSelectTier={selectTier}
-   onQuantityChange={changeQuantity}
-   onContinueToPayment={openPayment}
-   onRetryTicketTypes={()=>void refreshEvents()}
-   onBackToDetails={backToDetails}
-   onPaymentMethodChange={(value)=>{setPaymentMethod(value);setAccountCopied(false);setBookingError("");}}
-   onCopyAccount={copyAccount}
-   onReceiptChange={setReceipt}
-   onSubmitBooking={submitBooking}
-   onGoNotifications={()=>{resetBooking();setActiveTab("notifications");}}
-/>}
  {!isGatekeeperPage&&!selected&&<nav className="bottom-nav" aria-label="التنقل الرئيسي"><button className={activeTab==="home"?"selected":""} onClick={()=>go("home")}><House size={21}/><span>الرئيسية</span></button><button className={activeTab==="tickets"?"selected":""} onClick={()=>go("tickets")}><Ticket size={21}/><span>تذاكري</span></button><button className={activeTab==="notifications"?"selected":""} onClick={()=>go("notifications")}><Bell size={21}/><span>الإشعارات</span></button><button className={activeTab==="profile"?"selected":""} onClick={()=>go("profile")}><UserRound size={21}/><span>حسابي</span></button></nav>}
  </>
  
