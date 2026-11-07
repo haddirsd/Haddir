@@ -1,5 +1,5 @@
 import { getSupabaseBrowserClient } from "../../../lib/supabase";
-import type { AdminEventEditorData, AdminEventRow, AdminTicketForm, AdminEventAccountForm } from "./admin-events.types";
+import type { AdminEventEditorData, AdminEventFormValues, AdminEventRow, AdminTicketForm, AdminEventAccountForm } from "./admin-events.types";
 
 export async function listAdminEvents(): Promise<{ data: AdminEventRow[]; error: string | null }> {
   const supabase = getSupabaseBrowserClient();
