@@ -7,7 +7,7 @@ import type { AdminBookingRow } from "./admin-bookings.types";
 
 export function useAdminBookings(searchTerm: string) {
   const [rows, setRows] = useState<AdminBookingRow[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const latestRequest = useRef(0);
 
