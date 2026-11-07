@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getSupabaseBrowserClient } from "../lib/supabase";
 import { useBooking } from "../features/booking/useBooking";
 import { useEvents } from "../features/events/useEvents";
+import { useEventNavigation } from "../features/events/useEventNavigation";
 import { HomeEventsWorkspace } from "../features/events/components/HomeEventsWorkspace";
 import { EventDetailWorkspace } from "../features/events/components/EventDetailWorkspace";
 import { TicketWorkspace } from "../features/customer-account/components/TicketWorkspace";
@@ -18,29 +19,13 @@ const formatMoney=(value:number,currency="SDG")=>new Intl.NumberFormat("ar-SD").
 type Tab="home"|"tickets"|"notifications"|"profile";
 export default function Home(){
  const { events, eventsLoading, eventsError, ticketTypesError } = useEvents();
- const [activeTab,setActiveTab]=useState<Tab>("home"),[selectedEvent,setSelectedEvent]=useState<string|null>(null),[selectedTier,setSelectedTier]=useState(0),[tierChosen,setTierChosen]=useState(false),[showPayment,setShowPayment]=useState(false),[darkMode,setDarkMode]=useState(false),[loginEmail,setLoginEmail]=useState("");
+ const [activeTab,setActiveTab]=useState<Tab>("home"),[darkMode,setDarkMode]=useState(false),[loginEmail,setLoginEmail]=useState("");
  const [fullName,setFullName]=useState(""),[email,setEmail]=useState(""),[phone,setPhone]=useState(""),[avatarUrl,setAvatarUrl]=useState(""),[profileEditing,setProfileEditing]=useState(false),[saved,setSaved]=useState(false),[profileSaving,setProfileSaving]=useState(false);
  const [authUser,setAuthUser]=useState<{id:string;email?:string;user_metadata?:Record<string,unknown>}|null>(null),[userRole,setUserRole]=useState("customer"),[authMessage,setAuthMessage]=useState(""),[activeWorkspace,setActiveWorkspace]=useState<"customer"|"organizer"|"gatekeeper"|"advertiser"|"admin"|"owner"|null>(null);
  const [isGatekeeperPage,setIsGatekeeperPage]=useState(false);
- const [ticketCount,setTicketCount]=useState(1);
  const [showWelcome,setShowWelcome]=useState(false);
  const [showAdvertiserStats,setShowAdvertiserStats]=useState(false);
  const [assignedEvent,setAssignedEvent]=useState<any|null>(null);
- useEffect(()=>{
-  const handleBrowserBack=(event:PopStateEvent)=>{
-   const pageState=(event.state as {haddirPage?:string}|null)?.haddirPage;
-   if(pageState==="event-detail"){
-    setShowPayment(false);
-    return;
-   }
-   setSelectedEvent(null);
-   setShowPayment(false);
-   setSelectedTier(0);
-   setTierChosen(false);
-  };
-  window.addEventListener("popstate",handleBrowserBack);
-  return()=>window.removeEventListener("popstate",handleBrowserBack);
- },[]);
  const [advertiserStats,setAdvertiserStats]=useState<any|null>(null);
  const [advertiserStatsLoading,setAdvertiserStatsLoading]=useState(false);
  const [advertiserStatsError,setAdvertiserStatsError]=useState("");
@@ -79,21 +64,6 @@ export default function Home(){
  useEffect(()=>{const saved=window.localStorage.getItem("haddir-theme");const prefersDark=window.matchMedia?.("(prefers-color-scheme: dark)").matches;setDarkMode(saved?saved==="dark":!!prefersDark);},[]);
  useEffect(()=>{document.documentElement.dataset.theme=darkMode?"dark":"light";document.documentElement.style.colorScheme=darkMode?"dark":"light";window.localStorage.setItem("haddir-theme",darkMode?"dark":"light");},[darkMode]);
  useEffect(()=>{const key="haddir-welcome-seen";if(!sessionStorage.getItem(key)){setShowWelcome(true);sessionStorage.setItem(key,"1");const timer=window.setTimeout(()=>setShowWelcome(false),3600);return()=>window.clearTimeout(timer);}},[]);
- useEffect(() => {
-  const params = new URLSearchParams(window.location.search);
-  const requested = params.get("event");
-  if (!requested || !events.some((event) => event.id === requested)) return;
-
-  setSelectedEvent(requested);
-  const index = Number(params.get("tier") || 0);
-  const selected = events.find((event) => event.id === requested);
-  if (selected?.tiers[index]) {
-    setSelectedTier(index);
-    setTierChosen(params.has("tier"));
-  }
-  setTicketCount(Math.min(5, Math.max(1, Number(params.get("qty") || 1))));
-  setShowPayment(params.get("checkout") === "1");
- }, [events]);
  useEffect(()=>{const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("تسجيل الدخول يحتاج إعداد مفاتيح Supabase في بيئة الموقع.");return;}let alive=true;const load=async(user:{id:string;email?:string;user_metadata?:Record<string,unknown>}|null)=>{if(!alive)return;setAuthUser(user as typeof authUser);if(user){const {data}=await supabase.from("profiles").select("role,full_name,phone").eq("id",user.id).maybeSingle();if(!alive)return;setUserRole(data?.role||"customer");const {data:assignmentRows}=await supabase.from("event_role_assignments").select("event_id,assignment_role,events(id,title,venue,city,starts_at,status)").eq("user_id",user.id).in("assignment_role",["gatekeeper","organizer","advertiser"]).limit(1);if(!alive)return;setAssignedEvent(assignmentRows?.[0]||null);const metadataName=String(user.user_metadata?.full_name||user.user_metadata?.name||"");const metadataAvatar=String(user.user_metadata?.avatar_url||user.user_metadata?.picture||"");setFullName(String(data?.full_name||metadataName||""));setPhone(String(data?.phone||""));setEmail(user.email||"");setAvatarUrl(metadataAvatar);setProfileEditing(false);setSaved(false);}else{setUserRole("customer");setAssignedEvent(null);setGatekeeperResult(null);setGatekeeperCode("");setFullName("");setEmail("");setPhone("");setAvatarUrl("");setProfileEditing(false);setSaved(false);setActiveWorkspace(null);}};supabase.auth.getSession().then(({data})=>load(data.session?.user??null));const {data:{subscription}}=supabase.auth.onAuthStateChange((_event,session)=>{void load(session?.user??null);});return()=>{alive=false;subscription.unsubscribe();};},[]);
  const gatekeeper = useGatekeeper({ authUser, assignedEvent, userRole, isGatekeeperPage, activeWorkspace });
  const {
@@ -140,10 +110,11 @@ export default function Home(){
  };
  const unreadNotificationCount=myNotifications.filter(n=>!n.is_read).length;
  const filteredNotifications=myNotifications.filter(n=>notificationFilter==="all"||(notificationFilter==="unread"?!n.is_read:n.is_read));
- const selected=events.find(e=>e.id===selectedEvent);
- const booking=useBooking({authUser,selected:selected||null,selectedTier,ticketCount,onSuccess:()=>setActiveTab("notifications")});
+ const eventNavigation=useEventNavigation({events,authUser,onRequireLogin:()=>{setAuthMessage("سجّل الدخول أولاً عشان نكمل حجزك. الفعاليات متاحة للتصفح بدون حساب.");setActiveTab("profile");}});
+ const {selectedEvent:selected,selectedTier,tierChosen,showPayment,ticketCount,resetEventNavigation,openEvent:openEventNavigation,closeEvent,selectTier,changeQuantity,continueToPayment,backToDetails}=eventNavigation;
+ const booking=useBooking({authUser,selected,selectedTier,ticketCount,onSuccess:()=>setActiveTab("notifications")});
  const {eventPaymentAccounts,paymentMethod,setPaymentMethod,receipt,setReceipt,bookingDone,bookingNumber,bookingError,setBookingError,bookingSubmitting,accountCopied,setAccountCopied,loadPaymentAccounts,copyAccount,submitBooking}=booking;
- const resetBooking=()=>{setSelectedEvent(null);setSelectedTier(0);setTierChosen(false);setShowPayment(false);setTicketCount(1);booking.resetBooking();};
+ const resetBooking=()=>{resetEventNavigation();booking.resetBooking();};
  const go=(tab:Tab)=>{
   resetBooking();setActiveTab(tab);
   const url=new URL(window.location.href);
@@ -152,9 +123,9 @@ export default function Home(){
   window.history.replaceState({}, "", url.pathname+url.search+url.hash);
   window.scrollTo({top:0,behavior:"smooth"});
  }; const downloadTicket=async(ticket:any)=>{try{const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1350;const ctx=canvas.getContext("2d");if(!ctx)return;await document.fonts.ready;ctx.fillStyle="#f7f1fb";ctx.fillRect(0,0,1080,1350);ctx.fillStyle="#fff";ctx.fillRect(48,48,984,1254);ctx.strokeStyle="#e7d9f1";ctx.lineWidth=3;ctx.strokeRect(48,48,984,1254);ctx.direction="rtl";ctx.textAlign="right";const right=950;ctx.fillStyle="#5b2e82";ctx.font="bold 48px Alexandria,Arial";ctx.fillText("حاضر  HADDIR",right,135);ctx.fillStyle="#8b7897";ctx.font="26px Alexandria,Arial";ctx.fillText("تذكرة دخول إلكترونية",right,190);ctx.strokeStyle="#dfd1e9";ctx.setLineDash([10,9]);ctx.beginPath();ctx.moveTo(100,230);ctx.lineTo(980,230);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle="#8b7897";ctx.font="26px Alexandria,Arial";ctx.fillText("الفعالية",right,300);ctx.fillStyle="#30213b";ctx.font="bold 44px Alexandria,Arial";const eventTitle=String(ticket.events?.title||"فعالية");ctx.fillText(eventTitle.length>32?eventTitle.slice(0,32)+"…":eventTitle,right,365);ctx.fillStyle="#8b7897";ctx.font="24px Alexandria,Arial";ctx.fillText("نوع التذكرة",right,455);ctx.fillText("رقم الحجز",520,455);ctx.fillStyle="#3d3047";ctx.font="bold 27px Alexandria,Arial";ctx.fillText(String(ticket.ticket_types?.name||"تذكرة"),right,500);ctx.fillText(String(ticket.bookings?.booking_number||"—"),520,500);ctx.fillStyle="#8b7897";ctx.font="24px Alexandria,Arial";ctx.fillText("الموقع",right,575);ctx.fillText("التاريخ",520,575);ctx.fillStyle="#3d3047";ctx.font="bold 25px Alexandria,Arial";ctx.fillText(String(ticket.events?.venue||"—"),right,620);ctx.fillText(ticket.events?.starts_at?formatEventDate(ticket.events.starts_at):"—",520,620);ctx.strokeStyle="#e5d9ed";ctx.setLineDash([10,9]);ctx.beginPath();ctx.moveTo(100,675);ctx.lineTo(980,675);ctx.stroke();ctx.setLineDash([]);const qr=document.querySelector('[data-ticket-id="'+String(ticket.id)+'"] .haddir-ticket-qr svg');if(!qr)throw new Error("QR unavailable");const svg=new XMLSerializer().serializeToString(qr);const img=new Image();const loaded=new Promise<void>((resolve,reject)=>{img.onload=()=>resolve();img.onerror=()=>reject(new Error("QR image failed"));});img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);await loaded;ctx.drawImage(img,360,700,360,360);ctx.fillStyle="#8e8297";ctx.font="23px Alexandria,Arial";ctx.textAlign="center";ctx.fillText("امسح الرمز للتحقق من التذكرة",540,1100);ctx.fillStyle="#5c2e82";ctx.font="bold 48px Arial";ctx.fillText(String(ticket.ticket_code||""),540,1170);ctx.fillStyle="#f6f0fa";ctx.fillRect(48,1200,984,102);ctx.fillStyle="#76558d";ctx.font="bold 23px Alexandria,Arial";ctx.fillText("احتفظ بالتذكرة وأبرزها عند الدخول",540,1262);const link=document.createElement("a");link.download="haddir-ticket-"+String(ticket.ticket_code||ticket.id)+".png";link.href=canvas.toDataURL("image/png");link.click();}catch(error){console.error("Ticket image export failed",error);alert("تعذر حفظ التذكرة كصورة. حاول مرة أخرى.");}};
- const openEvent=(id:string)=>{resetBooking();const url=new URL(window.location.href);url.searchParams.set("event",id);url.searchParams.delete("checkout");url.searchParams.delete("tier");url.searchParams.delete("qty");window.history.pushState({...window.history.state,haddirPage:"event-detail"},"",url.pathname+url.search+url.hash);setSelectedEvent(id);window.scrollTo({top:0,behavior:"smooth"});};
- const openPayment=async()=>{if(!tierChosen)return;if(!authUser){setAuthMessage("سجّل الدخول أولاً عشان نكمل حجزك. الفعاليات متاحة للتصفح بدون حساب.");setSelectedEvent(null);setShowPayment(false);setActiveTab("profile");window.scrollTo({top:0,behavior:"smooth"});return;}setAuthMessage("");if(selected){const loaded=await loadPaymentAccounts(selected.id);if(!loaded)return;}const url=new URL(window.location.href);url.searchParams.set("checkout","1");url.searchParams.set("tier",String(selectedTier));url.searchParams.set("qty",String(ticketCount));window.history.pushState({...window.history.state,haddirPage:"event-payment"},"",url.pathname+url.search+url.hash);setShowPayment(true);window.scrollTo({top:0,behavior:"smooth"});};
- const backToDetails=()=>{if((window.history.state as {haddirPage?:string}|null)?.haddirPage==="event-payment"){window.history.back();return;}const url=new URL(window.location.href);url.searchParams.delete("checkout");window.history.replaceState({...window.history.state,haddirPage:"event-detail"},"",url.pathname+url.search+url.hash);setShowPayment(false);window.scrollTo({top:0,behavior:"smooth"});};
+ const openEvent=(id:string)=>{booking.resetBooking();openEventNavigation(id);};
+ const openPayment=()=>{setAuthMessage("");void continueToPayment(loadPaymentAccounts);};
+ const backToDetails=backToDetails;
 
  return <main dir="rtl" lang="ar" className={"app-shell"+(darkMode?" theme-dark":"")}>
  <>
@@ -276,9 +247,9 @@ export default function Home(){
    bookingError={bookingError}
    bookingSubmitting={bookingSubmitting}
    accountCopied={accountCopied}
-   onClose={()=>{if((window.history.state as {haddirPage?:string}|null)?.haddirPage==="event-detail"||(window.history.state as {haddirPage?:string}|null)?.haddirPage==="event-payment"){window.history.back();}else{setSelectedEvent(null);setShowPayment(false);}}}
-   onSelectTier={(index)=>{setSelectedTier(index);setTierChosen(true);setTicketCount(1);const url=new URL(window.location.href);url.searchParams.set("tier",String(index));url.searchParams.set("qty","1");window.history.replaceState({...window.history.state,haddirPage:"event-detail"},"",url.pathname+url.search+url.hash);}}
-   onQuantityChange={(quantity)=>{setTicketCount(quantity);const url=new URL(window.location.href);url.searchParams.set("qty",String(quantity));window.history.replaceState(window.history.state,"",url.pathname+url.search+url.hash);}}
+   onClose={closeEvent}
+   onSelectTier={selectTier}
+   onQuantityChange={changeQuantity}
    onContinueToPayment={openPayment}
    onRetryTicketTypes={()=>window.location.reload()}
    onBackToDetails={backToDetails}
