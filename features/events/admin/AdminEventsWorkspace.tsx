@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { RefreshCw } from "lucide-react";
 import { getSupabaseBrowserClient } from "../../../lib/supabase";
+import { saveAdminEvent } from "./admin-events.service";
 import { deleteOrCancelAdminEvent, getAdminEventEditorData, publishDraftAdminEvent } from "./admin-events.service";
 import { useAdminEvents } from "./useAdminEvents";
 import type { AdminEventAccountForm, AdminEventFormValues, AdminEventRole, AdminEventRow, AdminTicketForm } from "./admin-events.types";
@@ -61,75 +62,30 @@ export default function AdminEventsWorkspace({ role }: { role: AdminEventRole })
       e.preventDefault();
       const supabase = getSupabaseBrowserClient();
       if (!supabase || !role || !["owner","admin"].includes(role)) return;
-      setSavingEvent(true); setEventMessage("");
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { setEventMessage("انتهت الجلسة، سجل الدخول مرة أخرى."); setSavingEvent(false); return; }
-      if(!eventForm.title.trim()||!eventForm.city.trim()||!eventForm.venue.trim()||!eventForm.starts_at){setEventMessage("أكمل اسم الفعالية والمدينة والمكان وموعد البداية.");setSavingEvent(false);return;}
-      if(eventForm.ends_at&&new Date(eventForm.ends_at)<=new Date(eventForm.starts_at)){setEventMessage("موعد نهاية الفعالية لازم يكون بعد موعد البداية.");setSavingEvent(false);return;}
-      if(eventAccountForms.some(a=>!a.account_name.trim()||!a.account_number.trim()||!a.beneficiary.trim())){setEventMessage("أكمل اسم ورقم كل حساب أو أزله من القائمة.");setSavingEvent(false);return;}
-      if(!ticketForms.length||ticketForms.some(t=>!t.name.trim()||t.price===""||!t.quantity_total||!Number.isFinite(Number(t.price))||Number(t.price)<0||!Number.isInteger(Number(t.quantity_total))||Number(t.quantity_total)<Math.max(1,t.quantity_sold)||(t.sales_start_at&&t.sales_end_at&&new Date(t.sales_end_at)<=new Date(t.sales_start_at)))){setEventMessage("راجع فئات التذاكر: الاسم والسعر والكمية مطلوبة، والكمية لا تقل عن المباع، ونهاية البيع بعد بدايته.");setSavingEvent(false);return;}
-      let coverUrl = eventForm.cover_image_url.trim() || null;
-      if (coverFile) {
-        if (!coverFile.type.startsWith("image/")) { setEventMessage("الملف المختار ليس صورة."); setSavingEvent(false); return; }
-        if (coverFile.size > 10 * 1024 * 1024) { setEventMessage("حجم الصورة أكبر من 10 ميجابايت."); setSavingEvent(false); return; }
-        const ext = (coverFile.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g,"") || "jpg";
-        const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
-        const { error: uploadError } = await supabase.storage.from("event-covers").upload(path, coverFile, {contentType:coverFile.type,upsert:false,cacheControl:"31536000"});
-        if (uploadError) { setEventMessage("تعذر رفع صورة الغلاف: "+uploadError.message); setSavingEvent(false); return; }
-        coverUrl = supabase.storage.from("event-covers").getPublicUrl(path).data.publicUrl;
+      setSavingEvent(true);
+      setEventMessage("");
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) { setEventMessage("انتهت الجلسة، سجل الدخول مرة أخرى."); return; }
+        const result = await saveAdminEvent({
+          userId: user.id, eventForm, ticketForms, eventAccountForms, coverFile, editingEventId,
+        });
+        if (result.error) { setEventMessage(result.error); return; }
+        setEventMessage(result.message || "تم حفظ الفعالية بنجاح.");
+        setEditingEventId(null);
+        setEventForm(emptyEventForm);
+        setTicketForms([emptyTicket()]);
+        setEventAccountForms([]);
+        setCoverFile(null);
+        setCoverPreview("");
+        setShowEventForm(false);
+        await loadEvents();
+      } catch (error) {
+        setEventMessage(error instanceof Error ? error.message : "تعذر حفظ الفعالية.");
+      } finally {
+        setSavingEvent(false);
       }
-      const eventPayload = {title:eventForm.title.trim(),description:eventForm.description.trim()||null,category:eventForm.category.trim()||null,city:eventForm.city.trim()||null,venue:eventForm.venue.trim()||null,address:eventForm.address.trim()||null,location_url:eventForm.location_url.trim()||null,starts_at:new Date(eventForm.starts_at).toISOString(),ends_at:eventForm.ends_at?new Date(eventForm.ends_at).toISOString():null,cover_image_url:coverUrl,is_trending:eventForm.is_trending,platform_fee_percent:Math.min(100,Math.max(0,Number(eventForm.platform_fee_percent)||0))};
-      if(editingEventId){
-        const {error:updateError}=await supabase.from("events").update(eventPayload).eq("id",editingEventId);
-        if(updateError){setEventMessage("تعذر تحديث الفعالية: "+updateError.message);setSavingEvent(false);return;}
-        const {data:existingTickets,error:existingError}=await supabase.from("ticket_types").select("id,quantity_sold").eq("event_id",editingEventId);
-        if(existingError){setEventMessage("تم تحديث الفعالية لكن تعذر تحميل التذاكر: "+existingError.message);setSavingEvent(false);return;}
-        const keptIds=ticketForms.map(t=>t.id).filter(Boolean) as string[];
-        for(const t of ticketForms){
-          if(!t.name.trim()||!t.quantity_total||Number(t.price)<0||Number(t.quantity_total)<t.quantity_sold){setEventMessage("راجع بيانات التذاكر: الكمية لا يمكن أن تقل عن المباع.");setSavingEvent(false);return;}
-          const payload={name:t.name.trim(),description:t.description.trim()||null,price:Number(t.price),currency:t.currency,quantity_total:Number(t.quantity_total),sales_start_at:t.sales_start_at?new Date(t.sales_start_at).toISOString():null,sales_end_at:t.sales_end_at?new Date(t.sales_end_at).toISOString():null,is_active:t.is_active};
-          const result=t.id?await supabase.from("ticket_types").update(payload).eq("id",t.id):await supabase.from("ticket_types").insert({...payload,event_id:editingEventId,quantity_sold:0});
-          if(result.error){setEventMessage("تم تحديث بيانات الفعالية لكن تعذر حفظ التذاكر: "+result.error.message);setSavingEvent(false);return;}
-        }
-        for(const old of (existingTickets||[]).filter((t:any)=>!keptIds.includes(t.id))){
-          if(Number(old.quantity_sold)>0){await supabase.from("ticket_types").update({is_active:false}).eq("id",old.id);continue;}
-          const {count}=await supabase.from("booking_items").select("id",{count:"exact",head:true}).eq("ticket_type_id",old.id);
-          if((count||0)>0) await supabase.from("ticket_types").update({is_active:false}).eq("id",old.id);
-          else await supabase.from("ticket_types").delete().eq("id",old.id);
-        }
-        const {data:existingAccounts,error:existingAccountsError}=await supabase.from("event_payment_accounts").select("id").eq("event_id",editingEventId);
-        if(existingAccountsError){setEventMessage("تم تحديث الفعالية لكن تعذر تحميل حساباتها الحالية: "+existingAccountsError.message);setSavingEvent(false);return;}
-        const retainedAccountIds=eventAccountForms.map(a=>a.id).filter(Boolean) as string[];
-        for(const oldAccount of (existingAccounts||[]).filter((a:any)=>!retainedAccountIds.includes(a.id))){
-          const {error:deleteAccountError}=await supabase.from("event_payment_accounts").delete().eq("id",oldAccount.id).eq("event_id",editingEventId);
-          if(deleteAccountError){setEventMessage("تم تحديث الفعالية لكن تعذر إزالة حساب دفع: "+deleteAccountError.message);setSavingEvent(false);return;}
-        }
-        for(let i=0;i<eventAccountForms.length;i++){
-          const a=eventAccountForms[i];
-          const accountPayload={account_name:a.account_name.trim(),account_number:a.account_number.trim(),beneficiary:a.beneficiary.trim(),is_active:a.is_active,sort_order:a.sort_order??(i+1)*10};
-          const accountResult=a.id
-            ? await supabase.from("event_payment_accounts").update(accountPayload).eq("id",a.id).eq("event_id",editingEventId)
-            : await supabase.from("event_payment_accounts").insert({...accountPayload,event_id:editingEventId});
-          if(accountResult.error){setEventMessage("تم تحديث الفعالية لكن تعذر حفظ حساباتها: "+accountResult.error.message);setSavingEvent(false);return;}
-        }
-        setEventMessage("تم تحديث الفعالية وجميع أنواع التذاكر وحسابات الدفع.");setEditingEventId(null);setEventForm(emptyEventForm);setTicketForms([emptyTicket()]);setEventAccountForms([]);setCoverFile(null);setCoverPreview("");setShowEventForm(false);setSavingEvent(false);await loadEvents();return;
-      }
-      const slug = eventForm.title.trim().toLowerCase().normalize("NFKD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9\\u0600-\\u06ff]+/g,"-").replace(/^-|-$/g,"") + "-" + Math.random().toString(36).slice(2,7);
-      const { data: event, error: eventError } = await supabase.from("events").insert({...eventPayload,slug,status:"draft",created_by:user.id}).select("id").single();
-      if (eventError || !event) { setEventMessage("تعذر إنشاء الفعالية: " + (eventError?.message || "خطأ غير معروف")); setSavingEvent(false); return; }
-      const { error: ticketError } = await supabase.from("ticket_types").insert(ticketForms.map(t=>({event_id:event.id,name:t.name.trim(),description:t.description.trim()||null,price:Number(t.price),currency:t.currency,quantity_total:Number(t.quantity_total),quantity_sold:0,sales_start_at:t.sales_start_at?new Date(t.sales_start_at).toISOString():null,sales_end_at:t.sales_end_at?new Date(t.sales_end_at).toISOString():null,is_active:t.is_active})));
-      if(!ticketError&&eventAccountForms.length){const {error:accountError}=await supabase.from("event_payment_accounts").insert(eventAccountForms.map((a,i)=>({event_id:event.id,account_name:a.account_name.trim(),account_number:a.account_number.trim(),beneficiary:a.beneficiary.trim(),is_active:a.is_active,sort_order:a.sort_order??(i+1)*10})));if(accountError){await supabase.from("events").delete().eq("id",event.id);setEventMessage("تعذر حفظ حسابات الدفع، وتم التراجع عن إنشاء الفعالية: "+accountError.message);setSavingEvent(false);return;}}
-      if (ticketError) {
-        await supabase.from("events").delete().eq("id",event.id);
-        setEventMessage("لم يتم حفظ نوع التذكرة، وتم التراجع عن إنشاء الفعالية: " + ticketError.message);
-        setSavingEvent(false); return;
-      }
-      setEventMessage("تم إنشاء الفعالية ونوع التذكرة كمسودة بنجاح.");
-      setEditingEventId(null);setEventForm(emptyEventForm);setTicketForms([emptyTicket()]);setEventAccountForms([]);setCoverFile(null);setCoverPreview("");
-      setShowEventForm(false); setSavingEvent(false); await loadEvents();
     };
-  
-  
 
   const eventCards = <div className="admin-event-cards">
         {rows.length===0?<p className="admin-no-data">لا توجد فعاليات حتى الآن. أضف أول فعالية من الزر بالأعلى.</p>:rows.map((r,i)=><article className="admin-event-card" key={r.id||i}>
