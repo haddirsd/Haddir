@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "../../lib/supabase";
 import AdminEventsWorkspace from "../../features/events/admin/AdminEventsWorkspace";
 import AdminBookingsWorkspace from "../../features/booking/admin/AdminBookingsWorkspace";
+import AdminPaymentsWorkspace from "../../features/booking/admin/AdminPaymentsWorkspace";
 import { Activity, ArrowRight, BadgeCheck, Banknote, CalendarDays, ClipboardCheck, LayoutDashboard, LogOut, Shield, Ticket, Users, Wallet, RefreshCw } from "lucide-react";
 
 type AdminRole = "owner" | "admin" | "supervisor";
@@ -26,8 +27,6 @@ export default function AdminPage() {
   const [rows, setRows] = useState<Row[]>([]);
   const [counts, setCounts] = useState({ events: 0, bookings: 0, pending: 0, users: 0, confirmed: 0, revenue: 0 });
   const [dataReady, setDataReady] = useState(false);
-  const [rejectionReasons,setRejectionReasons]=useState<Record<string,string>>({});
-  const [paymentActionMessage,setPaymentActionMessage]=useState("");
   const [updatingUserId,setUpdatingUserId]=useState<string|null>(null);
   const [userMessage,setUserMessage]=useState("");
   const [eventOptions,setEventOptions]=useState<Row[]>([]);
@@ -89,11 +88,10 @@ export default function AdminPage() {
 
   const loadSection = async () => {
     const supabase = getSupabaseBrowserClient();
-    if (!supabase || !role || section === "overview" || section === "events" || section === "bookings") return;
+    if (!supabase || !role || section === "overview" || section === "events" || section === "bookings" || section === "payments") return;
     setSectionLoading(true); setError(""); setRows([]);
     let result: {data:any[]|null,error:any} = {data:[],error:null};
     if (section === "activity") result = await supabase.from("admin_activity_log").select("id,actor_name,actor_role,action,entity_type,entity_label,event_id,booking_id,details,created_at,events(title)").order("created_at",{ascending:false}).limit(500);
-    if (section === "payments") result = await supabase.from("payment_submissions").select("id,booking_id,transfer_reference,receipt_path,amount,currency,status,review_note,created_at,payment_account_id,payment_account_name,payment_account_number,payment_account_beneficiary,bookings(booking_number,customer_name,customer_email,customer_phone,subtotal,currency,events(title,city,venue,starts_at),booking_items(quantity,ticket_types(name)))").eq("status","submitted").order("created_at",{ascending:false}).limit(100);
     if (section === "users" && role !== "supervisor") {
       const term=searchTerm.trim().replace(/[(),]/g," ").replace(/[%_]/g,"");
       const [{data:userRows,error:userError},{count:totalCount,error:countError}]=await Promise.all([
@@ -141,13 +139,6 @@ export default function AdminPage() {
     }
     if (result.error) { setSectionLoading(false);setError("تعذر تحميل بيانات هذا القسم: " + result.error.message); return; }
     let loadedRows=result.data||[];
-    if(section==="payments"){
-      loadedRows=await Promise.all(loadedRows.map(async(row:any)=>{
-        if(!row.receipt_path)return row;
-        const {data}=await supabase.storage.from("payment-receipts").createSignedUrl(row.receipt_path,900);
-        return {...row,receipt_url:data?.signedUrl||null};
-      }));
-    }
     setSectionLoading(false);
     setRows(loadedRows);
   };
@@ -167,7 +158,7 @@ export default function AdminPage() {
        ]);
        setCounts({events:events.count||0,bookings:bookings.count||0,pending:pending.count||0,users:users.count||0,confirmed:confirmed.data?.length||0,revenue:(confirmed.data||[]).reduce((sum:any,row:any)=>sum+Number(row.subtotal||0),0)});
      };
-     const tables=section==="overview"?["events","bookings","payment_submissions"]:section==="payments"?["payment_submissions","bookings","booking_items"]:section==="activity"?["admin_activity_log"]:[];
+     const tables=section==="overview"?["events","bookings","payment_submissions"]:section==="activity"?["admin_activity_log"]:[];
      if(!tables.length)return;
      let channel=supabase.channel("admin-live-"+section);
      for(const table of tables){
@@ -179,21 +170,6 @@ export default function AdminPage() {
      channel.subscribe();
      return()=>{void supabase.removeChannel(channel);};
    },[section,role,searchTerm]);
-
-  const reviewPayment=async(row:Row,decision:"approve"|"reject")=>{
-    const supabase=getSupabaseBrowserClient();if(!supabase||!role)return;
-    const reason=decision==="reject"?(rejectionReasons[row.id]||"").trim():null;
-    if(decision==="reject"&&!reason){setError("اكتب سبب الرفض أولاً حتى نرسله للعميل.");return;}
-    if(decision==="approve"&&!window.confirm("تأكيد قبول الدفع وإصدار تذاكر برموز دخول من 10 أرقام؟"))return;
-    setSectionLoading(true);setError("");
-    const {data,error}=await supabase.rpc("review_payment_submission",{p_submission_id:row.id,p_decision:decision,p_rejection_reason:reason||null});
-    setSectionLoading(false);
-    if(error){setError("تعذرت مراجعة إثبات الدفع: "+error.message);return;}
-    setRejectionReasons(v=>{const next={...v};delete next[row.id];return next;});
-    setPaymentActionMessage(decision==="approve"?("تم اعتماد الدفع وإصدار "+Number(data?.tickets_created||0)+" تذكرة. حُفظ إشعار البريد في قائمة الانتظار، وسيُرسل بعد تفعيل إعدادات Resend."):"تم رفض إثبات الدفع وإرسال السبب للعميل. حُفظ إشعار البريد في قائمة الانتظار، وسيُرسل بعد تفعيل إعدادات Resend.");
-    if(data?.booking_id){void supabase.functions.invoke("send-booking-email",{body:{booking_id:data.booking_id,decision}}).then(({error}:any)=>{if(error)console.info("Booking email remains queued until Resend is configured.");});}
-    await loadSection();
-  };
 
   const updateUserRole = async (userRow:Row, nextRole:string, eventId:string|null) => {
     const supabase=getSupabaseBrowserClient();
@@ -296,7 +272,6 @@ export default function AdminPage() {
     }
     const columns: Record<string,{key:string,label:string,format?:(r:Row)=>string}[]> = {
       events:[{key:"title",label:"الفعالية"},{key:"category",label:"التصنيف"},{key:"city",label:"المدينة"},{key:"venue",label:"الموقع"},{key:"starts_at",label:"الموعد",format:r=>r.starts_at?new Date(r.starts_at).toLocaleString("ar-SD"):"—"},{key:"status",label:"الحالة",format:r=>statusLabels[r.status]||fmt(r.status)}],
-      payments:[{key:"booking",label:"الحجز",format:r=>r.bookings?.booking_number||r.booking_id},{key:"customer",label:"الزبون",format:r=>r.bookings?.customer_name||"—"},{key:"transfer_reference",label:"مرجع التحويل"},{key:"receipt_url",label:"الإيصال",format:r=>r.receipt_url?"متاح":"—"},{key:"amount",label:"المبلغ",format:r=>money(r.amount,r.currency)},{key:"status",label:"الحالة",format:r=>statusLabels[r.status]||fmt(r.status)},{key:"review_note",label:"ملاحظة المراجعة"},{key:"created_at",label:"التاريخ",format:r=>new Date(r.created_at).toLocaleDateString("ar-SD")}],
       users:[{key:"full_name",label:"الاسم"},{key:"phone",label:"الهاتف"},{key:"role",label:"الدور"},{key:"created_at",label:"تاريخ التسجيل",format:r=>new Date(r.created_at).toLocaleDateString("ar-SD")}]
     };
     const cols=columns[section]||[];
@@ -335,42 +310,6 @@ export default function AdminPage() {
         {rows.length===0&&<p className="admin-no-data">لا يوجد مستخدمون مسجلون حتى الآن.</p>}
       </div>;
     }
-    if(section==="payments"){
-      return <div className="admin-payment-cards">
-        {rows.length===0?<p className="admin-no-data">لا توجد إثباتات دفع حتى الآن.</p>:rows.map((r,i)=>{
-          const pending=r.status==="submitted";
-          return <article className="admin-payment-card" key={r.id||i}>
-            <div className="admin-payment-card-head">
-              <div><small>رقم الحجز</small><h4>{r.bookings?.booking_number||"—"}</h4></div>
-              <span className={"admin-event-status status-"+(r.status||"submitted")}>{statusLabels[r.status]||fmt(r.status)}</span>
-            </div>
-            <div className="admin-payment-card-event"><Ticket size={17}/><strong>{r.bookings?.events?.title||"فعالية غير محددة"}</strong></div>
-            <div className="admin-payment-card-grid">
-              <div><small>المدينة والمكان</small><strong>{[r.bookings?.events?.city,r.bookings?.events?.venue].filter(Boolean).join(" · ")||"—"}</strong></div>
-              <div><small>العميل</small><strong>{fmt(r.bookings?.customer_name)}</strong></div>
-              <div><small>البريد الإلكتروني</small><strong>{fmt(r.bookings?.customer_email)}</strong></div>
-              <div><small>رقم الهاتف</small><strong dir="ltr">{fmt(r.bookings?.customer_phone)}</strong></div>
-              <div><small>المبلغ المحوّل</small><strong>{money(r.amount,r.currency)}</strong></div>
-              <div><small>وسيلة الدفع</small><strong>{fmt(r.payment_account_name)}</strong></div>
-              <div><small>رقم الحساب</small><strong dir="ltr">{fmt(r.payment_account_number)}</strong></div>
-              <div><small>اسم المستفيد</small><strong>{fmt(r.payment_account_beneficiary)}</strong></div>
-              <div><small>التذاكر</small><strong>{(r.bookings?.booking_items||[]).map((x:any)=>`${x.ticket_types?.name||"تذكرة"} × ${x.quantity}`).join("، ")||"—"}</strong></div>
-              <div><small>مرجع التحويل</small><strong>{fmt(r.transfer_reference)}</strong></div>
-              <div><small>تاريخ الإرسال</small><strong>{r.created_at?new Date(r.created_at).toLocaleString("ar-SD"):"—"}</strong></div>
-              <div><small>الإيصال</small>{r.receipt_url?<a className="admin-payment-receipt" href={r.receipt_url} target="_blank" rel="noreferrer">عرض إيصال التحويل</a>:<strong>غير مرفق</strong>}</div>
-              {r.review_note&&<div className="admin-payment-note"><small>ملاحظة المراجعة</small><strong>{r.review_note}</strong></div>}
-            </div>
-            {pending&&<div className="admin-payment-actions">
-              <button className="admin-payment-approve" type="button" disabled={sectionLoading||!r.receipt_url} onClick={()=>void reviewPayment(r,"approve")}>قبول الدفع وإصدار التذاكر</button>
-              <div className="admin-payment-reject-box">
-                <label>سبب الرفض (سيصل للعميل)<textarea rows={2} value={rejectionReasons[r.id]||""} onChange={e=>setRejectionReasons(v=>({...v,[r.id]:e.target.value}))} placeholder="مثلاً: صورة الإيصال غير واضحة أو المبلغ غير مطابق..."/></label>
-                <button className="admin-payment-reject" type="button" disabled={sectionLoading||!(rejectionReasons[r.id]||"").trim()} onClick={()=>void reviewPayment(r,"reject")}>رفض وإرسال السبب</button>
-              </div>
-            </div>}
-          </article>;
-        })}
-      </div>;
-    }
     return <div className="admin-table-wrap"><table className="admin-data-table"><thead><tr>{cols.map(c=><th key={c.key}>{c.label}</th>)}</tr></thead><tbody>{rows.map((r,i)=><tr key={r.id||i}>{cols.map(c=><td key={c.key}>{c.format?c.format(r):fmt(r[c.key])}</td>)}</tr>)}</tbody></table>{rows.length===0&&<p className="admin-no-data">لا توجد سجلات حتى الآن.</p>}</div>;
   };
 
@@ -386,9 +325,8 @@ export default function AdminPage() {
       <div className="admin-content">
         <div className="admin-welcome"><div><span className="admin-eyebrow">لوحة التحكم</span><h2>مرحباً، {name}</h2><p>{supervisor?"راجع الحجوزات وإثباتات التحويل.":"تابع أداء منصة حاضر وأدر عملياتها من مكان واحد."}</p></div><div className="admin-welcome-mark"><LayoutDashboard size={30}/></div></div>
         {error&&<div className="admin-notice" role="status">{error}</div>}
-        {paymentActionMessage&&<div className="admin-notice" role="status">{paymentActionMessage}</div>}
         {section==="overview"&&<><div className="admin-metric-grid">{metrics.map(m=><article className="admin-metric" key={m.title}><span><m.icon size={20}/></span><small>{m.title}</small><strong>{dataReady?m.value.toLocaleString("ar-SD"):"—"}</strong></article>)}</div><div className="admin-panel"><div className="admin-panel-head"><div><h3>{supervisor?"المهام اليومية":"نظرة سريعة"}</h3><p>بيانات مباشرة من قاعدة بيانات حاضر</p></div></div><div className="admin-shortcuts">{(supervisor?["bookings","payments"] as Section[]:["events","bookings","payments","users","reports"] as Section[]).map(item=><button key={item} onClick={()=>setSection(item)}><span>{item==="events"?<CalendarDays/>:item==="bookings"?<Ticket/>:item==="payments"?<Wallet/>:item==="users"?<Users/>:<Activity/>}</span><b>{labels[item]}</b><ArrowRight size={16}/></button>)}</div></div></>}
-        {section==="events"?<AdminEventsWorkspace role={role}/>:section==="bookings"?<AdminBookingsWorkspace searchTerm={searchTerm} onSearchTermChange={setSearchTerm}/>:section!=="overview"&&<div className="admin-panel"><div className="admin-panel-head"><div><h3>{labels[section]}</h3><p>"السجلات الفعلية المحفوظة في قاعدة البيانات"</p></div><div className="admin-panel-actions">{section==="users"&&<label className="admin-search-box"><span>بحث بالرقم أو البريد أو الهاتف</span><input type="search" value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} placeholder="رقم الهاتف أو البريد الإلكتروني"/></label>}{section==="users"&&<span className="admin-user-total">عدد المستخدمين: {userTotal.toLocaleString("ar-SD")}</span>}<button className="admin-refresh" onClick={()=>void loadSection()} disabled={sectionLoading}><RefreshCw size={16}/> تحديث</button></div></div>{sectionLoading?<p className="admin-no-data">جاري تحميل البيانات...</p>:renderRows()}</div>}
+        {section==="events"?<AdminEventsWorkspace role={role}/>:section==="bookings"?<AdminBookingsWorkspace searchTerm={searchTerm} onSearchTermChange={setSearchTerm}/>:section==="payments"?<AdminPaymentsWorkspace/>:section!=="overview"&&<div className="admin-panel"><div className="admin-panel-head"><div><h3>{labels[section]}</h3><p>"السجلات الفعلية المحفوظة في قاعدة البيانات"</p></div><div className="admin-panel-actions">{section==="users"&&<label className="admin-search-box"><span>بحث بالرقم أو البريد أو الهاتف</span><input type="search" value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} placeholder="رقم الهاتف أو البريد الإلكتروني"/></label>}{section==="users"&&<span className="admin-user-total">عدد المستخدمين: {userTotal.toLocaleString("ar-SD")}</span>}<button className="admin-refresh" onClick={()=>void loadSection()} disabled={sectionLoading}><RefreshCw size={16}/> تحديث</button></div></div>{sectionLoading?<p className="admin-no-data">جاري تحميل البيانات...</p>:renderRows()}</div>}
         <footer className="admin-footer">حاضر · نظام إدارة الفعاليات والتذاكر <span>{roleLabel}</span></footer>
       </div>
     </section>
