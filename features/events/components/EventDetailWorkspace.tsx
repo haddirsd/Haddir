@@ -1,5 +1,6 @@
 "use client";
 
+import type { FormEvent } from "react";
 import { ArrowLeft, CalendarDays, ExternalLink, MapPin, Share2, Wallet } from "lucide-react";
 import type { EventItem } from "../events.types";
 import type { EventPaymentAccount } from "../../booking/booking.types";
@@ -31,7 +32,7 @@ type EventDetailWorkspaceProps = {
   onPaymentMethodChange: (value: string) => void;
   onCopyAccount: (accountNumber: string) => void;
   onReceiptChange: (file: File | null) => void;
-  onSubmitBooking: (event: React.FormEvent<HTMLFormElement>) => void;
+  onSubmitBooking: (event: FormEvent<HTMLFormElement>) => void;
   onGoNotifications: () => void;
 };
 
