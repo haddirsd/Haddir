@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getSupabaseBrowserClient } from "../lib/supabase";
 import { useBooking } from "../features/booking/useBooking";
 import { useEvents } from "../features/events/useEvents";
+import { formatEventDate, formatMoney } from "../features/events/events.formatters";
 import { useEventNavigation } from "../features/events/useEventNavigation";
 import { HomeEventsWorkspace } from "../features/events/components/HomeEventsWorkspace";
 import { EventDetailWorkspace } from "../features/events/components/EventDetailWorkspace";
@@ -12,13 +13,9 @@ import { useGatekeeper } from "../features/gatekeeper/useGatekeeper";
 import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
 import { Bell, CheckCircle2, House, Sparkles, Ticket, UserRound, ChevronLeft, ScanLine, ShieldCheck, ClipboardList } from "lucide-react";
 
-const formatEventDate=(value:string)=>new Intl.DateTimeFormat("ar-SD",{weekday:"long",day:"numeric",month:"long"}).format(new Date(value));
-
-const currencyLabel=(currency:string)=>({SDG:"ج.س",SAR:"ر.س",AED:"د.إ",USD:"$",EGP:"ج.م"}[currency.trim().toUpperCase()]||currency.trim().toUpperCase());
-const formatMoney=(value:number,currency="SDG")=>new Intl.NumberFormat("ar-SD").format(value)+" "+currencyLabel(currency);
 type Tab="home"|"tickets"|"notifications"|"profile";
 export default function Home(){
- const { events, eventsLoading, eventsError, ticketTypesError } = useEvents();
+ const { events, eventsLoading, eventsError, ticketTypesError, refreshEvents } = useEvents();
  const [activeTab,setActiveTab]=useState<Tab>("home"),[darkMode,setDarkMode]=useState(false),[loginEmail,setLoginEmail]=useState("");
  const [fullName,setFullName]=useState(""),[email,setEmail]=useState(""),[phone,setPhone]=useState(""),[avatarUrl,setAvatarUrl]=useState(""),[profileEditing,setProfileEditing]=useState(false),[saved,setSaved]=useState(false),[profileSaving,setProfileSaving]=useState(false);
  const [authUser,setAuthUser]=useState<{id:string;email?:string;user_metadata?:Record<string,unknown>}|null>(null),[userRole,setUserRole]=useState("customer"),[authMessage,setAuthMessage]=useState(""),[activeWorkspace,setActiveWorkspace]=useState<"customer"|"organizer"|"gatekeeper"|"advertiser"|"admin"|"owner"|null>(null);
@@ -137,7 +134,7 @@ export default function Home(){
   loading={eventsLoading}
   error={eventsError}
   onOpenEvent={openEvent}
-  onRetry={()=>window.location.reload()}
+  onRetry={()=>void refreshEvents()}
 />
  </>}
  {!isGatekeeperPage&&activeTab==="tickets"&&<TicketWorkspace
@@ -250,7 +247,7 @@ export default function Home(){
    onSelectTier={selectTier}
    onQuantityChange={changeQuantity}
    onContinueToPayment={openPayment}
-   onRetryTicketTypes={()=>window.location.reload()}
+   onRetryTicketTypes={()=>void refreshEvents()}
    onBackToDetails={backToDetails}
    onPaymentMethodChange={(value)=>{setPaymentMethod(value);setAccountCopied(false);setBookingError("");}}
    onCopyAccount={copyAccount}
