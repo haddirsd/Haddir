@@ -30,7 +30,7 @@ export default function AdvertiserWorkspace({
           <article><small>التذاكر ضمن طلبات مرفوضة</small><strong>{Number(statistics.totals?.rejected_tickets||0).toLocaleString("ar-SD")}</strong></article>
         </div>
         <h3 className="advertiser-stats-subtitle">ملخص المبيعات والمستحقات</h3>
-        {statistics.financials.length?statistics.financials.map(line=><article className="advertiser-finance-card" key={line.currency}>
+        {(statistics.financials||[]).length?(statistics.financials||[]).map(line=><article className="advertiser-finance-card" key={line.currency}>
           <div><small>إجمالي المبيعات المعتمدة</small><strong>{formatMoney(Number(line.sales||0),line.currency)}</strong></div>
           {Number(statistics.event.platform_fee_percent||0)>0&&<div><small>عمولة حاضر ({Number(statistics.event.platform_fee_percent)}%)</small><strong>{formatMoney(Number(line.platform_fee||0),line.currency)}</strong></div>}
           <div className="advertiser-net"><small>صافي مستحقات المعلن</small><strong>{formatMoney(Number(line.advertiser_net||0),line.currency)}</strong></div>
