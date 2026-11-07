@@ -2,7 +2,6 @@
 
 import { useState, type FormEvent } from "react";
 import { RefreshCw } from "lucide-react";
-import { getSupabaseBrowserClient } from "../../../lib/supabase";
 import { deleteOrCancelAdminEvent, getAdminEventEditorData, publishDraftAdminEvent, saveAdminEvent } from "./admin-events.service";
 import { useAdminEvents } from "./useAdminEvents";
 import type { AdminEventAccountForm, AdminEventFormValues, AdminEventRole, AdminEventRow, AdminTicketForm } from "./admin-events.types";
@@ -59,15 +58,12 @@ export default function AdminEventsWorkspace({ role }: { role: AdminEventRole })
 
     const createEvent = async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      const supabase = getSupabaseBrowserClient();
-      if (!supabase || !role || !["owner","admin"].includes(role)) return;
+      if (!role || !["owner","admin"].includes(role)) return;
       setSavingEvent(true);
       setEventMessage("");
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) { setEventMessage("انتهت الجلسة، سجل الدخول مرة أخرى."); return; }
         const result = await saveAdminEvent({
-          userId: user.id, eventForm, ticketForms, eventAccountForms, coverFile, editingEventId,
+          eventForm, ticketForms, eventAccountForms, coverFile, editingEventId,
         });
         if (result.error) { setEventMessage(result.error); return; }
         setEventMessage(result.message || "تم حفظ الفعالية بنجاح.");
