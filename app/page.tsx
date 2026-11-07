@@ -342,8 +342,9 @@ export default function Home(){
        onContinue={openPayment}
        onRetry={()=>window.location.reload()}
      />
-
- </div>:<div className="detail-sheet event-detail-layout payment-sheet">
+    </div>
+   </div>
+  </div>:<div className="detail-sheet event-detail-layout payment-sheet">
     <div className="checkout-topbar">
      <div className="checkout-back-group"><button type="button" className="detail-glass-button checkout-back-icon" aria-label="العودة للتفاصيل" onClick={backToDetails}><ArrowLeft size={20}/></button><span>العودة للتفاصيل</span></div>
      <span className="checkout-wallet-icon" aria-label="المحفظة"><Wallet size={23}/></span>
