@@ -6,6 +6,7 @@ import { getSupabaseBrowserClient } from "../../lib/supabase";
 import AdminEventsWorkspace from "../../features/events/admin/AdminEventsWorkspace";
 import AdminBookingsWorkspace from "../../features/booking/admin/AdminBookingsWorkspace";
 import AdminPaymentsWorkspace from "../../features/booking/admin/AdminPaymentsWorkspace";
+import AdminUsersWorkspace from "../../features/users/admin/AdminUsersWorkspace";
 import { Activity, ArrowRight, BadgeCheck, Banknote, CalendarDays, ClipboardCheck, LayoutDashboard, LogOut, Shield, Ticket, Users, Wallet, RefreshCw } from "lucide-react";
 
 type AdminRole = "owner" | "admin" | "supervisor";
@@ -27,16 +28,10 @@ export default function AdminPage() {
   const [rows, setRows] = useState<Row[]>([]);
   const [counts, setCounts] = useState({ events: 0, bookings: 0, pending: 0, users: 0, confirmed: 0, revenue: 0 });
   const [dataReady, setDataReady] = useState(false);
-  const [updatingUserId,setUpdatingUserId]=useState<string|null>(null);
-  const [userMessage,setUserMessage]=useState("");
-  const [eventOptions,setEventOptions]=useState<Row[]>([]);
-  const [roleDrafts,setRoleDrafts]=useState<Record<string,string>>({});
-  const [assignmentEventIds,setAssignmentEventIds]=useState<Record<string,string>>({});
   const [statistics,setStatistics]=useState<{events:Row[];profiles:Row[];bookings:Row[];tickets:Row[]}|null>(null);
   const [statsView,setStatsView]=useState<"general"|"event">("general");
   const [statsEventId,setStatsEventId]=useState("");
   const [searchTerm,setSearchTerm]=useState("");
-  const [userTotal,setUserTotal]=useState(0);
   const [darkMode,setDarkMode]=useState(false);
 
   useEffect(() => {
@@ -88,31 +83,10 @@ export default function AdminPage() {
 
   const loadSection = async () => {
     const supabase = getSupabaseBrowserClient();
-    if (!supabase || !role || section === "overview" || section === "events" || section === "bookings" || section === "payments") return;
+    if (!supabase || !role || section === "overview" || section === "events" || section === "bookings" || section === "payments" || section === "users") return;
     setSectionLoading(true); setError(""); setRows([]);
     let result: {data:any[]|null,error:any} = {data:[],error:null};
     if (section === "activity") result = await supabase.from("admin_activity_log").select("id,actor_name,actor_role,action,entity_type,entity_label,event_id,booking_id,details,created_at,events(title)").order("created_at",{ascending:false}).limit(500);
-    if (section === "users" && role !== "supervisor") {
-      const term=searchTerm.trim().replace(/[(),]/g," ").replace(/[%_]/g,"");
-      const [{data:userRows,error:userError},{count:totalCount,error:countError}]=await Promise.all([
-        supabase.rpc("admin_search_profiles",{p_query:term||null,p_limit:100,p_offset:0}),
-        supabase.from("profiles").select("id",{count:"exact",head:true})
-      ]);
-      result={data:userRows||null,error:userError||countError};
-      setUserTotal(totalCount||0);
-      if (!result.error) {
-        const [{data:assignments,error:assignmentError},{data:events,error:eventError}] = await Promise.all([
-          supabase.from("event_role_assignments").select("user_id,event_id,assignment_role"),
-          supabase.from("events").select("id,title,status").in("status",["draft","published"]).order("created_at",{ascending:false}).limit(200)
-        ]);
-        if (assignmentError || eventError) { result = {data:null,error:assignmentError||eventError}; }
-        else {
-          setEventOptions(events||[]);
-          const byUser = new Map((assignments||[]).map((a:any)=>[a.user_id,a.event_id]));
-          result = {data:(result.data||[]).map((u:any)=>({...u,assignment_event_id:byUser.get(u.id)||""})),error:null};
-        }
-      }
-    }
     if (section === "reports" && role !== "supervisor") {
       const fetchAll = async (table:string, columns:string, sort:string) => {
         const all:Row[]=[]; let offset=0;
@@ -170,25 +144,6 @@ export default function AdminPage() {
      channel.subscribe();
      return()=>{void supabase.removeChannel(channel);};
    },[section,role,searchTerm]);
-
-  const updateUserRole = async (userRow:Row, nextRole:string, eventId:string|null) => {
-    const supabase=getSupabaseBrowserClient();
-    if(!supabase||!role||!["owner","admin"].includes(role)||updatingUserId)return;
-    if(userRow.role==="owner"){setError("لا يمكن تغيير صلاحية مالك المنصة.");return;}
-    if(!["admin","supervisor","gatekeeper","advertiser","customer"].includes(nextRole))return;
-    if((nextRole==="gatekeeper"||nextRole==="advertiser")&&!eventId){setError("اختار الفعالية أولاً لهذا المستخدم.");return;}
-    const {data:{user}}=await supabase.auth.getUser();
-    if(user?.id===userRow.id){setError("لا يمكنك تغيير دور حسابك الحالي من هنا.");return;}
-    if(!window.confirm("تأكيد تغيير دور "+(userRow.full_name||"هذا المستخدم")+"؟"))return;
-    setUpdatingUserId(userRow.id);setError("");setUserMessage("");
-    const {error:updateError}=await supabase.rpc("admin_update_profile_role",{p_user_id:userRow.id,p_role:nextRole,p_event_id:eventId});
-    setUpdatingUserId(null);
-    if(updateError){setError("تعذر تعديل دور المستخدم: "+updateError.message);return;}
-    setRows(current=>current.map(item=>item.id===userRow.id?{...item,role:nextRole,assignment_event_id:eventId||""}:item));
-    setRoleDrafts(v=>({...v,[userRow.id]:nextRole}));
-    setAssignmentEventIds(v=>({...v,[userRow.id]:eventId||""}));
-    setUserMessage("تم تحديث دور المستخدم بنجاح.");
-  };
 
   const signOut = async () => { const supabase = getSupabaseBrowserClient(); if (supabase) await supabase.auth.signOut(); router.replace("/"); };
 
@@ -272,44 +227,9 @@ export default function AdminPage() {
     }
     const columns: Record<string,{key:string,label:string,format?:(r:Row)=>string}[]> = {
       events:[{key:"title",label:"الفعالية"},{key:"category",label:"التصنيف"},{key:"city",label:"المدينة"},{key:"venue",label:"الموقع"},{key:"starts_at",label:"الموعد",format:r=>r.starts_at?new Date(r.starts_at).toLocaleString("ar-SD"):"—"},{key:"status",label:"الحالة",format:r=>statusLabels[r.status]||fmt(r.status)}],
-      users:[{key:"full_name",label:"الاسم"},{key:"phone",label:"الهاتف"},{key:"role",label:"الدور"},{key:"created_at",label:"تاريخ التسجيل",format:r=>new Date(r.created_at).toLocaleDateString("ar-SD")}]
+
     };
     const cols=columns[section]||[];
-    if(section==="users"){
-      const roleNames:Record<string,string>={owner:"مالك المنصة",admin:"مشرف",supervisor:"موظف حاضر",organizer:"منظم حاضر",gatekeeper:"منظم حاضر",advertiser:"مُعلن",customer:"عميل"};
-      return <div className="admin-users-table-wrap">
-        <table className="admin-users-table">
-          <thead><tr><th>الإسم</th><th>رقم الهاتف</th><th>الدور</th><th>تاريخ التسجيل</th><th>تعديل الدور / الفعالية</th></tr></thead>
-          <tbody>{rows.map((r,i)=>{
-            const draftRole=roleDrafts[r.id]||r.role||"customer";
-            const selectedEvent=assignmentEventIds[r.id]??r.assignment_event_id??"";
-            const protectedUser=r.role==="owner";
-            return <tr key={r.id||i}>
-              <td data-label="الإسم"><strong>{fmt(r.full_name)}</strong></td>
-              <td data-label="رقم الهاتف"><span dir="ltr">{fmt(r.phone)}</span><small className="admin-user-email" dir="ltr">{fmt(r.email)}</small></td>
-              <td data-label="الدور"><span className="admin-user-role">{roleNames[r.role]||fmt(r.role)}</span></td>
-              <td data-label="تاريخ التسجيل">{r.created_at?new Date(r.created_at).toLocaleDateString("ar-SD"):"—"}</td>
-              <td data-label="تعديل الدور / الفعالية">
-                <div className="admin-user-role-editor">
-                  <select aria-label={"تعديل دور "+(r.full_name||"المستخدم")} value={draftRole} disabled={updatingUserId===r.id||protectedUser} onChange={e=>setRoleDrafts(v=>({...v,[r.id]:e.target.value}))}>
-                    <option value="customer">عميل</option><option value="admin">مشرف إداري</option><option value="supervisor">موظف حاضر</option><option value="gatekeeper">منظم حاضر (بواب)</option><option value="advertiser">مُعلن</option>
-                    {r.role==="organizer"&&<option value="organizer">منظم حاضر</option>}
-                    {protectedUser&&<option value={r.role}>{roleNames[r.role]||r.role}</option>}
-                  </select>
-                  {(draftRole==="gatekeeper"||draftRole==="advertiser"||draftRole==="organizer")&&<select aria-label="اختيار الفعالية" value={selectedEvent} disabled={updatingUserId===r.id} onChange={e=>setAssignmentEventIds(v=>({...v,[r.id]:e.target.value}))}>
-                    <option value="">اختر الفعالية (تشمل المسودات)</option>
-                    {eventOptions.map((ev:any)=><option key={ev.id} value={ev.id}>{ev.title} · {ev.status==="draft"?"مسودة":ev.status==="published"?"منشورة":ev.status}</option>)}
-                  </select>}
-                  {!protectedUser&&<button type="button" className="admin-user-save-role" disabled={updatingUserId===r.id||draftRole==="organizer"||((draftRole==="gatekeeper"||draftRole==="advertiser")&&!selectedEvent)||draftRole===r.role&&((draftRole!=="gatekeeper"&&draftRole!=="advertiser")||selectedEvent===(r.assignment_event_id||""))} onClick={()=>void updateUserRole(r,draftRole,(draftRole==="gatekeeper"||draftRole==="advertiser")?selectedEvent:null)}>{updatingUserId===r.id?"جاري الحفظ…":"حفظ"}</button>}
-                </div>
-                {updatingUserId===r.id&&<small className="admin-user-saving">جاري الحفظ…</small>}
-              </td>
-            </tr>;
-          })}</tbody>
-        </table>
-        {rows.length===0&&<p className="admin-no-data">لا يوجد مستخدمون مسجلون حتى الآن.</p>}
-      </div>;
-    }
     return <div className="admin-table-wrap"><table className="admin-data-table"><thead><tr>{cols.map(c=><th key={c.key}>{c.label}</th>)}</tr></thead><tbody>{rows.map((r,i)=><tr key={r.id||i}>{cols.map(c=><td key={c.key}>{c.format?c.format(r):fmt(r[c.key])}</td>)}</tr>)}</tbody></table>{rows.length===0&&<p className="admin-no-data">لا توجد سجلات حتى الآن.</p>}</div>;
   };
 
@@ -326,7 +246,7 @@ export default function AdminPage() {
         <div className="admin-welcome"><div><span className="admin-eyebrow">لوحة التحكم</span><h2>مرحباً، {name}</h2><p>{supervisor?"راجع الحجوزات وإثباتات التحويل.":"تابع أداء منصة حاضر وأدر عملياتها من مكان واحد."}</p></div><div className="admin-welcome-mark"><LayoutDashboard size={30}/></div></div>
         {error&&<div className="admin-notice" role="status">{error}</div>}
         {section==="overview"&&<><div className="admin-metric-grid">{metrics.map(m=><article className="admin-metric" key={m.title}><span><m.icon size={20}/></span><small>{m.title}</small><strong>{dataReady?m.value.toLocaleString("ar-SD"):"—"}</strong></article>)}</div><div className="admin-panel"><div className="admin-panel-head"><div><h3>{supervisor?"المهام اليومية":"نظرة سريعة"}</h3><p>بيانات مباشرة من قاعدة بيانات حاضر</p></div></div><div className="admin-shortcuts">{(supervisor?["bookings","payments"] as Section[]:["events","bookings","payments","users","reports"] as Section[]).map(item=><button key={item} onClick={()=>setSection(item)}><span>{item==="events"?<CalendarDays/>:item==="bookings"?<Ticket/>:item==="payments"?<Wallet/>:item==="users"?<Users/>:<Activity/>}</span><b>{labels[item]}</b><ArrowRight size={16}/></button>)}</div></div></>}
-        {section==="events"?<AdminEventsWorkspace role={role}/>:section==="bookings"?<AdminBookingsWorkspace searchTerm={searchTerm} onSearchTermChange={setSearchTerm}/>:section==="payments"?<AdminPaymentsWorkspace/>:section!=="overview"&&<div className="admin-panel"><div className="admin-panel-head"><div><h3>{labels[section]}</h3><p>"السجلات الفعلية المحفوظة في قاعدة البيانات"</p></div><div className="admin-panel-actions">{section==="users"&&<label className="admin-search-box"><span>بحث بالرقم أو البريد أو الهاتف</span><input type="search" value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} placeholder="رقم الهاتف أو البريد الإلكتروني"/></label>}{section==="users"&&<span className="admin-user-total">عدد المستخدمين: {userTotal.toLocaleString("ar-SD")}</span>}<button className="admin-refresh" onClick={()=>void loadSection()} disabled={sectionLoading}><RefreshCw size={16}/> تحديث</button></div></div>{sectionLoading?<p className="admin-no-data">جاري تحميل البيانات...</p>:renderRows()}</div>}
+        {section==="events"?<AdminEventsWorkspace role={role}/>:section==="bookings"?<AdminBookingsWorkspace searchTerm={searchTerm} onSearchTermChange={setSearchTerm}/>:section==="payments"?<AdminPaymentsWorkspace/>:section==="users"?<AdminUsersWorkspace role={role} searchTerm={searchTerm} onSearchTermChange={setSearchTerm}/>:section!=="overview"&&<div className="admin-panel"><div className="admin-panel-head"><div><h3>{labels[section]}</h3><p>"السجلات الفعلية المحفوظة في قاعدة البيانات"</p></div><div className="admin-panel-actions">{}<button className="admin-refresh" onClick={()=>void loadSection()} disabled={sectionLoading}><RefreshCw size={16}/> تحديث</button></div></div>{sectionLoading?<p className="admin-no-data">جاري تحميل البيانات...</p>:renderRows()}</div>}
         <footer className="admin-footer">حاضر · نظام إدارة الفعاليات والتذاكر <span>{roleLabel}</span></footer>
       </div>
     </section>
