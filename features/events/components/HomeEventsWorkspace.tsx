@@ -1,0 +1,229 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { CalendarDays, MapPin } from "lucide-react";
+import type { EventItem } from "../events.types";
+
+type HomeEventsWorkspaceProps = {
+  events: EventItem[];
+  loading: boolean;
+  error: string;
+  onOpenEvent: (eventId: string) => void;
+  onRetry: () => void;
+};
+
+export function HomeEventsWorkspace({
+  events,
+  loading,
+  error,
+  onOpenEvent,
+  onRetry,
+}: HomeEventsWorkspaceProps) {
+  const trendingEvents = events.filter((event) => event.isTrending);
+  const trendingDisplayEvents = [...trendingEvents].reverse();
+  const trendingLoopEvents =
+    trendingDisplayEvents.length > 1
+      ? [...trendingDisplayEvents, ...trendingDisplayEvents, ...trendingDisplayEvents]
+      : trendingDisplayEvents;
+  const trendingCarouselRef = useRef<HTMLDivElement | null>(null);
+  const [trendingPaused, setTrendingPaused] = useState(false);
+
+  useEffect(() => {
+    const count = trendingEvents.length;
+    const carousel = trendingCarouselRef.current;
+    if (count < 2 || !carousel || trendingPaused) return;
+
+    let index = count * 2 - 1;
+    let resetTimer: number | undefined;
+
+    const centerCard = (cardIndex: number, behavior: ScrollBehavior) => {
+      const cards = carousel.querySelectorAll<HTMLElement>(".trending-card");
+      const card = cards[cardIndex];
+      if (!card) return;
+      const box = carousel.getBoundingClientRect();
+      const rect = card.getBoundingClientRect();
+      const left =
+        rect.left -
+        box.left +
+        carousel.scrollLeft -
+        (carousel.clientWidth - card.clientWidth) / 2;
+
+      if (behavior === "auto") {
+        carousel.style.scrollBehavior = "auto";
+        carousel.scrollLeft = left;
+        carousel.style.scrollBehavior = "";
+      } else {
+        carousel.scrollTo({ left, behavior });
+      }
+    };
+
+    const initialFrame = window.requestAnimationFrame(() =>
+      centerCard(index, "auto")
+    );
+    const interval = window.setInterval(() => {
+      index -= 1;
+      centerCard(index, "smooth");
+      if (index <= count - 1) {
+        resetTimer = window.setTimeout(() => {
+          index = count * 2 - 1;
+          centerCard(index, "auto");
+        }, 720);
+      }
+    }, 3000);
+
+    return () => {
+      window.cancelAnimationFrame(initialFrame);
+      window.clearInterval(interval);
+      if (resetTimer !== undefined) window.clearTimeout(resetTimer);
+    };
+  }, [trendingEvents.length, trendingPaused]);
+
+  return (
+    <section className="home-discovery redesigned-home" id="events">
+      <div className="container">
+        {loading ? (
+          <div className="empty-state">
+            <strong>جاري تحميل الفعاليات...</strong>
+          </div>
+        ) : error ? (
+          <div className="empty-state" role="alert">
+            <strong>ما قدرنا نحمّل الفعاليات</strong>
+            <p>{error}</p>
+            <button className="btn btn-outline" onClick={onRetry}>
+              إعادة المحاولة
+            </button>
+          </div>
+        ) : (
+          <>
+            <section className="trending-section">
+              <div className="redesign-section-head">
+                <div className="redesign-title">
+                  <h2>رائج الآن</h2>
+                  <span className="trending-dot" aria-hidden="true" />
+                </div>
+              </div>
+              {trendingEvents.length ? (
+                <div
+                  ref={trendingCarouselRef}
+                  className="trending-carousel hide-scrollbar"
+                  dir="ltr"
+                  onMouseEnter={() => setTrendingPaused(true)}
+                  onMouseLeave={() => setTrendingPaused(false)}
+                  onTouchStart={() => setTrendingPaused(true)}
+                  onTouchEnd={() => setTrendingPaused(false)}
+                  onTouchCancel={() => setTrendingPaused(false)}
+                >
+                  {trendingLoopEvents.map((event, index) => (
+                    <article
+                      className="trending-card snap-item"
+                      key={event.id + "-loop-" + index}
+                      role="button"
+                      tabIndex={index >= trendingEvents.length ? -1 : 0}
+                      aria-hidden={index >= trendingEvents.length}
+                      aria-label={"عرض تفاصيل " + event.title}
+                      onClick={() => onOpenEvent(event.id)}
+                      onKeyDown={(keyboardEvent) => {
+                        if (
+                          keyboardEvent.key === "Enter" ||
+                          keyboardEvent.key === " "
+                        ) {
+                          keyboardEvent.preventDefault();
+                          onOpenEvent(event.id);
+                        }
+                      }}
+                    >
+                      <div className={"trending-card-media " + event.cover}>
+                        {event.coverImageUrl ? (
+                          <img
+                            src={event.coverImageUrl}
+                            alt={index >= trendingEvents.length ? "" : event.title}
+                            loading="lazy"
+                          />
+                        ) : (
+                          <span className="trending-placeholder">✦</span>
+                        )}
+                        <div className="trending-overlay" />
+                        <span className="trending-category">{event.category}</span>
+                        <span className="trending-price">{event.price}</span>
+                        <div className="trending-card-copy">
+                          <h3>{event.title}</h3>
+                          <div>
+                            <CalendarDays size={14} />
+                            <span>{event.date} · {event.time}</span>
+                          </div>
+                          <div>
+                            <MapPin size={14} />
+                            <span>{event.venue || event.place}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <div className="empty-state">ما في فعاليات رائجة حالياً.</div>
+              )}
+            </section>
+
+            <section className="more-events redesigned-more">
+              <div className="redesign-section-head">
+                <h2>فعاليات أخرى</h2>
+                <span>{events.filter((event) => !event.isTrending).length} فعاليات</span>
+              </div>
+              {events.some((event) => !event.isTrending) ? (
+                <div className="event-list">
+                  {events
+                    .filter((event) => !event.isTrending)
+                    .map((event) => (
+                      <article
+                        className="event-list-card event-card-clickable"
+                        key={event.id}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={"عرض تفاصيل " + event.title}
+                        onClick={() => onOpenEvent(event.id)}
+                        onKeyDown={(keyboardEvent) => {
+                          if (
+                            keyboardEvent.key === "Enter" ||
+                            keyboardEvent.key === " "
+                          ) {
+                            keyboardEvent.preventDefault();
+                            onOpenEvent(event.id);
+                          }
+                        }}
+                      >
+                        <div className={"event-list-thumb " + event.cover}>
+                          {event.coverImageUrl ? (
+                            <img src={event.coverImageUrl} alt={event.title} loading="lazy" />
+                          ) : (
+                            <span>✦</span>
+                          )}
+                        </div>
+                        <div className="event-list-info">
+                          <h3>{event.title}</h3>
+                          <div className="event-list-top">
+                            <span>{event.category}</span>
+                            <strong>{event.price}</strong>
+                          </div>
+                          <p>
+                            <CalendarDays size={13} />
+                            {event.date} · {event.time}
+                          </p>
+                          <p>
+                            <MapPin size={13} />
+                            {event.venue || event.place}
+                          </p>
+                        </div>
+                      </article>
+                    ))}
+                </div>
+              ) : (
+                <div className="empty-state">ما في فعاليات أخرى حالياً.</div>
+              )}
+            </section>
+          </>
+        )}
+      </div>
+    </section>
+  );
+}
