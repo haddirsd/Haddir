@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { RefreshCw } from "lucide-react";
 import { getSupabaseBrowserClient } from "../../../lib/supabase";
 import { deleteOrCancelAdminEvent, getAdminEventEditorData, publishDraftAdminEvent } from "./admin-events.service";
@@ -19,7 +19,7 @@ export default function AdminEventsWorkspace({ role }: { role: AdminEventRole })
     const [editingEventId, setEditingEventId] = useState<string | null>(null);
     const emptyEventForm = {title:"",description:"",category:"",city:"",venue:"",address:"",location_url:"",starts_at:"",ends_at:"",cover_image_url:"",is_trending:false,platform_fee_percent:"0"};
     const emptyTicket = ():AdminTicketForm => ({name:"تذكرة عامة",description:"",price:"",currency:"SDG",quantity_total:"",quantity_sold:0,sales_start_at:"",sales_end_at:"",is_active:true});
-    const [ticketForms,setTicketForms] = useState<TicketForm[]>([emptyTicket()]);
+    const [ticketForms,setTicketForms] = useState<AdminTicketForm[]>([emptyTicket()]);
     const [eventAccountForms,setEventAccountForms]=useState<AdminEventAccountForm[]>([]);
     const [eventForm, setEventForm] = useState<AdminEventFormValues>(emptyEventForm);
     const [coverFile, setCoverFile] = useState<File | null>(null);
