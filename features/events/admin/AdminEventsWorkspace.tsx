@@ -13,10 +13,6 @@ const fmt = (v: unknown) => v == null || v === "" ? "—" : String(v);
 export default function AdminEventsWorkspace({ role }: { role: AdminRole }) {
   const [rows,setRows]=useState<Row[]>([]);
   const [loading,setLoading]=useState(false);
-  const [showEventForm,setShowEventForm]=useState(false);
-  const [savingEvent,setSavingEvent]=useState(false);
-  const [eventMessage,setEventMessage]=useState("");
-  const [editingEventId,setEditingEventId]=useState<string|null>(null);
   const [showEventForm, setShowEventForm] = useState(false);
     const [savingEvent, setSavingEvent] = useState(false);
     const [eventMessage, setEventMessage] = useState("");
@@ -95,7 +91,7 @@ export default function AdminEventsWorkspace({ role }: { role: AdminRole }) {
       setShowEventForm(true);setEventMessage("");window.scrollTo({top:0,behavior:"smooth"});
     };
   
-    const createEvent = async (e: React.FormEvent<HTMLFormElement>) => {
+    const createEvent = async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       const supabase = getSupabaseBrowserClient();
       if (!supabase || !role || !["owner","admin"].includes(role)) return;
@@ -177,8 +173,8 @@ export default function AdminEventsWorkspace({ role }: { role: AdminRole }) {
           </div>
           {(role==="owner"||role==="admin")&&<div className="admin-event-card-actions">
             <button className="admin-event-edit" type="button" disabled={loading} onClick={()=>editEvent(r)}>تعديل</button>
-            <button className="admin-event-delete" type="button" disabled={sectionLoading} onClick={()=>void deleteEvent(r)}>حذف</button>
-            {r.status==="draft"?<button className="admin-create-button" type="button" disabled={sectionLoading} onClick={()=>void publishEvent(r.id)}>نشر الفعالية</button>:null}
+            <button className="admin-event-delete" type="button" disabled={loading} onClick={()=>void deleteEvent(r)}>حذف</button>
+            {r.status==="draft"?<button className="admin-create-button" type="button" disabled={loading} onClick={()=>void publishEvent(r.id)}>نشر الفعالية</button>:null}
             {r.is_trending?<small>رائج الآن</small>:null}
           </div>}
         </article>)}
