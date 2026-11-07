@@ -3,94 +3,60 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { RefreshCw } from "lucide-react";
 import { getSupabaseBrowserClient } from "../../../lib/supabase";
+import { deleteOrCancelAdminEvent, getAdminEventEditorData, publishDraftAdminEvent } from "./admin-events.service";
+import { useAdminEvents } from "./useAdminEvents";
+import type { AdminEventAccountForm, AdminEventFormValues, AdminEventRole, AdminEventRow, AdminTicketForm } from "./admin-events.types";
 
-type AdminRole = "owner" | "admin" | "supervisor";
-type Row = Record<string, any>;
 
 const statusLabels: Record<string, string> = { draft:"مسودة", published:"منشورة", cancelled:"ملغاة", completed:"مكتملة" };
 const fmt = (v: unknown) => v == null || v === "" ? "—" : String(v);
 
-export default function AdminEventsWorkspace({ role }: { role: AdminRole }) {
-  const [rows,setRows]=useState<Row[]>([]);
-  const [loading,setLoading]=useState(false);
+export default function AdminEventsWorkspace({ role }: { role: AdminEventRole }) {
+  const { rows, loading, loadError, refreshEvents: loadEvents } = useAdminEvents();
   const [showEventForm, setShowEventForm] = useState(false);
     const [savingEvent, setSavingEvent] = useState(false);
     const [eventMessage, setEventMessage] = useState("");
     const [editingEventId, setEditingEventId] = useState<string | null>(null);
     const emptyEventForm = {title:"",description:"",category:"",city:"",venue:"",address:"",location_url:"",starts_at:"",ends_at:"",cover_image_url:"",is_trending:false,platform_fee_percent:"0"};
-    type TicketForm = {id?:string;name:string;description:string;price:string;currency:string;quantity_total:string;quantity_sold:number;sales_start_at:string;sales_end_at:string;is_active:boolean};
-    const emptyTicket = ():TicketForm => ({name:"تذكرة عامة",description:"",price:"",currency:"SDG",quantity_total:"",quantity_sold:0,sales_start_at:"",sales_end_at:"",is_active:true});
+    const emptyTicket = ():AdminTicketForm => ({name:"تذكرة عامة",description:"",price:"",currency:"SDG",quantity_total:"",quantity_sold:0,sales_start_at:"",sales_end_at:"",is_active:true});
     const [ticketForms,setTicketForms] = useState<TicketForm[]>([emptyTicket()]);
-    type EventAccountForm={id?:string;account_name:string;account_number:string;beneficiary:string;is_active:boolean;sort_order:number};
-    const [eventAccountForms,setEventAccountForms]=useState<EventAccountForm[]>([]);
-    const [eventForm, setEventForm] = useState(emptyEventForm);
+    const [eventAccountForms,setEventAccountForms]=useState<AdminEventAccountForm[]>([]);
+    const [eventForm, setEventForm] = useState<AdminEventFormValues>(emptyEventForm);
     const [coverFile, setCoverFile] = useState<File | null>(null);
     const [coverPreview, setCoverPreview] = useState("");
   
-  const loadEvents = async () => {
-    const supabase=getSupabaseBrowserClient();
-    if(!supabase)return;
-    setLoading(true);
-    const {data,error}=await supabase.from("events").select("id,title,category,city,venue,starts_at,status,created_at,is_trending,description,address,location_url,ends_at,cover_image_url,platform_fee_percent").order("created_at",{ascending:false}).limit(100);
-    setLoading(false);
-    if(error){setEventMessage("تعذر تحميل الفعاليات: "+error.message);return;}
-    setRows(data||[]);
-  };
-
-  useEffect(()=>{
-    void loadEvents();
-    const supabase=getSupabaseBrowserClient();
-    if(!supabase)return;
-    const channel=supabase.channel("admin-events-workspace")
-      .on("postgres_changes",{event:"*",schema:"public",table:"events"},()=>void loadEvents())
-      .on("postgres_changes",{event:"*",schema:"public",table:"ticket_types"},()=>void loadEvents())
-      .on("postgres_changes",{event:"*",schema:"public",table:"event_payment_accounts"},()=>void loadEvents())
-      .subscribe();
-    return()=>{void supabase.removeChannel(channel);};
-  },[]);
-
-    const deleteEvent = async (r:Row) => {
-      const supabase=getSupabaseBrowserClient();if(!supabase||!role||!["owner","admin"].includes(role))return;
-      if(!window.confirm("حذف الفعالية «"+r.title+"»؟ إذا كانت مرتبطة بحجوزات أو تذاكر صادرة فسيتم إلغاؤها وإخفاؤها مع الاحتفاظ بالسجلات المالية والتذاكر السابقة."))return;
-      setLoading(true);
-      const [{count:bookings},{count:tickets}] = await Promise.all([
-        supabase.from("bookings").select("id",{count:"exact",head:true}).eq("event_id",r.id),
-        supabase.from("tickets").select("id",{count:"exact",head:true}).eq("event_id",r.id)
-      ]);
-      if((bookings||0)>0||(tickets||0)>0){
-        const {error}=await supabase.from("events").update({status:"cancelled",is_trending:false}).eq("id",r.id);
-        if(!error) await supabase.from("ticket_types").update({is_active:false}).eq("event_id",r.id);
-        setLoading(false);if(error){setEventMessage("تعذر إلغاء الفعالية: "+error.message);return;}
-        setEventMessage("الفعالية مرتبطة بحجوزات/تذاكر؛ ألغيناها وأخفيناها مع الاحتفاظ بالسجلات.");await loadEvents();return;
-      }
-      const {error}=await supabase.from("events").delete().eq("id",r.id);
-      setLoading(false);if(error){setEventMessage("تعذر حذف الفعالية: "+error.message);return;}
-      setEventMessage("تم حذف الفعالية نهائياً.");await loadEvents();
+    const deleteEvent = async (r: AdminEventRow) => {
+      if (!role || !["owner","admin"].includes(role)) return;
+      if (!window.confirm("حذف الفعالية «"+r.title+"»؟ إذا كانت مرتبطة بحجوزات أو تذاكر صادرة فسيتم إلغاؤها وإخفاؤها مع الاحتفاظ بالسجلات المالية والتذاكر السابقة.")) return;
+      setEventMessage("");
+      const result = await deleteOrCancelAdminEvent(r.id);
+      if (result.error) { setEventMessage(result.error); return; }
+      setEventMessage(result.message);
+      await loadEvents();
     };
-  
+
     const publishEvent = async (eventId: string) => {
-      const supabase = getSupabaseBrowserClient();
-      if (!supabase || !role || !["owner","admin"].includes(role)) return;
-      const confirmed = window.confirm("هل تريد نشر هذه الفعالية الآن؟ ستصبح ظاهرة للزوار.");
-      if (!confirmed) return;
-      setLoading(true);
-      const { error } = await supabase.from("events").update({ status: "published" }).eq("id", eventId).eq("status", "draft");
-      setLoading(false);
-      if (error) { setEventMessage("تعذر نشر الفعالية: " + error.message); return; }
+      if (!role || !["owner","admin"].includes(role)) return;
+      if (!window.confirm("هل تريد نشر هذه الفعالية الآن؟ ستصبح ظاهرة للزوار.")) return;
+      const result = await publishDraftAdminEvent(eventId);
+      if (result.error) { setEventMessage(result.error); return; }
       setEventMessage("تم إرسال طلب النشر بنجاح.");
       await loadEvents();
     };
-  
-    const editEvent = (r: Row) => {
+
+    const editEvent = async (r: AdminEventRow) => {
       setEditingEventId(r.id);
       const localDate=(v:string|null)=>v?new Date(new Date(v).getTime()-new Date(v).getTimezoneOffset()*60000).toISOString().slice(0,16):"";
       setEventForm({...emptyEventForm,title:r.title||"",description:r.description||"",category:r.category||"",city:r.city||"",venue:r.venue||"",address:r.address||"",location_url:r.location_url||"",starts_at:localDate(r.starts_at),ends_at:localDate(r.ends_at),cover_image_url:r.cover_image_url||"",is_trending:!!r.is_trending,platform_fee_percent:String(r.platform_fee_percent??0)});
       setCoverFile(null);setCoverPreview(r.cover_image_url||"");
-      const supabase=getSupabaseBrowserClient();
-      void (async()=>{if(!supabase)return;const {data:accounts,error:accountsError}=await supabase.from("event_payment_accounts").select("id,account_name,account_number,beneficiary,is_active,sort_order").eq("event_id",r.id).order("sort_order");if(accountsError){setEventMessage("تعذر تحميل حسابات الفعالية: "+accountsError.message);return;}setEventAccountForms((accounts||[]).map((a:any)=>({id:a.id,account_name:a.account_name,account_number:a.account_number,beneficiary:a.beneficiary||"",is_active:a.is_active,sort_order:a.sort_order})));const {data,error}=await supabase.from("ticket_types").select("id,name,description,price,currency,quantity_total,quantity_sold,sales_start_at,sales_end_at,is_active").eq("event_id",r.id).order("created_at",{ascending:true});if(error){setEventMessage("تعذر تحميل أنواع التذاكر: "+error.message);return;}setTicketForms((data||[]).map((t:any)=>({id:t.id,name:t.name,description:t.description||"",price:String(t.price),currency:String(t.currency||"SDG").trim(),quantity_total:String(t.quantity_total),quantity_sold:Number(t.quantity_sold||0),sales_start_at:t.sales_start_at?new Date(new Date(t.sales_start_at).getTime()-new Date(t.sales_start_at).getTimezoneOffset()*60000).toISOString().slice(0,16):"",sales_end_at:t.sales_end_at?new Date(new Date(t.sales_end_at).getTime()-new Date(t.sales_end_at).getTimezoneOffset()*60000).toISOString().slice(0,16):"",is_active:t.is_active!==false})));if(!data?.length)setTicketForms([emptyTicket()]);})();
-      setShowEventForm(true);setEventMessage("");window.scrollTo({top:0,behavior:"smooth"});
+      setShowEventForm(true);setEventMessage("");
+      const result = await getAdminEventEditorData(r.id);
+      if (result.error || !result.data) { setEventMessage(result.error || "تعذر تحميل تفاصيل الفعالية."); return; }
+      setEventAccountForms(result.data.paymentAccounts);
+      setTicketForms(result.data.tickets.length ? result.data.tickets : [emptyTicket()]);
+      window.scrollTo({top:0,behavior:"smooth"});
     };
-  
+
     const createEvent = async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       const supabase = getSupabaseBrowserClient();
@@ -188,7 +154,7 @@ export default function AdminEventsWorkspace({ role }: { role: AdminRole }) {
         <button className="admin-refresh" type="button" onClick={()=>void loadEvents()} disabled={loading}><RefreshCw size={16}/> تحديث</button>
       </div>
     </div>
-    {eventMessage&&<p className="admin-form-message" role="status">{eventMessage}</p>}
+    {(eventMessage||loadError)&&<p className="admin-form-message" role="status">{eventMessage||loadError}</p>}
     {showEventForm&&<form className="admin-event-form" onSubmit={createEvent}><h3>{editingEventId?"تعديل بيانات الفعالية":"بيانات الفعالية"}</h3><div className="admin-form-grid"><label>اسم الفعالية *<input required value={eventForm.title} onChange={e=>setEventForm({...eventForm,title:e.target.value})}/></label><label>المدينة *<input required value={eventForm.city} onChange={e=>setEventForm({...eventForm,city:e.target.value})}/></label><label>المكان *<input required value={eventForm.venue} onChange={e=>setEventForm({...eventForm,venue:e.target.value})}/></label><label>العنوان التفصيلي<input value={eventForm.address} onChange={e=>setEventForm({...eventForm,address:e.target.value})}/></label><label>رابط الموقع / Google Maps<input type="url" placeholder="https://maps.google.com/..." value={eventForm.location_url} onChange={e=>setEventForm({...eventForm,location_url:e.target.value})}/></label><label className="admin-form-wide">صورة الغلاف (من جهازك)<input type="file" accept="image/*" onChange={e=>{const file=e.target.files?.[0]||null;setCoverFile(file);if(file){const url=URL.createObjectURL(file);setCoverPreview(url);}else{setCoverPreview(eventForm.cover_image_url);}}}/><small className="admin-form-hint">الصيغ المدعومة حسب المتصفح · الحد الأقصى 10 MB · تُرفع الصورة الأصلية دون ضغط.</small></label>{coverPreview&&<div className="admin-cover-preview"><img src={coverPreview} alt="معاينة صورة الغلاف"/><button type="button" onClick={()=>{setCoverFile(null);setCoverPreview("");setEventForm({...eventForm,cover_image_url:""});}}>إزالة الصورة</button></div>}<label>الزمان / تاريخ ووقت البداية *<input type="datetime-local" required value={eventForm.starts_at} onChange={e=>setEventForm({...eventForm,starts_at:e.target.value})}/></label><label>تاريخ ووقت النهاية<input type="datetime-local" value={eventForm.ends_at} onChange={e=>setEventForm({...eventForm,ends_at:e.target.value})}/></label></div><label>نسبة عمولة المنصة (%) *<input type="number" min="0" max="100" step="0.01" required value={eventForm.platform_fee_percent} onChange={e=>setEventForm({...eventForm,platform_fee_percent:e.target.value})}/><small className="admin-form-hint">تُستخدم لحساب صافي عمولة حاضر في الإحصائيات.</small></label><label className="admin-form-wide">عن الفعالية<textarea rows={3} value={eventForm.description} onChange={e=>setEventForm({...eventForm,description:e.target.value})}/></label><label className="admin-trending-check"><input type="checkbox" checked={eventForm.is_trending} onChange={e=>setEventForm({...eventForm,is_trending:e.target.checked})}/> إظهار الفعالية في «رائج الآن»</label><section className="admin-ticket-editor"><div className="admin-ticket-heading"><h3>حسابات التحويل الخاصة بالفعالية</h3><button type="button" className="admin-create-button" onClick={()=>setEventAccountForms(v=>[...v,{account_name:"",account_number:"",beneficiary:"",is_active:true,sort_order:(v.length+1)*10}])}>＋ إضافة حساب</button></div>{eventAccountForms.map((a,i)=><div className="admin-ticket-row" key={a.id||"event-account-"+i}><div className="admin-form-grid"><label>اسم البنك أو طريقة الدفع *<input value={a.account_name} onChange={e=>setEventAccountForms(v=>v.map((x,j)=>j===i?{...x,account_name:e.target.value}:x))}/></label><label>رقم الحساب *<input dir="ltr" value={a.account_number} onChange={e=>setEventAccountForms(v=>v.map((x,j)=>j===i?{...x,account_number:e.target.value}:x))}/></label><label>اسم المستفيد *<input value={a.beneficiary} onChange={e=>setEventAccountForms(v=>v.map((x,j)=>j===i?{...x,beneficiary:e.target.value}:x))}/></label><label className="admin-trending-check"><input type="checkbox" checked={a.is_active} onChange={e=>setEventAccountForms(v=>v.map((x,j)=>j===i?{...x,is_active:e.target.checked}:x))}/> متاح للحجز</label><button type="button" className="admin-delete-button" onClick={()=>setEventAccountForms(v=>v.filter((_,j)=>j!==i))}>إزالة الحساب</button></div></div>)}</section><div className="admin-ticket-editor"><div className="admin-ticket-heading"><h3>أنواع التذاكر</h3><button type="button" className="admin-create-button" onClick={()=>setTicketForms(v=>[...v,emptyTicket()])}>＋ إضافة فئة تذكرة</button></div>{ticketForms.map((t,i)=><div className="admin-ticket-row" key={t.id||"new-"+i}><div className="admin-ticket-row-head"><b>الفئة {i+1}</b>{ticketForms.length>1&&<button type="button" className="admin-delete-button" onClick={()=>setTicketForms(v=>v.filter((_,j)=>j!==i))}>إزالة</button>}</div><div className="admin-form-grid"><label>اسم التذكرة *<input required value={t.name} onChange={e=>setTicketForms(v=>v.map((x,j)=>j===i?{...x,name:e.target.value}:x))}/></label><label>الوصف (اختياري)<input value={t.description} onChange={e=>setTicketForms(v=>v.map((x,j)=>j===i?{...x,description:e.target.value}:x))}/></label><label>السعر *<input type="number" min="0" step="0.01" required value={t.price} onChange={e=>setTicketForms(v=>v.map((x,j)=>j===i?{...x,price:e.target.value}:x))}/></label><label>العملة<select value={t.currency} onChange={e=>setTicketForms(v=>v.map((x,j)=>j===i?{...x,currency:e.target.value}:x))}><option value="SDG">جنيه سوداني (SDG)</option><option value="SAR">ريال سعودي (SAR)</option><option value="AED">درهم إماراتي (AED)</option><option value="USD">دولار أمريكي (USD)</option><option value="EGP">جنيه مصري (EGP)</option></select></label><label>الكمية المتاحة *<input type="number" min={t.quantity_sold||1} step="1" required value={t.quantity_total} onChange={e=>setTicketForms(v=>v.map((x,j)=>j===i?{...x,quantity_total:e.target.value}:x))}/></label><label>بداية البيع<input type="datetime-local" value={t.sales_start_at} onChange={e=>setTicketForms(v=>v.map((x,j)=>j===i?{...x,sales_start_at:e.target.value}:x))}/></label><label>نهاية البيع<input type="datetime-local" value={t.sales_end_at} onChange={e=>setTicketForms(v=>v.map((x,j)=>j===i?{...x,sales_end_at:e.target.value}:x))}/></label><label className="admin-trending-check"><input type="checkbox" checked={t.is_active} onChange={e=>setTicketForms(v=>v.map((x,j)=>j===i?{...x,is_active:e.target.checked}:x))}/> الفئة مفعّلة للحجز</label>{t.quantity_sold>0&&<small className="admin-form-hint">تم بيع {t.quantity_sold} — لا يمكن تقليل الكمية عنها.</small>}</div></div>)}</div><p className="admin-form-hint">سيتم حفظ الفعالية كمسودة، ولن تظهر للجمهور إلا بعد نشرها.</p>{eventMessage&&<p className="admin-form-message" role="status">{eventMessage}</p>}<button className="admin-create-button" type="submit" disabled={savingEvent}>{savingEvent?"جاري الحفظ...":editingEventId?"حفظ التعديلات":"حفظ الفعالية"}</button></form>}
     {loading?<p className="admin-no-data">جاري تحميل البيانات...</p>:eventCards}
   </section>;
