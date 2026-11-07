@@ -1,20 +1,7 @@
 import { getSupabaseBrowserClient } from "../../lib/supabase";
 import type { EventItem, PublicEventsResult } from "./events.types";
 
-const formatEventDate = (value: string) =>
-  new Intl.DateTimeFormat("ar-SD", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  }).format(new Date(value));
-
-const currencyLabel = (currency: string) =>
-  ({ SDG: "ج.س", SAR: "ر.س", AED: "د.إ", USD: "$", EGP: "ج.م" }[
-    currency.trim().toUpperCase()
-  ] || currency.trim().toUpperCase());
-
-const formatMoney = (value: number, currency = "SDG") =>
-  new Intl.NumberFormat("ar-SD").format(value) + " " + currencyLabel(currency);
+import { formatEventDate, formatMoney } from "./events.formatters";
 
 export async function getPublishedEvents(): Promise<PublicEventsResult> {
   const supabase = getSupabaseBrowserClient();
