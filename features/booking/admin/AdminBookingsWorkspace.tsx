@@ -9,6 +9,7 @@ const statusLabels: Record<string, string> = {
   pending_payment: "بانتظار الدفع", under_review: "قيد المراجعة", confirmed: "مؤكد",
   rejected: "مرفوض", expired: "منتهي", submitted: "بانتظار المراجعة",
   approved: "مقبول",
+};
 const fmt = (value: unknown) => value == null || value === "" ? "—" : String(value);
 const money = (value: unknown, currency = "SDG") => value == null ? "—" : `${Number(value).toLocaleString("ar-SD")} ${currency}`;
 
