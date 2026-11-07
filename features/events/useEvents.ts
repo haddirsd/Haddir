@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getSupabaseBrowserClient } from "../../lib/supabase";
 import { getPublishedEvents } from "./events.service";
 import type { EventItem } from "./events.types";
@@ -10,6 +10,27 @@ export function useEvents() {
   const [eventsLoading, setEventsLoading] = useState(true);
   const [eventsError, setEventsError] = useState("");
   const [ticketTypesError, setTicketTypesError] = useState("");
+  const latestRequest = useRef(0);
+
+  const refreshEvents = useCallback(async () => {
+    const requestId = ++latestRequest.current;
+    setEventsLoading(true);
+    setEventsError("");
+
+    try {
+      const result = await getPublishedEvents();
+      if (requestId !== latestRequest.current) return;
+      setEvents(result.events);
+      setTicketTypesError(result.ticketTypesError);
+    } catch (error) {
+      if (requestId !== latestRequest.current) return;
+      setEventsError(
+        error instanceof Error ? error.message : "تعذر تحميل الفعاليات."
+      );
+    } finally {
+      if (requestId === latestRequest.current) setEventsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
@@ -19,50 +40,27 @@ export function useEvents() {
       return;
     }
 
-    let alive = true;
-    let latestRequest = 0;
-
-    const loadEvents = async () => {
-      const requestId = ++latestRequest;
-      setEventsLoading(true);
-      setEventsError("");
-
-      try {
-        const result = await getPublishedEvents();
-        if (!alive || requestId !== latestRequest) return;
-        setEvents(result.events);
-        setTicketTypesError(result.ticketTypesError);
-        setEventsLoading(false);
-      } catch (error) {
-        if (!alive || requestId !== latestRequest) return;
-        setEventsError(
-          error instanceof Error ? error.message : "تعذر تحميل الفعاليات."
-        );
-        setEventsLoading(false);
-      }
-    };
-
-    void loadEvents();
+    void refreshEvents();
 
     const channel = supabase
       .channel("public-events-live")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "events" },
-        () => void loadEvents()
+        () => void refreshEvents()
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "ticket_types" },
-        () => void loadEvents()
+        () => void refreshEvents()
       )
       .subscribe();
 
     return () => {
-      alive = false;
+      latestRequest.current += 1;
       void supabase.removeChannel(channel);
     };
-  }, []);
+  }, [refreshEvents]);
 
-  return { events, eventsLoading, eventsError, ticketTypesError };
+  return { events, eventsLoading, eventsError, ticketTypesError, refreshEvents };
 }
