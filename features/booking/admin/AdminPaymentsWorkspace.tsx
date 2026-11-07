@@ -22,14 +22,19 @@ export default function AdminPaymentsWorkspace() {
     if (decision === "reject" && !reason) { setActionError("اكتب سبب الرفض أولاً حتى نرسله للعميل."); return; }
     if (decision === "approve" && !window.confirm("تأكيد قبول الدفع وإصدار تذاكر برموز دخول من 10 أرقام؟")) return;
     setReviewing(true); setActionError(""); setActionMessage("");
-    const result = await reviewAdminPayment(row.id, decision, reason);
-    setReviewing(false);
-    if (result.error) { setActionError("تعذرت مراجعة إثبات الدفع: " + result.error); return; }
-    setRejectionReasons(current => { const next = { ...current }; delete next[row.id]; return next; });
-    setActionMessage(decision === "approve"
-      ? "تم اعتماد الدفع وإصدار " + Number(result.data?.ticketsCreated || 0) + " تذكرة. حُفظ إشعار البريد في قائمة الانتظار، وسيُرسل بعد تفعيل إعدادات Resend."
-      : "تم رفض إثبات الدفع وإرسال السبب للعميل. حُفظ إشعار البريد في قائمة الانتظار، وسيُرسل بعد تفعيل إعدادات Resend.");
-    await refresh();
+    try {
+      const result = await reviewAdminPayment(row.id, decision, reason);
+      if (result.error) { setActionError("تعذرت مراجعة إثبات الدفع: " + result.error); return; }
+      setRejectionReasons(current => { const next = { ...current }; delete next[row.id]; return next; });
+      setActionMessage(decision === "approve"
+        ? "تم اعتماد الدفع وإصدار " + Number(result.data?.ticketsCreated || 0) + " تذكرة. حُفظ إشعار البريد في قائمة الانتظار، وسيُرسل بعد تفعيل إعدادات Resend."
+        : "تم رفض إثبات الدفع وإرسال السبب للعميل. حُفظ إشعار البريد في قائمة الانتظار، وسيُرسل بعد تفعيل إعدادات Resend.");
+      await refresh();
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : "تعذرت مراجعة إثبات الدفع.");
+    } finally {
+      setReviewing(false);
+    }
   };
 
   return <section className="admin-panel">
