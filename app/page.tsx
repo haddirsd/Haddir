@@ -166,7 +166,7 @@ export default function Home(){
  const unreadNotificationCount=myNotifications.filter(n=>!n.is_read).length;
  const filteredNotifications=myNotifications.filter(n=>notificationFilter==="all"||(notificationFilter==="unread"?!n.is_read:n.is_read));
  const notificationKind=(type:string)=>{
-  if(type==="ticket_approved"||type==="payment_rejected")return "booking";
+  if(type==="ticket_approved"||type==="payment_rejected"||type==="booking_expired")return "booking";
   if(String(type||"").startsWith("event_reminder_"))return "event";
   return "system";
  };
