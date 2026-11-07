@@ -8,6 +8,7 @@ import { EventDetailWorkspace } from "./EventDetailWorkspace";
 
 type EventsWorkspaceProps = {
   showHome: boolean;
+  authUser: { id: string; email?: string; user_metadata?: Record<string, unknown> } | null;
   onRequireLogin: () => void;
   onBookingSuccess: () => void;
   onGoNotifications: () => void;
@@ -16,6 +17,7 @@ type EventsWorkspaceProps = {
 /** Owns the complete public event experience: data, URLs, details and booking. */
 export function EventsWorkspace({
   showHome,
+  authUser,
   onRequireLogin,
   onBookingSuccess,
   onGoNotifications,
@@ -23,7 +25,7 @@ export function EventsWorkspace({
   const { events, eventsLoading, eventsError, ticketTypesError, refreshEvents } = useEvents();
   const workspace = useEventWorkspace({
     events,
-    authUser: null,
+    authUser,
     onRequireLogin,
     onBookingSuccess,
   });
