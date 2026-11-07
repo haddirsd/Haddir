@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { getSupabaseBrowserClient } from "../lib/supabase";
-import { formatEventDate, formatMoney } from "../features/events/events.formatters";
+import { formatEventDate } from "../features/events/events.formatters";
+import AdvertiserWorkspace from "../features/advertiser/AdvertiserWorkspace";
 import { EventsWorkspace } from "../features/events/components/EventsWorkspace";
 import { TicketWorkspace } from "../features/customer-account/components/TicketWorkspace";
 import { NotificationsWorkspace } from "../features/customer-account/components/NotificationsWorkspace";
@@ -17,11 +18,7 @@ export default function Home(){
  const [authUser,setAuthUser]=useState<{id:string;email?:string;user_metadata?:Record<string,unknown>}|null>(null),[userRole,setUserRole]=useState("customer"),[authMessage,setAuthMessage]=useState(""),[activeWorkspace,setActiveWorkspace]=useState<"customer"|"organizer"|"gatekeeper"|"advertiser"|"admin"|"owner"|null>(null);
  const [isGatekeeperPage,setIsGatekeeperPage]=useState(false);
  const [showWelcome,setShowWelcome]=useState(false);
- const [showAdvertiserStats,setShowAdvertiserStats]=useState(false);
  const [assignedEvent,setAssignedEvent]=useState<any|null>(null);
- const [advertiserStats,setAdvertiserStats]=useState<any|null>(null);
- const [advertiserStatsLoading,setAdvertiserStatsLoading]=useState(false);
- const [advertiserStatsError,setAdvertiserStatsError]=useState("");
  const [myTickets,setMyTickets]=useState<any[]>([]),[myNotifications,setMyNotifications]=useState<any[]>([]),[accountDataLoading,setAccountDataLoading]=useState(false),[accountDataError,setAccountDataError]=useState("");
  const [notificationFilter,setNotificationFilter]=useState<"all"|"unread"|"read">("all");
  const [ticketFilter,setTicketFilter]=useState<"new"|"used">("new");
@@ -65,17 +62,6 @@ export default function Home(){
   gatekeeperCounts, gatekeeperHistory: gatekeeperManualHistory, gatekeeperHistoryLoading,
   scannerOpen, setScannerOpen, videoRef, runGatekeeperAction, openScanner, openManualEntry,
  } = gatekeeper;
- const openAdvertiserStats=async()=>{
-  if(!authUser||userRole!=="advertiser")return;
-  const supabase=getSupabaseBrowserClient();
-  if(!supabase){setAdvertiserStatsError("تعذر الاتصال بقاعدة البيانات حالياً.");setShowAdvertiserStats(true);return;}
-  setShowAdvertiserStats(true);setAdvertiserStatsLoading(true);setAdvertiserStatsError("");setAdvertiserStats(null);
-  const {data,error}=await supabase.rpc("get_advertiser_event_statistics");
-  setAdvertiserStatsLoading(false);
-  if(error){setAdvertiserStatsError(error.message||"تعذر تحميل إحصائيات الفعالية.");return;}
-  if(!data?.event){setAdvertiserStatsError("ما لقينا فعالية مرتبطة بحسابك.");return;}
-  setAdvertiserStats(data);
- };
  const signInWithGoogle=async()=>{const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("إعدادات تسجيل الدخول غير مكتملة على الموقع.");return;}const {error}=await supabase.auth.signInWithOAuth({provider:"google",options:{redirectTo:window.location.origin}});if(error)setAuthMessage(error.message);};
  const signInWithEmail=async()=>{const supabase=getSupabaseBrowserClient();if(!supabase||!loginEmail.trim()){setAuthMessage("أدخل بريدك الإلكتروني أولاً.");return;}const {error}=await supabase.auth.signInWithOtp({email:loginEmail.trim(),options:{emailRedirectTo:window.location.origin}});setAuthMessage(error?error.message:"أرسلنا رابط تسجيل الدخول إلى بريدك الإلكتروني. افتح الرسالة للمتابعة.");};
  const saveProfile=async()=>{if(!authUser){setAuthMessage("سجّل الدخول أولاً لحفظ بياناتك.");return;}const normalizedPhone=phone.replace(/[٠-٩]/g,d=>String("٠١٢٣٤٥٦٧٨٩".indexOf(d))).replace(/\s+/g,"");if(!/^0\d{9}$/.test(normalizedPhone)){setAuthMessage("رقم الهاتف لازم يكون 10 خانات بالضبط ويبدأ بصفر، مثال: 09XXXXXXXX.");return;}const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("تعذر الاتصال بقاعدة البيانات حالياً.");return;}setProfileSaving(true);setSaved(false);setAuthMessage("");const {data,error}=await supabase.from("profiles").update({phone:normalizedPhone}).eq("id",authUser.id).select("phone").single();setProfileSaving(false);if(error){setAuthMessage("ما قدرنا نحفظ رقمك. تأكد من الاتصال وحاول مرة تانية.");return;}setPhone(data.phone||normalizedPhone);setProfileEditing(false);setSaved(true);};
@@ -165,33 +151,8 @@ export default function Home(){
   {(userRole==="owner"||userRole==="admin")&&<button type="button" className="role-workspace-button" onClick={()=>window.location.assign("/admin")}><span className="role-workspace-icon"><ShieldCheck size={21}/></span><span><strong>لوحة الإدارة</strong><small>إدارة المنصة والموظفين والفعاليات والحجوزات</small></span><ChevronLeft size={18}/></button>}
   {userRole==="supervisor"&&<button type="button" className="role-workspace-button" onClick={()=>window.location.assign("/admin")}><span className="role-workspace-icon"><ClipboardList size={21}/></span><span><strong>لوحة الإشراف</strong><small>مراجعة الحجوزات وإثباتات الدفع واتخاذ قرار القبول أو الرفض</small></span><ChevronLeft size={18}/></button>}
    {(userRole==="gatekeeper"||userRole==="organizer")&&<button type="button" className="role-workspace-button" onClick={()=>window.location.assign("/?tab=profile&workspace=gatekeeper")}><span className="role-workspace-icon"><ScanLine size={21}/></span><span><strong>مسح التذاكر</strong><small>فحص تذاكر الفعالية وتأكيد دخول الحضور</small></span><ChevronLeft size={18}/></button>}
-  {userRole==="advertiser"&&<button type="button" className="role-workspace-button" onClick={()=>void openAdvertiserStats()}><span className="role-workspace-icon"><Ticket size={21}/></span><span><strong>تفاصيل الفعالية</strong><small>عرض المبيعات والتذاكر والمستحقات للفعالية المرتبطة بك</small></span><ChevronLeft size={18}/></button>}
+  {userRole==="advertiser"&&<AdvertiserWorkspace authUser={authUser} userRole={userRole}/>}
 
- </section>}
- {authUser&&userRole==="advertiser"&&<section className="detail-section advertiser-profile-stats">
-  
-  {showAdvertiserStats&&<div className="advertiser-statistics-panel">
-   <div className="advertiser-stats-heading"><div><small>لوحة المعلن</small><h2>إحصائيات فعاليتك</h2></div><button type="button" className="btn btn-outline" onClick={()=>setShowAdvertiserStats(false)}>إغلاق</button></div>
-   {advertiserStatsLoading?<div className="empty-state">جاري تحميل الإحصائيات...</div>:advertiserStatsError?<div className="empty-state" role="alert">{advertiserStatsError}</div>:advertiserStats&&<>
-    <article className="advertiser-event-summary"><small>الفعالية المرتبطة بحسابك فقط</small><h3>{advertiserStats.event.title}</h3><p>{advertiserStats.event.venue||advertiserStats.event.city||"الموقع غير محدد"} · {advertiserStats.event.starts_at?formatEventDate(advertiserStats.event.starts_at):"—"}</p></article>
-    <div className="advertiser-metric-grid">
-     <article><small>الحاجزون المعتمدون</small><strong>{Number(advertiserStats.totals?.bookers||0).toLocaleString("ar-SD")}</strong></article>
-     <article><small>الحجوزات المؤكدة</small><strong>{Number(advertiserStats.totals?.confirmed_bookings||0).toLocaleString("ar-SD")}</strong></article>
-     <article><small>الحجوزات المرفوضة</small><strong>{Number(advertiserStats.totals?.rejected_bookings||0).toLocaleString("ar-SD")}</strong></article>
-     <article><small>التذاكر المباعة</small><strong>{Number(advertiserStats.totals?.confirmed_tickets||0).toLocaleString("ar-SD")}</strong></article>
-     <article><small>التذاكر ضمن طلبات مرفوضة</small><strong>{Number(advertiserStats.totals?.rejected_tickets||0).toLocaleString("ar-SD")}</strong></article>
-    </div>
-    <h3 className="advertiser-stats-subtitle">ملخص المبيعات والمستحقات</h3>
-    {(advertiserStats.financials||[]).length?advertiserStats.financials.map((line:any)=><article className="advertiser-finance-card" key={line.currency}>
-     <div><small>إجمالي المبيعات المعتمدة</small><strong>{formatMoney(Number(line.sales||0),line.currency)}</strong></div>
-     {Number(advertiserStats.event.platform_fee_percent||0)>0&&<div><small>عمولة حاضر ({Number(advertiserStats.event.platform_fee_percent)}%)</small><strong>{formatMoney(Number(line.platform_fee||0),line.currency)}</strong></div>}
-     <div className="advertiser-net"><small>صافي مستحقات المعلن</small><strong>{formatMoney(Number(line.advertiser_net||0),line.currency)}</strong></div>
-    </article>):<article className="advertiser-finance-card"><div><small>إجمالي المبيعات المعتمدة</small><strong>{formatMoney(0)}</strong></div>{Number(advertiserStats.event.platform_fee_percent||0)>0&&<div><small>عمولة حاضر ({Number(advertiserStats.event.platform_fee_percent)}%)</small><strong>{formatMoney(0)}</strong></div>}<div className="advertiser-net"><small>صافي مستحقات المعلن</small><strong>{formatMoney(0)}</strong></div></article>}
-    <h3 className="advertiser-stats-subtitle">تفاصيل فئات التذاكر</h3>
-    <div className="advertiser-ticket-table"><table><thead><tr><th>الفئة</th><th>السعة</th><th>المباع</th><th>المرفوض</th><th>المتبقي</th><th>المبيعات</th></tr></thead><tbody>{(advertiserStats.ticket_types||[]).map((ticket:any)=><tr key={ticket.id}><td>{ticket.name}</td><td>{Number(ticket.quantity_total||0).toLocaleString("ar-SD")}</td><td>{Number(ticket.confirmed_quantity||0).toLocaleString("ar-SD")}</td><td>{Number(ticket.rejected_quantity||0).toLocaleString("ar-SD")}</td><td>{Number(ticket.remaining_quantity||0).toLocaleString("ar-SD")}</td><td>{formatMoney(Number(ticket.sales||0),ticket.currency)}</td></tr>)}</tbody></table></div>
-    <p className="advertiser-stats-note">المبيعات محسوبة من الحجوزات المؤكدة فقط. صافي المستحقات يساوي المبيعات بعد خصم عمولة حاضر، ولا يشمل مصروفات تشغيلية أو تسويات خارج المنصة.</p>
-   </>}
-  </div>}
  </section>}
  {authUser&&<button className="btn profile-logout-button role-logout-button" type="button" onClick={signOut}>تسجيل الخروج</button>}
  <div className="profile-settings-panel"><div><strong>إعدادات العرض</strong><p>غيّر مظهر التطبيق في كل الصفحات.</p></div><button className="btn btn-outline" type="button" onClick={()=>setDarkMode(v=>!v)}>{darkMode?"☀ الوضع النهاري":"☾ الوضع الليلي"}</button></div>
