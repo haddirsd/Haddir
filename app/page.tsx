@@ -9,11 +9,10 @@ import { TicketWorkspace } from "../features/customer-account/components/TicketW
 import { NotificationsWorkspace } from "../features/customer-account/components/NotificationsWorkspace";
 import { useGatekeeper } from "../features/gatekeeper/useGatekeeper";
 import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
-import { Bell, CheckCircle2, House, Settings, Sparkles, Ticket, UserRound, ChevronLeft, ScanLine, ShieldCheck, ClipboardList } from "lucide-react";
+import { Bell, CheckCircle2, House, Sparkles, Ticket, UserRound, ChevronLeft, ScanLine, ShieldCheck, ClipboardList } from "lucide-react";
 
 const formatEventDate=(value:string)=>new Intl.DateTimeFormat("ar-SD",{weekday:"long",day:"numeric",month:"long"}).format(new Date(value));
 
-const toNumber=(value:string)=>{const digits=value.replace(/[٠-٩]/g,d=>String("٠١٢٣٤٥٦٧٨٩".indexOf(d)));const n=Number(digits.replace(/[^0-9]/g,""));return Number.isFinite(n)?n:0};
 const currencyLabel=(currency:string)=>({SDG:"ج.س",SAR:"ر.س",AED:"د.إ",USD:"$",EGP:"ج.م"}[currency.trim().toUpperCase()]||currency.trim().toUpperCase());
 const formatMoney=(value:number,currency="SDG")=>new Intl.NumberFormat("ar-SD").format(value)+" "+currencyLabel(currency);
 type Tab="home"|"tickets"|"notifications"|"profile";
