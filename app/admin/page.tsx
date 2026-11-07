@@ -26,6 +26,7 @@ export default function AdminPage() {
   const [counts, setCounts] = useState({ events: 0, bookings: 0, pending: 0, users: 0, confirmed: 0, revenue: 0 });
   const [dataReady, setDataReady] = useState(false);
   const [rejectionReasons,setRejectionReasons]=useState<Record<string,string>>({});
+  const [paymentActionMessage,setPaymentActionMessage]=useState("");
   const [updatingUserId,setUpdatingUserId]=useState<string|null>(null);
   const [userMessage,setUserMessage]=useState("");
   const [eventOptions,setEventOptions]=useState<Row[]>([]);
@@ -202,7 +203,7 @@ export default function AdminPage() {
     setSectionLoading(false);
     if(error){setError("تعذرت مراجعة إثبات الدفع: "+error.message);return;}
     setRejectionReasons(v=>{const next={...v};delete next[row.id];return next;});
-    setEventMessage(decision==="approve"?("تم اعتماد الدفع وإصدار "+Number(data?.tickets_created||0)+" تذكرة. حُفظ إشعار البريد في قائمة الانتظار، وسيُرسل بعد تفعيل إعدادات Resend."):"تم رفض إثبات الدفع وإرسال السبب للعميل. حُفظ إشعار البريد في قائمة الانتظار، وسيُرسل بعد تفعيل إعدادات Resend.");
+    setPaymentActionMessage(decision==="approve"?("تم اعتماد الدفع وإصدار "+Number(data?.tickets_created||0)+" تذكرة. حُفظ إشعار البريد في قائمة الانتظار، وسيُرسل بعد تفعيل إعدادات Resend."):"تم رفض إثبات الدفع وإرسال السبب للعميل. حُفظ إشعار البريد في قائمة الانتظار، وسيُرسل بعد تفعيل إعدادات Resend.");
     if(data?.booking_id){void supabase.functions.invoke("send-booking-email",{body:{booking_id:data.booking_id,decision}}).then(({error}:any)=>{if(error)console.info("Booking email remains queued until Resend is configured.");});}
     await loadSection();
   };
@@ -429,6 +430,7 @@ export default function AdminPage() {
       <div className="admin-content">
         <div className="admin-welcome"><div><span className="admin-eyebrow">لوحة التحكم</span><h2>مرحباً، {name}</h2><p>{supervisor?"راجع الحجوزات وإثباتات التحويل.":"تابع أداء منصة حاضر وأدر عملياتها من مكان واحد."}</p></div><div className="admin-welcome-mark"><LayoutDashboard size={30}/></div></div>
         {error&&<div className="admin-notice" role="status">{error}</div>}
+        {paymentActionMessage&&<div className="admin-notice" role="status">{paymentActionMessage}</div>}
         {section==="overview"&&<><div className="admin-metric-grid">{metrics.map(m=><article className="admin-metric" key={m.title}><span><m.icon size={20}/></span><small>{m.title}</small><strong>{dataReady?m.value.toLocaleString("ar-SD"):"—"}</strong></article>)}</div><div className="admin-panel"><div className="admin-panel-head"><div><h3>{supervisor?"المهام اليومية":"نظرة سريعة"}</h3><p>بيانات مباشرة من قاعدة بيانات حاضر</p></div></div><div className="admin-shortcuts">{(supervisor?["bookings","payments"] as Section[]:["events","bookings","payments","users","reports"] as Section[]).map(item=><button key={item} onClick={()=>setSection(item)}><span>{item==="events"?<CalendarDays/>:item==="bookings"?<Ticket/>:item==="payments"?<Wallet/>:item==="users"?<Users/>:<Activity/>}</span><b>{labels[item]}</b><ArrowRight size={16}/></button>)}</div></div></>}
         {section==="events"?<AdminEventsWorkspace role={role}/>:section!=="overview"&&<div className="admin-panel"><div className="admin-panel-head"><div><h3>{labels[section]}</h3><p>{section==="events"?"إدارة الفعاليات في بطاقات مرتبة":"السجلات الفعلية المحفوظة في قاعدة البيانات"}</p></div><div className="admin-panel-actions">{(section==="bookings"||section==="users")&&<label className="admin-search-box"><span>بحث بالرقم أو البريد أو الهاتف</span><input type="search" value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} placeholder={section==="bookings"?"رقم الحجز أو بريد العميل":"رقم الهاتف أو البريد الإلكتروني"}/></label>}{section==="users"&&<span className="admin-user-total">عدد المستخدمين: {userTotal.toLocaleString("ar-SD")}</span>}<button className="admin-refresh" onClick={()=>void loadSection()} disabled={sectionLoading}><RefreshCw size={16}/> تحديث</button></div></div>{sectionLoading?<p className="admin-no-data">جاري تحميل البيانات...</p>:renderRows()}</div>}
         <footer className="admin-footer">حاضر · نظام إدارة الفعاليات والتذاكر <span>{roleLabel}</span></footer>
