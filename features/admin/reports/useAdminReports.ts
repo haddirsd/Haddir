@@ -21,19 +21,7 @@ export function useAdminReports() {
     setLoading(false);
   }, []);
 
-  useEffect(() => {
-    void refresh();
-    const supabase = getSupabaseBrowserClient();
-    if (!supabase) return;
-    const channel = supabase.channel("admin-reports-workspace")
-      .on("postgres_changes", { event: "*", schema: "public", table: "events" }, () => void refresh())
-      .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, () => void refresh())
-      .on("postgres_changes", { event: "*", schema: "public", table: "bookings" }, () => void refresh())
-      .on("postgres_changes", { event: "*", schema: "public", table: "booking_items" }, () => void refresh())
-      .on("postgres_changes", { event: "*", schema: "public", table: "tickets" }, () => void refresh())
-      .subscribe();
-    return () => { latestRequest.current += 1; void supabase.removeChannel(channel); };
-  }, [refresh]);
+  useEffect(() => { void refresh(); }, [refresh]);
 
   return { statistics, loading, error, refresh };
 }
