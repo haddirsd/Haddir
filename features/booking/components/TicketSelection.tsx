@@ -42,7 +42,7 @@ export function TicketSelection({
 }: TicketSelectionProps) {
   const tier = tiers[selectedTier];
   const maxQuantity = tier ? Math.min(5, tier.available) : 0;
-  const unavailableStatuses = ["تم البيع بالكامل", "انتهت", "غير متاح", "البيع غير متاح حالياً"];
+  const unavailableStatuses = ["تم البيع بالكامل", "بدأت", "انتهت", "غير متاح", "البيع غير متاح حالياً"];
   const canContinue = !!tier && tierChosen && tier.availableNow &&
     tier.available >= ticketCount && !unavailableStatuses.includes(eventStatus);
 
