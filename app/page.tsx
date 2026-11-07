@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { getSupabaseBrowserClient } from "../lib/supabase";
-import { getEventPaymentAccounts, createBooking, uploadPaymentReceipt, submitPayment, removePaymentReceipt } from "../features/booking/booking.service";
-import type { EventPaymentAccount } from "../features/booking/booking.types";
+import { useBooking } from "../features/booking/useBooking";
+import { PaymentCheckout } from "../features/booking/components/PaymentCheckout";
+import { BookingSuccess } from "../features/booking/components/BookingSuccess";
 import { useGatekeeper } from "../features/gatekeeper/useGatekeeper";
 import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
 import { QRCodeSVG as QrCodeSVG } from "qrcode.react";
@@ -20,7 +21,7 @@ export default function Home(){
  const [fullName,setFullName]=useState(""),[email,setEmail]=useState(""),[phone,setPhone]=useState(""),[avatarUrl,setAvatarUrl]=useState(""),[profileEditing,setProfileEditing]=useState(false),[saved,setSaved]=useState(false),[profileSaving,setProfileSaving]=useState(false);
  const [authUser,setAuthUser]=useState<{id:string;email?:string;user_metadata?:Record<string,unknown>}|null>(null),[userRole,setUserRole]=useState("customer"),[authMessage,setAuthMessage]=useState(""),[activeWorkspace,setActiveWorkspace]=useState<"customer"|"organizer"|"gatekeeper"|"advertiser"|"admin"|"owner"|null>(null);
  const [isGatekeeperPage,setIsGatekeeperPage]=useState(false);
- const [ticketCount,setTicketCount]=useState(1),[eventPaymentAccounts,setEventPaymentAccounts]=useState<EventPaymentAccount[]>([]),[paymentMethod,setPaymentMethod]=useState(""),[receipt,setReceipt]=useState<File|null>(null),[bookingDone,setBookingDone]=useState(false),[bookingId,setBookingId]=useState<string|null>(null),[bookingNumber,setBookingNumber]=useState(""),[bookingError,setBookingError]=useState(""),[bookingSubmitting,setBookingSubmitting]=useState(false),[accountCopied,setAccountCopied]=useState(false);
+ const [ticketCount,setTicketCount]=useState(1);
  const [showWelcome,setShowWelcome]=useState(false);
  const [showAdvertiserStats,setShowAdvertiserStats]=useState(false);
  const [assignedEvent,setAssignedEvent]=useState<any|null>(null);
@@ -169,7 +170,9 @@ export default function Home(){
   return "system";
  };
  const selected=events.find(e=>e.id===selectedEvent);
- const resetBooking=()=>{setSelectedEvent(null);setSelectedTier(0);setTierChosen(false);setShowPayment(false);setTicketCount(1);setPaymentMethod("");setReceipt(null);setBookingDone(false);setBookingId(null);setBookingNumber("");setBookingError("");setBookingSubmitting(false);};
+ const booking=useBooking({authUser,selected:selected||null,selectedTier,ticketCount,onSuccess:()=>setActiveTab("notifications")});
+ const {eventPaymentAccounts,paymentMethod,setPaymentMethod,receipt,setReceipt,bookingDone,bookingNumber,bookingError,setBookingError,bookingSubmitting,accountCopied,setAccountCopied,loadPaymentAccounts,copyAccount,submitBooking}=booking;
+ const resetBooking=()=>{setSelectedEvent(null);setSelectedTier(0);setTierChosen(false);setShowPayment(false);setTicketCount(1);booking.resetBooking();};
  const go=(tab:Tab)=>{
   resetBooking();setActiveTab(tab);
   const url=new URL(window.location.href);
@@ -179,47 +182,9 @@ export default function Home(){
   window.scrollTo({top:0,behavior:"smooth"});
  }; const downloadTicket=async(ticket:any)=>{try{const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1350;const ctx=canvas.getContext("2d");if(!ctx)return;await document.fonts.ready;ctx.fillStyle="#f7f1fb";ctx.fillRect(0,0,1080,1350);ctx.fillStyle="#fff";ctx.fillRect(48,48,984,1254);ctx.strokeStyle="#e7d9f1";ctx.lineWidth=3;ctx.strokeRect(48,48,984,1254);ctx.direction="rtl";ctx.textAlign="right";const right=950;ctx.fillStyle="#5b2e82";ctx.font="bold 48px Alexandria,Arial";ctx.fillText("حاضر  HADDIR",right,135);ctx.fillStyle="#8b7897";ctx.font="26px Alexandria,Arial";ctx.fillText("تذكرة دخول إلكترونية",right,190);ctx.strokeStyle="#dfd1e9";ctx.setLineDash([10,9]);ctx.beginPath();ctx.moveTo(100,230);ctx.lineTo(980,230);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle="#8b7897";ctx.font="26px Alexandria,Arial";ctx.fillText("الفعالية",right,300);ctx.fillStyle="#30213b";ctx.font="bold 44px Alexandria,Arial";const eventTitle=String(ticket.events?.title||"فعالية");ctx.fillText(eventTitle.length>32?eventTitle.slice(0,32)+"…":eventTitle,right,365);ctx.fillStyle="#8b7897";ctx.font="24px Alexandria,Arial";ctx.fillText("نوع التذكرة",right,455);ctx.fillText("رقم الحجز",520,455);ctx.fillStyle="#3d3047";ctx.font="bold 27px Alexandria,Arial";ctx.fillText(String(ticket.ticket_types?.name||"تذكرة"),right,500);ctx.fillText(String(ticket.bookings?.booking_number||"—"),520,500);ctx.fillStyle="#8b7897";ctx.font="24px Alexandria,Arial";ctx.fillText("الموقع",right,575);ctx.fillText("التاريخ",520,575);ctx.fillStyle="#3d3047";ctx.font="bold 25px Alexandria,Arial";ctx.fillText(String(ticket.events?.venue||"—"),right,620);ctx.fillText(ticket.events?.starts_at?formatEventDate(ticket.events.starts_at):"—",520,620);ctx.strokeStyle="#e5d9ed";ctx.setLineDash([10,9]);ctx.beginPath();ctx.moveTo(100,675);ctx.lineTo(980,675);ctx.stroke();ctx.setLineDash([]);const qr=document.querySelector('[data-ticket-id="'+String(ticket.id)+'"] .haddir-ticket-qr svg');if(!qr)throw new Error("QR unavailable");const svg=new XMLSerializer().serializeToString(qr);const img=new Image();const loaded=new Promise<void>((resolve,reject)=>{img.onload=()=>resolve();img.onerror=()=>reject(new Error("QR image failed"));});img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);await loaded;ctx.drawImage(img,330,700,420,420);ctx.fillStyle="#8e8297";ctx.font="23px Alexandria,Arial";ctx.textAlign="center";ctx.fillText("امسح الرمز للتحقق من التذكرة",540,1045);ctx.fillStyle="#5c2e82";ctx.font="bold 48px Arial";ctx.fillText(String(ticket.ticket_code||""),540,1120);ctx.fillStyle="#f6f0fa";ctx.fillRect(48,1190,984,112);ctx.fillStyle="#76558d";ctx.font="bold 23px Alexandria,Arial";ctx.fillText("احتفظ بالتذكرة وأبرزها عند الدخول",540,1255);const link=document.createElement("a");link.download="haddir-ticket-"+String(ticket.ticket_code||ticket.id)+".png";link.href=canvas.toDataURL("image/png");link.click();}catch(error){console.error("Ticket image export failed",error);alert("تعذر حفظ التذكرة كصورة. حاول مرة أخرى.");}};
  const openEvent=(id:string)=>{resetBooking();const url=new URL(window.location.href);url.searchParams.set("event",id);url.searchParams.delete("checkout");url.searchParams.delete("tier");url.searchParams.delete("qty");window.history.pushState({...window.history.state,haddirPage:"event-detail"},"",url.pathname+url.search+url.hash);setSelectedEvent(id);window.scrollTo({top:0,behavior:"smooth"});};
- const openPayment=async()=>{if(!tierChosen)return;if(!authUser){setAuthMessage("سجّل الدخول أولاً عشان نكمل حجزك. الفعاليات متاحة للتصفح بدون حساب.");setSelectedEvent(null);setShowPayment(false);setActiveTab("profile");window.scrollTo({top:0,behavior:"smooth"});return;}setAuthMessage("");if(getSupabaseBrowserClient()&&selected){const {data,error}=await getEventPaymentAccounts(selected.id);if(error){setBookingError("تعذر تحميل حسابات الدفع لهذه الفعالية: "+(error.message||""));return;}setEventPaymentAccounts(data||[]);setPaymentMethod("");setAccountCopied(false);}const url=new URL(window.location.href);url.searchParams.set("checkout","1");url.searchParams.set("tier",String(selectedTier));url.searchParams.set("qty",String(ticketCount));window.history.pushState({...window.history.state,haddirPage:"event-payment"},"",url.pathname+url.search+url.hash);setShowPayment(true);window.scrollTo({top:0,behavior:"smooth"});};
+ const openPayment=async()=>{if(!tierChosen)return;if(!authUser){setAuthMessage("سجّل الدخول أولاً عشان نكمل حجزك. الفعاليات متاحة للتصفح بدون حساب.");setSelectedEvent(null);setShowPayment(false);setActiveTab("profile");window.scrollTo({top:0,behavior:"smooth"});return;}setAuthMessage("");if(selected){const loaded=await loadPaymentAccounts(selected.id);if(!loaded)return;}const url=new URL(window.location.href);url.searchParams.set("checkout","1");url.searchParams.set("tier",String(selectedTier));url.searchParams.set("qty",String(ticketCount));window.history.pushState({...window.history.state,haddirPage:"event-payment"},"",url.pathname+url.search+url.hash);setShowPayment(true);window.scrollTo({top:0,behavior:"smooth"});};
  const backToDetails=()=>{if((window.history.state as {haddirPage?:string}|null)?.haddirPage==="event-payment"){window.history.back();return;}const url=new URL(window.location.href);url.searchParams.delete("checkout");window.history.replaceState({...window.history.state,haddirPage:"event-detail"},"",url.pathname+url.search+url.hash);setShowPayment(false);window.scrollTo({top:0,behavior:"smooth"});};
- const submitBooking=async(e:any)=>{
-  e.preventDefault();
-  if(!receipt){setBookingError("ارفع صورة إيصال التحويل أولاً.");return;}
-  if(!authUser||!selected||!selected.tiers[selectedTier]){setBookingError("انتهت جلسة الحجز. سجّل الدخول وحاول مرة أخرى.");return;}
-  if(!eventPaymentAccounts.some(a=>a.id===paymentMethod)){setBookingError("اختر حساب دفع متاح لهذه الفعالية.");return;}
-  if(!["image/jpeg","image/png","image/webp"].includes(receipt.type)){setBookingError("الصيغ المدعومة: JPG أو PNG أو WebP.");return;}
-  if(receipt.size>5*1024*1024){setBookingError("حجم الإيصال يجب ألا يتجاوز 5 ميجابايت.");return;}
-  if(!getSupabaseBrowserClient()){setBookingError("تعذر الاتصال بقاعدة البيانات حالياً.");return;}
-  setBookingSubmitting(true);setBookingError("");
-  let activeBookingId=bookingId;
-  let uploadedReceiptPath:string|null=null;
-  try{
-   if(!activeBookingId){
-    const {data:created,error}=await createBooking(selected.id,selected.tiers[selectedTier].id,ticketCount);
-    if(error){setBookingError(error.message||"ما قدرنا ننشئ الحجز.");return;}
-    if(!created?.booking_id){setBookingError("لم نستلم تأكيد إنشاء الحجز.");return;}
-    activeBookingId=created.booking_id;setBookingId(activeBookingId);setBookingNumber(created.booking_number||"");
-   }
-   const {path:receiptPath,error:uploadError}=await uploadPaymentReceipt(authUser.id,activeBookingId,receipt);
-   if(uploadError||!receiptPath){setBookingError("تم حفظ الحجز لكن تعذر رفع الإيصال: "+(uploadError?.message||"تعذر تحديد مسار الإيصال")+". يمكنك المحاولة مرة أخرى.");return;}
-   uploadedReceiptPath=receiptPath;
-   const {data:submissionId,error:submitError}=await submitPayment(activeBookingId,paymentMethod,receiptPath);
-   if(submitError||!submissionId){
-    await removePaymentReceipt(receiptPath);
-    uploadedReceiptPath=null;
-    setBookingError(submitError?.message||"تعذر إرسال إثبات الدفع للمراجعة. حاول مرة أخرى.");return;
-   }
-   uploadedReceiptPath=null;
-   setBookingDone(true);setActiveTab("notifications");
-  }catch(error){
-   if(uploadedReceiptPath){
-    try{await removePaymentReceipt(uploadedReceiptPath);}catch(cleanupError){console.error("Could not remove unsubmitted payment receipt",cleanupError);}
-   }
-   console.error("Booking submission failed",error);
-   setBookingError(error instanceof Error&&error.message?error.message:"حصل خطأ غير متوقع أثناء إرسال الحجز. حاول مرة أخرى.");
-  }finally{
-   setBookingSubmitting(false);
-  }
-};
+
  return <main dir="rtl" lang="ar" className={"app-shell"+(darkMode?" theme-dark":"")}>
  <>
  {!selected&&(isGatekeeperPage?<header className="screen-topbar gatekeeper-page-topbar"><button type="button" className="btn btn-outline" onClick={()=>{setIsGatekeeperPage(false);setActiveWorkspace(null);const url=new URL(window.location.href);url.searchParams.delete("workspace");window.location.assign(url.pathname+url.search+url.hash);}}>العودة للملف الشخصي</button><strong>مسح التذاكر</strong><span className="screen-icon"><ScanLine/></span></header>:activeTab==="home"?<header className="topbar"><div className="container header-inner"><button className="brand brand-button" onClick={()=>go("home")}><span className="brand-mark">ح</span> حاضر</button><div className="desktop-greeting">من السودان، لكل لحظة تستاهل الحضور.</div><button className="header-icon theme-toggle" type="button" aria-label={darkMode?"تفعيل الوضع النهاري":"تفعيل الوضع الليلي"} aria-pressed={darkMode} onClick={()=>setDarkMode(v=>!v)}>{<span className="theme-toggle-track" aria-hidden="true"><span className="theme-toggle-knob">{darkMode?"☾":"☀"}</span></span>}</button></div></header>:<header className="screen-topbar"><span className="screen-topbar-spacer" aria-hidden="true"/><strong>{({tickets:"تذاكري",notifications:"الإشعارات",profile:"الملف الشخصي"} as Record<string,string>)[activeTab]}</strong><span className="screen-icon">{activeTab==="tickets"?<Ticket/>:activeTab==="notifications"?<Bell/>:<UserRound/>}</span></header>)}
@@ -371,7 +336,40 @@ export default function Home(){
     {tierChosen&&<div className="detail-booking-dock actionable-footer"><div className="detail-dock-summary"><small>المبلغ الإجمالي <span className="ticket-count-badge">{ticketCount} تذاكر</span></small><strong>{selected.tiers[selectedTier].price==="مجاناً"?"مجاناً":formatMoney(selected.tiers[selectedTier].priceValue*ticketCount,selected.tiers[selectedTier].currency)}</strong><span>{selected.tiers[selectedTier].name}</span></div><button className="btn btn-primary pay-button" disabled={!selected.tiers[selectedTier]?.availableNow||selected.tiers[selectedTier]?.available<ticketCount||["تم البيع بالكامل","انتهت","غير متاح","البيع غير متاح حالياً"].includes(selected.status)} onClick={openPayment}>ادفع الآن <ArrowLeft size={18}/></button></div>}
    </div>
   </div>
- </div>:<div className="detail-sheet event-detail-layout payment-sheet"><div className="checkout-topbar"><div className="checkout-back-group"><button type="button" className="detail-glass-button checkout-back-icon" aria-label="العودة للتفاصيل" onClick={backToDetails}><ArrowLeft size={20}/></button><span>العودة للتفاصيل</span></div><span className="checkout-wallet-icon" aria-label="المحفظة"><Wallet size={23}/></span></div><div className="payment-screen"><div className="booking-steps" aria-label="خطوات الحجز"><span className="step-done">١. اختيار الفئة</span><span className="step-done">٢. مراجعة الحجز</span><span className="step-current">٣. الدفع</span></div>{!bookingDone?<form className="checkout-form" onSubmit={submitBooking}><span className="section-kicker">الخطوة الثالثة من الحجز</span><h1>إتمام الحجز</h1><p>راجع تفاصيل حجزك وأكمل بيانات الدفع.</p><div className="checkout-event"><span className={"checkout-thumb event-cover "+selected.cover}>{selected.coverImageUrl&&<img className="event-cover-image" src={selected.coverImageUrl} alt=""/>}{!selected.coverImageUrl&&<span className="cover-symbol">✦</span>}</span><div><strong>{selected.title}</strong><small>{selected.tiers[selectedTier].name}</small></div></div><div className="checkout-total"><span>الإجمالي</span><strong>{selected.tiers[selectedTier].price==="مجاناً"?"مجاناً":formatMoney(selected.tiers[selectedTier].priceValue*ticketCount,selected.tiers[selectedTier].currency)}</strong></div><section className="checkout-section"><h2>طريقة الدفع</h2><label className="checkout-label"><span>اختر حساب التحويل</span><select required value={paymentMethod} onChange={e=>{setPaymentMethod(e.target.value);setAccountCopied(false);setBookingError("");}} disabled={eventPaymentAccounts.length===0}><option value="" disabled>اضغط هنا لاختيار طريقة الدفع</option>{eventPaymentAccounts.map(account=><option key={account.id} value={account.id}>{account.account_name}</option>)}</select></label><div className="account-details">{paymentMethod&&<><div className="account-number-card"><small>رقم الحساب</small><strong dir="ltr">{eventPaymentAccounts.find(a=>a.id===paymentMethod)?.account_number||"—"}</strong><button type="button" className="copy-account-button" disabled={!eventPaymentAccounts.find(a=>a.id===paymentMethod)?.account_number} onClick={async()=>{const number=eventPaymentAccounts.find(a=>a.id===paymentMethod)?.account_number;if(!number)return;try{await navigator.clipboard.writeText(number);setAccountCopied(true);window.setTimeout(()=>setAccountCopied(false),1800);}catch{setBookingError("تعذر نسخ رقم الحساب. يمكنك تحديد الرقم ونسخه يدوياً.");}}}><Copy size={15}/>{accountCopied?"تم النسخ":"نسخ الرقم"}</button></div><div><small>اسم المستفيد</small><strong>{eventPaymentAccounts.find(a=>a.id===paymentMethod)?.beneficiary||"—"}</strong></div></>}</div>{paymentMethod&&<p className="account-note">حوّل المبلغ الموضح أعلاه إلى حساب الدفع المحدد، ثم ارفع صورة الإيصال لإرسال طلبك للمراجعة.</p>}{!eventPaymentAccounts.length&&<p className="checkout-footnote" role="alert">لم تُضف حسابات دفع لهذه الفعالية بعد. يرجى التواصل مع منظم الفعالية.</p>}</section><section className="checkout-section"><h2>إيصال التحويل</h2><label className="receipt-upload"><input type="file" accept="image/jpeg,image/png,image/webp" onChange={e=>setReceipt(e.target.files?.[0]||null)}/><span className="upload-symbol"><CreditCard size={20}/></span><strong>{receipt?receipt.name:"ارفع صورة إيصال التحويل"}</strong><small>JPG أو PNG أو WebP · بحد أقصى 5 ميجابايت</small><span className="upload-action">{receipt?"تغيير الصورة":"اختيار صورة"}</span></label></section>{bookingError&&<p className="checkout-footnote" role="alert">{bookingError}</p>}<p className="checkout-footnote">سيتم مراجعة الإيصال وتحديث حالة طلبك عبر الإشعارات. لا يتم إصدار التذكرة إلا بعد اعتماد الدفع.</p>{receipt&&<div className="checkout-submit-dock"><button className="btn btn-primary pay-button" type="submit" disabled={bookingSubmitting||eventPaymentAccounts.length===0}>{bookingSubmitting?"جاري رفع الإيصال وإرسال الطلب...":"إرسال طلب الدفع للمراجعة"} <ArrowLeft size={17}/></button></div>}</form>:<div className="booking-success"><span className="success-mark"><CheckCircle2 size={34}/></span><span className="section-kicker">تم بنجاح</span><h1>استلمنا طلب حجزك!</h1><p>تم استلام إثبات الدفع للحجز <strong>{bookingNumber}</strong> لفعالية <strong>{selected.title}</strong>، وأُرسل الآن لفريق حاضر للمراجعة. ستصدر التذكرة ورمز QR بعد اعتماد الدفع.</p><div className="success-summary"><span>عدد التذاكر</span><strong>{ticketCount}</strong><span>الإجمالي</span><strong>{selected.tiers[selectedTier].price==="مجاناً"?"مجاناً":formatMoney(selected.tiers[selectedTier].priceValue*ticketCount)}</strong></div><button className="btn btn-primary pay-button" onClick={()=>{resetBooking();setActiveTab("notifications");}}>مراجعة الإشعارات <Bell size={17}/></button></div>}</div></div>}
+ </div>:<div className="detail-sheet event-detail-layout payment-sheet">
+    <div className="checkout-topbar">
+     <div className="checkout-back-group"><button type="button" className="detail-glass-button checkout-back-icon" aria-label="العودة للتفاصيل" onClick={backToDetails}><ArrowLeft size={20}/></button><span>العودة للتفاصيل</span></div>
+     <span className="checkout-wallet-icon" aria-label="المحفظة"><Wallet size={23}/></span>
+    </div>
+    <div className="payment-screen">
+     <div className="booking-steps" aria-label="خطوات الحجز"><span className="step-done">١. اختيار الفئة</span><span className="step-done">٢. مراجعة الحجز</span><span className="step-current">٣. الدفع</span></div>
+     {!bookingDone
+      ? <PaymentCheckout
+          event={selected}
+          selectedTier={selectedTier}
+          ticketCount={ticketCount}
+          totalLabel={selected.tiers[selectedTier].price==="مجاناً"?"مجاناً":formatMoney(selected.tiers[selectedTier].priceValue*ticketCount,selected.tiers[selectedTier].currency)}
+          accounts={eventPaymentAccounts}
+          paymentMethod={paymentMethod}
+          onPaymentMethodChange={(value)=>{setPaymentMethod(value);setAccountCopied(false);setBookingError("");}}
+          accountCopied={accountCopied}
+          onCopyAccount={copyAccount}
+          receipt={receipt}
+          onReceiptChange={setReceipt}
+          bookingError={bookingError}
+          bookingSubmitting={bookingSubmitting}
+          onSubmit={submitBooking}
+        />
+      : <BookingSuccess
+          bookingNumber={bookingNumber}
+          eventTitle={selected.title}
+          ticketCount={ticketCount}
+          totalLabel={selected.tiers[selectedTier].price==="مجاناً"?"مجاناً":formatMoney(selected.tiers[selectedTier].priceValue*ticketCount)}
+          onGoNotifications={()=>{resetBooking();setActiveTab("notifications");}}
+        />
+     }
+    </div>
+   </div>
  </section>}
  {!isGatekeeperPage&&!selected&&<nav className="bottom-nav" aria-label="التنقل الرئيسي"><button className={activeTab==="home"?"selected":""} onClick={()=>go("home")}><House size={21}/><span>الرئيسية</span></button><button className={activeTab==="tickets"?"selected":""} onClick={()=>go("tickets")}><Ticket size={21}/><span>تذاكري</span></button><button className={activeTab==="notifications"?"selected":""} onClick={()=>go("notifications")}><Bell size={21}/><span>الإشعارات</span></button><button className={activeTab==="profile"?"selected":""} onClick={()=>go("profile")}><UserRound size={21}/><span>حسابي</span></button></nav>}
  </>
