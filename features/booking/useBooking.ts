@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { getSupabaseBrowserClient } from "../../lib/supabase";
 import {
@@ -40,9 +40,10 @@ export function useBooking({
   const [bookingError, setBookingError] = useState("");
   const [bookingSubmitting, setBookingSubmitting] = useState(false);
   const [accountCopied, setAccountCopied] = useState(false);
+  const submissionLock = useRef(false);
 
   const loadPaymentAccounts = useCallback(async (eventId: string) => {
-    // Keep the previous fallback: if Supabase is unavailable, checkout can still open.
+    // Preserve the existing offline fallback: checkout can render, but submission still requires Supabase.
     if (!getSupabaseBrowserClient()) return true;
     const { data, error } = await getEventPaymentAccounts(eventId);
     if (error) {
@@ -69,6 +70,7 @@ export function useBooking({
 
   const submitBooking = useCallback(async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (submissionLock.current) return;
     if (!receipt) {
       setBookingError("ارفع صورة إيصال التحويل أولاً.");
       return;
@@ -94,6 +96,8 @@ export function useBooking({
       return;
     }
 
+    // A ref closes the rapid double-submit window before React can re-render.
+    submissionLock.current = true;
     setBookingSubmitting(true);
     setBookingError("");
     const currentSelection = {
@@ -178,6 +182,7 @@ export function useBooking({
           : "حصل خطأ غير متوقع أثناء إرسال الحجز. حاول مرة أخرى.",
       );
     } finally {
+      submissionLock.current = false;
       setBookingSubmitting(false);
     }
   }, [authUser, selected, selectedTier, ticketCount, receipt, eventPaymentAccounts, paymentMethod, bookingId, bookingContext, onSuccess]);
