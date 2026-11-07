@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import type { FormEvent } from "react";
 import { getSupabaseBrowserClient } from "../../lib/supabase";
 import {
   getEventPaymentAccounts,
@@ -65,7 +66,7 @@ export function useBooking({
     }
   }, []);
 
-  const submitBooking = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
+  const submitBooking = useCallback(async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!receipt) {
       setBookingError("ارفع صورة إيصال التحويل أولاً.");
