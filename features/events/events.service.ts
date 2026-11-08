@@ -98,7 +98,7 @@ export async function getPublishedEvents(): Promise<PublicEventsResult> {
       cover: ["cover-one", "cover-two", "cover-three"][index % 3],
       coverImageUrl: event.cover_image_url || null,
       tag: event.category || "فعالية",
-      time: new Intl.DateTimeFormat("ar-SD", {
+      time: new Intl.DateTimeFormat("ar-SD-u-nu-latn", {
         hour: "numeric",
         minute: "2-digit",
       }).format(new Date(event.starts_at)),
