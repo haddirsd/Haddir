@@ -115,7 +115,6 @@ export function EventDetailWorkspace({
             )}
             <div className="detail-cover-shade" />
             <div className="detail-cover-title">
-              <span>تجربة تستحق الحضور</span>
               <h1>{event.title}</h1>
             </div>
             {!event.coverImageUrl && <span className="cover-symbol">✦</span>}
