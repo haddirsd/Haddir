@@ -2765,3 +2765,282 @@ body{
 @media(prefers-reduced-motion:reduce){
   .bottom-nav-active-pill,.bottom-nav button{transition:none}
 }
+
+
+/* =========================================================
+   HADDIR VISUAL IDENTITY — glass / arctic teal
+   Presentation only: no application data or behavior changes.
+   Font remains IBM Plex Sans Arabic.
+   ========================================================= */
+:root{
+  --bg:#eef6f9;
+  --fg:#082028;
+  --muted:#52707a;
+  --line:rgba(8,75,91,.13);
+  --surface:rgba(255,255,255,.78);
+  --surface-soft:#d8ecf3;
+  --green:#0284c7;
+  --dark:#075985;
+  --haddir-accent:#0284c7;
+  --haddir-accent-strong:#036b9e;
+  --haddir-glass:rgba(255,255,255,.72);
+  --haddir-shadow:0 18px 50px rgba(5,45,58,.09);
+  color-scheme:light;
+}
+html[data-theme="dark"]{color-scheme:dark}
+html[data-theme="dark"] body{
+  background:#030b0e;
+  color:#e7f7fb;
+}
+body{
+  background:
+    radial-gradient(ellipse at 8% 0%,rgba(56,189,248,.10),transparent 34rem),
+    radial-gradient(ellipse at 95% 22%,rgba(14,165,233,.07),transparent 30rem),
+    var(--bg);
+  color:var(--fg);
+  font-family:"IBM Plex Sans Arabic",Arial,sans-serif;
+}
+::selection{background:rgba(56,189,248,.3);color:var(--fg)}
+.theme-dark{
+  --bg:#030b0e;
+  --fg:#e7f7fb;
+  --muted:#91aeb8;
+  --line:rgba(125,211,228,.17);
+  --surface:rgba(7,29,36,.78);
+  --surface-soft:#0b2630;
+  --green:#38bdf8;
+  --dark:#0ea5e9;
+  --haddir-accent:#38bdf8;
+  --haddir-accent-strong:#7dd3fc;
+  --haddir-glass:rgba(7,29,36,.72);
+  --haddir-shadow:0 20px 60px rgba(0,0,0,.32);
+  background:
+    radial-gradient(ellipse at 12% -5%,rgba(14,165,233,.16),transparent 34rem),
+    radial-gradient(ellipse at 100% 30%,rgba(8,145,178,.10),transparent 32rem),
+    var(--bg);
+  color:var(--fg);
+}
+html[data-theme="dark"] body{
+  background:
+    radial-gradient(ellipse at 12% -5%,rgba(14,165,233,.16),transparent 34rem),
+    radial-gradient(ellipse at 100% 30%,rgba(8,145,178,.10),transparent 32rem),
+    #030b0e;
+}
+.app-shell,.admin-shell,.admin-loading,.admin-denied{
+  background:
+    radial-gradient(ellipse at 10% 0%,rgba(56,189,248,.08),transparent 32rem),
+    radial-gradient(ellipse at 100% 26%,rgba(14,165,233,.055),transparent 30rem),
+    var(--bg);
+  color:var(--fg);
+}
+.theme-dark.app-shell,.theme-dark.admin-shell,.theme-dark.admin-loading,.theme-dark.admin-denied{
+  background:
+    radial-gradient(ellipse at 12% -5%,rgba(14,165,233,.16),transparent 34rem),
+    radial-gradient(ellipse at 100% 30%,rgba(8,145,178,.10),transparent 32rem),
+    var(--bg);
+}
+
+/* Shared glass surfaces */
+.topbar,.screen-topbar,.detail-topbar,.bottom-nav,
+.detail-booking-dock,.detail-sheet .actionable-footer,
+.admin-sidebar,.admin-topbar{
+  background:var(--haddir-glass)!important;
+  border-color:var(--line)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(145%);
+  backdrop-filter:blur(22px) saturate(145%);
+  box-shadow:0 8px 34px rgba(4,42,54,.055);
+}
+.topbar{position:sticky;top:0;z-index:45}
+.bottom-nav{
+  border:1px solid var(--line)!important;
+  border-radius:22px!important;
+  box-shadow:0 14px 42px rgba(4,42,54,.13)!important;
+}
+.theme-dark .topbar,.theme-dark .screen-topbar,.theme-dark .detail-topbar,
+.theme-dark .bottom-nav,.theme-dark .detail-booking-dock,
+.theme-dark .detail-sheet .actionable-footer,.theme-dark .admin-sidebar,
+.theme-dark .admin-topbar{
+  background:rgba(7,29,36,.76)!important;
+  border-color:var(--line)!important;
+  box-shadow:0 14px 42px rgba(0,0,0,.24);
+}
+
+/* Cards, panels, fields */
+.event-card,.notification-item,.profile-card,.empty-panel,.ticket-card,
+.haddir-ticket,.checkout-section,.checkout-event,.payment-summary,
+.payment-placeholder,.tier-card,.detail-facts>div,.detail-quantity,
+.booking-steps,.profile-form,.settings-row,.admin-panel,.admin-metric,
+.admin-event-card,.admin-booking-card,.admin-payment-card,
+.admin-stat-card,.admin-selected-event,.gatekeeper-card,
+.advertiser-event-summary,.gatekeeper-workspace,.role-workspace-button{
+  background:var(--surface)!important;
+  border-color:var(--line)!important;
+  box-shadow:var(--haddir-shadow);
+  -webkit-backdrop-filter:blur(16px);
+  backdrop-filter:blur(16px);
+}
+.theme-dark .event-card,.theme-dark .notification-item,.theme-dark .profile-card,
+.theme-dark .empty-panel,.theme-dark .ticket-card,.theme-dark .haddir-ticket,
+.theme-dark .checkout-section,.theme-dark .checkout-event,.theme-dark .payment-summary,
+.theme-dark .payment-placeholder,.theme-dark .tier-card,.theme-dark .detail-facts>div,
+.theme-dark .detail-quantity,.theme-dark .booking-steps,.theme-dark .profile-form,
+.theme-dark .settings-row,.theme-dark .admin-panel,.theme-dark .admin-metric,
+.theme-dark .admin-event-card,.theme-dark .admin-booking-card,.theme-dark .admin-payment-card,
+.theme-dark .admin-stat-card,.theme-dark .admin-selected-event,.theme-dark .gatekeeper-card,
+.theme-dark .advertiser-event-summary,.theme-dark .gatekeeper-workspace,
+.theme-dark .role-workspace-button{
+  background:var(--surface)!important;
+  border-color:var(--line)!important;
+  color:var(--fg);
+  box-shadow:var(--haddir-shadow);
+}
+.event-card,.notification-item,.profile-card,.empty-panel,.haddir-ticket,
+.admin-event-card,.admin-booking-card,.admin-payment-card{
+  border-radius:20px;
+}
+.event-card-clickable:hover,.event-card-clickable:focus-visible{
+  border-color:rgba(2,132,199,.4);
+  box-shadow:0 20px 48px rgba(2,132,199,.14);
+}
+input,textarea,select,.profile-form input,.admin-event-form input,
+.admin-event-form textarea,.admin-search-box input,.checkout-label input,
+.checkout-label select,.gatekeeper-input input{
+  border-color:var(--line)!important;
+  background:color-mix(in srgb,var(--surface) 82%,transparent)!important;
+  color:var(--fg)!important;
+}
+input:focus,textarea:focus,select:focus{
+  border-color:var(--green)!important;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 16%,transparent)!important;
+  outline:none;
+}
+.theme-dark input,.theme-dark textarea,.theme-dark select,
+.theme-dark .admin-event-form input,.theme-dark .admin-event-form textarea{
+  background:rgba(2,12,16,.72)!important;
+  color:var(--fg)!important;
+  border-color:var(--line)!important;
+}
+
+/* Accent, buttons, navigation and status elements */
+.brand,.brand-button,.header-icon,.screen-icon,.section-kicker,
+.event-date,.text-link,.detail-back,.detail-share,.map-link,
+.detail-facts>div,.quick-location-row>svg,.quick-info-row>svg,
+.detail-section h2,.tier-card strong,.detail-dock-summary strong{
+  color:var(--green);
+}
+.brand-mark,.btn-primary,.category.active,.admin-create-button,
+.admin-sidebar nav button.active,.admin-brand>span,
+.admin-avatar,.actionable-footer .pay-button{
+  background:linear-gradient(135deg,#0ea5e9,#036b9e)!important;
+  color:#fff!important;
+  border-color:transparent!important;
+  box-shadow:0 8px 24px rgba(2,132,199,.2);
+}
+.theme-dark .brand-mark,.theme-dark .btn-primary,
+.theme-dark .category.active,.theme-dark .admin-create-button,
+.theme-dark .admin-sidebar nav button.active,
+.theme-dark .admin-brand>span,.theme-dark .admin-avatar,
+.theme-dark .actionable-footer .pay-button{
+  background:linear-gradient(135deg,#38bdf8,#0284c7)!important;
+  color:#03151b!important;
+}
+.btn-outline{
+  color:var(--fg);
+  background:var(--surface);
+  border-color:var(--line);
+}
+.theme-dark .btn-outline{color:var(--fg);background:var(--surface);border-color:var(--line)}
+.bottom-nav button{color:var(--muted)}
+.bottom-nav button.selected{color:var(--green)}
+.header-icon,.screen-icon,.payment-icon,.empty-illustration,
+.notification-icon,.profile-avatar,.quick-info-icon{
+  background:color-mix(in srgb,var(--green) 11%,var(--surface))!important;
+  color:var(--green)!important;
+  border:1px solid color-mix(in srgb,var(--green) 16%,var(--line));
+}
+.event-status{background:rgba(34,197,94,.12);color:#16834a;border-color:rgba(34,197,94,.2)}
+.event-status.status-low{background:rgba(245,158,11,.13);color:#b77912}
+.theme-dark .event-status{background:rgba(74,222,128,.12);color:#86efac}
+.theme-dark .event-status.status-low{background:rgba(251,191,36,.12);color:#fcd34d}
+
+/* Details, booking, tickets and notifications */
+.detail-screen{
+  background:
+    radial-gradient(ellipse at 50% -8%,rgba(56,189,248,.12),transparent 42%),
+    var(--bg);
+}
+.detail-sheet{background:var(--bg);color:var(--fg)}
+.detail-cover{box-shadow:0 24px 65px rgba(2,45,60,.18)}
+.map-link{
+  background:color-mix(in srgb,var(--green) 7%,var(--surface))!important;
+  border-color:var(--line)!important;
+  color:var(--green)!important;
+}
+.tier-card.tier-selected{
+  border-color:var(--green)!important;
+  background:color-mix(in srgb,var(--green) 9%,var(--surface))!important;
+  box-shadow:0 8px 26px color-mix(in srgb,var(--green) 12%,transparent);
+}
+.theme-dark .tier-card.tier-selected{
+  background:rgba(56,189,248,.12)!important;
+  border-color:#38bdf8!important;
+}
+.detail-booking-dock,.detail-sheet .actionable-footer{
+  border-color:var(--line)!important;
+}
+.haddir-ticket{border:1px solid var(--line)}
+.haddir-ticket-head,.haddir-ticket-meta,.haddir-ticket-qr{border-color:var(--line)}
+.haddir-ticket-footer{background:var(--surface-soft);color:var(--muted)}
+.theme-dark .haddir-ticket-footer{background:#0b2630;color:#b9d9e2}
+.notification-item.is-unread{border-color:color-mix(in srgb,var(--green) 40%,var(--line))}
+.theme-dark .notification-item.is-unread{background:rgba(8,47,58,.82);border-color:rgba(56,189,248,.34)}
+.profile-settings-panel{background:var(--surface);border-color:var(--line);color:var(--fg)}
+.theme-dark .profile-settings-panel{background:var(--surface);border-color:var(--line);color:var(--fg)}
+.info-strip,.auth-message,.checkout-total,.admin-notice{
+  background:color-mix(in srgb,var(--green) 9%,var(--surface));
+  border-color:var(--line);
+  color:var(--fg);
+}
+
+/* Admin and staff workspaces */
+.admin-sidebar{border-left:1px solid var(--line)}
+.admin-brand,.admin-sidebar nav button,.admin-logout,
+.admin-top-user,.admin-side-caption,.admin-mini-profile,
+.admin-welcome,.admin-panel-head,.admin-footer{
+  color:var(--fg);
+}
+.admin-sidebar nav button{border-radius:13px;color:var(--muted)}
+.admin-sidebar nav button.active{color:#fff}
+.admin-welcome,.admin-panel,.admin-metric,.admin-event-card,
+.admin-booking-card,.admin-payment-card,.admin-selected-event,
+.admin-stat-tabs button,.admin-event-stat-select select,
+.admin-user-total,.admin-search-box input,.admin-event-form{
+  border-color:var(--line)!important;
+}
+.admin-event-form{background:var(--surface)!important;border-radius:18px}
+.admin-event-form label,.admin-form-hint,.admin-form-message{color:var(--muted)}
+.admin-panel-head h3,.admin-event-card-title h4,
+.admin-booking-card-head h4,.admin-payment-card-head h4,
+.admin-stats-heading,.admin-selected-event h3,
+.admin-welcome h2{color:var(--fg)}
+.admin-panel-head p,.admin-event-card-meta,.admin-booking-card-grid,
+.admin-payment-note,.admin-footer,.admin-welcome p{color:var(--muted)}
+.theme-dark .admin-event-form{background:var(--surface)!important;border-color:var(--line)}
+.theme-dark .admin-event-form label{color:var(--muted)}
+.theme-dark .admin-event-form input,.theme-dark .admin-event-form textarea{
+  background:rgba(2,12,16,.72)!important;color:var(--fg)!important;border-color:var(--line)!important;
+}
+.admin-loading,.admin-denied{color:var(--fg)}
+.admin-spinner{border-color:var(--line);border-top-color:var(--green)}
+
+/* Smooth, restrained motion and accessibility */
+.event-card,.btn,.header-icon,.bottom-nav button,.tier-card,
+.admin-sidebar nav button,.role-workspace-button{
+  transition:background-color .22s ease,border-color .22s ease,
+    color .22s ease,box-shadow .22s ease,transform .22s ease;
+}
+.btn-primary:hover,.actionable-footer .pay-button:hover,
+.admin-create-button:hover{filter:brightness(1.06);transform:translateY(-1px)}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
