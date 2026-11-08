@@ -25,11 +25,17 @@ export function useAdminBookings(searchTerm: string) {
     void refresh();
     const supabase = getSupabaseBrowserClient();
     if (!supabase) return;
+    let hasSubscribed = false;
     const channel = supabase.channel("admin-bookings-workspace")
       .on("postgres_changes", { event: "*", schema: "public", table: "bookings" }, () => void refresh())
       .on("postgres_changes", { event: "*", schema: "public", table: "booking_items" }, () => void refresh())
       .on("postgres_changes", { event: "*", schema: "public", table: "payment_submissions" }, () => void refresh())
-      .subscribe();
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          if (hasSubscribed) void refresh();
+          hasSubscribed = true;
+        }
+      });
     return () => {
       latestRequest.current += 1;
       void supabase.removeChannel(channel);
