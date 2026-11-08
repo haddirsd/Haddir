@@ -12,7 +12,7 @@ type AssignedEvent = { events?: { title?: string; venue?: string; city?: string;
 export function GatekeeperWorkspace({
   userRole, assignedEvent, online, counts, loading, code, result, manualEntryOpen,
   scannerOpen, history, historyLoading, videoRef, onOpenScanner, onOpenManual,
-  onCodeChange, onManualSubmit, onClose,
+  onCodeChange, onManualSubmit, onAcknowledgeResult, onClose,
 }: {
   userRole: string;
   assignedEvent: AssignedEvent;
@@ -30,6 +30,7 @@ export function GatekeeperWorkspace({
   onOpenManual: () => void;
   onCodeChange: (value: string) => void;
   onManualSubmit: () => void;
+  onAcknowledgeResult: () => void;
   onClose: () => void;
 }) {
   const formatDate = (value: string) => new Intl.DateTimeFormat("ar-SD-u-nu-latn", { weekday: "long", day: "numeric", month: "long" }).format(new Date(value));
@@ -57,14 +58,26 @@ export function GatekeeperWorkspace({
         </div>
         {scannerOpen && <QrScanner videoRef={videoRef} />}
         {manualEntryOpen && <ManualTicketEntry code={code} loading={loading} disabled={!assignedEvent} onCodeChange={onCodeChange} onSubmit={onManualSubmit} />}
-        {result && <div className={"gatekeeper-result " + (result.status === "checked_in" ? "valid" : result.status === "used" ? "used" : result.status === "not_found" ? "invalid" : "error")}>
-          <strong>{result.status === "checked_in" ? "مقبولة — تم تسجيل استخدامها بنجاح" : result.status === "used" ? "مستخدمة — تم استخدام هذه التذكرة من قبل" : result.status === "not_found" ? "مزوّرة — هذا الكود غير صادر من نظام حاضر" : result.message}</strong>
-          {result.ticket_code && <div className="gatekeeper-result-details">
-            <span>اسم المشتري: {result.buyer_name || result.attendee_name || "—"}</span><span>الفعالية: {result.event_title || "—"}</span><span>فئة التذكرة: {result.ticket_type || "—"}</span>
-            {result.attendee_count != null && <span>عدد الأفراد في الحجز: {result.attendee_count}</span>}<span>الكود: {result.ticket_code}</span>
-          </div>}
-          {result.status === "checked_in" && <p>تم تحديث حالة التذكرة في النظام إلى «مستخدمة»، ولن تُقبل مرة أخرى.</p>}
-        </div>}
+        {result && (() => {
+          const tone = result.status === "checked_in" ? "valid" : result.status === "used" ? "used" : result.status === "not_found" || result.status === "invalid" ? "invalid" : "error";
+          const heading = result.status === "checked_in" ? "مقبولة — تم تسجيل الدخول" : result.status === "used" ? "مستعملة — سبق تسجيل الدخول بها" : result.status === "not_found" ? "من خارج نظام حاضر" : result.status === "invalid" ? "تذكرة غير صالحة" : "تعذر إكمال الفحص";
+          return <div className="gatekeeper-result-backdrop" role="presentation">
+            <section className={"gatekeeper-result-modal " + tone} role="dialog" aria-modal="true" aria-labelledby="gatekeeper-result-title">
+              <div className="gatekeeper-result-status-icon" aria-hidden="true">{tone === "valid" ? "✓" : tone === "used" ? "!" : "×"}</div>
+              <strong id="gatekeeper-result-title">{heading}</strong>
+              <p className="gatekeeper-result-message">{result.message || (result.status === "checked_in" ? "تم اعتماد التذكرة وتسجيل استخدامها بنجاح." : result.status === "used" ? "لا تسمح بدخول حامل هذه التذكرة مرة أخرى." : "لم يتم العثور على تذكرة صادرة من نظام حاضر بهذا الرمز.")}</p>
+              {result.ticket_code && <div className="gatekeeper-result-details">
+                <span><b>اسم المشتري:</b> {result.buyer_name || result.attendee_name || "—"}</span>
+                <span><b>الفعالية:</b> {result.event_title || "—"}</span>
+                <span><b>فئة التذكرة:</b> {result.ticket_type || "—"}</span>
+                {result.attendee_count != null && <span><b>عدد الأفراد:</b> {result.attendee_count}</span>}
+                <span><b>كود التذكرة:</b> <b dir="ltr">{result.ticket_code}</b></span>
+              </div>}
+              {result.status === "checked_in" && <p className="gatekeeper-result-note">تم تحديث حالة التذكرة إلى «مستخدمة» ولن تُقبل مرة أخرى.</p>}
+              <button type="button" className="btn btn-primary gatekeeper-result-acknowledge" onClick={onAcknowledgeResult}>موافق — فحص التذكرة التالية</button>
+            </section>
+          </div>;
+        })()}
         <ScanHistory items={history} loading={historyLoading} />
       </div> : <div className="empty-state" role="alert">
         <strong>ما عندك صلاحية لواجهة البواب</strong><p>الواجهة دي مخصصة لحسابات البواب والمنظم المعتمدة فقط.</p>
