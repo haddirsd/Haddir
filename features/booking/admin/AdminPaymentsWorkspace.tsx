@@ -27,8 +27,8 @@ export default function AdminPaymentsWorkspace() {
       if (result.error) { setActionError("تعذرت مراجعة إثبات الدفع: " + result.error); return; }
       setRejectionReasons(current => { const next = { ...current }; delete next[row.id]; return next; });
       setActionMessage(decision === "approve"
-        ? "تم اعتماد الدفع وإصدار " + Number(result.data?.ticketsCreated || 0) + " تذكرة. حُفظ إشعار البريد في قائمة الانتظار، وسيُرسل بعد تفعيل إعدادات Resend."
-        : "تم رفض إثبات الدفع وإرسال السبب للعميل. حُفظ إشعار البريد في قائمة الانتظار، وسيُرسل بعد تفعيل إعدادات Resend.");
+        ? "تم اعتماد الدفع وإصدار " + Number(result.data?.ticketsCreated || 0) + " تذكرة. وصل إشعار القبول للعميل داخل التطبيق."
+        : "تم رفض إثبات الدفع وإرسال السبب للعميل داخل التطبيق.");
       await refresh();
     } catch (error) {
       setActionError(error instanceof Error ? error.message : "تعذرت مراجعة إثبات الدفع.");
