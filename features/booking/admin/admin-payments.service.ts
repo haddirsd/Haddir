@@ -25,11 +25,5 @@ export async function reviewAdminPayment(
     p_submission_id: submissionId, p_decision: decision, p_rejection_reason: rejectionReason,
   });
   if (error) return { data: null, error: error.message || "تعذرت مراجعة إثبات الدفع." };
-  if (data?.booking_id) {
-    void supabase.functions.invoke("send-booking-email", { body: { booking_id: data.booking_id, decision } })
-      .then(({ error: emailError }: any) => {
-        if (emailError) console.info("Booking email remains queued until Resend is configured.");
-      });
-  }
   return { data: { bookingId: data?.booking_id || null, ticketsCreated: Number(data?.tickets_created || 0) }, error: null };
 }
