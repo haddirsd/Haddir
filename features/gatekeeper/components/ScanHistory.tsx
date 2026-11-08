@@ -24,7 +24,7 @@ export function ScanHistory({
                 <strong className={item.outcome === "accepted" ? "accepted" : item.outcome === "used" ? "used" : item.outcome === "forged" ? "forged" : "invalid"}>
                   {item.outcome === "accepted" ? "مقبولة — تم الدخول" : item.outcome === "used" ? "محاولة دخول مكررة" : item.outcome === "forged" ? "كود غير موجود" : "تذكرة غير صالحة"}
                 </strong>
-                <small>{item.gatekeeper_name || "بواب الفعالية"} · {item.scanned_at ? new Date(item.scanned_at).toLocaleString("ar-SD") : "—"}</small>
+                <small>{item.gatekeeper_name || "بواب الفعالية"} · {item.scanned_at ? new Date(item.scanned_at).toLocaleString("ar-SD-u-nu-latn") : "—"}</small>
               </div>
             </article>
           ))}
