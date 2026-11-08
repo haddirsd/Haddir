@@ -42,6 +42,8 @@ export function useAdminUsers(role: AdminUsersRole, searchTerm: string) {
   const updateRole = useCallback(async (userRow: AdminUserRow, nextRole: string, eventId: string | null) => {
     if (!["owner", "admin"].includes(role) || updatingUserId) return;
     if (userRow.role === "owner") { setError("لا يمكن تغيير صلاحية مالك المنصة."); return; }
+    if (role === "admin" && userRow.role === "admin") { setError("لا يحق للمشرف الإداري تغيير صلاحيات مشرف إداري آخر."); return; }
+    if (nextRole === "admin" && role !== "owner") { setError("تعيين المشرف الإداري من صلاحيات مالك المنصة فقط."); return; }
     if (nextRole === "organizer") return;
     if ((nextRole === "gatekeeper" || nextRole === "advertiser") && !eventId) { setError("اختار الفعالية أولاً لهذا المستخدم."); return; }
     if (!window.confirm("تأكيد تغيير دور " + (userRow.full_name || "هذا المستخدم") + "؟")) return;
