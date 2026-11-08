@@ -176,6 +176,7 @@ export default function Home(){
    onOpenManual={openManualEntry}
    onCodeChange={setGatekeeperCode}
    onManualSubmit={()=>{setScannerOpen(false);setManualEntryOpen(false);void runGatekeeperAction(true,gatekeeperCode,"manual");}}
+   onAcknowledgeResult={acknowledgeGatekeeperResult}
    onClose={()=>{const url=new URL(window.location.href);url.searchParams.delete("workspace");url.searchParams.set("tab","profile");window.location.assign(url.pathname+url.search+url.hash);}}
   />}
  </div>
