@@ -1,5 +1,5 @@
 export const formatEventDate = (value: string) =>
-  new Intl.DateTimeFormat("ar-SD", {
+  new Intl.DateTimeFormat("ar-SD-u-nu-latn", {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -11,4 +11,4 @@ export const currencyLabel = (currency: string) =>
   ] || currency.trim().toUpperCase());
 
 export const formatMoney = (value: number, currency = "SDG") =>
-  new Intl.NumberFormat("ar-SD").format(value) + " " + currencyLabel(currency);
+  new Intl.NumberFormat("ar-SD-u-nu-latn").format(value) + " " + currencyLabel(currency);
