@@ -77,26 +77,17 @@ export function useGatekeeper({
     const supabase = getSupabaseBrowserClient();
     if (!isGatekeeperPage || !authUser || !assignedEvent?.event_id || (userRole !== "gatekeeper" && userRole !== "organizer") || !supabase) return;
     let hasSubscribed = false;
-    const refresh = async () => {
-      const [{ data: stats }, { data: history, error }] = await Promise.all([
-        getGatekeeperScanStats(assignedEvent.event_id),
-        getGatekeeperScanHistory(assignedEvent.event_id),
-      ]);
-      if (!alive) return;
-      if (stats) setGatekeeperCounts({ ...emptyStats, ...stats });
-      if (!error && Array.isArray(history)) setGatekeeperHistory(history);
-    };
-    void refresh();
+    void refreshGatekeeperData();
     const channel = supabase.channel("gatekeeper-live-" + assignedEvent.event_id)
-      .on("postgres_changes", { event: "*", schema: "public", table: "gatekeeper_scan_logs", filter: "event_id=eq." + assignedEvent.event_id }, () => { void refresh(); })
+      .on("postgres_changes", { event: "*", schema: "public", table: "gatekeeper_scan_logs", filter: "event_id=eq." + assignedEvent.event_id }, () => { void refreshGatekeeperData(); })
       .subscribe((status) => {
         if (status === "SUBSCRIBED") {
-          if (hasSubscribed) void refresh();
+          if (hasSubscribed) void refreshGatekeeperData();
           hasSubscribed = true;
         }
       });
-    return () => { alive = false; dataRequestSequence.current += 1; void supabase.removeChannel(channel); };
-  }, [isGatekeeperPage, authUser, assignedEvent?.event_id, userRole]);
+    return () => { dataRequestSequence.current += 1; void supabase.removeChannel(channel); };
+  }, [isGatekeeperPage, authUser, assignedEvent?.event_id, userRole, refreshGatekeeperData]);
 
   useEffect(() => {
     const update = () => setGatekeeperOnline(typeof navigator !== "undefined" ? navigator.onLine : true);
