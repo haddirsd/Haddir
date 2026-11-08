@@ -14,7 +14,7 @@ export default function AdminUsersWorkspace({
     roleDrafts, setRoleDrafts, assignmentEventIds, setAssignmentEventIds, refresh, updateRole,
   } = useAdminUsers(role, searchTerm);
   const roleNames: Record<string,string> = {
-    owner:"مالك المنصة", admin:"مشرف", supervisor:"موظف حاضر",
+    owner:"مالك المنصة", admin:"مشرف إداري", supervisor:"موظف حاضر",
     organizer:"منظم حاضر", gatekeeper:"منظم حاضر", advertiser:"مُعلن", customer:"عميل",
   };
 
@@ -35,7 +35,7 @@ export default function AdminUsersWorkspace({
         <tbody>{rows.map((row,index)=>{
           const draftRole=roleDrafts[row.id]||row.role||"customer";
           const selectedEvent=assignmentEventIds[row.id]??row.assignment_event_id??"";
-          const protectedUser=row.role==="owner";
+          const protectedUser=row.role==="owner"||(role==="admin"&&row.role==="admin");
           return <tr key={row.id||index}>
             <td data-label="الإسم"><strong>{fmt(row.full_name)}</strong></td>
             <td data-label="رقم الهاتف"><span dir="ltr">{fmt(row.phone)}</span><small className="admin-user-email" dir="ltr">{fmt(row.email)}</small></td>
@@ -44,7 +44,9 @@ export default function AdminUsersWorkspace({
             <td data-label="تعديل الدور / الفعالية">
               <div className="admin-user-role-editor">
                 <select aria-label={"تعديل دور "+(row.full_name||"المستخدم")} value={draftRole} disabled={updatingUserId===row.id||protectedUser} onChange={event=>setRoleDrafts(current=>({...current,[row.id]:event.target.value}))}>
-                  <option value="customer">عميل</option><option value="admin">مشرف إداري</option><option value="supervisor">موظف حاضر</option><option value="gatekeeper">منظم حاضر (بواب)</option><option value="advertiser">مُعلن</option>
+                  <option value="customer">عميل</option>
+                  {(role==="owner"||row.role==="admin")&&<option value="admin">مشرف إداري</option>}
+                  <option value="supervisor">موظف حاضر</option><option value="gatekeeper">منظم حاضر (بواب)</option><option value="advertiser">مُعلن</option>
                   {row.role==="organizer"&&<option value="organizer">منظم حاضر</option>}
                   {protectedUser&&<option value={row.role}>{roleNames[row.role]||row.role}</option>}
                 </select>
@@ -52,7 +54,7 @@ export default function AdminUsersWorkspace({
                   <option value="">اختر الفعالية (تشمل المسودات)</option>
                   {eventOptions.map(option=><option key={option.id} value={option.id}>{option.title} · {option.status==="draft"?"مسودة":option.status==="published"?"منشورة":option.status}</option>)}
                 </select>}
-                {!protectedUser&&<button type="button" className="admin-user-save-role" disabled={updatingUserId===row.id||draftRole==="organizer"||((draftRole==="gatekeeper"||draftRole==="advertiser")&&!selectedEvent)||draftRole===row.role&&((draftRole!=="gatekeeper"&&draftRole!=="advertiser")||selectedEvent===(row.assignment_event_id||""))} onClick={()=>void updateRole(row,draftRole,(draftRole==="gatekeeper"||draftRole==="advertiser")?selectedEvent:null)}>{updatingUserId===row.id?"جاري الحفظ…":"حفظ"}</button>}
+                {!protectedUser&&<button type="button" className="admin-user-save-role" disabled={updatingUserId===row.id||draftRole==="organizer"||(draftRole==="admin"&&role!=="owner")||((draftRole==="gatekeeper"||draftRole==="advertiser")&&!selectedEvent)||draftRole===row.role&&((draftRole!=="gatekeeper"&&draftRole!=="advertiser")||selectedEvent===(row.assignment_event_id||""))} onClick={()=>void updateRole(row,draftRole,(draftRole==="gatekeeper"||draftRole==="advertiser")?selectedEvent:null)}>{updatingUserId===row.id?"جاري الحفظ…":"حفظ"}</button>}
               </div>
               {updatingUserId===row.id&&<small className="admin-user-saving">جاري الحفظ…</small>}
             </td>
