@@ -9,7 +9,7 @@ export async function getAdminOverviewStats(role: AdminOverviewRole): Promise<{ 
     supabase.from("bookings").select("id", { count: "exact", head: true }),
     supabase.from("payment_submissions").select("id", { count: "exact", head: true }).eq("status", "submitted"),
     role === "owner" || role === "admin" ? supabase.from("profiles").select("id", { count: "exact", head: true }) : Promise.resolve({ count: null, error: null }),
-    supabase.from("bookings").select("subtotal").eq("status", "confirmed"),
+    role === "supervisor" ? Promise.resolve({ data: [], error: null }) : supabase.from("bookings").select("subtotal").eq("status", "confirmed"),
   ]);
   const failed = [events, bookings, pending, users, confirmed].some(result => result.error);
   if (failed) return { data: null, error: "تعذر تحميل بعض مؤشرات الإدارة. تحقق من سياسات قاعدة البيانات." };
