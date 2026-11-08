@@ -8,7 +8,7 @@ import type { AdminPaymentDecision, AdminPaymentRow } from "./admin-payments.typ
 
 const statusLabels: Record<string,string> = { submitted:"بانتظار المراجعة", approved:"مقبول", rejected:"مرفوض" };
 const fmt = (value: unknown) => value == null || value === "" ? "—" : String(value);
-const money = (value: unknown, currency = "SDG") => value == null ? "—" : `${Number(value).toLocaleString("ar-SD")} ${currency}`;
+const money = (value: unknown, currency = "SDG") => value == null ? "—" : `${Number(value).toLocaleString("ar-SD-u-nu-latn")} ${currency}`;
 
 export default function AdminPaymentsWorkspace() {
   const { rows, loading, error, refresh } = useAdminPayments();
@@ -65,7 +65,7 @@ export default function AdminPaymentsWorkspace() {
             <div><small>اسم المستفيد</small><strong>{fmt(r.payment_account_beneficiary)}</strong></div>
             <div><small>التذاكر</small><strong>{(r.bookings?.booking_items||[]).map(item=>`${item.ticket_types?.name||"تذكرة"} × ${item.quantity}`).join("، ")||"—"}</strong></div>
             <div><small>مرجع التحويل</small><strong>{fmt(r.transfer_reference)}</strong></div>
-            <div><small>تاريخ الإرسال</small><strong>{r.created_at?new Date(r.created_at).toLocaleString("ar-SD"):"—"}</strong></div>
+            <div><small>تاريخ الإرسال</small><strong>{r.created_at?new Date(r.created_at).toLocaleString("ar-SD-u-nu-latn"):"—"}</strong></div>
             <div><small>الإيصال</small>{r.receipt_url?<a className="admin-payment-receipt" href={r.receipt_url} target="_blank" rel="noreferrer">عرض إيصال التحويل</a>:<strong>غير مرفق</strong>}</div>
             {r.review_note&&<div className="admin-payment-note"><small>ملاحظة المراجعة</small><strong>{r.review_note}</strong></div>}
           </div>
