@@ -3701,3 +3701,291 @@ input:focus,textarea:focus,select:focus{
   .trending-dot{animation:none!important}
   .trending-card,.event-list-thumb img,.btn,.bottom-nav button{transition:none!important}
 }
+
+
+/* =========================================================
+   HADDIR — FINAL GLOBAL THEME LAYER
+   The supplied glass interface is the visual source of truth.
+   Applies consistently to customer, booking, staff and admin screens.
+   IBM Plex Sans Arabic is retained as the product-wide font.
+   ========================================================= */
+:root,
+html[data-theme="light"]{
+  color-scheme:light;
+  --bg:#eef6f9;
+  --bg-secondary:#d8ecf3;
+  --fg:#082028;
+  --muted:rgba(8,32,40,.65);
+  --line:rgba(8,55,71,.12);
+  --surface:rgba(255,255,255,.68);
+  --surface-strong:rgba(255,255,255,.84);
+  --surface-soft:rgba(216,236,243,.76);
+  --green:#0284c7;
+  --dark:#075985;
+  --haddir-accent:#0284c7;
+  --haddir-accent-strong:#0369a1;
+  --haddir-accent-soft:rgba(2,132,199,.15);
+  --haddir-accent-glow:rgba(2,132,199,.20);
+  --haddir-glass-blur:22px;
+  --haddir-glass-border:rgba(255,255,255,.66);
+  --haddir-glass-shadow:0 18px 44px rgba(4,47,60,.11),inset 0 1px 0 rgba(255,255,255,.62);
+}
+html[data-theme="dark"],
+.theme-dark{
+  color-scheme:dark;
+  --bg:#030b0e;
+  --bg-secondary:#071d24;
+  --fg:#fff;
+  --muted:rgba(255,255,255,.62);
+  --line:rgba(255,255,255,.14);
+  --surface:rgba(255,255,255,.06);
+  --surface-strong:rgba(7,29,36,.82);
+  --surface-soft:rgba(7,29,36,.72);
+  --green:#38bdf8;
+  --dark:#0ea5e9;
+  --haddir-accent:#38bdf8;
+  --haddir-accent-strong:#7dd3fc;
+  --haddir-accent-soft:rgba(56,189,248,.15);
+  --haddir-accent-glow:rgba(56,189,248,.35);
+  --haddir-glass-border:rgba(255,255,255,.14);
+  --haddir-glass-shadow:0 20px 48px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.08);
+}
+html,body{min-height:100%;font-family:"IBM Plex Sans Arabic",Arial,sans-serif}
+html body{
+  color:var(--fg)!important;
+  background:
+    radial-gradient(circle at 85% 12%,rgba(45,160,185,.22) 0%,rgba(20,88,105,.09) 32%,transparent 65%),
+    radial-gradient(circle at 15% 65%,rgba(19,78,94,.10) 0%,transparent 58%),
+    linear-gradient(160deg,#d8ecf3 0%,#eef6f9 68%)!important;
+  transition:background .4s ease,color .4s ease;
+}
+html[data-theme="dark"] body{
+  background:
+    radial-gradient(circle at 85% 12%,rgba(45,160,185,.30) 0%,rgba(20,88,105,.15) 35%,transparent 70%),
+    radial-gradient(circle at 15% 65%,rgba(19,78,94,.24) 0%,transparent 65%),
+    linear-gradient(160deg,#071d24 0%,#030b0e 68%)!important;
+}
+.app-shell,.admin-shell,.admin-loading,.admin-denied,
+.event-detail-page,.detail-screen,.payment-screen{
+  color:var(--fg)!important;
+  background:transparent!important;
+}
+.app-shell,.admin-shell{
+  position:relative;isolation:isolate;
+  background:
+    radial-gradient(circle at 85% 12%,rgba(56,189,248,.10) 0%,transparent 34rem),
+    radial-gradient(circle at 15% 65%,rgba(14,116,144,.07) 0%,transparent 34rem),
+    var(--bg)!important;
+}
+html[data-theme="dark"] .app-shell,
+html[data-theme="dark"] .admin-shell,
+.theme-dark.app-shell,.admin-shell.theme-dark{
+  background:
+    radial-gradient(circle at 85% 12%,rgba(45,160,185,.22) 0%,rgba(20,88,105,.10) 35%,transparent 70%),
+    radial-gradient(circle at 15% 65%,rgba(19,78,94,.18) 0%,transparent 65%),
+    linear-gradient(160deg,#071d24 0%,#030b0e 68%)!important;
+}
+.app-shell:before,.admin-shell:before{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 0%,rgba(56,189,248,.045),transparent 55%);
+}
+
+/* Unified translucent surfaces across every role and workflow */
+.event-card,.trending-card,.event-list-card,.ticket-card,.ticket-preview-card,
+.haddir-ticket,.notification-item,.notifications-toolbar,.notification-filters button,
+.profile-card,.profile-form,.profile-account-card,.profile-settings-panel,
+.empty-panel,.empty-state,.info-strip,.settings-row,.role-workspace-button,
+.advertiser-statistics-panel,.advertiser-event-summary,.advertiser-metric-grid article,
+.advertiser-finance-card,.gatekeeper-workspace,.gatekeeper-assigned-event,
+.gatekeeper-manual-form,.gatekeeper-manual-history,.gatekeeper-history-item,
+.gatekeeper-result,.admin-panel,.admin-metric,.admin-shortcuts button,
+.admin-event-card,.admin-booking-card,.admin-payment-card,.admin-event-form,
+.admin-ticket-editor,.admin-ticket-row,.admin-selected-event,.admin-users-table-wrap,
+.admin-table-wrap,.checkout-section,.checkout-event,.payment-summary,
+.payment-placeholder,.account-details,.account-number-card,.receipt-upload,
+.tier-card,.detail-quantity,.detail-quick-info,.detail-about,.detail-ticket-section,
+.booking-steps,.profile-info-list>div,.profile-settings-panel,
+.detail-facts>div,.payment-placeholder,.settings-row{
+  color:var(--fg)!important;
+  background:var(--surface)!important;
+  border-color:var(--line)!important;
+  box-shadow:var(--haddir-glass-shadow)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(145%);
+  backdrop-filter:blur(18px) saturate(145%);
+}
+html[data-theme="dark"] .event-card,html[data-theme="dark"] .trending-card,
+html[data-theme="dark"] .event-list-card,html[data-theme="dark"] .ticket-card,
+html[data-theme="dark"] .ticket-preview-card,html[data-theme="dark"] .haddir-ticket,
+html[data-theme="dark"] .notification-item,html[data-theme="dark"] .profile-card,
+html[data-theme="dark"] .profile-form,html[data-theme="dark"] .profile-account-card,
+html[data-theme="dark"] .profile-settings-panel,html[data-theme="dark"] .empty-panel,
+html[data-theme="dark"] .settings-row,html[data-theme="dark"] .role-workspace-button,
+html[data-theme="dark"] .advertiser-statistics-panel,html[data-theme="dark"] .advertiser-event-summary,
+html[data-theme="dark"] .advertiser-finance-card,html[data-theme="dark"] .gatekeeper-workspace,
+html[data-theme="dark"] .gatekeeper-assigned-event,html[data-theme="dark"] .gatekeeper-manual-form,
+html[data-theme="dark"] .gatekeeper-manual-history,html[data-theme="dark"] .gatekeeper-history-item,
+html[data-theme="dark"] .gatekeeper-result,html[data-theme="dark"] .admin-panel,
+html[data-theme="dark"] .admin-metric,html[data-theme="dark"] .admin-event-card,
+html[data-theme="dark"] .admin-booking-card,html[data-theme="dark"] .admin-payment-card,
+html[data-theme="dark"] .admin-event-form,html[data-theme="dark"] .admin-ticket-editor,
+html[data-theme="dark"] .admin-ticket-row,html[data-theme="dark"] .admin-selected-event,
+html[data-theme="dark"] .checkout-section,html[data-theme="dark"] .checkout-event,
+html[data-theme="dark"] .payment-summary,html[data-theme="dark"] .payment-placeholder,
+html[data-theme="dark"] .account-details,html[data-theme="dark"] .account-number-card,
+html[data-theme="dark"] .receipt-upload,html[data-theme="dark"] .tier-card,
+html[data-theme="dark"] .detail-quantity,html[data-theme="dark"] .detail-quick-info,
+html[data-theme="dark"] .detail-about,html[data-theme="dark"] .detail-ticket-section,
+html[data-theme="dark"] .booking-steps,html[data-theme="dark"] .detail-facts>div{
+  color:var(--fg)!important;background:var(--surface)!important;border-color:var(--line)!important;
+}
+
+/* Shared glass header and navigation */
+.app-shell>.topbar,.app-shell>.screen-topbar,.gatekeeper-page-topbar,
+.admin-sidebar,.admin-topbar,.detail-sticky-controls,.checkout-topbar{
+  background:var(--surface-strong)!important;border-color:var(--line)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(160%)!important;
+  backdrop-filter:blur(22px) saturate(160%)!important;
+  box-shadow:0 12px 34px rgba(4,42,54,.08)!important;
+}
+html[data-theme="dark"] .app-shell>.topbar,
+html[data-theme="dark"] .app-shell>.screen-topbar,
+html[data-theme="dark"] .gatekeeper-page-topbar,
+html[data-theme="dark"] .admin-sidebar,html[data-theme="dark"] .admin-topbar,
+html[data-theme="dark"] .detail-sticky-controls,html[data-theme="dark"] .checkout-topbar{
+  background:rgba(7,29,36,.84)!important;border-color:var(--line)!important;
+  box-shadow:0 14px 42px rgba(0,0,0,.28)!important;
+}
+.brand,.brand-button,.screen-topbar strong,.screen-heading h1,
+.screen-heading p,.admin-panel-head h3,.admin-event-card-title h4,
+.admin-booking-card-head h4,.admin-payment-card-head h4,
+.admin-welcome h2,.admin-stats-heading,.gatekeeper-workspace-head h2{
+  color:var(--fg)!important;
+}
+.brand-mark,.screen-icon,.header-icon,.notification-icon,.profile-avatar,
+.empty-illustration,.quick-info-icon,.payment-icon,.role-workspace-icon{
+  border:1px solid color-mix(in srgb,var(--green) 20%,var(--line))!important;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--green) 15%,var(--surface)),var(--surface))!important;
+  color:var(--green)!important;
+}
+.app-shell .bottom-nav{
+  position:fixed!important;z-index:90!important;left:50%!important;right:auto!important;
+  bottom:calc(13px + env(safe-area-inset-bottom))!important;
+  transform:translateX(-50%)!important;display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;align-items:center;
+  width:min(440px,calc(100% - 28px))!important;height:72px!important;padding:8px!important;
+  border:1px solid var(--haddir-glass-border)!important;border-radius:999px!important;
+  overflow:hidden;isolation:isolate;
+  background:linear-gradient(135deg,rgba(255,255,255,.76),rgba(218,245,248,.58) 55%,rgba(190,231,238,.48))!important;
+  box-shadow:0 22px 46px rgba(4,35,44,.22),0 5px 16px rgba(4,35,44,.10),inset 0 1px 1px rgba(255,255,255,.72)!important;
+  -webkit-backdrop-filter:blur(26px) saturate(170%)!important;
+  backdrop-filter:blur(26px) saturate(170%)!important;
+}
+html[data-theme="dark"] .app-shell .bottom-nav{
+  background:linear-gradient(135deg,rgba(4,25,32,.91),rgba(7,45,55,.86) 55%,rgba(5,31,40,.94))!important;
+  border-color:rgba(164,226,237,.22)!important;
+  box-shadow:0 22px 48px rgba(0,0,0,.48),inset 0 1px 1px rgba(255,255,255,.10)!important;
+}
+.app-shell .bottom-nav button{
+  position:relative;z-index:2;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:4px;min-width:0;min-height:54px;padding:4px 2px;
+  border:0!important;border-radius:999px!important;background:transparent!important;
+  color:rgba(5,43,53,.60)!important;font-size:10px!important;font-weight:700;
+}
+html[data-theme="dark"] .app-shell .bottom-nav button{color:rgba(223,245,248,.62)!important}
+.app-shell .bottom-nav button.selected{color:#036b9e!important}
+html[data-theme="dark"] .app-shell .bottom-nav button.selected{color:#b8f3fb!important}
+.app-shell .bottom-nav-active-pill{
+  top:7px!important;right:8px!important;bottom:7px!important;
+  width:calc((100% - 16px)/4)!important;border:1px solid rgba(226,250,255,.72)!important;
+  border-radius:999px!important;
+  background:linear-gradient(155deg,rgba(255,255,255,.64),rgba(105,198,214,.24) 58%,rgba(42,139,159,.17))!important;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.88),0 4px 14px rgba(4,54,67,.13)!important;
+  pointer-events:none;transition:transform .45s cubic-bezier(.34,1.35,.64,1);
+}
+html[data-theme="dark"] .app-shell .bottom-nav-active-pill{
+  border-color:rgba(188,239,248,.30)!important;
+  background:linear-gradient(155deg,rgba(132,207,220,.25),rgba(35,135,154,.24) 58%,rgba(13,82,100,.28))!important;
+}
+.app-shell{padding-bottom:110px!important}
+@media(min-width:801px){.app-shell .bottom-nav{bottom:18px!important}}
+@media(max-width:520px){.app-shell .bottom-nav{height:68px!important;width:calc(100% - 24px)!important}.app-shell{padding-bottom:100px!important}}
+
+/* Inputs, selects and text areas use the same frosted material */
+input,textarea,select,.profile-form input,.profile-form textarea,.profile-form select,
+.admin-search-box input,.admin-event-form input,.admin-event-form textarea,
+.admin-event-form select,.admin-users-table select,.checkout-label input,
+.checkout-label select,.gatekeeper-input input,.admin-payment-reject-box textarea{
+  color:var(--fg)!important;background:color-mix(in srgb,var(--surface-strong) 86%,transparent)!important;
+  border:1px solid var(--line)!important;border-radius:13px!important;
+}
+html[data-theme="dark"] input,html[data-theme="dark"] textarea,html[data-theme="dark"] select{
+  color:var(--fg)!important;background:rgba(2,18,23,.68)!important;border-color:var(--line)!important;
+}
+input:focus,textarea:focus,select:focus{
+  outline:none!important;border-color:var(--green)!important;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 17%,transparent)!important;
+}
+::placeholder{color:var(--muted)!important;opacity:.8}
+
+/* Actions, chips, active states and status colors */
+.brand,.header-icon,.screen-icon,.section-kicker,.event-date,.text-link,
+.detail-back,.detail-share,.map-link,.detail-section h2,.tier-card strong,
+.detail-dock-summary strong,.admin-metric strong,.advertiser-metric-grid strong{
+  color:var(--green)!important;
+}
+.btn-primary,.pay-button,.admin-create-button,.admin-user-save-role,
+.admin-payment-approve,.gatekeeper-actions .btn-primary{
+  color:#03151b!important;
+  background:linear-gradient(135deg,#7dd3fc 0%,#38bdf8 48%,#0284c7 100%)!important;
+  border:1px solid rgba(255,255,255,.24)!important;
+  box-shadow:0 9px 24px rgba(2,132,199,.24),inset 0 1px 0 rgba(255,255,255,.42)!important;
+  font-weight:900!important;
+}
+.btn-outline,.admin-refresh,.admin-event-edit,.admin-event-delete,.admin-payment-reject{
+  color:var(--fg)!important;background:var(--surface)!important;border:1px solid var(--line)!important;
+}
+.event-status{background:rgba(34,197,94,.12)!important;color:#16834a!important}
+.event-status.status-low{background:rgba(245,158,11,.13)!important;color:#b77912!important}
+html[data-theme="dark"] .event-status{background:rgba(74,222,128,.12)!important;color:#86efac!important}
+html[data-theme="dark"] .event-status.status-low{background:rgba(251,191,36,.12)!important;color:#fcd34d!important}
+.admin-sidebar nav button.active{
+  color:#03151b!important;background:linear-gradient(135deg,#7dd3fc,#0284c7)!important;
+}
+.map-link{
+  background:color-mix(in srgb,var(--green) 7%,var(--surface))!important;
+  border-color:var(--line)!important;color:var(--green)!important;
+}
+.tier-card.tier-selected{
+  border-color:var(--green)!important;
+  background:color-mix(in srgb,var(--green) 9%,var(--surface))!important;
+}
+html[data-theme="dark"] .tier-card.tier-selected{background:rgba(56,189,248,.12)!important;border-color:#38bdf8!important}
+.admin-users-table th,.admin-data-table th{
+  background:color-mix(in srgb,var(--green) 9%,var(--surface))!important;
+  color:var(--fg)!important;border-color:var(--line)!important;
+}
+.admin-users-table td,.admin-data-table td{color:var(--fg)!important;border-color:var(--line)!important}
+.trending-dot{background:#ef4444!important;box-shadow:0 0 0 4px rgba(239,68,68,.12),0 0 16px rgba(239,68,68,.5)!important}
+.detail-screen{background:var(--bg)!important}
+.detail-sheet{background:transparent!important;color:var(--fg)!important}
+.detail-sticky-controls,.checkout-topbar{background:var(--surface-strong)!important}
+.detail-booking-dock.actionable-footer{background:var(--surface-strong)!important;border-color:var(--line)!important}
+.admin-panel-head p,.admin-event-card-meta,.admin-booking-card-grid small,
+.admin-payment-card-grid small,.admin-footer,.admin-form-hint,
+.gatekeeper-workspace-head p,.gatekeeper-assigned-event span{color:var(--muted)!important}
+
+/* Retire inherited violet accents: all interactive accents follow the theme token */
+.text-purple-300,.text-purple-400,.text-purple-500,.text-violet-300,.text-violet-400,
+.text-violet-500,.text-fuchsia-400,.text-indigo-400{color:var(--green)!important}
+.bg-purple-500,.bg-violet-500,.bg-fuchsia-500,.bg-indigo-500{background:var(--green)!important}
+.border-purple-400,.border-violet-400,.border-fuchsia-400,.border-indigo-400{
+  border-color:color-mix(in srgb,var(--green) 35%,var(--line))!important;
+}
+@media(max-width:700px){
+  .app-shell>.topbar,.app-shell>.screen-topbar,.gatekeeper-page-topbar{height:64px}
+  .detail-quick-info{grid-template-columns:1fr!important;gap:12px!important}
+  .quick-info-divider{width:100%;height:1px}
+}
+@media(prefers-reduced-motion:reduce){
+  .app-shell .bottom-nav-active-pill{transition:none!important}
+}
