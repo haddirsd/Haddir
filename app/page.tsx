@@ -31,13 +31,14 @@ export default function Home(){
  },[]);
  useEffect(()=>{
   const supabase=getSupabaseBrowserClient();if(!supabase||!authUser)return;
-  let alive=true;let firstLoad=true;setAccountDataLoading(true);setAccountDataError("");
+  let alive=true;let firstLoad=true;let requestSequence=0;setAccountDataLoading(true);setAccountDataError("");
   const loadAccountData=async()=>{
+   const requestId=++requestSequence;
    const [ticketsResult,notificationsResult]=await Promise.all([
     supabase.from("tickets").select("id,booking_item_id,ticket_code,status,issued_at,events(title,starts_at,venue,cover_image_url),ticket_types(name),bookings!inner(booking_number,user_id),booking_items(quantity)").eq("bookings.user_id",authUser.id).order("issued_at",{ascending:false}),
     supabase.from("notifications").select("id,title,message,type,is_read,created_at,booking_id").eq("user_id",authUser.id).order("created_at",{ascending:false}).limit(100)
    ]);
-   if(!alive)return;
+   if(!alive||requestId!==requestSequence)return;
    const failure=ticketsResult.error||notificationsResult.error;
    if(failure)setAccountDataError(failure.message||"تعذر تحميل بيانات الحساب.");
    else{setMyTickets(ticketsResult.data||[]);setMyNotifications(notificationsResult.data||[]);setAccountDataError("");}
@@ -48,8 +49,8 @@ export default function Home(){
    .on("postgres_changes",{event:"*",schema:"public",table:"tickets"},()=>{void loadAccountData();})
    .on("postgres_changes",{event:"*",schema:"public",table:"notifications",filter:"user_id=eq."+authUser.id},()=>{void loadAccountData();})
    .on("postgres_changes",{event:"UPDATE",schema:"public",table:"bookings",filter:"user_id=eq."+authUser.id},()=>{void loadAccountData();})
-   .subscribe();
-  return()=>{alive=false;void supabase.removeChannel(channel);};
+   .subscribe((status)=>{if(status==="SUBSCRIBED")void loadAccountData();});
+  return()=>{alive=false;requestSequence++;void supabase.removeChannel(channel);};
  },[authUser]);
  useEffect(()=>{const saved=window.localStorage.getItem("haddir-theme");const prefersDark=window.matchMedia?.("(prefers-color-scheme: dark)").matches;setDarkMode(saved?saved==="dark":!!prefersDark);},[]);
  useEffect(()=>{document.documentElement.dataset.theme=darkMode?"dark":"light";document.documentElement.style.colorScheme=darkMode?"dark":"light";window.localStorage.setItem("haddir-theme",darkMode?"dark":"light");},[darkMode]);
