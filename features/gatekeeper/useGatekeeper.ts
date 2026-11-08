@@ -34,13 +34,16 @@ export function useGatekeeper({
   const [gatekeeperHistoryLoading, setGatekeeperHistoryLoading] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const dataRequestSequence = useRef(0);
 
   const refreshGatekeeperData = useCallback(async () => {
     if (!assignedEvent?.event_id) return;
+    const requestId = ++dataRequestSequence.current;
     const [{ data: stats }, { data: history, error }] = await Promise.all([
       getGatekeeperScanStats(assignedEvent.event_id),
       getGatekeeperScanHistory(assignedEvent.event_id),
     ]);
+    if (requestId !== dataRequestSequence.current) return;
     if (stats) setGatekeeperCounts({ ...emptyStats, ...stats });
     if (!error && Array.isArray(history)) setGatekeeperHistory(history);
   }, [assignedEvent?.event_id]);
@@ -60,6 +63,10 @@ export function useGatekeeper({
   ) => {
     const code = (codeOverride ?? gatekeeperCode).trim();
     if (!authUser || !assignedEvent || !code) return;
+    if (!gatekeeperOnline) {
+      setGatekeeperResult({ ok: false, status: "error", message: "لا يوجد اتصال بالإنترنت. لن يتم اعتماد الدخول قبل استعادة الاتصال." });
+      return;
+    }
     if (entryMethod === "manual" && !/^[0-9]{10}$/.test(code)) {
       setGatekeeperResult({ ok: false, status: "error", message: "كود التذكرة يجب أن يتكون من 10 أرقام فقط." });
       return;
@@ -70,7 +77,7 @@ export function useGatekeeper({
     if (error) setGatekeeperResult({ ok: false, status: "error", message: error.message || "تعذر التحقق من التذكرة." });
     else setGatekeeperResult(data as GatekeeperTicketActionResult);
     await refreshGatekeeperData();
-  }, [authUser, assignedEvent, gatekeeperCode, refreshGatekeeperData]);
+  }, [authUser, assignedEvent, gatekeeperCode, gatekeeperOnline, refreshGatekeeperData]);
 
   useEffect(() => {
     if (!authUser || !assignedEvent?.event_id || (userRole !== "gatekeeper" && userRole !== "organizer")) return;
@@ -81,6 +88,7 @@ export function useGatekeeper({
     const supabase = getSupabaseBrowserClient();
     if (!isGatekeeperPage || !authUser || !assignedEvent?.event_id || (userRole !== "gatekeeper" && userRole !== "organizer") || !supabase) return;
     let alive = true;
+    let hasSubscribed = false;
     const refresh = async () => {
       const [{ data: stats }, { data: history, error }] = await Promise.all([
         getGatekeeperScanStats(assignedEvent.event_id),
@@ -93,8 +101,13 @@ export function useGatekeeper({
     void refresh();
     const channel = supabase.channel("gatekeeper-live-" + assignedEvent.event_id)
       .on("postgres_changes", { event: "*", schema: "public", table: "gatekeeper_scan_logs", filter: "event_id=eq." + assignedEvent.event_id }, () => { void refresh(); })
-      .subscribe();
-    return () => { alive = false; void supabase.removeChannel(channel); };
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          if (hasSubscribed) void refresh();
+          hasSubscribed = true;
+        }
+      });
+    return () => { alive = false; dataRequestSequence.current += 1; void supabase.removeChannel(channel); };
   }, [isGatekeeperPage, authUser, assignedEvent?.event_id, userRole]);
 
   useEffect(() => {
