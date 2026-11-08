@@ -59,7 +59,7 @@ export default function AdminPage() {
     return () => { alive = false; };
   }, [router]);
 
-  const nav = useMemo(() => role === "supervisor" ? (["overview","bookings","payments","activity"] as Section[]) : (["overview","events","bookings","payments","users","reports","activity"] as Section[]), [role]);
+  const nav = useMemo(() => role === "supervisor" ? (["overview","bookings","payments"] as Section[]) : (["overview","events","bookings","payments","users","reports","activity"] as Section[]), [role]);
 
   const signOut = async () => { const supabase = getSupabaseBrowserClient(); if (supabase) await supabase.auth.signOut(); router.replace("/"); };
 
