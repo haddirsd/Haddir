@@ -32,7 +32,7 @@ export function GatekeeperWorkspace({
   onManualSubmit: () => void;
   onClose: () => void;
 }) {
-  const formatDate = (value: string) => new Intl.DateTimeFormat("ar-SD", { weekday: "long", day: "numeric", month: "long" }).format(new Date(value));
+  const formatDate = (value: string) => new Intl.DateTimeFormat("ar-SD-u-nu-latn", { weekday: "long", day: "numeric", month: "long" }).format(new Date(value));
   return (
     <section className="screen container gatekeeper-page-screen" aria-label="واجهة البواب">
       {(userRole === "gatekeeper" || userRole === "organizer") ? <div className="gatekeeper-workspace">
