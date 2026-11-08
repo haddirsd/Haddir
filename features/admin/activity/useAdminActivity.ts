@@ -23,9 +23,15 @@ export function useAdminActivity() {
     void refresh();
     const supabase = getSupabaseBrowserClient();
     if (!supabase) return;
+    let hasSubscribed = false;
     const channel = supabase.channel("admin-activity-workspace")
       .on("postgres_changes", { event: "*", schema: "public", table: "admin_activity_log" }, () => void refresh())
-      .subscribe();
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          if (hasSubscribed) void refresh();
+          hasSubscribed = true;
+        }
+      });
     return () => { latestRequest.current += 1; void supabase.removeChannel(channel); };
   }, [refresh]);
   return { rows, loading, error, refresh };
