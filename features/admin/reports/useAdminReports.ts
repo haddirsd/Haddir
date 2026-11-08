@@ -28,6 +28,7 @@ export function useAdminReports() {
     let hasSubscribed = false;
     const channel = supabase.channel("admin-reports-workspace")
       .on("postgres_changes", { event: "*", schema: "public", table: "events" }, () => void refresh())
+      .on("postgres_changes", { event: "*", schema: "public", table: "ticket_types" }, () => void refresh())
       .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, () => void refresh())
       .on("postgres_changes", { event: "*", schema: "public", table: "bookings" }, () => void refresh())
       .on("postgres_changes", { event: "*", schema: "public", table: "booking_items" }, () => void refresh())
