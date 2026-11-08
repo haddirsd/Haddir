@@ -3044,3 +3044,38 @@ input:focus,textarea:focus,select:focus{
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+
+/* Final UI coverage for payment event labels and ticket availability */
+.admin-payment-card-event{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-width:0;
+  margin:2px 0 10px;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:color-mix(in srgb,var(--green) 7%,var(--surface));
+  color:var(--green);
+}
+.admin-payment-card-event svg{flex:none}
+.admin-payment-card-event strong{
+  min-width:0;
+  color:var(--fg);
+  font-size:12px;
+  line-height:1.6;
+  overflow-wrap:anywhere;
+}
+.detail-sheet .tier-availability{
+  flex:0 1 112px;
+  min-width:0;
+  margin-inline-start:auto;
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.5;
+  text-align:end;
+}
+@media(max-width:520px){
+  .detail-sheet .tier-availability{flex-basis:86px;font-size:9px}
+}
