@@ -11,7 +11,7 @@ const statusLabels: Record<string, string> = {
   approved: "مقبول",
 };
 const fmt = (value: unknown) => value == null || value === "" ? "—" : String(value);
-const money = (value: unknown, currency = "SDG") => value == null ? "—" : `${Number(value).toLocaleString("ar-SD")} ${currency}`;
+const money = (value: unknown, currency = "SDG") => value == null ? "—" : `${Number(value).toLocaleString("ar-SD-u-nu-latn")} ${currency}`;
 
 export default function AdminBookingsWorkspace() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -48,8 +48,8 @@ export default function AdminBookingsWorkspace() {
             <div><small>إيصال التحويل</small>{payment?.receipt_url?<a className="admin-payment-receipt" href={payment.receipt_url} target="_blank" rel="noreferrer">عرض إيصال التحويل</a>:<strong>لا يوجد إيصال</strong>}</div>
             <div><small>حالة إثبات الدفع</small><strong>{payment?.status?statusLabels[payment.status]||payment.status:"لم يُرسل"}</strong></div>
             <div><small>مرجع التحويل</small><strong>{payment?.transfer_reference||"—"}</strong></div>
-            <div><small>تاريخ الحجز</small><strong>{r.created_at?new Date(r.created_at).toLocaleString("ar-SD"):"—"}</strong></div>
-            {r.expires_at&&r.status!=="confirmed"&&<div><small>انتهاء الحجز</small><strong>{new Date(r.expires_at).toLocaleString("ar-SD")}</strong></div>}
+            <div><small>تاريخ الحجز</small><strong>{r.created_at?new Date(r.created_at).toLocaleString("ar-SD-u-nu-latn"):"—"}</strong></div>
+            {r.expires_at&&r.status!=="confirmed"&&<div><small>انتهاء الحجز</small><strong>{new Date(r.expires_at).toLocaleString("ar-SD-u-nu-latn")}</strong></div>}
           </div>
         </article>;
       })}
