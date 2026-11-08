@@ -26,6 +26,7 @@ export function useGatekeeper({
 }) {
   const [gatekeeperCode, setGatekeeperCode] = useState("");
   const [gatekeeperResult, setGatekeeperResult] = useState<GatekeeperTicketActionResult | null>(null);
+  const [lastEntryMethod, setLastEntryMethod] = useState<GatekeeperEntryMethod>("qr");
   const [gatekeeperLoading, setGatekeeperLoading] = useState(false);
   const [gatekeeperOnline, setGatekeeperOnline] = useState(true);
   const [manualEntryOpen, setManualEntryOpen] = useState(false);
@@ -65,6 +66,7 @@ export function useGatekeeper({
       setGatekeeperResult({ ok: false, status: "error", message: "كود التذكرة يجب أن يتكون من 10 أرقام فقط." });
       return;
     }
+    setLastEntryMethod(entryMethod);
     setGatekeeperLoading(true);
     const { data, error } = await submitGatekeeperTicketAction(code, confirm, entryMethod);
     setGatekeeperLoading(false);
@@ -145,6 +147,18 @@ export function useGatekeeper({
     setManualEntryOpen(false);
     setScannerOpen(value => !value);
   };
+  const acknowledgeGatekeeperResult = () => {
+    setGatekeeperResult(null);
+    setGatekeeperCode("");
+    if (lastEntryMethod === "manual") {
+      setScannerOpen(false);
+      setManualEntryOpen(true);
+    } else {
+      setManualEntryOpen(false);
+      setScannerOpen(true);
+    }
+  };
+
   const openManualEntry = () => {
     setScannerOpen(false);
     setGatekeeperResult(null);
@@ -158,7 +172,7 @@ export function useGatekeeper({
     manualEntryOpen, setManualEntryOpen,
     gatekeeperCounts, gatekeeperHistory, gatekeeperHistoryLoading,
     scannerOpen, setScannerOpen, videoRef,
-    runGatekeeperAction, refreshGatekeeperData,
+    runGatekeeperAction, refreshGatekeeperData, acknowledgeGatekeeperResult,
     openScanner, openManualEntry,
   };
 }
