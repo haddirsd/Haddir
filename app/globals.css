@@ -2409,3 +2409,90 @@ body{font-size:16px}
   background:#39284b;
   color:#dfc8f7;
 }
+
+
+/* Keep the home header pinned while the home feed scrolls. */
+.app-shell > header.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 70;
+  flex: 0 0 auto;
+  background: var(--surface, #fcf9ff);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+/* Event detail actions stay visible above the scrolling event content. */
+.detail-sticky-controls {
+  position: sticky;
+  top: 0;
+  z-index: 75;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 66px;
+  padding: 10px max(16px, calc((100vw - 1000px) / 2 + 16px));
+  border-bottom: 1px solid var(--line);
+  background: var(--surface, #fcf9ff);
+  box-shadow: 0 5px 18px rgba(30, 14, 45, .07);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+.detail-sticky-back,
+.detail-sticky-share {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--surface-soft, #f2eafb);
+  color: var(--green);
+}
+.detail-sticky-actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.detail-sticky-category {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  max-width: min(52vw, 260px);
+  padding: 7px 14px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-soft, #f2eafb);
+  color: var(--fg);
+  font-size: 12px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.theme-dark .detail-sticky-controls {
+  background: rgba(33, 26, 42, .96);
+  border-color: var(--line);
+}
+.theme-dark .detail-sticky-back,
+.theme-dark .detail-sticky-share,
+.theme-dark .detail-sticky-category {
+  background: #30253b;
+  border-color: var(--line);
+  color: #eadcf8;
+}
+@media (max-width: 600px) {
+  .detail-sticky-controls {
+    min-height: 60px;
+    padding: 8px 14px;
+  }
+  .detail-sticky-back,
+  .detail-sticky-share {
+    width: 40px;
+    height: 40px;
+  }
+}
