@@ -40,8 +40,8 @@ export default function AdvertiserWorkspace({
           <div className="advertiser-net"><small>صافي مستحقات المعلن</small><strong>{formatMoney(0)}</strong></div>
         </article>}
         <h3 className="advertiser-stats-subtitle">تفاصيل فئات التذاكر</h3>
-        <div className="advertiser-ticket-table"><table><thead><tr><th>الفئة</th><th>السعة</th><th>المباع</th><th>المرفوض</th><th>المتبقي</th><th>المبيعات</th></tr></thead><tbody>{(statistics.ticket_types||[]).map(ticket=><tr key={ticket.id}><td>{ticket.name}</td><td>{Number(ticket.quantity_total||0).toLocaleString("ar-SD")}</td><td>{Number(ticket.confirmed_quantity||0).toLocaleString("ar-SD")}</td><td>{Number(ticket.rejected_quantity||0).toLocaleString("ar-SD")}</td><td>{Number(ticket.remaining_quantity||0).toLocaleString("ar-SD")}</td><td>{formatMoney(Number(ticket.sales||0),ticket.currency)}</td></tr>)}</tbody></table></div>
-        <p className="advertiser-stats-note">المبيعات محسوبة من الحجوزات المؤكدة فقط. صافي المستحقات يساوي المبيعات بعد خصم عمولة حاضر، ولا يشمل مصروفات تشغيلية أو تسويات خارج المنصة.</p>
+        <div className="advertiser-ticket-table"><table><thead><tr><th>الفئة</th><th>السعة</th><th>المباع</th><th>محجوز مؤقتاً</th><th>المرفوض</th><th>المتاح للبيع</th><th>المبيعات</th></tr></thead><tbody>{(statistics.ticket_types||[]).map(ticket=><tr key={ticket.id}><td>{ticket.name}</td><td>{Number(ticket.quantity_total||0).toLocaleString("ar-SD")}</td><td>{Number(ticket.confirmed_quantity||0).toLocaleString("ar-SD")}</td><td>{Number(ticket.reserved_quantity||0).toLocaleString("ar-SD")}</td><td>{Number(ticket.rejected_quantity||0).toLocaleString("ar-SD")}</td><td>{Number(ticket.remaining_quantity||0).toLocaleString("ar-SD")}</td><td>{formatMoney(Number(ticket.sales||0),ticket.currency)}</td></tr>)}</tbody></table></div>
+        <p className="advertiser-stats-note">المبيعات والتذاكر المباعة محسوبة من الحجوزات المؤكدة فقط. المتاح للبيع يستبعد الحجوزات النشطة قيد الدفع أو المراجعة. صافي المستحقات يساوي المبيعات بعد خصم عمولة حاضر، ولا يشمل مصروفات تشغيلية أو تسويات خارج المنصة.</p>
       </>}
     </div>}
   </div>;
