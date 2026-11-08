@@ -179,7 +179,7 @@ export default function Home(){
    onClose={()=>{const url=new URL(window.location.href);url.searchParams.delete("workspace");url.searchParams.set("tab","profile");window.location.assign(url.pathname+url.search+url.hash);}}
   />}
  </div>
- {!isGatekeeperPage&&!isEventDetailOpen&&<nav className="bottom-nav" aria-label="التنقل الرئيسي"><button className={activeTab==="home"?"selected":""} onClick={()=>go("home")}><House size={21}/><span>الرئيسية</span></button><button className={activeTab==="tickets"?"selected":""} onClick={()=>go("tickets")}><Ticket size={21}/><span>تذاكري</span></button><button className={activeTab==="notifications"?"selected":""} onClick={()=>go("notifications")}><Bell size={21}/><span>الإشعارات</span></button><button className={activeTab==="profile"?"selected":""} onClick={()=>go("profile")}><UserRound size={21}/><span>حسابي</span></button></nav>}
+ {!isGatekeeperPage&&!isEventDetailOpen&&<nav className="bottom-nav" aria-label="التنقل الرئيسي"><span className="bottom-nav-active-pill" aria-hidden="true" style={{transform:`translateX(-${["home","tickets","notifications","profile"].indexOf(activeTab)*100}%)`}}/><button className={activeTab==="home"?"selected":""} onClick={()=>go("home")}><House size={21}/><span>الرئيسية</span></button><button className={activeTab==="tickets"?"selected":""} onClick={()=>go("tickets")}><Ticket size={21}/><span>تذاكري</span></button><button className={activeTab==="notifications"?"selected":""} onClick={()=>go("notifications")}><Bell size={21}/><span>الإشعارات</span></button><button className={activeTab==="profile"?"selected":""} onClick={()=>go("profile")}><UserRound size={21}/><span>حسابي</span></button></nav>}
  </>
  
  </main>;
