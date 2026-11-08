@@ -39,21 +39,15 @@ export function useGatekeeper({
   const refreshGatekeeperData = useCallback(async () => {
     if (!assignedEvent?.event_id) return;
     const requestId = ++dataRequestSequence.current;
+    setGatekeeperHistoryLoading(true);
     const [{ data: stats }, { data: history, error }] = await Promise.all([
       getGatekeeperScanStats(assignedEvent.event_id),
       getGatekeeperScanHistory(assignedEvent.event_id),
     ]);
     if (requestId !== dataRequestSequence.current) return;
+    setGatekeeperHistoryLoading(false);
     if (stats) setGatekeeperCounts({ ...emptyStats, ...stats });
     if (!error && Array.isArray(history)) setGatekeeperHistory(history);
-  }, [assignedEvent?.event_id]);
-
-  const loadGatekeeperHistory = useCallback(async () => {
-    if (!assignedEvent?.event_id) return;
-    setGatekeeperHistoryLoading(true);
-    const { data, error } = await getGatekeeperScanHistory(assignedEvent.event_id);
-    setGatekeeperHistoryLoading(false);
-    if (!error && Array.isArray(data)) setGatekeeperHistory(data);
   }, [assignedEvent?.event_id]);
 
   const runGatekeeperAction = useCallback(async (
@@ -80,14 +74,8 @@ export function useGatekeeper({
   }, [authUser, assignedEvent, gatekeeperCode, gatekeeperOnline, refreshGatekeeperData]);
 
   useEffect(() => {
-    if (!authUser || !assignedEvent?.event_id || (userRole !== "gatekeeper" && userRole !== "organizer")) return;
-    void refreshGatekeeperData();
-  }, [authUser, assignedEvent?.event_id, userRole, refreshGatekeeperData]);
-
-  useEffect(() => {
     const supabase = getSupabaseBrowserClient();
     if (!isGatekeeperPage || !authUser || !assignedEvent?.event_id || (userRole !== "gatekeeper" && userRole !== "organizer") || !supabase) return;
-    let alive = true;
     let hasSubscribed = false;
     const refresh = async () => {
       const [{ data: stats }, { data: history, error }] = await Promise.all([
@@ -179,7 +167,7 @@ export function useGatekeeper({
     manualEntryOpen, setManualEntryOpen,
     gatekeeperCounts, gatekeeperHistory, gatekeeperHistoryLoading,
     scannerOpen, setScannerOpen, videoRef,
-    runGatekeeperAction, loadGatekeeperHistory, refreshGatekeeperData,
+    runGatekeeperAction, refreshGatekeeperData,
     openScanner, openManualEntry,
   };
 }
