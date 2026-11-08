@@ -1,6 +1,6 @@
 "use client";
 
-import type { RefObject } from "react";
+import { useEffect, useState, type RefObject } from "react";
 import { ClipboardList, ScanLine } from "lucide-react";
 import type { GatekeeperScanHistoryItem, GatekeeperScanStats, GatekeeperTicketActionResult } from "../gatekeeper.types";
 import { ManualTicketEntry } from "./ManualTicketEntry";
@@ -33,6 +33,12 @@ export function GatekeeperWorkspace({
   onAcknowledgeResult: () => void;
   onClose: () => void;
 }) {
+  const [slowRequest, setSlowRequest] = useState(false);
+  useEffect(() => {
+    if (!loading) { setSlowRequest(false); return; }
+    const timer = window.setTimeout(() => setSlowRequest(true), 1400);
+    return () => window.clearTimeout(timer);
+  }, [loading]);
   const formatDate = (value: string) => new Intl.DateTimeFormat("ar-SD-u-nu-latn", { weekday: "long", day: "numeric", month: "long" }).format(new Date(value));
   return (
     <section className="screen container gatekeeper-page-screen" aria-label="واجهة البواب">
@@ -56,6 +62,13 @@ export function GatekeeperWorkspace({
           <button type="button" className="btn btn-primary" disabled={!assignedEvent || loading || !online} onClick={onOpenScanner}><ScanLine size={18} />{scannerOpen ? "إغلاق الكاميرا" : "مسح بالكاميرا"}</button>
           <button type="button" className="btn btn-outline" disabled={!assignedEvent || loading || !online} onClick={onOpenManual}><ClipboardList size={18} />إدخال يدوي</button>
         </div>
+        {loading && <div className="gatekeeper-network-loading" role="status" aria-live="polite">
+          <div className="gatekeeper-network-loading-card">
+            <span className="gatekeeper-loading-spinner" aria-hidden="true" />
+            <strong>{slowRequest ? "الاتصال بطيء، ما زلنا نتحقق..." : "جارٍ التحقق من التذكرة..."}</strong>
+            <p>{slowRequest ? "قد يستغرق الرد وقتاً إضافياً. لا تغلق الصفحة ولا تكرر الفحص، سنعرض النتيجة فور وصولها." : "نتواصل مع نظام حاضر للتأكد من صلاحية التذكرة وتسجيل الدخول."}</p>
+          </div>
+        </div>}
         {scannerOpen && <QrScanner videoRef={videoRef} />}
         {manualEntryOpen && <ManualTicketEntry code={code} loading={loading} disabled={!assignedEvent} onCodeChange={onCodeChange} onSubmit={onManualSubmit} />}
         {result && (() => {
