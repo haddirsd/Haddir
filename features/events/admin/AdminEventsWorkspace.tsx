@@ -86,7 +86,7 @@ export default function AdminEventsWorkspace({ role }: { role: AdminEventRole })
         {rows.length===0?<p className="admin-no-data">لا توجد فعاليات حتى الآن. أضف أول فعالية من الزر بالأعلى.</p>:rows.map((r,i)=><article className="admin-event-card" key={r.id||i}>
           <div className="admin-event-card-main">
             <div className="admin-event-card-title"><h4>{r.title||"فعالية بدون عنوان"}</h4><span className={"admin-event-status status-"+(r.status||"draft")}>{statusLabels[r.status]||fmt(r.status)}</span></div>
-            <div className="admin-event-card-meta"><span><b>التصنيف:</b> {fmt(r.category)}</span><span><b>المدينة:</b> {fmt(r.city)}</span><span><b>المكان:</b> {fmt(r.venue)}</span><span><b>الموعد:</b> {r.starts_at?new Date(r.starts_at).toLocaleString("ar-SD"):"—"}</span></div>
+            <div className="admin-event-card-meta"><span><b>التصنيف:</b> {fmt(r.category)}</span><span><b>المدينة:</b> {fmt(r.city)}</span><span><b>المكان:</b> {fmt(r.venue)}</span><span><b>الموعد:</b> {r.starts_at?new Date(r.starts_at).toLocaleString("ar-SD-u-nu-latn"):"—"}</span></div>
           </div>
           {(role==="owner"||role==="admin")&&<div className="admin-event-card-actions">
             <button className="admin-event-edit" type="button" disabled={loading} onClick={()=>editEvent(r)}>تعديل</button>
