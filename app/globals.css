@@ -4126,3 +4126,26 @@ html[data-theme="dark"] .tier-card.tier-selected{background:rgba(56,189,248,.12)
 @keyframes gatekeeper-result-pop{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(prefers-reduced-motion:reduce){.gatekeeper-result-backdrop,.gatekeeper-result-modal{animation:none}}
 @media(max-width:520px){.gatekeeper-result-backdrop{padding:14px}.gatekeeper-result-modal{padding:21px 16px;border-radius:21px}.gatekeeper-result-modal>strong{font-size:18px}}
+
+
+/* Clear network feedback while gatekeeper verification is pending */
+.gatekeeper-network-loading{
+  position:fixed;inset:0;z-index:1550;display:grid;place-items:center;
+  padding:18px;background:rgba(8,18,20,.54);backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px);animation:gatekeeper-result-fade .16s ease-out both;
+}
+.gatekeeper-network-loading-card{
+  width:min(100%,360px);display:grid;justify-items:center;gap:12px;
+  padding:25px 22px;border:1px solid var(--line);border-radius:22px;
+  background:var(--card-bg,var(--surface));color:var(--fg);
+  box-shadow:0 20px 65px rgba(0,0,0,.24);text-align:center;
+}
+.gatekeeper-loading-spinner{
+  width:42px;height:42px;border:4px solid var(--line);
+  border-top-color:var(--green);border-left-color:var(--green);
+  border-radius:50%;animation:gatekeeper-network-spin .75s linear infinite;
+}
+.gatekeeper-network-loading-card strong{font-size:16px;font-weight:900}
+.gatekeeper-network-loading-card p{margin:0;color:var(--muted,var(--fg));font-size:12px;line-height:1.8}
+@keyframes gatekeeper-network-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.gatekeeper-loading-spinner{animation:none}}
