@@ -70,7 +70,7 @@ export function NotificationsWorkspace({
                 <span className="notification-copy">
                   <strong>{notification.title}</strong>
                   <p>{notification.message}</p>
-                  <small>{new Date(notification.created_at).toLocaleString("ar-SD")}</small>
+                  <small>{new Date(notification.created_at).toLocaleString("ar-SD-u-nu-latn")}</small>
                 </span>
                 <span className="notification-state">{notification.is_read ? "مقروء" : "جديد"}</span>
               </button>
