@@ -3989,3 +3989,39 @@ html[data-theme="dark"] .tier-card.tier-selected{background:rgba(56,189,248,.12)
 @media(prefers-reduced-motion:reduce){
   .app-shell .bottom-nav-active-pill{transition:none!important}
 }
+
+
+/* Event details: clean date and venue information layout */
+.detail-sheet .detail-quick-info{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  align-items:stretch!important;
+  gap:12px!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.detail-sheet .detail-quick-info .quick-info-row{
+  min-width:0;
+  min-height:88px;
+  padding:15px!important;
+  gap:12px!important;
+  border:1px solid var(--haddir-glass-border)!important;
+  border-radius:18px!important;
+  background:var(--surface)!important;
+  box-shadow:var(--haddir-glass-shadow)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(145%);
+  backdrop-filter:blur(18px) saturate(145%);
+}
+.detail-sheet .detail-quick-info .quick-info-row>div{min-width:0;gap:5px}
+.detail-sheet .detail-quick-info .quick-info-row small{font-size:11px;font-weight:600}
+.detail-sheet .detail-quick-info .quick-info-row strong{font-size:14px;line-height:1.55}
+.detail-sheet .detail-quick-info .quick-info-row span:not(.quick-info-icon){font-size:11px;line-height:1.6;overflow-wrap:anywhere}
+.detail-sheet .detail-quick-info .quick-info-icon{width:42px;height:42px;border-radius:13px!important}
+.detail-sheet .detail-quick-info .quick-location-row>svg{width:16px;flex:none}
+@media(max-width:700px){
+  .detail-sheet .detail-quick-info{grid-template-columns:minmax(0,1fr)!important;gap:10px!important}
+  .detail-sheet .detail-quick-info .quick-info-row{min-height:76px;padding:12px!important}
+  .detail-sheet .detail-quick-info .quick-info-row strong{font-size:13px}
+}
