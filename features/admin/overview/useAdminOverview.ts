@@ -27,11 +27,17 @@ export function useAdminOverview(role: AdminOverviewRole) {
     void refresh();
     const supabase = getSupabaseBrowserClient();
     if (!supabase) return;
+    let hasSubscribed = false;
     const channel = supabase.channel("admin-overview-workspace")
       .on("postgres_changes", { event: "*", schema: "public", table: "events" }, () => void refresh())
       .on("postgres_changes", { event: "*", schema: "public", table: "bookings" }, () => void refresh())
       .on("postgres_changes", { event: "*", schema: "public", table: "payment_submissions" }, () => void refresh())
-      .subscribe();
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          if (hasSubscribed) void refresh();
+          hasSubscribed = true;
+        }
+      });
     return () => { latestRequest.current += 1; void supabase.removeChannel(channel); };
   }, [refresh]);
 
