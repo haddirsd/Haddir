@@ -4025,3 +4025,60 @@ html[data-theme="dark"] .tier-card.tier-selected{background:rgba(56,189,248,.12)
   .detail-sheet .detail-quick-info .quick-info-row{min-height:76px;padding:12px!important}
   .detail-sheet .detail-quick-info .quick-info-row strong{font-size:13px}
 }
+
+
+/* Haddir screen transitions: subtle, fast, and consistent in both themes */
+@keyframes haddir-screen-enter{
+  from{opacity:0;transform:translate3d(0,12px,0) scale(.995)}
+  to{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+@keyframes haddir-detail-enter{
+  from{opacity:0;transform:translate3d(0,18px,0) scale(.99)}
+  to{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+@keyframes haddir-payment-enter{
+  from{opacity:0;transform:translate3d(-18px,0,0)}
+  to{opacity:1;transform:translate3d(0,0,0)}
+}
+.app-content>.screen,
+.app-content>.profile-screen,
+.app-content>.gatekeeper-page-screen{
+  animation:haddir-screen-enter .28s cubic-bezier(.2,.75,.25,1) both;
+  will-change:opacity,transform;
+}
+.app-content .event-detail-page{
+  animation:haddir-detail-enter .32s cubic-bezier(.2,.75,.25,1) both;
+  transform-origin:50% 85%;
+  will-change:opacity,transform;
+}
+.app-content .event-detail-page .payment-sheet .payment-screen{
+  animation:haddir-payment-enter .26s cubic-bezier(.2,.75,.25,1) both;
+}
+.app-shell .screen-topbar,
+.app-shell .topbar{
+  animation:haddir-screen-enter .22s ease-out both;
+}
+.app-shell .bottom-nav-active-pill{
+  transition:transform .34s cubic-bezier(.22,.8,.25,1),background-color .25s ease,box-shadow .25s ease;
+}
+.app-shell .bottom-nav button{
+  transition:color .22s ease,opacity .22s ease,transform .22s ease;
+}
+.app-shell .bottom-nav button:active{transform:scale(.94)}
+@media(prefers-reduced-motion:reduce){
+  .app-content>.screen,
+  .app-content>.profile-screen,
+  .app-content>.gatekeeper-page-screen,
+  .app-content .event-detail-page,
+  .app-content .event-detail-page .payment-sheet .payment-screen,
+  .app-shell .screen-topbar,
+  .app-shell .topbar{
+    animation:none!important;
+    transform:none!important;
+  }
+  .app-shell .bottom-nav-active-pill,
+  .app-shell .bottom-nav button{
+    transition:none!important;
+  }
+  .app-shell .bottom-nav button:active{transform:none}
+}
