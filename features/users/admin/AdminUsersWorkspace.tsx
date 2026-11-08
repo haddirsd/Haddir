@@ -23,7 +23,7 @@ export default function AdminUsersWorkspace({
       <div><h3>المستخدمون والصلاحيات</h3><p>إدارة أدوار الحسابات وربط المنظم والمعلن بفعالياتهم</p></div>
       <div className="admin-panel-actions">
         <label className="admin-search-box"><span>بحث بالرقم أو البريد أو الهاتف</span><input type="search" value={searchTerm} onChange={event=>onSearchTermChange(event.target.value)} placeholder="رقم الهاتف أو البريد الإلكتروني"/></label>
-        <span className="admin-user-total">عدد المستخدمين: {userTotal.toLocaleString("ar-SD")}</span>
+        <span className="admin-user-total">عدد المستخدمين: {userTotal.toLocaleString("ar-SD-u-nu-latn")}</span>
         <button className="admin-refresh" type="button" onClick={()=>void refresh()} disabled={loading}><RefreshCw size={16}/> تحديث</button>
       </div>
     </div>
@@ -40,7 +40,7 @@ export default function AdminUsersWorkspace({
             <td data-label="الإسم"><strong>{fmt(row.full_name)}</strong></td>
             <td data-label="رقم الهاتف"><span dir="ltr">{fmt(row.phone)}</span><small className="admin-user-email" dir="ltr">{fmt(row.email)}</small></td>
             <td data-label="الدور"><span className="admin-user-role">{roleNames[row.role]||fmt(row.role)}</span></td>
-            <td data-label="تاريخ التسجيل">{row.created_at?new Date(row.created_at).toLocaleDateString("ar-SD"):"—"}</td>
+            <td data-label="تاريخ التسجيل">{row.created_at?new Date(row.created_at).toLocaleDateString("ar-SD-u-nu-latn"):"—"}</td>
             <td data-label="تعديل الدور / الفعالية">
               <div className="admin-user-role-editor">
                 <select aria-label={"تعديل دور "+(row.full_name||"المستخدم")} value={draftRole} disabled={updatingUserId===row.id||protectedUser} onChange={event=>setRoleDrafts(current=>({...current,[row.id]:event.target.value}))}>
