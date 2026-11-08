@@ -25,6 +25,7 @@ export type AdvertiserTicketLine = {
   currency: string;
   quantity_total: number;
   confirmed_quantity: number;
+  reserved_quantity: number;
   rejected_quantity: number;
   remaining_quantity: number;
   sales: number | string;
