@@ -53,7 +53,7 @@ export function GatekeeperWorkspace({
         {!assignedEvent && <p className="gatekeeper-inline-error">حسابك غير مربوط بفعالية حالياً. راجع إدارة حاضر لتعيين الفعالية.</p>}
         <div className="gatekeeper-actions">
           <button type="button" className="btn btn-primary" disabled={!assignedEvent || loading || !online} onClick={onOpenScanner}><ScanLine size={18} />{scannerOpen ? "إغلاق الكاميرا" : "مسح بالكاميرا"}</button>
-          <button type="button" className="btn btn-outline" disabled={!assignedEvent || loading} onClick={onOpenManual}><ClipboardList size={18} />إدخال يدوي</button>
+          <button type="button" className="btn btn-outline" disabled={!assignedEvent || loading || !online} onClick={onOpenManual}><ClipboardList size={18} />إدخال يدوي</button>
         </div>
         {scannerOpen && <QrScanner videoRef={videoRef} />}
         {manualEntryOpen && <ManualTicketEntry code={code} loading={loading} disabled={!assignedEvent} onCodeChange={onCodeChange} onSubmit={onManualSubmit} />}
