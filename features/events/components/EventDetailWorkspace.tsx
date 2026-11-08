@@ -75,45 +75,45 @@ export function EventDetailWorkspace({
     <section className="event-detail-page" aria-label={"تفاصيل " + event.title}>
       {!showPayment ? (
         <div className="detail-sheet event-detail-layout" aria-label={"تفاصيل " + event.title}>
+          <div className="detail-sticky-controls" aria-label="أدوات تفاصيل الفعالية">
+            <button className="detail-sticky-back" aria-label="الرجوع من تفاصيل الفعالية" onClick={onClose}>
+              <ArrowLeft size={20} />
+            </button>
+            <div className="detail-sticky-actions">
+              <span className="detail-sticky-category">{event.category || "فعالية"}</span>
+              <button
+                className="detail-sticky-share"
+                aria-label="مشاركة الفعالية"
+                onClick={async () => {
+                  const eventUrl = new URL(window.location.pathname, window.location.origin);
+                  eventUrl.searchParams.set("event", String(event.id));
+                  try {
+                    if (navigator.share) {
+                      await navigator.share({
+                        title: event.title,
+                        text: "شوف الفعالية دي على حاضر",
+                        url: eventUrl.toString(),
+                      });
+                    } else {
+                      await navigator.clipboard.writeText(eventUrl.toString());
+                      alert("تم نسخ رابط الفعالية");
+                    }
+                  } catch (error) {
+                    if (error instanceof Error && error.name !== "AbortError") {
+                      alert("تعذر مشاركة الفعالية حالياً.");
+                    }
+                  }
+                }}
+              >
+                <Share2 size={18} />
+              </button>
+            </div>
+          </div>
           <div className={"detail-cover event-cover " + event.cover}>
             {event.coverImageUrl && (
               <img className="event-cover-image" src={event.coverImageUrl} alt={event.title} />
             )}
             <div className="detail-cover-shade" />
-            <div className="detail-cover-controls">
-              <button className="detail-glass-button" aria-label="إغلاق التفاصيل" onClick={onClose}>
-                <ArrowLeft size={20} />
-              </button>
-              <div className="detail-cover-actions">
-                <span className="detail-category-badge">{event.category || "فعالية"}</span>
-                <button
-                  className="detail-glass-button"
-                  aria-label="مشاركة الفعالية"
-                  onClick={async () => {
-                    const eventUrl = new URL(window.location.pathname, window.location.origin);
-                    eventUrl.searchParams.set("event", String(event.id));
-                    try {
-                      if (navigator.share) {
-                        await navigator.share({
-                          title: event.title,
-                          text: "شوف الفعالية دي على حاضر",
-                          url: eventUrl.toString(),
-                        });
-                      } else {
-                        await navigator.clipboard.writeText(eventUrl.toString());
-                        alert("تم نسخ رابط الفعالية");
-                      }
-                    } catch (error) {
-                      if (error instanceof Error && error.name !== "AbortError") {
-                        alert("تعذر مشاركة الفعالية حالياً.");
-                      }
-                    }
-                  }}
-                >
-                  <Share2 size={18} />
-                </button>
-              </div>
-            </div>
             <div className="detail-cover-title">
               <span>تجربة تستحق الحضور</span>
               <h1>{event.title}</h1>
