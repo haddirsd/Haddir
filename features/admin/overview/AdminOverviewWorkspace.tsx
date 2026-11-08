@@ -15,7 +15,7 @@ export default function AdminOverviewWorkspace({
     : [{ title: "الفعاليات", value: stats.events, icon: CalendarDays }, { title: "الحجوزات", value: stats.bookings, icon: Ticket }, { title: "إثباتات بانتظار المراجعة", value: stats.pending, icon: ClipboardCheck }, { title: "حسابات المستخدمين", value: stats.users, icon: Users }];
   const shortcuts: Section[] = supervisor ? ["bookings", "payments"] : ["events", "bookings", "payments", "users", "reports"];
   const labels: Record<Section,string> = { events:"الفعاليات", bookings:"الحجوزات", payments:"مراجعة المدفوعات", users:"المستخدمون", reports:"الإحصائيات" };
-  const number = (value:number) => loading ? "—" : value.toLocaleString("ar-SD");
+  const number = (value:number) => loading ? "—" : value.toLocaleString("ar-SD-u-nu-latn");
 
   return <section className="admin-overview-workspace">
     <div className="admin-panel-head"><div><h3>{supervisor?"المهام اليومية":"نظرة سريعة"}</h3><p>بيانات مباشرة من قاعدة بيانات حاضر</p></div><button className="admin-refresh" type="button" onClick={()=>void refresh()} disabled={loading}><RefreshCw size={16}/> تحديث</button></div>
