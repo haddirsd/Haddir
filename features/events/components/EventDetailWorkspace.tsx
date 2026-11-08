@@ -131,7 +131,6 @@ export function EventDetailWorkspace({
                     <span>{event.time || "يحدد لاحقاً"}</span>
                   </div>
                 </div>
-                <div className="quick-info-divider" />
                 <a className="quick-info-row quick-location-row" href={event.map || "#"} target="_blank" rel="noreferrer">
                   <span className="quick-info-icon location-icon"><MapPin size={21} /></span>
                   <div>
