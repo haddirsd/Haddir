@@ -13,11 +13,9 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
   },
   icons: {
-    icon: [
-      { url: "/Haddir_20261109_140420_0000.svg", sizes: "any", type: "image/svg+xml" },
-      { url: "/Haddir_20261109_140420_0000.svg", sizes: "any", type: "image/svg+xml" },
-    ],
-    apple: [{ url: "/Haddir_20261109_140420_0000.svg", sizes: "192x192", type: "image/svg+xml" }],
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml", sizes: "any" }],
+    shortcut: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/Haddir_Logo_Blue.svg", type: "image/svg+xml" }],
   },
 };
 
