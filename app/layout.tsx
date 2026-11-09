@@ -24,6 +24,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ar" dir="rtl">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "(function(){try{var saved=localStorage.getItem('haddir-theme');var dark=saved?saved==='dark':!!window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.dataset.theme=dark?'dark':'light';document.documentElement.style.colorScheme=dark?'dark':'light';}catch(_){document.documentElement.dataset.theme='light';document.documentElement.style.colorScheme='light';}})();",
+          }}
+        />
+      </head>
       <body>
         <PwaRegistration />
         {children}
