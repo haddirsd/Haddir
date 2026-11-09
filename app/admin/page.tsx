@@ -20,6 +20,7 @@ export default function AdminPage() {
   const router = useRouter();
   const [role, setRole] = useState<AdminRole | null>(null);
   const [name, setName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [section, setSection] = useState<Section>("overview");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -52,7 +53,9 @@ export default function AdminPage() {
         setError("ليس لديك صلاحية الوصول إلى لوحة الإدارة."); setLoading(false); return;
       }
       setRole(profile.role as AdminRole);
-      setName(profile.full_name || user.email || "فريق حاضر");
+      const metadata = user.user_metadata || {};
+      setName(profile.full_name || metadata.full_name || metadata.name || user.email || "فريق حاضر");
+      setAvatarUrl(String(metadata.avatar_url || metadata.picture || metadata.photo_url || ""));
       setLoading(false);
     };
     void init();
@@ -70,13 +73,13 @@ export default function AdminPage() {
   const roleLabel = role === "owner" ? "مالك المنصة" : role === "admin" ? "المشرف الإداري" : "موظف حاضر";
   return <main className={"admin-shell"+(darkMode?" theme-dark":"")} dir="rtl">
     <aside className="admin-sidebar">
-      <button className="admin-brand" onClick={() => router.push("/")}><span>ح</span><b>حاضر</b><small>الإدارة</small></button>
+      <button className="admin-brand" onClick={() => router.push("/")}><img src={darkMode?"/haddir_for_dark.svg":"/haddir_for_light.svg"} alt="حاضر"/><small>الإدارة</small></button>
       <div className="admin-side-caption">مساحة العمل</div>
       <nav aria-label="تبويبات لوحة الإدارة">{nav.map(item=><button key={item} className={section===item?"active":""} onClick={()=>setSection(item)}><span>{item==="overview"?<LayoutDashboard/>:item==="events"?<CalendarDays/>:item==="bookings"?<Ticket/>:item==="payments"?<Banknote/>:item==="users"?<Users/>:<Activity/>}</span>{labels[item]}</button>)}</nav>
-      <div className="admin-side-bottom"><div className="admin-mini-profile"><span>{role==="owner"?<Shield/>:role==="admin"?<BadgeCheck/>:<ClipboardCheck/>}</span><div><b>{name}</b><small>{roleLabel}</small></div></div><button className="admin-logout" onClick={signOut}><LogOut size={17}/> تسجيل الخروج</button></div>
+      <div className="admin-side-bottom"><div className="admin-mini-profile"><span className="admin-mini-avatar">{avatarUrl?<img src={avatarUrl} alt="صورة الحساب"/>:role==="owner"?<Shield/>:role==="admin"?<BadgeCheck/>:<ClipboardCheck/>}</span><div><b>{name}</b><small>{roleLabel}</small></div></div><button className="admin-logout" onClick={signOut}><LogOut size={17}/> تسجيل الخروج</button></div>
     </aside>
     <section className="admin-main">
-      <header className="admin-topbar"><div><span>حاضر / لوحة الإدارة</span><h1>{labels[section]}</h1></div><div className="admin-top-user"><span>{roleLabel}</span><span className="admin-avatar">{name.slice(0,1)}</span></div></header>
+      <header className="admin-topbar"><div><span>حاضر / لوحة الإدارة</span><h1>{labels[section]}</h1></div><div className="admin-top-user"><span>{roleLabel}</span><span className="admin-avatar">{avatarUrl?<img src={avatarUrl} alt="صورة حساب Google"/>:name.slice(0,1)}</span></div></header>
       <div className="admin-content">
         <div className="admin-welcome"><div><span className="admin-eyebrow">لوحة التحكم</span><h2>مرحباً، {name}</h2><p>{supervisor?"راجع الحجوزات وإثباتات التحويل.":"تابع أداء منصة حاضر وأدر عملياتها من مكان واحد."}</p></div><div className="admin-welcome-mark"><LayoutDashboard size={30}/></div></div>
         {error&&<div className="admin-notice" role="status">{error}</div>}
