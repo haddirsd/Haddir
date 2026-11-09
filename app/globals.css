@@ -4456,3 +4456,35 @@ html[data-theme="dark"] .tier-card.tier-selected{background:rgba(56,189,248,.12)
     border-inline: 1px solid var(--line) !important;
   }
 }
+
+
+/* Empty customer tabs should end with their content, not an artificial scroll tail. */
+.app-shell:has(.app-content .notifications-screen > .empty-state),
+.app-shell:has(.app-content .notifications-screen > .empty-state) .app-content,
+.app-shell:has(.app-content .tickets-screen > .empty-state),
+.app-shell:has(.app-content .tickets-screen > .empty-state) .app-content {
+  min-height: 0 !important;
+  height: auto !important;
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+  overscroll-behavior-y: none !important;
+}
+.app-shell:has(.app-content .notifications-screen > .empty-state),
+.app-shell:has(.app-content .tickets-screen > .empty-state) {
+  overflow-y: clip !important;
+}
+.app-content:has(.notifications-screen > .empty-state),
+.app-content:has(.tickets-screen > .empty-state) {
+  min-height: 0 !important;
+  height: auto !important;
+  padding-bottom: 0 !important;
+  overscroll-behavior-y: none !important;
+}
+.notifications-screen:has(> .empty-state),
+.tickets-screen:has(> .empty-state) {
+  min-height: 0 !important;
+  height: auto !important;
+  padding-bottom: 18px !important;
+  margin-bottom: 0 !important;
+  overscroll-behavior-y: none !important;
+}
