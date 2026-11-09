@@ -8,12 +8,19 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
   "orientation": "any",
   "background_color": "#eef6f9",
   "theme_color": "#eef6f9",
   "icons": [
-    { "src": "/Haddir_20261109_140420_0000.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
-    { "src": "/Haddir_20261109_140420_0000.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+    {
+      "src": "/Haddir_Logo_Blue.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
   ]
 }
