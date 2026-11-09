@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   icons: {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml", sizes: "any" }],
     shortcut: [{ url: "/favicon.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/Haddir_Logo_Blue.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/Haddir_App_Icon.svg", type: "image/svg+xml" }],
   },
 };
 
