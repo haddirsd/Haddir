@@ -39,11 +39,11 @@ function downloadEventReport(event: Row, ticketRows: Row[], bookings: Row[], con
     ["رقم الحجز","الحالة","البريد","الهاتف","عدد التذاكر","الإجمالي","العملة","تاريخ الحجز"],
     ...bookings.map(b=>[b.booking_number||b.id,statusLabels[b.status]||b.status,b.customer_email,b.customer_phone,(b.booking_items||[]).reduce((n:any,i:any)=>n+Number(i.quantity||0),0),b.subtotal,b.currency,b.created_at])
   ];
-  const csv="\\uFEFF"+rows.map(row=>row.map(csvCell).join(",")).join("\\r\\n");
+  const csv="\uFEFF"+rows.map(row=>row.map(csvCell).join(",")).join("\r\n");
   const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
   const url=URL.createObjectURL(blob);
   const link=document.createElement("a");
-  const safeName=String(event.title||"event").replace(/[^\\p{L}\\p{N}-]+/gu,"-").replace(/^-|-$/g,"")||"event";
+  const safeName=String(event.title||"event").replace(/[^\p{L}\p{N}-]+/gu,"-").replace(/^-|-$/g,"")||"event";
   link.href=url;link.download="haddir-event-report-"+safeName+".csv";
   document.body.appendChild(link);link.click();link.remove();
   window.setTimeout(()=>URL.revokeObjectURL(url),1000);
