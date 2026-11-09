@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { CheckCircle2 } from "lucide-react";
 
 type BookingSuccessProps = {
@@ -17,8 +19,20 @@ export function BookingSuccess({
   totalLabel,
   onGoNotifications,
 }: BookingSuccessProps) {
-  return (
-    <div className="booking-success-backdrop" role="presentation">
+  const [mounted, setMounted] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    setDarkMode(Boolean(document.querySelector(".app-shell.theme-dark")));
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
+
+  if (!mounted) return null;
+
+  return createPortal(
+    <div className={"booking-success-backdrop" + (darkMode ? " theme-dark" : "")} role="presentation">
       <section
         className="booking-success booking-success-dialog"
         role="alertdialog"
@@ -44,6 +58,7 @@ export function BookingSuccess({
           موافقة
         </button>
       </section>
-    </div>
+    </div>,
+    document.body
   );
 }
