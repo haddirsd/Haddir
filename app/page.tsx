@@ -20,7 +20,7 @@ export default function Home(){
  const [showWelcome,setShowWelcome]=useState(false),[welcomeGreeting,setWelcomeGreeting]=useState("أهلاً بيك في حاضر");
  const [assignedEvent,setAssignedEvent]=useState<any|null>(null);
  const [myTickets,setMyTickets]=useState<any[]>([]),[myNotifications,setMyNotifications]=useState<any[]>([]),[accountDataLoading,setAccountDataLoading]=useState(false),[accountDataError,setAccountDataError]=useState("");
- const [notificationFilter,setNotificationFilter]=useState<"all"|"unread"|"read">("all");
+ const [notificationFilter,setNotificationFilter]=useState<"unread"|"read">("unread");
  const [ticketFilter,setTicketFilter]=useState<"new"|"used">("new");
  const [expandedTicketId,setExpandedTicketId]=useState<string|null>(null);
   useEffect(()=>{
@@ -68,12 +68,13 @@ export default function Home(){
  const saveProfile=async()=>{if(!authUser){setAuthMessage("سجّل الدخول أولاً لحفظ بياناتك.");return;}const normalizedPhone=phone.replace(/[٠-٩]/g,d=>String("٠١٢٣٤٥٦٧٨٩".indexOf(d))).replace(/\s+/g,"");if(!/^0\d{9}$/.test(normalizedPhone)){setAuthMessage("رقم الهاتف لازم يكون 10 خانات بالضبط ويبدأ بصفر، مثال: 09XXXXXXXX.");return;}const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("تعذر الاتصال بقاعدة البيانات حالياً.");return;}setProfileSaving(true);setSaved(false);setAuthMessage("");const {data,error}=await supabase.from("profiles").update({phone:normalizedPhone}).eq("id",authUser.id).select("phone").single();setProfileSaving(false);if(error){setAuthMessage("ما قدرنا نحفظ رقمك. تأكد من الاتصال وحاول مرة تانية.");return;}setPhone(data.phone||normalizedPhone);setProfileEditing(false);setSaved(true);};
  const signOut=async()=>{if(!window.confirm("هل تريد تسجيل الخروج من حسابك؟ ستعود إلى شاشة تسجيل الدخول."))return;const supabase=getSupabaseBrowserClient();if(supabase){const {error}=await supabase.auth.signOut();if(error){setAuthMessage("تعذر تسجيل الخروج حالياً. حاول مرة أخرى.");return;}}setAuthMessage("تم تسجيل الخروج بنجاح. يمكنك تسجيل الدخول مرة أخرى في أي وقت.");};
 
- const markNotificationRead=async(notification:any,isRead=true)=>{
+ const markNotificationRead=async(notification:any)=>{
   if(!authUser)return;
   const supabase=getSupabaseBrowserClient();if(!supabase)return;
-  const {error}=await supabase.from("notifications").update({is_read:isRead}).eq("id",notification.id).eq("user_id",authUser.id);
+  const {error}=await supabase.from("notifications").update({is_read:true}).eq("id",notification.id).eq("user_id",authUser.id);
   if(error){setAccountDataError("تعذر تحديث حالة الإشعار. "+error.message);return;}
-  setMyNotifications(rows=>rows.map(row=>row.id===notification.id?{...row,is_read:isRead}:row));
+  setMyNotifications(rows=>rows.map(row=>row.id===notification.id?{...row,is_read:true}:row));
+  setNotificationFilter("read");
  };
  const markAllNotificationsRead=async()=>{
   if(!authUser)return;
@@ -83,13 +84,14 @@ export default function Home(){
   const {error}=await supabase.from("notifications").update({is_read:true}).in("id",unreadIds).eq("user_id",authUser.id);
   if(error){setAccountDataError("تعذر تعليم الإشعارات كمقروءة. "+error.message);return;}
   setMyNotifications(rows=>rows.map(row=>({...row,is_read:true})));
+  setNotificationFilter("read");
  };
  const openNotification=async(notification:any)=>{
   if(!notification.is_read)await markNotificationRead(notification,true);
   if(notification.type==="ticket_approved"||String(notification.type||"").startsWith("event_reminder_"))go("tickets");
  };
  const unreadNotificationCount=myNotifications.filter(n=>!n.is_read).length;
- const filteredNotifications=myNotifications.filter(n=>notificationFilter==="all"||(notificationFilter==="unread"?!n.is_read:n.is_read));
+ const filteredNotifications=myNotifications.filter(n=>notificationFilter==="unread"?!n.is_read:n.is_read);
  const go=(tab:Tab)=>{
   setEventResetKey(value=>value+1);setActiveTab(tab);
   const url=new URL(window.location.href);
@@ -134,7 +136,7 @@ export default function Home(){
   onFilterChange={setNotificationFilter}
   onMarkAllRead={()=>void markAllNotificationsRead()}
   onOpenNotification={(notification)=>void openNotification(notification)}
-  onToggleRead={(notification,isRead)=>void markNotificationRead(notification,isRead)}
+  onToggleRead={(notification)=>void markNotificationRead(notification)}
  />}
  {!isGatekeeperPage&&activeTab==="profile"&&<section className="screen container profile-screen">
    <div className="profile-card profile-account-card">
