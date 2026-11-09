@@ -5,7 +5,8 @@ export type AdminEventRow = {
   category: string | null;
   city: string | null;
   venue: string | null;
-  starts_at: string;
+  starts_at: string | null;
+  is_continuous: boolean;
   status: string;
   created_at: string;
   is_trending: boolean;
@@ -46,6 +47,7 @@ export type AdminEventFormValues = {
   location_url: string;
   starts_at: string;
   ends_at: string;
+  is_continuous: boolean;
   cover_image_url: string;
   is_trending: boolean;
   platform_fee_percent: string;
