@@ -17,7 +17,7 @@
   "theme_color": "#eef6f9",
   "icons": [
     {
-      "src": "/Haddir_Logo_Blue.svg",
+      "src": "/Haddir_App_Icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
