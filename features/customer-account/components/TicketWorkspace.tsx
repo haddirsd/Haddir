@@ -7,7 +7,7 @@ export type CustomerTicket = {
   id: string;
   status: string;
   ticket_code: string;
-  events?: { title?: string; starts_at?: string; venue?: string; cover_image_url?: string | null } | null;
+  events?: { title?: string; starts_at?: string; is_continuous?: boolean; venue?: string; cover_image_url?: string | null } | null;
   ticket_types?: { name?: string } | null;
   bookings?: { booking_number?: string } | null;
   booking_items?: { quantity?: number } | null;
@@ -62,7 +62,7 @@ export function TicketWorkspace({
               </span>
               <span className="ticket-preview-copy">
                 <strong>{ticket.events?.title || "فعالية"}</strong>
-                <span><CalendarDays size={13} />{ticket.events?.starts_at ? formatEventDate(ticket.events.starts_at) : "التاريخ غير محدد"}</span>
+                <span><CalendarDays size={13} />{ticket.events?.is_continuous ? "تذكرة مستمرة" : ticket.events?.starts_at ? formatEventDate(ticket.events.starts_at) : "التاريخ غير محدد"}</span>
                 <span><UserRound size={13} />عدد الأشخاص: {ticket.booking_items?.quantity || 1}</span>
               </span>
               <span className={"ticket-preview-status " + (ticket.status === "used" ? "used" : "")}>{ticket.status === "used" ? "مستخدمة" : "جديدة"}</span>
@@ -76,7 +76,7 @@ export function TicketWorkspace({
                   <div><small>نوع التذكرة</small><strong>{ticket.ticket_types?.name || "تذكرة"}</strong></div>
                   <div><small>رقم الحجز</small><strong>{ticket.bookings?.booking_number || "—"}</strong></div>
                   <div><small>الموقع</small><strong>{ticket.events?.venue || "—"}</strong></div>
-                  <div><small>التاريخ</small><strong>{ticket.events?.starts_at ? formatEventDate(ticket.events.starts_at) : "—"}</strong></div>
+                  <div><small>التاريخ</small><strong>{ticket.events?.is_continuous ? "مستمر" : ticket.events?.starts_at ? formatEventDate(ticket.events.starts_at) : "—"}</strong></div>
                   <div><small>عدد الأشخاص</small><strong>{ticket.booking_items?.quantity || 1} أشخاص</strong></div>
                 </div>
                 <div className="haddir-ticket-qr"><QrCodeSVG value={ticket.ticket_code} size={220} level="H" includeMargin /><small>امسح الرمز للتحقق من التذكرة، أو أدخل الكود يدوياً عند البوابة</small></div>
