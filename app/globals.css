@@ -4192,3 +4192,51 @@ html[data-theme="dark"] .tier-card.tier-selected{background:rgba(56,189,248,.12)
     padding-bottom:176px!important;
   }
 }
+
+
+/* Correct fixed checkout bar: remove the transformed ancestor that trapped it. */
+.app-content .event-detail-page{
+  animation:none!important;
+  transform:none!important;
+  will-change:auto!important;
+}
+.event-detail-page .event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer{
+  position:fixed!important;
+  left:0!important;
+  right:0!important;
+  bottom:calc(78px + env(safe-area-inset-bottom))!important;
+  z-index:999!important;
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:11px 16px!important;
+  border-radius:16px 16px 0 0!important;
+  border:1px solid var(--line)!important;
+  border-bottom:0!important;
+  background:var(--surface-strong)!important;
+  box-shadow:0 -8px 24px rgba(4,35,44,.14)!important;
+  transform:none!important;
+}
+.event-detail-page .event-detail-layout:not(.payment-sheet) .detail-content{
+  padding-bottom:120px!important;
+}
+@media(min-width:801px){
+  .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer{
+    left:50%!important;
+    right:auto!important;
+    bottom:92px!important;
+    width:min(900px,calc(100% - 40px))!important;
+    transform:translateX(-50%)!important;
+    border:1px solid var(--line)!important;
+    border-radius:18px!important;
+  }
+}
+@media(max-width:520px){
+  .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer{
+    bottom:calc(76px + env(safe-area-inset-bottom))!important;
+    padding:9px 12px!important;
+  }
+  .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-content{
+    padding-bottom:112px!important;
+  }
+}
