@@ -87,7 +87,7 @@ export async function saveAdminEvent(input: SaveAdminEventInput): Promise<{ mess
   if (!ticketForms.length || ticketForms.some(ticket =>
     !ticket.name.trim() || ticket.price === "" ||
     !Number.isFinite(Number(ticket.price)) || Number(ticket.price) < 0 ||
-    (ticket.quantity_total.trim() !== "" && (!Number.isInteger(Number(ticket.quantity_total)) || Number(ticket.quantity_total) < ticket.quantity_sold)) ||
+    (ticket.quantity_total.trim() !== "" && (!Number.isInteger(Number(ticket.quantity_total)) || Number(ticket.quantity_total) < Math.max(1, ticket.quantity_sold))) ||
     (ticket.sales_start_at && ticket.sales_end_at && new Date(ticket.sales_end_at) <= new Date(ticket.sales_start_at))
   )) return { message: null, error: "راجع فئات التذاكر: اسم التذكرة والسعر مطلوبان، والكمية الاختيارية لا تقل عن الكمية المباعة، ونهاية البيع بعد بدايته." };
 
@@ -125,7 +125,7 @@ export async function saveAdminEvent(input: SaveAdminEventInput): Promise<{ mess
 
     const keptIds = ticketForms.map(ticket => ticket.id).filter(Boolean) as string[];
     for (const ticket of ticketForms) {
-      if (!ticket.name.trim() || Number(ticket.price) < 0 || (ticket.quantity_total.trim() !== "" && (!Number.isInteger(Number(ticket.quantity_total)) || Number(ticket.quantity_total) < ticket.quantity_sold)))
+      if (!ticket.name.trim() || Number(ticket.price) < 0 || (ticket.quantity_total.trim() !== "" && (!Number.isInteger(Number(ticket.quantity_total)) || Number(ticket.quantity_total) < Math.max(1, ticket.quantity_sold))))
         return { message: null, error: "راجع بيانات التذاكر: الكمية لا يمكن أن تقل عن المباع." };
       const payload = {
         name: ticket.name.trim(), description: ticket.description.trim() || null,
