@@ -4149,3 +4149,46 @@ html[data-theme="dark"] .tier-card.tier-selected{background:rgba(56,189,248,.12)
 .gatekeeper-network-loading-card p{margin:0;color:var(--muted,var(--fg));font-size:12px;line-height:1.8}
 @keyframes gatekeeper-network-spin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.gatekeeper-loading-spinner{animation:none}}
+
+
+/* Keep the event-details payment action visible while the page scrolls. */
+.event-detail-page .event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer{
+  position:fixed!important;
+  inset-inline:0!important;
+  bottom:calc(88px + env(safe-area-inset-bottom))!important;
+  z-index:120!important;
+  width:100%!important;
+  margin:0!important;
+  padding:12px max(14px,calc((100vw - 900px)/2))!important;
+  border:1px solid var(--haddir-glass-border)!important;
+  border-inline:0!important;
+  border-radius:18px 18px 0 0!important;
+  background:var(--surface-strong)!important;
+  box-shadow:0 -12px 34px rgba(4,35,44,.16)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(160%)!important;
+  backdrop-filter:blur(22px) saturate(160%)!important;
+}
+.event-detail-page .event-detail-layout:not(.payment-sheet) .detail-content{
+  padding-bottom:190px!important;
+}
+@media(min-width:801px){
+  .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer{
+    bottom:calc(100px + env(safe-area-inset-bottom))!important;
+    width:min(900px,calc(100% - 40px))!important;
+    left:50%!important;
+    right:auto!important;
+    transform:translateX(-50%);
+    border:1px solid var(--haddir-glass-border)!important;
+    border-radius:20px!important;
+  }
+}
+@media(max-width:520px){
+  .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer{
+    bottom:calc(84px + env(safe-area-inset-bottom))!important;
+    padding:10px 12px!important;
+    border-radius:16px 16px 0 0!important;
+  }
+  .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-content{
+    padding-bottom:176px!important;
+  }
+}
