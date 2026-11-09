@@ -40,7 +40,10 @@ export default function AdminReportsWorkspace() {
           const eventPending=eventBookings.filter(b=>["pending_payment","under_review"].includes(b.status));
           const eventRejected=eventBookings.filter(b=>b.status==="rejected");
           const eventPeople=new Set(eventBookings.filter(b=>!["rejected","cancelled","expired"].includes(b.status)).map(b=>b.user_id||b.customer_email||b.customer_phone||b.id)).size;
-          const eventTickets=data.tickets.filter(t=>t.event_id===event?.id);\n          const checkedInTickets=eventTickets.filter(t=>t.status==="used");\n\n          const eventTicketRows=(event?.ticket_types||[]).map((type:Row)=>{
+          const eventTickets=data.tickets.filter(t=>t.event_id===event?.id);
+          const checkedInTickets=eventTickets.filter(t=>t.status==="used");
+
+          const eventTicketRows=(event?.ticket_types||[]).map((type:Row)=>{
             const items=eventConfirmed.flatMap(b=>b.booking_items||[]).filter((i:any)=>i.ticket_type_id===type.id);
             const reservedItems=eventPending.flatMap(b=>b.booking_items||[]).filter((i:any)=>i.ticket_type_id===type.id);
             const rejectedItems=eventRejected.flatMap(b=>b.booking_items||[]).filter((i:any)=>i.ticket_type_id===type.id);
