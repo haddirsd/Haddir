@@ -4414,3 +4414,45 @@ html[data-theme="dark"] .tier-card.tier-selected{background:rgba(56,189,248,.12)
 
 /* Official Haddir identity */
 .brand-logo{display:block;width:42px;height:42px;object-fit:contain;flex:none}.brand{gap:9px}.brand-word{color:var(--fg);font-size:23px;font-weight:900;line-height:1;letter-spacing:0}.welcome-brand-logo{display:block;width:76px;height:76px;object-fit:contain;flex:none;filter:drop-shadow(0 8px 18px #21596418)}
+
+
+/* Fixed ticket action dock: always visible, safe-area aware, and independent of scroll. */
+.app-content .event-detail-page .detail-sheet:not(.payment-sheet) {
+  padding-bottom: 0 !important;
+}
+.app-content .event-detail-page .detail-sheet:not(.payment-sheet) .detail-content {
+  padding-bottom: calc(154px + env(safe-area-inset-bottom)) !important;
+}
+.app-content .event-detail-page .detail-booking-dock.actionable-footer {
+  position: fixed !important;
+  inset-inline: 0 !important;
+  bottom: 0 !important;
+  z-index: 120 !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(145px, 42%) !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 850px !important;
+  margin: 0 auto !important;
+  padding: 12px max(16px, calc((100vw - 850px)/2 + 18px)) calc(12px + env(safe-area-inset-bottom)) !important;
+  border: 0 !important;
+  border-top: 1px solid var(--line) !important;
+  border-radius: 0 !important;
+  background: var(--surface-strong) !important;
+  box-shadow: 0 -10px 30px rgba(13,33,37,.10) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(145%) !important;
+  backdrop-filter: blur(18px) saturate(145%) !important;
+}
+.app-content .event-detail-page .detail-booking-dock .pay-button:disabled {
+  opacity: .42 !important;
+  filter: saturate(.45) !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}
+@media (min-width: 851px) {
+  .app-content .event-detail-page .detail-booking-dock.actionable-footer {
+    inset-inline: 50% !important;
+    transform: translateX(50%) !important;
+    border-inline: 1px solid var(--line) !important;
+  }
+}
