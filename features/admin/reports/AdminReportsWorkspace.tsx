@@ -144,7 +144,7 @@ export default function AdminReportsWorkspace() {
 
                   <section className="admin-report-page admin-report-register">
                     <div className="admin-report-section-head"><span>04 / سجل الدخول</span><h2>التذاكر والتحقق عند البوابة</h2><p>حالة رموز الدخول ووقت استخدامها عند التحقق.</p></div>
-                    <div className="admin-report-table-wrap"><table><thead><tr><th>كود التذكرة</th><th>اسم حامل التذكرة</th><th>الفئة</th><th>الحالة</th><th>وقت الدخول</th></tr></thead><tbody>{eventTickets.map((t:Row)=><tr key={t.id}><td dir="ltr">{t.ticket_code||"—"}</td><td>{t.attendee_name||"—"}</td><td>{eventTicketRows.find(x=>x.id===t.ticket_type_id)?.name||"—"}</td><td>{t.status==="used"?"تم الدخول":t.status==="valid"?"صالحة":"غير صالحة"}</td><td>{t.used_at?new Date(t.used_at).toLocaleString("ar-SD-u-nu-latn"):"—"}</td></tr>)}</tbody></table></div>
+                    <div className="admin-report-table-wrap"><table><thead><tr><th>كود التذكرة</th><th>اسم حامل التذكرة</th><th>الفئة</th><th>الحالة</th><th>وقت الدخول</th></tr></thead><tbody>{eventTickets.map((t:Row)=><tr key={t.id}><td dir="ltr">{t.ticket_code||"—"}</td><td>{t.attendee_name||"—"}</td><td>{eventTicketRows.find((x: Row)=>x.id===t.ticket_type_id)?.name||"—"}</td><td>{t.status==="used"?"تم الدخول":t.status==="valid"?"صالحة":"غير صالحة"}</td><td>{t.used_at?new Date(t.used_at).toLocaleString("ar-SD-u-nu-latn"):"—"}</td></tr>)}</tbody></table></div>
                     <div className="admin-report-note">هذا السجل يعرض بيانات التذاكر المتاحة في النظام وقت إصدار التقرير. أي دخول يتم بعد ذلك لن يظهر إلا في تقرير جديد.</div>
                     <div className="admin-report-footer"><span>حاضِر · نهاية التقرير</span><b>05</b></div>
                   </section>
