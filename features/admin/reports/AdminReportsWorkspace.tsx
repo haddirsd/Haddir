@@ -40,7 +40,7 @@ export default function AdminReportsWorkspace() {
           const eventPending=eventBookings.filter(b=>["pending_payment","under_review"].includes(b.status));
           const eventRejected=eventBookings.filter(b=>b.status==="rejected");
           const eventPeople=new Set(eventBookings.filter(b=>!["rejected","cancelled","expired"].includes(b.status)).map(b=>b.user_id||b.customer_email||b.customer_phone||b.id)).size;
-          const eventTicketRows=(event?.ticket_types||[]).map((type:Row)=>{
+          const eventTickets=data.tickets.filter(t=>t.event_id===event?.id);\n          const checkedInTickets=eventTickets.filter(t=>t.status==="used");\n          const eventNetRows=eventRevenueRows.map(x=>({currency:x.currency,value:x.value*(1-Number(event?.platform_fee_percent||0)/100)}));\n          const eventTicketRows=(event?.ticket_types||[]).map((type:Row)=>{
             const items=eventConfirmed.flatMap(b=>b.booking_items||[]).filter((i:any)=>i.ticket_type_id===type.id);
             const reservedItems=eventPending.flatMap(b=>b.booking_items||[]).filter((i:any)=>i.ticket_type_id===type.id);
             const rejectedItems=eventRejected.flatMap(b=>b.booking_items||[]).filter((i:any)=>i.ticket_type_id===type.id);
@@ -74,10 +74,77 @@ export default function AdminReportsWorkspace() {
               <div className="admin-event-stat-select"><label htmlFor="stats-event-select">اختار الفعالية</label><select id="stats-event-select" value={statsEventId} onChange={e=>setStatsEventId(e.target.value)}><option value="">اختر فعالية...</option>{data.events.map(e=><option key={e.id} value={e.id}>{e.title} — {statusLabels[e.status]||e.status}</option>)}</select></div>
               {!event?<p className="admin-no-data">اختار فعالية عشان تظهر إحصائياتها.</p>:<>
                 <div className="admin-selected-event"><div><small>الفعالية المحددة</small><h3>{event.title}</h3><span>{statusLabels[event.status]||event.status} · عمولة المنصة {Number(event.platform_fee_percent||0)}%</span></div><button className="admin-print-button" type="button" onClick={()=>window.print()}>تحميل تقرير الفعالية PDF</button></div>
-                <div className="admin-print-report-head"><div className="admin-print-brand"><img src="/haddir_for_ticket.svg" alt="شعار حاضر" /><b>حاضِر · تقرير إحصائيات فعالية</b></div><h2>{event.title}</h2><p>الحالة: {statusLabels[event.status]||event.status} · عمولة المنصة: {Number(event.platform_fee_percent||0)}% · تاريخ التقرير: {new Date().toLocaleString("ar-SD-u-nu-latn")}</p></div>
-                {metricCards([{title:"عدد الحاجزين",value:eventPeople},{title:"الحجوزات المؤكدة",value:eventConfirmed.length},{title:"الحجوزات المرفوضة",value:eventRejected.length},{title:"إجمالي سعة التذاكر",value:eventTicketRows.some((t:Row)=>t.quantity_total==null)?"غير محدود":sum(eventTicketRows,"quantity_total")},{title:"التذاكر المباعة",value:sum(eventTicketRows,"sold")},{title:"محجوزة قيد الدفع/المراجعة",value:sum(eventTicketRows,"reserved")},{title:"التذاكر المرفوضة",value:sum(eventTicketRows,"rejectedCount")},{title:"التذاكر المتاحة فعلياً",value:eventTicketRows.some((t:Row)=>t.quantity_total==null)?"غير محدود":sum(eventTicketRows,"remaining")},{title:"إجمالي المبيعات",value:moneyLines(eventRevenueRows,"value")},{title:"صافي دخل المنصة (العمولة)",value:moneyLines(eventCommissionRows,"value"),hint:Number(event.platform_fee_percent||0)===0?"لا توجد عمولة مستحقة على هذه الفعالية":"محسوبة من المبيعات المعتمدة فقط"}])}
-                <h3 className="admin-stats-heading">تفاصيل فئات التذاكر</h3>
-                <div className="admin-table-wrap"><table className="admin-data-table"><thead><tr><th>الفئة</th><th>السعر</th><th>الإجمالي</th><th>المباع</th><th>قيد الدفع/المراجعة</th><th>المرفوض</th><th>المتبقي فعلياً</th><th>قيمة المبيعات</th></tr></thead><tbody>{eventTicketRows.map((t:Row)=><tr key={t.id}><td>{t.name}</td><td>{money(t.price,t.currency)}</td><td>{fmtCount(Number(t.quantity_total||0))}</td><td>{fmtCount(t.sold)}</td><td>{fmtCount(t.reserved)}</td><td>{fmtCount(t.rejectedCount)}</td><td>{fmtCount(t.remaining)}</td><td>{money(t.revenue,t.currency)}</td></tr>)}</tbody></table></div>
+                <div className="admin-event-report" dir="rtl">
+                  <section className="admin-report-page admin-report-cover">
+                    <div className="admin-report-topline"><img src="/haddir_for_ticket.svg" alt="حاضر" /><span>حاضِر · منصة الفعاليات</span><small>تقرير فعالية تفصيلي</small></div>
+                    {event.cover_image_url&&<img className="admin-report-cover-image" src={event.cover_image_url} alt="" />}
+                    <div className="admin-report-cover-content">
+                      <span className="admin-report-kicker">تقرير الأداء والتشغيل</span>
+                      <h1>{event.title}</h1>
+                      <p>{event.description||"تقرير تفصيلي لأداء الفعالية والحجوزات والمبيعات والدخول."}</p>
+                      <div className="admin-report-meta-grid">
+                        <div><small>التصنيف</small><b>{event.category||"غير محدد"}</b></div>
+                        <div><small>الموقع</small><b>{[event.venue,event.city].filter(Boolean).join(" · ")||"غير محدد"}</b></div>
+                        <div><small>موعد الفعالية</small><b>{event.is_continuous?"فعالية مستمرة":event.starts_at?new Date(event.starts_at).toLocaleString("ar-SD-u-nu-latn"):"غير محدد"}</b></div>
+                        <div><small>الحالة</small><b>{statusLabels[event.status]||event.status}</b></div>
+                        <div><small>نسبة عمولة المنصة</small><b>{Number(event.platform_fee_percent||0)}%</b></div>
+                        <div><small>تاريخ إصدار التقرير</small><b>{new Date().toLocaleDateString("ar-SD-u-nu-latn")}</b></div>
+                      </div>
+                    </div>
+                    <div className="admin-report-footer"><span>مستند إداري · للاستخدام الداخلي</span><b>01</b></div>
+                  </section>
+
+                  <section className="admin-report-page">
+                    <div className="admin-report-section-head"><span>01 / الملخص التنفيذي</span><h2>نظرة عامة على الأداء</h2><p>ملخص الحجوزات، أعداد التذاكر، المبيعات، ومؤشرات الدخول.</p></div>
+                    <div className="admin-report-kpi-grid">
+                      <article><small>عدد الحاجزين</small><strong>{fmtCount(eventPeople)}</strong><span>حجوزات غير مرفوضة أو ملغاة أو منتهية</span></article>
+                      <article><small>الحجوزات المؤكدة</small><strong>{fmtCount(eventConfirmed.length)}</strong><span>حجوزات تم اعتمادها</span></article>
+                      <article><small>قيد الدفع / المراجعة</small><strong>{fmtCount(eventPending.length)}</strong><span>طلبات لم تكتمل مراجعتها</span></article>
+                      <article><small>الحجوزات المرفوضة</small><strong>{fmtCount(eventRejected.length)}</strong><span>طلبات لم يتم اعتمادها</span></article>
+                      <article><small>التذاكر المصدرة</small><strong>{fmtCount(eventTickets.length)}</strong><span>إجمالي رموز الدخول</span></article>
+                      <article><small>تم تسجيل الدخول</small><strong>{fmtCount(checkedInTickets.length)}</strong><span>{eventTickets.length?Math.round(checkedInTickets.length/eventTickets.length*100):0}% من التذاكر المصدرة</span></article>
+                    </div>
+                    <div className="admin-report-highlight">
+                      <div><small>إجمالي المبيعات المعتمدة</small><strong>{moneyLines(eventRevenueRows,"value")}</strong></div>
+                      <div><small>عمولة منصة حاضر</small><strong>{moneyLines(eventCommissionRows,"value")}</strong></div>
+                      <div><small>صافي مستحق منظم الفعالية</small><strong>{moneyLines(eventNetRows,"value")}</strong></div>
+                    </div>
+                    <h3 className="admin-report-subtitle">حالة التذاكر والدخول</h3>
+                    <div className="admin-report-status-list">
+                      <div><span>صالحة ولم تستخدم</span><b>{fmtCount(eventTickets.filter(t=>t.status==="valid").length)}</b></div>
+                      <div><span>تم استخدامها عند البوابة</span><b>{fmtCount(checkedInTickets.length)}</b></div>
+                      <div><span>غير صالحة / ملغاة</span><b>{fmtCount(eventTickets.filter(t=>!["valid","used"].includes(t.status)).length)}</b></div>
+                      <div><span>إجمالي الكمية المحجوزة قيد المراجعة</span><b>{fmtCount(sum(eventTicketRows,"reserved"))}</b></div>
+                    </div>
+                    <p className="admin-report-note">تُحتسب المبيعات من الحجوزات المؤكدة فقط. صافي المنظم هو المبيعات المعتمدة بعد خصم عمولة المنصة، ولا يشمل المصروفات التشغيلية أو التسويات الخارجية.</p>
+                    <div className="admin-report-footer"><span>حاضِر · تقرير الفعالية</span><b>02</b></div>
+                  </section>
+
+                  <section className="admin-report-page">
+                    <div className="admin-report-section-head"><span>02 / تفاصيل المبيعات</span><h2>فئات التذاكر والأداء المالي</h2><p>تفصيل السعة والبيع والحجوزات المعلقة والإيراد حسب كل فئة.</p></div>
+                    <div className="admin-report-table-wrap"><table><thead><tr><th>فئة التذكرة</th><th>السعر</th><th>السعة</th><th>المباع</th><th>قيد المراجعة</th><th>المتبقي</th><th>المبيعات</th></tr></thead><tbody>{eventTicketRows.map((t:Row)=><tr key={t.id}><td><b>{t.name}</b>{t.description&&<small>{t.description}</small>}</td><td>{money(t.price,t.currency)}</td><td>{t.quantity_total==null?"غير محدود":fmtCount(Number(t.quantity_total))}</td><td>{fmtCount(t.sold)}</td><td>{fmtCount(t.reserved)}</td><td>{t.remaining==="غير محدود"?"غير محدود":fmtCount(Number(t.remaining))}</td><td>{money(t.revenue,t.currency)}</td></tr>)}</tbody></table></div>
+                    <div className="admin-report-finance-grid">
+                      <div><small>إجمالي المبيعات</small><b>{moneyLines(eventRevenueRows,"value")}</b></div>
+                      <div><small>نسبة العمولة</small><b>{Number(event.platform_fee_percent||0)}%</b></div>
+                      <div><small>دخل المنصة</small><b>{moneyLines(eventCommissionRows,"value")}</b></div>
+                      <div><small>صافي المنظم</small><b>{moneyLines(eventNetRows,"value")}</b></div>
+                    </div>
+                    <div className="admin-report-footer"><span>حاضِر · تقرير الفعالية</span><b>03</b></div>
+                  </section>
+
+                  <section className="admin-report-page admin-report-register">
+                    <div className="admin-report-section-head"><span>03 / سجل الحجوزات</span><h2>تفاصيل طلبات الحجز</h2><p>سجل تفصيلي للحجوزات المرتبطة بهذه الفعالية.</p></div>
+                    <div className="admin-report-table-wrap"><table><thead><tr><th>رقم الحجز</th><th>اسم الحاجز</th><th>تاريخ الطلب</th><th>التذاكر</th><th>القيمة</th><th>الحالة</th></tr></thead><tbody>{eventBookings.map((b:Row)=><tr key={b.id}><td>{b.booking_number||b.id.slice(0,8)}</td><td>{b.customer_name||"—"}<small>{b.customer_phone||b.customer_email||""}</small></td><td>{b.created_at?new Date(b.created_at).toLocaleDateString("ar-SD-u-nu-latn"):"—"}</td><td>{(b.booking_items||[]).map((i:Row)=>`${i.ticket_types?.name||"تذكرة"} × ${i.quantity}`).join("، ")||"—"}</td><td>{money(b.subtotal,b.currency)}</td><td><span className={`admin-report-status status-${b.status}`}>{statusLabels[b.status]||b.status}</span></td></tr>)}</tbody></table></div>
+                    <div className="admin-report-footer"><span>بيانات الحجز كما هي مسجلة في النظام</span><b>04</b></div>
+                  </section>
+
+                  <section className="admin-report-page admin-report-register">
+                    <div className="admin-report-section-head"><span>04 / سجل الدخول</span><h2>التذاكر والتحقق عند البوابة</h2><p>حالة رموز الدخول ووقت استخدامها عند التحقق.</p></div>
+                    <div className="admin-report-table-wrap"><table><thead><tr><th>كود التذكرة</th><th>اسم حامل التذكرة</th><th>الفئة</th><th>الحالة</th><th>وقت الدخول</th></tr></thead><tbody>{eventTickets.map((t:Row)=><tr key={t.id}><td dir="ltr">{t.ticket_code||"—"}</td><td>{t.attendee_name||"—"}</td><td>{eventTicketRows.find(x=>x.id===t.ticket_type_id)?.name||"—"}</td><td>{t.status==="used"?"تم الدخول":t.status==="valid"?"صالحة":"غير صالحة"}</td><td>{t.used_at?new Date(t.used_at).toLocaleString("ar-SD-u-nu-latn"):"—"}</td></tr>)}</tbody></table></div>
+                    <div className="admin-report-note">هذا السجل يعرض بيانات التذاكر المتاحة في النظام وقت إصدار التقرير. أي دخول يتم بعد ذلك لن يظهر إلا في تقرير جديد.</div>
+                    <div className="admin-report-footer"><span>حاضِر · نهاية التقرير</span><b>05</b></div>
+                  </section>
+                </div>
               </>}
             </>}
           </div>;
