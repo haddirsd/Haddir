@@ -111,7 +111,7 @@ export default function Home(){
   onEventOpenChange={setIsEventDetailOpen}
   onRequireLogin={()=>{setAuthMessage("سجّل الدخول أولاً عشان نكمل حجزك. الفعاليات متاحة للتصفح بدون حساب.");setActiveTab("profile");}}
   onBookingSuccess={()=>{}}
-  onGoNotifications={()=>setActiveTab("notifications")}
+  onGoNotifications={()=>go("notifications")}
  />
  {!isGatekeeperPage&&activeTab==="tickets"&&<TicketWorkspace
   loading={accountDataLoading}
