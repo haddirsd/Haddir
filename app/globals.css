@@ -4598,3 +4598,15 @@ body {
 .theme-dark .admin-activity-item-rail:after{background:#365057}
 @media(max-width:850px){.admin-activity-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-activity-search{grid-column:1/-1}}
 @media(max-width:560px){.admin-activity-heading{align-items:stretch;flex-direction:column}.admin-activity-heading .admin-refresh{align-self:flex-start}.admin-activity-stats{gap:7px}.admin-activity-stats article{align-items:flex-start;flex-direction:column;gap:8px;padding:10px}.admin-activity-stats article>span{width:31px;height:31px}.admin-activity-stats strong{font-size:18px}.admin-activity-stats small{font-size:9px}.admin-activity-filters{grid-template-columns:1fr 1fr}.admin-activity-search{grid-column:1/-1}.admin-activity-item{grid-template-columns:25px minmax(0,1fr);gap:7px;padding:12px}.admin-activity-item-top{flex-direction:column;gap:5px}.admin-activity-item-top time{font-size:9px}.admin-activity-changes>div{display:grid;grid-template-columns:1fr;gap:6px}}
+
+
+/* Admin identity: approved Haddir mark and Google account photo */
+.admin-brand>img{display:block;width:112px;height:48px;object-fit:contain;object-position:right center;flex:none}
+.admin-brand{gap:9px}
+.admin-brand>span{display:none}
+.admin-mini-profile .admin-mini-avatar{overflow:hidden;width:37px;height:37px;border-radius:50%;background:#eaf7fa;color:#2c8da0}
+.admin-mini-avatar img,.admin-avatar img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.admin-avatar{overflow:hidden}
+.theme-dark .admin-brand{color:#d7f1f5}
+.theme-dark .admin-mini-profile{border-top-color:#254047}
+.theme-dark .admin-mini-avatar{background:#1b3941;color:#a7e2eb}
