@@ -87,7 +87,7 @@ export default function Home(){
   setNotificationFilter("read");
  };
  const openNotification=async(notification:any)=>{
-  if(!notification.is_read)await markNotificationRead(notification,true);
+  if(!notification.is_read)await markNotificationRead(notification);
   if(notification.type==="ticket_approved"||String(notification.type||"").startsWith("event_reminder_"))go("tickets");
  };
  const unreadNotificationCount=myNotifications.filter(n=>!n.is_read).length;
