@@ -1396,6 +1396,8 @@ body{font-size:16px}
 
 /* Event statistics PDF / print layout */
 .admin-print-report-head{display:none}
+.admin-print-brand{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.admin-print-brand img{width:42px;height:42px;object-fit:contain}
 .admin-print-button{border:0;border-radius:10px;padding:10px 15px;background:#408b9a;color:#fff;font:inherit;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap}
 @media print{
   @page{size:A4 landscape;margin:12mm}
@@ -1405,7 +1407,8 @@ body{font-size:16px}
   .admin-statistics{position:absolute!important;inset:0 auto auto 0!important;width:100%!important;padding:0!important;display:block!important;background:#fff!important;color:#111!important}
   .admin-stat-tabs,.admin-event-stat-select,.admin-print-button{display:none!important}
   .admin-print-report-head{display:block!important;margin:0 0 16px!important;padding:0 0 12px!important;border-bottom:2px solid #408b9a!important;color:#111!important}
-  .admin-print-report-head b{font-size:13px!important;color:#408b9a!important}
+  .admin-print-brand b{font-size:13px!important;color:#408b9a!important}
+  .admin-print-brand img{width:48px!important;height:48px!important;object-fit:contain!important}
   .admin-print-report-head h2{margin:7px 0!important;font-size:22px!important}
   .admin-print-report-head p{margin:0!important;font-size:11px!important;color:#444!important}
   .admin-selected-event{display:none!important}
