@@ -74,7 +74,7 @@ export function TicketSelection({
                 </span>
                 <strong className="tier-price">{option.price}</strong>
                 <small className="tier-availability">
-                  {option.availableNow ? `متبقي ${option.available} تذكرة` : option.available <= 0 ? "نفدت التذاكر" : "البيع غير متاح حالياً"}
+                  {option.availableNow ? (Number.isFinite(option.available) ? `متبقي ${option.available} تذكرة` : "متاح دون حد محدد") : option.available <= 0 ? "نفدت التذاكر" : "البيع غير متاح حالياً"}
                 </small>
               </button>
             ))}
