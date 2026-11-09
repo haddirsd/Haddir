@@ -9,47 +9,6 @@ type Row = AdminReportRow;
 const statusLabels: Record<string,string> = {draft:"مسودة",published:"منشورة",cancelled:"ملغاة",completed:"مكتملة",pending_payment:"بانتظار الدفع",under_review:"قيد المراجعة",confirmed:"مؤكد",rejected:"مرفوض",expired:"منتهي",submitted:"بانتظار المراجعة",approved:"مقبول",valid:"صالح",used:"مستخدم"};
 const money = (value: unknown, currency = "SDG") => value == null ? "—" : `${Number(value).toLocaleString("ar-SD-u-nu-latn")} ${currency}`;
 
-function csvCell(value: unknown) {
-  const text = value == null ? "" : String(value);
-  return '"' + text.replace(/"/g, '""') + '"';
-}
-function downloadEventReport(event: Row, ticketRows: Row[], bookings: Row[], confirmed: Row[], pending: Row[], rejected: Row[], people: number, currencyLines: string, commissionLines: string) {
-  const rows: unknown[][] = [
-    ["تقرير إحصائيات فعالية حاضر"],
-    ["الفعالية", event.title],
-    ["الحالة", statusLabels[event.status] || event.status],
-    ["نسبة عمولة المنصة", Number(event.platform_fee_percent || 0) + "%"],
-    ["تاريخ إنشاء التقرير", new Date().toLocaleString("ar-SD-u-nu-latn")],
-    [],
-    ["ملخص الفعالية", "القيمة"],
-    ["عدد الحاجزين", people],
-    ["الحجوزات المؤكدة", confirmed.length],
-    ["الحجوزات المرفوضة", rejected.length],
-    ["بانتظار الدفع أو المراجعة", pending.length],
-    ["التذاكر المباعة", ticketRows.reduce((n,x)=>n+Number(x.sold||0),0)],
-    ["التذاكر المحجوزة", ticketRows.reduce((n,x)=>n+Number(x.reserved||0),0)],
-    ["إجمالي المبيعات المعتمدة", currencyLines],
-    ["دخل المنصة من العمولة", commissionLines],
-    [],
-    ["تفاصيل فئات التذاكر"],
-    ["الفئة","السعر","العملة","الإجمالي","المباع","قيد الدفع/المراجعة","المرفوض","المتبقي فعلياً","قيمة المبيعات"],
-    ...ticketRows.map(t=>[t.name,t.price,t.currency,t.quantity_total??"غير محدود",t.sold,t.reserved,t.rejectedCount,t.remaining,t.revenue]),
-    [],
-    ["تفاصيل الحجوزات"],
-    ["رقم الحجز","الحالة","البريد","الهاتف","عدد التذاكر","الإجمالي","العملة","تاريخ الحجز"],
-    ...bookings.map(b=>[b.booking_number||b.id,statusLabels[b.status]||b.status,b.customer_email,b.customer_phone,(b.booking_items||[]).reduce((n:any,i:any)=>n+Number(i.quantity||0),0),b.subtotal,b.currency,b.created_at])
-  ];
-  const csv="\uFEFF"+rows.map(row=>row.map(csvCell).join(",")).join("\r\n");
-  const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
-  const url=URL.createObjectURL(blob);
-  const link=document.createElement("a");
-  const safeName=String(event.title||"event").replace(/[^\p{L}\p{N}-]+/gu,"-").replace(/^-|-$/g,"")||"event";
-  link.href=url;link.download="haddir-event-report-"+safeName+".csv";
-  document.body.appendChild(link);link.click();link.remove();
-  window.setTimeout(()=>URL.revokeObjectURL(url),1000);
-}
-
-
 export default function AdminReportsWorkspace() {
   const { statistics, loading, error, refresh } = useAdminReports();
   const [statsView,setStatsView] = useState<"general"|"event">("general");
@@ -114,8 +73,8 @@ export default function AdminReportsWorkspace() {
             </>:<>
               <div className="admin-event-stat-select"><label htmlFor="stats-event-select">اختار الفعالية</label><select id="stats-event-select" value={statsEventId} onChange={e=>setStatsEventId(e.target.value)}><option value="">اختر فعالية...</option>{data.events.map(e=><option key={e.id} value={e.id}>{e.title} — {statusLabels[e.status]||e.status}</option>)}</select></div>
               {!event?<p className="admin-no-data">اختار فعالية عشان تظهر إحصائياتها.</p>:<>
-                <div className="admin-selected-event"><div><small>الفعالية المحددة</small><h3>{event.title}</h3><span>{statusLabels[event.status]||event.status} · عمولة المنصة {Number(event.platform_fee_percent||0)}%</span></div><button className="admin-print-button" type="button" onClick={()=>downloadEventReport(event,eventTicketRows,eventBookings,eventConfirmed,eventPending,eventRejected,eventPeople,moneyLines(eventRevenueRows,"value"),moneyLines(eventCommissionRows,"value"))}>تحميل تقرير الفعالية (CSV)</button></div>
-                <div className="admin-print-report-head"><b>حاضِر · تقرير إحصائيات فعالية</b><h2>{event.title}</h2><p>الحالة: {statusLabels[event.status]||event.status} · عمولة المنصة: {Number(event.platform_fee_percent||0)}% · تاريخ التقرير: {new Date().toLocaleString("ar-SD-u-nu-latn")}</p></div>
+                <div className="admin-selected-event"><div><small>الفعالية المحددة</small><h3>{event.title}</h3><span>{statusLabels[event.status]||event.status} · عمولة المنصة {Number(event.platform_fee_percent||0)}%</span></div><button className="admin-print-button" type="button" onClick={()=>window.print()}>تحميل تقرير الفعالية PDF</button></div>
+                <div className="admin-print-report-head"><div className="admin-print-brand"><img src="/haddir_for_ticket.svg" alt="شعار حاضر" /><b>حاضِر · تقرير إحصائيات فعالية</b></div><h2>{event.title}</h2><p>الحالة: {statusLabels[event.status]||event.status} · عمولة المنصة: {Number(event.platform_fee_percent||0)}% · تاريخ التقرير: {new Date().toLocaleString("ar-SD-u-nu-latn")}</p></div>
                 {metricCards([{title:"عدد الحاجزين",value:eventPeople},{title:"الحجوزات المؤكدة",value:eventConfirmed.length},{title:"الحجوزات المرفوضة",value:eventRejected.length},{title:"إجمالي سعة التذاكر",value:eventTicketRows.some(t=>t.quantity_total==null)?"غير محدود":sum(eventTicketRows,"quantity_total")},{title:"التذاكر المباعة",value:sum(eventTicketRows,"sold")},{title:"محجوزة قيد الدفع/المراجعة",value:sum(eventTicketRows,"reserved")},{title:"التذاكر المرفوضة",value:sum(eventTicketRows,"rejectedCount")},{title:"التذاكر المتاحة فعلياً",value:eventTicketRows.some(t=>t.quantity_total==null)?"غير محدود":sum(eventTicketRows,"remaining")},{title:"إجمالي المبيعات",value:moneyLines(eventRevenueRows,"value")},{title:"صافي دخل المنصة (العمولة)",value:moneyLines(eventCommissionRows,"value"),hint:Number(event.platform_fee_percent||0)===0?"لا توجد عمولة مستحقة على هذه الفعالية":"محسوبة من المبيعات المعتمدة فقط"}])}
                 <h3 className="admin-stats-heading">تفاصيل فئات التذاكر</h3>
                 <div className="admin-table-wrap"><table className="admin-data-table"><thead><tr><th>الفئة</th><th>السعر</th><th>الإجمالي</th><th>المباع</th><th>قيد الدفع/المراجعة</th><th>المرفوض</th><th>المتبقي فعلياً</th><th>قيمة المبيعات</th></tr></thead><tbody>{eventTicketRows.map((t:Row)=><tr key={t.id}><td>{t.name}</td><td>{money(t.price,t.currency)}</td><td>{fmtCount(Number(t.quantity_total||0))}</td><td>{fmtCount(t.sold)}</td><td>{fmtCount(t.reserved)}</td><td>{fmtCount(t.rejectedCount)}</td><td>{fmtCount(t.remaining)}</td><td>{money(t.revenue,t.currency)}</td></tr>)}</tbody></table></div>
