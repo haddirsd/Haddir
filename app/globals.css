@@ -1400,27 +1400,32 @@ body{font-size:16px}
 .admin-print-brand img{width:42px;height:42px;object-fit:contain}
 .admin-print-button{border:0;border-radius:10px;padding:10px 15px;background:#408b9a;color:#fff;font:inherit;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap}
 @media print{
-  @page{size:A4 landscape;margin:12mm}
-  html,body{background:#fff!important;color:#111!important}
+  @page{size:A4 landscape;margin:10mm}
+  html,body{width:100%!important;height:auto!important;min-height:0!important;overflow:visible!important;background:#fff!important;color:#111!important}
   body *{visibility:hidden!important}
   .admin-statistics,.admin-statistics *{visibility:visible!important}
-  .admin-statistics{position:absolute!important;inset:0 auto auto 0!important;width:100%!important;padding:0!important;display:block!important;background:#fff!important;color:#111!important}
+  /* The admin panel clips overflowing content on screen; never clip a printed report. */
+  .admin-shell,.admin-main,.admin-content,.admin-panel{position:static!important;display:block!important;width:100%!important;height:auto!important;max-height:none!important;overflow:visible!important;transform:none!important}
+  .admin-statistics{position:static!important;inset:auto!important;width:100%!important;height:auto!important;max-height:none!important;overflow:visible!important;padding:0!important;display:block!important;background:#fff!important;color:#111!important}
+  .admin-statistics>*{visibility:visible!important}
   .admin-stat-tabs,.admin-event-stat-select,.admin-print-button{display:none!important}
-  .admin-print-report-head{display:block!important;margin:0 0 16px!important;padding:0 0 12px!important;border-bottom:2px solid #408b9a!important;color:#111!important}
+  .admin-print-report-head{display:block!important;visibility:visible!important;margin:0 0 16px!important;padding:0 0 12px!important;border-bottom:2px solid #408b9a!important;color:#111!important;break-inside:avoid!important}
   .admin-print-brand b{font-size:13px!important;color:#408b9a!important}
-  .admin-print-brand img{width:48px!important;height:48px!important;object-fit:contain!important}
+  .admin-print-brand img{display:block!important;width:48px!important;height:48px!important;object-fit:contain!important}
   .admin-print-report-head h2{margin:7px 0!important;font-size:22px!important}
   .admin-print-report-head p{margin:0!important;font-size:11px!important;color:#444!important}
   .admin-selected-event{display:none!important}
-  .admin-metric-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;margin:12px 0!important}
-  .admin-metric{break-inside:avoid!important;border:1px solid #ddd!important;background:#fff!important;color:#111!important;box-shadow:none!important;padding:10px!important}
+  .admin-metric-grid{display:grid!important;visibility:visible!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;margin:12px 0!important}
+  .admin-metric,.admin-metric *{visibility:visible!important}
+  .admin-metric{display:grid!important;break-inside:avoid!important;border:1px solid #ddd!important;background:#fff!important;color:#111!important;box-shadow:none!important;padding:10px!important}
   .admin-metric small,.admin-metric strong,.admin-stat-hint{color:#111!important}
   .admin-metric strong{font-size:17px!important}
-  .admin-stats-heading{margin:16px 0 8px!important;color:#111!important}
-  .admin-table-wrap{overflow:visible!important;border:0!important}
-  .admin-data-table{width:100%!important;border-collapse:collapse!important;font-size:10px!important}
+  .admin-stats-heading{display:block!important;visibility:visible!important;margin:16px 0 8px!important;color:#111!important;break-after:avoid!important}
+  .admin-table-wrap{display:block!important;visibility:visible!important;overflow:visible!important;border:0!important}
+  .admin-data-table,.admin-data-table *{visibility:visible!important}
+  .admin-data-table{display:table!important;width:100%!important;border-collapse:collapse!important;font-size:10px!important}
   .admin-data-table th,.admin-data-table td{border:1px solid #bbb!important;padding:7px 6px!important;color:#111!important;background:#fff!important}
-  .admin-stats-note{background:#fff!important;border:1px solid #ddd!important;color:#333!important}
+  .admin-stats-note{display:block!important;visibility:visible!important;background:#fff!important;border:1px solid #ddd!important;color:#333!important}
   tr{break-inside:avoid!important}
 }
 /* Responsive account profile refresh */
