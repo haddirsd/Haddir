@@ -40,7 +40,7 @@ export default function AdminReportsWorkspace() {
           const eventPending=eventBookings.filter(b=>["pending_payment","under_review"].includes(b.status));
           const eventRejected=eventBookings.filter(b=>b.status==="rejected");
           const eventPeople=new Set(eventBookings.filter(b=>!["rejected","cancelled","expired"].includes(b.status)).map(b=>b.user_id||b.customer_email||b.customer_phone||b.id)).size;
-          const eventTickets=data.tickets.filter(t=>t.event_id===event?.id);\n          const checkedInTickets=eventTickets.filter(t=>t.status==="used");\n          const eventNetRows=eventRevenueRows.map(x=>({currency:x.currency,value:x.value*(1-Number(event?.platform_fee_percent||0)/100)}));\n          const eventTicketRows=(event?.ticket_types||[]).map((type:Row)=>{
+          const eventTickets=data.tickets.filter(t=>t.event_id===event?.id);\n          const checkedInTickets=eventTickets.filter(t=>t.status==="used");\n\n          const eventTicketRows=(event?.ticket_types||[]).map((type:Row)=>{
             const items=eventConfirmed.flatMap(b=>b.booking_items||[]).filter((i:any)=>i.ticket_type_id===type.id);
             const reservedItems=eventPending.flatMap(b=>b.booking_items||[]).filter((i:any)=>i.ticket_type_id===type.id);
             const rejectedItems=eventRejected.flatMap(b=>b.booking_items||[]).filter((i:any)=>i.ticket_type_id===type.id);
@@ -52,6 +52,7 @@ export default function AdminReportsWorkspace() {
           });
           const eventRevenueRows=eventConfirmed.flatMap(b=>(b.booking_items||[]).map((i:any)=>({currency:i.ticket_types?.currency||b.currency,value:Number(i.line_total||Number(i.unit_price||0)*Number(i.quantity||0))})));
           const eventCommissionRows=eventRevenueRows.map(x=>({currency:x.currency,value:Math.round((x.value*Number(event?.platform_fee_percent||0)/100)*100)/100}));
+          const eventNetRows=eventRevenueRows.map(x=>({currency:x.currency,value:x.value*(1-Number(event?.platform_fee_percent||0)/100)}));
           const metricCards=(items:{title:string;value:string|number;hint?:string}[]) => <div className="admin-metric-grid">{items.map(x=><article className="admin-metric" key={x.title}><small>{x.title}</small><strong>{typeof x.value==="number"?fmtCount(x.value):x.value}</strong>{x.hint&&<span className="admin-stat-hint">{x.hint}</span>}</article>)}</div>;
           return <div className="admin-statistics">
             <div className="admin-stat-tabs">
