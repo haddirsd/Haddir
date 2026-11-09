@@ -98,18 +98,26 @@ export function TicketSelection({
         </section>
       )}
 
-      {tierChosen && tier && (
-        <div className="detail-booking-dock actionable-footer">
-          <div className="detail-dock-summary">
-            <small>المبلغ الإجمالي <span className="ticket-count-badge">{ticketCount} تذاكر</span></small>
-            <strong>{totalLabel}</strong>
-            <span>{tier.name}</span>
-          </div>
-          <button className="btn btn-primary pay-button" disabled={!canContinue} onClick={onContinue}>
-            ادفع الآن <ArrowLeft size={18} />
-          </button>
+      <div className="detail-booking-dock actionable-footer">
+        <div className="detail-dock-summary">
+          {tierChosen && tier ? (
+            <>
+              <small>المبلغ الإجمالي <span className="ticket-count-badge">{ticketCount} تذاكر</span></small>
+              <strong>{totalLabel}</strong>
+              <span>{tier.name}</span>
+            </>
+          ) : (
+            <>
+              <small>إجمالي الحجز</small>
+              <strong>لم يتم اختيار تذكرة</strong>
+              <span>اختر فئة التذكرة للمتابعة</span>
+            </>
+          )}
         </div>
-      )}
+        <button className="btn btn-primary pay-button" disabled={!canContinue} onClick={onContinue} aria-disabled={!canContinue}>
+          ادفع الآن <ArrowLeft size={18} />
+        </button>
+      </div>
     </>
   );
 }
