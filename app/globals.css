@@ -1457,7 +1457,7 @@ body{font-size:16px}
  .admin-shell,.admin-main,.admin-content,.admin-panel{position:static!important;display:block!important;width:100%!important;height:auto!important;max-height:none!important;overflow:visible!important;transform:none!important}
  .admin-event-report,.admin-event-report *{visibility:visible!important}
  .admin-event-report{position:absolute!important;top:0!important;left:0!important;display:block!important;width:100%!important;margin:0!important;padding:0!important;gap:0!important;background:#fff!important}
- .admin-report-page{display:flex!important;position:relative!important;width:100%!important;max-width:none!important;height:265mm!important;min-height:265mm!important;max-height:265mm!important;margin:0!important;padding:10mm 9mm 14mm!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:hidden!important;break-after:page!important;page-break-after:always!important;background:#fff!important;color:#17343a!important}
+ .admin-report-page{display:flex!important;position:relative!important;width:100%!important;max-width:none!important;height:auto!important;min-height:265mm!important;max-height:none!important;margin:0!important;padding:10mm 9mm 14mm!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important;break-after:page!important;page-break-after:always!important;background:#fff!important;color:#17343a!important}
  .admin-report-page:last-child{break-after:auto!important;page-break-after:auto!important}
  .admin-report-cover-image{max-height:72mm!important}
  .admin-report-kpi-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
