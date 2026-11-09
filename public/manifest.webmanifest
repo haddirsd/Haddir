@@ -13,8 +13,8 @@
     "minimal-ui"
   ],
   "orientation": "any",
-  "background_color": "#eef6f9",
-  "theme_color": "#eef6f9",
+  "background_color": "#2c8da0",
+  "theme_color": "#2c8da0",
   "icons": [
     {
       "src": "/Haddir_App_Icon.svg",
