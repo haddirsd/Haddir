@@ -110,7 +110,7 @@ export default function Home(){
   authUser={authUser}
   onEventOpenChange={setIsEventDetailOpen}
   onRequireLogin={()=>{setAuthMessage("سجّل الدخول أولاً عشان نكمل حجزك. الفعاليات متاحة للتصفح بدون حساب.");setActiveTab("profile");}}
-  onBookingSuccess={()=>setActiveTab("notifications")}
+  onBookingSuccess={()=>{}}
   onGoNotifications={()=>setActiveTab("notifications")}
  />
  {!isGatekeeperPage&&activeTab==="tickets"&&<TicketWorkspace
