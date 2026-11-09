@@ -36,6 +36,55 @@ export function useGatekeeper({
   const [scannerOpen, setScannerOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const dataRequestSequence = useRef(0);
+  const feedbackAudioContext = useRef<AudioContext | null>(null);
+
+  const prepareFeedbackAudio = useCallback(() => {
+    if (typeof window === "undefined" || !window.AudioContext) return;
+    try {
+      if (!feedbackAudioContext.current) feedbackAudioContext.current = new window.AudioContext();
+      if (feedbackAudioContext.current.state === "suspended") {
+        void feedbackAudioContext.current.resume().catch(() => undefined);
+      }
+    } catch {
+      // Audio feedback must never affect ticket validation.
+    }
+  }, []);
+
+  const playGatekeeperFeedback = useCallback((accepted: boolean) => {
+    if (typeof window === "undefined") return;
+    const context = feedbackAudioContext.current;
+    if (context) {
+      const playTone = (startAt: number, duration: number, frequency: number) => {
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+        oscillator.type = "sine";
+        oscillator.frequency.setValueAtTime(frequency, startAt);
+        gain.gain.setValueAtTime(0.0001, startAt);
+        gain.gain.exponentialRampToValueAtTime(0.16, startAt + 0.012);
+        gain.gain.setValueAtTime(0.16, startAt + duration - 0.025);
+        gain.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
+        oscillator.connect(gain);
+        gain.connect(context.destination);
+        oscillator.start(startAt);
+        oscillator.stop(startAt + duration);
+      };
+      const now = context.currentTime + 0.015;
+      if (accepted) playTone(now, 0.16, 880);
+      else {
+        playTone(now, 0.12, 660);
+        playTone(now + 0.2, 0.12, 660);
+      }
+      if (context.state === "suspended") void context.resume().catch(() => undefined);
+    }
+    if (!accepted && typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+      navigator.vibrate([140, 80, 140]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!gatekeeperResult) return;
+    playGatekeeperFeedback(gatekeeperResult.status === "checked_in");
+  }, [gatekeeperResult, playGatekeeperFeedback]);
 
   const refreshGatekeeperData = useCallback(async () => {
     if (!assignedEvent?.event_id) return;
@@ -58,6 +107,7 @@ export function useGatekeeper({
   ) => {
     const code = (codeOverride ?? gatekeeperCode).trim();
     if (!authUser || !assignedEvent || !code) return;
+    prepareFeedbackAudio();
     if (!gatekeeperOnline) {
       setGatekeeperResult({ ok: false, status: "error", message: "لا يوجد اتصال بالإنترنت. لن يتم اعتماد الدخول قبل استعادة الاتصال." });
       return;
@@ -73,7 +123,7 @@ export function useGatekeeper({
     if (error) setGatekeeperResult({ ok: false, status: "error", message: error.message || "تعذر التحقق من التذكرة." });
     else setGatekeeperResult(data as GatekeeperTicketActionResult);
     await refreshGatekeeperData();
-  }, [authUser, assignedEvent, gatekeeperCode, gatekeeperOnline, refreshGatekeeperData]);
+  }, [authUser, assignedEvent, gatekeeperCode, gatekeeperOnline, prepareFeedbackAudio, refreshGatekeeperData]);
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
@@ -143,6 +193,7 @@ export function useGatekeeper({
   }, [scannerOpen, activeWorkspace, runGatekeeperAction]);
 
   const openScanner = () => {
+    prepareFeedbackAudio();
     setGatekeeperResult(null);
     setManualEntryOpen(false);
     setScannerOpen(value => !value);
@@ -160,6 +211,7 @@ export function useGatekeeper({
   };
 
   const openManualEntry = () => {
+    prepareFeedbackAudio();
     setScannerOpen(false);
     setGatekeeperResult(null);
     setManualEntryOpen(true);
