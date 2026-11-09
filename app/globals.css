@@ -4306,3 +4306,40 @@ html[data-theme="dark"] .tier-card.tier-selected{background:rgba(56,189,248,.12)
   }
   .event-detail-layout.payment-sheet .checkout-form { gap: 9px !important; }
 }
+
+/* Event-detail screens must not inherit viewport-filling or transform contexts.
+   The transform on the animated page was trapping the fixed booking dock inside
+   the content box instead of anchoring it to the device viewport. */
+.app-shell:has(.event-detail-page) {
+  min-height: 0 !important;
+  height: auto !important;
+  padding-bottom: 0 !important;
+}
+.app-content:has(.event-detail-page) {
+  min-height: 0 !important;
+  height: auto !important;
+  padding-bottom: 0 !important;
+}
+.app-content .event-detail-page {
+  min-height: 0 !important;
+  height: auto !important;
+  animation: none !important;
+  transform: none !important;
+  transform-origin: initial !important;
+  will-change: auto !important;
+}
+.app-content .event-detail-page .detail-booking-dock.actionable-footer {
+  position: fixed !important;
+  bottom: 0 !important;
+}
+.app-content .event-detail-page .payment-sheet {
+  min-height: 0 !important;
+  height: auto !important;
+  padding-bottom: 0 !important;
+}
+.app-content .event-detail-page .payment-sheet .payment-screen,
+.app-content .event-detail-page .payment-sheet .checkout-form {
+  min-height: 0 !important;
+  height: auto !important;
+  padding-bottom: 0 !important;
+}
