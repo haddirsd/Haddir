@@ -20,7 +20,7 @@ export async function getAdminReportData(): Promise<{ data: AdminReportData | nu
   const [events, profiles, bookings, tickets] = await Promise.all([
     fetchAll("events", "id,title,status,starts_at,ends_at,platform_fee_percent,ticket_types(id,name,price,currency,quantity_total,quantity_sold)", "created_at"),
     fetchAll("profiles", "id,role", "created_at"),
-    fetchAll("bookings", "id,event_id,user_id,customer_email,customer_phone,subtotal,currency,status,created_at,booking_items(id,ticket_type_id,quantity,unit_price,line_total,ticket_types(name,currency))", "created_at"),
+    fetchAll("bookings", "id,event_id,booking_number,user_id,customer_email,customer_phone,subtotal,currency,status,created_at,booking_items(id,ticket_type_id,quantity,unit_price,line_total,ticket_types(name,currency))", "created_at"),
     fetchAll("tickets", "id,event_id,ticket_type_id,status", "issued_at"),
   ]);
   const failure = events.error || profiles.error || bookings.error || tickets.error;
