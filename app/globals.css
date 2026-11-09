@@ -4488,3 +4488,39 @@ html[data-theme="dark"] .tier-card.tier-selected{background:rgba(56,189,248,.12)
   margin-bottom: 0 !important;
   overscroll-behavior-y: none !important;
 }
+
+
+/* Consistent viewport and overscroll behavior across all customer-facing screens. */
+html, body {
+  min-height: 100%;
+  overscroll-behavior-y: none !important;
+}
+body {
+  padding-bottom: 0 !important;
+}
+.app-shell {
+  min-height: 100dvh !important;
+  height: auto !important;
+  overscroll-behavior-y: none !important;
+}
+.app-content {
+  min-height: 0 !important;
+  height: auto !important;
+  overscroll-behavior-y: none !important;
+}
+.app-content > .screen,
+.app-content > .profile-screen,
+.app-content > .home-discovery,
+.app-content > .event-detail-page,
+.app-content .event-detail-page,
+.app-content .payment-screen,
+.app-content .event-detail-layout,
+.app-content .checkout-form {
+  min-height: 0 !important;
+}
+.app-content > .screen,
+.app-content > .profile-screen,
+.app-content > .home-discovery {
+  height: auto !important;
+  overscroll-behavior-y: none !important;
+}
