@@ -18,10 +18,10 @@ async function fetchAll(table: string, columns: string, sort: string): Promise<{
 
 export async function getAdminReportData(): Promise<{ data: AdminReportData | null; error: string | null }> {
   const [events, profiles, bookings, tickets] = await Promise.all([
-    fetchAll("events", "id,title,status,starts_at,ends_at,platform_fee_percent,ticket_types(id,name,price,currency,quantity_total,quantity_sold)", "created_at"),
+    fetchAll("events", "id,title,category,city,venue,address,description,location_url,cover_image_url,status,starts_at,ends_at,is_continuous,created_at,platform_fee_percent,ticket_types(id,name,description,price,currency,quantity_total,quantity_sold,is_active)", "created_at"),
     fetchAll("profiles", "id,role", "created_at"),
-    fetchAll("bookings", "id,event_id,booking_number,user_id,customer_email,customer_phone,subtotal,currency,status,created_at,booking_items(id,ticket_type_id,quantity,unit_price,line_total,ticket_types(name,currency))", "created_at"),
-    fetchAll("tickets", "id,event_id,ticket_type_id,status", "issued_at"),
+    fetchAll("bookings", "id,event_id,booking_number,user_id,customer_name,customer_email,customer_phone,subtotal,currency,status,created_at,booking_items(id,ticket_type_id,quantity,unit_price,line_total,ticket_types(name,currency))", "created_at"),
+    fetchAll("tickets", "id,event_id,ticket_type_id,ticket_code,attendee_name,status,issued_at,used_at", "issued_at"),
   ]);
   const failure = events.error || profiles.error || bookings.error || tickets.error;
   if (failure) return { data: null, error: "تعذر تحميل الإحصائيات: " + failure.message };
