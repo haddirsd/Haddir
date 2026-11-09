@@ -17,9 +17,9 @@ type NotificationsWorkspaceProps = {
   error: string;
   notifications: CustomerNotification[];
   filteredNotifications: CustomerNotification[];
-  filter: "all" | "unread" | "read";
+  filter: "unread" | "read";
   unreadCount: number;
-  onFilterChange: (filter: "all" | "unread" | "read") => void;
+  onFilterChange: (filter: "unread" | "read") => void;
   onMarkAllRead: () => void;
   onOpenNotification: (notification: CustomerNotification) => void;
   onToggleRead: (notification: CustomerNotification, isRead: boolean) => void;
@@ -51,7 +51,6 @@ export function NotificationsWorkspace({
           <button type="button" className="notification-mark-all" onClick={onMarkAllRead} disabled={!unreadCount}>تعليم الكل كمقروء</button>
         </div>
         <div className="notification-filters" role="tablist" aria-label="تصفية الإشعارات">
-          <button type="button" className={filter === "all" ? "active" : ""} onClick={() => onFilterChange("all")}>الكل <span>{notifications.length}</span></button>
           <button type="button" className={filter === "unread" ? "active" : ""} onClick={() => onFilterChange("unread")}>غير مقروءة <span>{unreadCount}</span></button>
           <button type="button" className={filter === "read" ? "active" : ""} onClick={() => onFilterChange("read")}>مقروءة</button>
         </div>
@@ -74,7 +73,7 @@ export function NotificationsWorkspace({
                 </span>
                 <span className="notification-state">{notification.is_read ? "مقروء" : "جديد"}</span>
               </button>
-              <button type="button" className="notification-toggle-read" onClick={() => onToggleRead(notification, !notification.is_read)}>{notification.is_read ? "تحديد كغير مقروء" : "تحديد كمقروء"}</button>
+              {!notification.is_read && <button type="button" className="notification-toggle-read" onClick={() => onToggleRead(notification, true)}>تحديد كمقروء</button>}
             </article>;
           })}
         </div>}
