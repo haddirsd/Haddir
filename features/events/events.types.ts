@@ -27,6 +27,7 @@ export type EventItem = {
   map: string;
   about: string;
   isTrending: boolean;
+  isContinuous: boolean;
   tiers: EventTier[];
 };
 
