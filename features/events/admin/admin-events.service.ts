@@ -5,7 +5,7 @@ export async function listAdminEvents(): Promise<{ data: AdminEventRow[]; error:
   const supabase = getSupabaseBrowserClient();
   if (!supabase) return { data: [], error: "تعذر الاتصال بقاعدة البيانات." };
   const { data, error } = await supabase.from("events")
-    .select("id,title,category,city,venue,starts_at,status,created_at,is_trending,description,address,location_url,ends_at,cover_image_url,platform_fee_percent")
+    .select("id,title,category,city,venue,starts_at,ends_at,is_continuous,status,created_at,is_trending,description,address,location_url,cover_image_url,platform_fee_percent")
     .order("created_at", { ascending: false }).limit(100);
   return { data: (data || []) as AdminEventRow[], error: error?.message || null };
 }
@@ -29,7 +29,7 @@ export async function getAdminEventEditorData(eventId: string): Promise<{ data: 
   }));
   const tickets: AdminTicketForm[] = (ticketsResult.data || []).map((ticket: any) => ({
     id: ticket.id, name: ticket.name, description: ticket.description || "", price: String(ticket.price),
-    currency: String(ticket.currency || "SDG").trim(), quantity_total: String(ticket.quantity_total),
+    currency: String(ticket.currency || "SDG").trim(), quantity_total: ticket.quantity_total == null ? "" : String(ticket.quantity_total),
     quantity_sold: Number(ticket.quantity_sold || 0), sales_start_at: toLocalInput(ticket.sales_start_at),
     sales_end_at: toLocalInput(ticket.sales_end_at), is_active: ticket.is_active !== false,
   }));
@@ -78,17 +78,16 @@ export async function saveAdminEvent(input: SaveAdminEventInput): Promise<{ mess
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { message: null, error: "انتهت الجلسة، سجل الدخول مرة أخرى." };
 
-  if (!eventForm.title.trim() || !eventForm.city.trim() || !eventForm.venue.trim() || !eventForm.starts_at)
-    return { message: null, error: "أكمل اسم الفعالية والمدينة والمكان وموعد البداية." };
-  if (eventForm.ends_at && new Date(eventForm.ends_at) <= new Date(eventForm.starts_at))
+  if (!eventForm.title.trim() || !eventForm.city.trim() || !eventForm.venue.trim() || (!eventForm.is_continuous && !eventForm.starts_at))
+    return { message: null, error: "أكمل اسم الفعالية والمدينة والمكان وموعد البداية، أو فعّل خيار التذكرة المستمرة." };
+  if (!eventForm.is_continuous && eventForm.ends_at && new Date(eventForm.ends_at) <= new Date(eventForm.starts_at))
     return { message: null, error: "موعد نهاية الفعالية لازم يكون بعد موعد البداية." };
   if (eventAccountForms.some(account => !account.account_name.trim() || !account.account_number.trim() || !account.beneficiary.trim()))
     return { message: null, error: "أكمل اسم ورقم كل حساب أو أزله من القائمة." };
   if (!ticketForms.length || ticketForms.some(ticket =>
-    !ticket.name.trim() || ticket.price === "" || !ticket.quantity_total ||
+    !ticket.name.trim() || ticket.price === "" ||
     !Number.isFinite(Number(ticket.price)) || Number(ticket.price) < 0 ||
-    !Number.isInteger(Number(ticket.quantity_total)) ||
-    Number(ticket.quantity_total) < Math.max(1, ticket.quantity_sold) ||
+    (ticket.quantity_total.trim() !== "" && (!Number.isInteger(Number(ticket.quantity_total)) || Number(ticket.quantity_total) < ticket.quantity_sold)) ||
     (ticket.sales_start_at && ticket.sales_end_at && new Date(ticket.sales_end_at) <= new Date(ticket.sales_start_at))
   )) return { message: null, error: "راجع فئات التذاكر: الاسم والسعر والكمية مطلوبة، والكمية لا تقل عن المباع، ونهاية البيع بعد بدايته." };
 
@@ -110,8 +109,9 @@ export async function saveAdminEvent(input: SaveAdminEventInput): Promise<{ mess
     category: eventForm.category.trim() || null, city: eventForm.city.trim() || null,
     venue: eventForm.venue.trim() || null, address: eventForm.address.trim() || null,
     location_url: eventForm.location_url.trim() || null,
-    starts_at: new Date(eventForm.starts_at).toISOString(),
-    ends_at: eventForm.ends_at ? new Date(eventForm.ends_at).toISOString() : null,
+    starts_at: eventForm.is_continuous ? null : new Date(eventForm.starts_at).toISOString(),
+    ends_at: eventForm.is_continuous || !eventForm.ends_at ? null : new Date(eventForm.ends_at).toISOString(),
+    is_continuous: eventForm.is_continuous,
     cover_image_url: coverUrl, is_trending: eventForm.is_trending,
     platform_fee_percent: Math.min(100, Math.max(0, Number(eventForm.platform_fee_percent) || 0)),
   };
@@ -125,11 +125,11 @@ export async function saveAdminEvent(input: SaveAdminEventInput): Promise<{ mess
 
     const keptIds = ticketForms.map(ticket => ticket.id).filter(Boolean) as string[];
     for (const ticket of ticketForms) {
-      if (!ticket.name.trim() || !ticket.quantity_total || Number(ticket.price) < 0 || Number(ticket.quantity_total) < ticket.quantity_sold)
+      if (!ticket.name.trim() || Number(ticket.price) < 0 || (ticket.quantity_total.trim() !== "" && (!Number.isInteger(Number(ticket.quantity_total)) || Number(ticket.quantity_total) < ticket.quantity_sold)))
         return { message: null, error: "راجع بيانات التذاكر: الكمية لا يمكن أن تقل عن المباع." };
       const payload = {
         name: ticket.name.trim(), description: ticket.description.trim() || null,
-        price: Number(ticket.price), currency: ticket.currency, quantity_total: Number(ticket.quantity_total),
+        price: Number(ticket.price), currency: ticket.currency, quantity_total: ticket.quantity_total.trim() === "" ? null : Number(ticket.quantity_total),
         sales_start_at: ticket.sales_start_at ? new Date(ticket.sales_start_at).toISOString() : null,
         sales_end_at: ticket.sales_end_at ? new Date(ticket.sales_end_at).toISOString() : null,
         is_active: ticket.is_active,
