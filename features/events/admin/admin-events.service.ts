@@ -89,7 +89,7 @@ export async function saveAdminEvent(input: SaveAdminEventInput): Promise<{ mess
     !Number.isFinite(Number(ticket.price)) || Number(ticket.price) < 0 ||
     (ticket.quantity_total.trim() !== "" && (!Number.isInteger(Number(ticket.quantity_total)) || Number(ticket.quantity_total) < ticket.quantity_sold)) ||
     (ticket.sales_start_at && ticket.sales_end_at && new Date(ticket.sales_end_at) <= new Date(ticket.sales_start_at))
-  )) return { message: null, error: "راجع فئات التذاكر: الاسم والسعر والكمية مطلوبة، والكمية لا تقل عن المباع، ونهاية البيع بعد بدايته." };
+  )) return { message: null, error: "راجع فئات التذاكر: اسم التذكرة والسعر مطلوبان، والكمية الاختيارية لا تقل عن الكمية المباعة، ونهاية البيع بعد بدايته." };
 
   let coverUrl = eventForm.cover_image_url.trim() || null;
   if (coverFile) {
@@ -182,7 +182,7 @@ export async function saveAdminEvent(input: SaveAdminEventInput): Promise<{ mess
 
   const { error: ticketError } = await supabase.from("ticket_types").insert(ticketForms.map(ticket => ({
     event_id: event.id, name: ticket.name.trim(), description: ticket.description.trim() || null,
-    price: Number(ticket.price), currency: ticket.currency, quantity_total: Number(ticket.quantity_total),
+    price: Number(ticket.price), currency: ticket.currency, quantity_total: ticket.quantity_total.trim() === "" ? null : Number(ticket.quantity_total),
     quantity_sold: 0, sales_start_at: ticket.sales_start_at ? new Date(ticket.sales_start_at).toISOString() : null,
     sales_end_at: ticket.sales_end_at ? new Date(ticket.sales_end_at).toISOString() : null, is_active: ticket.is_active,
   })));
