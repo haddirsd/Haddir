@@ -73,10 +73,6 @@ export function PwaRegistration() {
   }, []);
 
   const applyUpdate = () => {
-    const waitingWorker = navigator.serviceWorker?.controller
-      ? undefined
-      : undefined;
-    void waitingWorker;
     setInstallingUpdate(true);
     navigator.serviceWorker.getRegistration("/").then((registration) => {
       if (!registration?.waiting) {
