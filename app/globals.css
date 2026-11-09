@@ -4411,3 +4411,7 @@ html[data-theme="dark"] .tier-card.tier-selected{background:rgba(56,189,248,.12)
 @media (prefers-reduced-motion: reduce) {
   .booking-success-backdrop, .booking-success-dialog { animation: none; }
 }
+
+
+/* Official Haddir identity */
+.brand-logo{display:block;width:42px;height:42px;object-fit:contain;flex:none}.brand{gap:9px}.welcome-brand-logo{display:block;width:76px;height:76px;object-fit:contain;flex:none;filter:drop-shadow(0 8px 18px #21596418)}
