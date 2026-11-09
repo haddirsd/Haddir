@@ -4413,4 +4413,4 @@ html[data-theme="dark"] .tier-card.tier-selected{background:rgba(56,189,248,.12)
 
 
 /* Official Haddir identity */
-.brand-logo{display:block;width:42px;height:42px;object-fit:contain;flex:none}.brand{gap:9px}.welcome-brand-logo{display:block;width:76px;height:76px;object-fit:contain;flex:none;filter:drop-shadow(0 8px 18px #21596418)}
+.brand-logo{display:block;width:42px;height:42px;object-fit:contain;flex:none}.brand{gap:9px}.brand-word{color:var(--fg);font-size:23px;font-weight:900;line-height:1;letter-spacing:0}.welcome-brand-logo{display:block;width:76px;height:76px;object-fit:contain;flex:none;filter:drop-shadow(0 8px 18px #21596418)}
