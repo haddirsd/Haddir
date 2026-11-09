@@ -9,9 +9,9 @@ export async function getPublishedEvents(): Promise<PublicEventsResult> {
 
   const { data, error } = await supabase
     .from("events")
-    .select("id,title,category,city,venue,starts_at,ends_at,description,status,is_trending,cover_image_url,location_url")
+    .select("id,title,category,city,venue,starts_at,ends_at,is_continuous,description,status,is_trending,cover_image_url,location_url")
     .eq("status", "published")
-    .order("starts_at", { ascending: true });
+    .order("starts_at", { ascending: true, nullsFirst: false });
 
   if (error) {
     console.error("Could not load events", error);
@@ -45,9 +45,10 @@ export async function getPublishedEvents(): Promise<PublicEventsResult> {
     const tiers = ticketRows
       .filter((ticket: any) => ticket.event_id === event.id && ticket.is_active)
       .map((ticket: any) => {
-        const total = Math.max(0, Number(ticket.quantity_total) || 0);
+        const unlimited = ticket.quantity_total == null;
+        const total = unlimited ? -1 : Math.max(0, Number(ticket.quantity_total) || 0);
         const sold = Math.max(0, Number(ticket.quantity_sold) || 0);
-        const available = Math.max(0, total - sold);
+        const available = unlimited ? Number.POSITIVE_INFINITY : Math.max(0, total - sold);
         const starts = ticket.sales_start_at
           ? new Date(ticket.sales_start_at).getTime()
           : 0;
@@ -68,14 +69,14 @@ export async function getPublishedEvents(): Promise<PublicEventsResult> {
           quantityTotal: total,
           quantitySold: sold,
           available,
-          availableNow: available > 0 && new Date(event.starts_at).getTime() > now && now >= starts && now <= ends,
+          availableNow: (unlimited || available > 0) && (event.is_continuous || (!!event.starts_at && new Date(event.starts_at).getTime() > now)) && now >= starts && now <= ends,
         };
       });
 
-    const eventStartsAt = new Date(event.starts_at).getTime();
+    const eventStartsAt = event.starts_at ? new Date(event.starts_at).getTime() : Infinity;
     const eventEndsAt = event.ends_at ? new Date(event.ends_at).getTime() : eventStartsAt;
-    const eventStarted = eventStartsAt <= now;
-    const eventEnded = eventEndsAt <= now;
+    const eventStarted = !event.is_continuous && eventStartsAt <= now;
+    const eventEnded = !event.is_continuous && eventEndsAt <= now;
     const status = eventEnded
       ? "انتهت"
       : eventStarted
@@ -90,7 +91,7 @@ export async function getPublishedEvents(): Promise<PublicEventsResult> {
 
     return {
       id: event.id,
-      date: formatEventDate(event.starts_at),
+      date: event.is_continuous ? "تذكرة مستمرة" : formatEventDate(event.starts_at),
       title: event.title,
       place: event.city || "",
       category: event.category || "فعاليات",
@@ -98,7 +99,7 @@ export async function getPublishedEvents(): Promise<PublicEventsResult> {
       cover: ["cover-one", "cover-two", "cover-three"][index % 3],
       coverImageUrl: event.cover_image_url || null,
       tag: event.category || "فعالية",
-      time: new Intl.DateTimeFormat("ar-SD-u-nu-latn", {
+      time: event.is_continuous ? "متاح طوال اليوم" : new Intl.DateTimeFormat("ar-SD-u-nu-latn", {
         hour: "numeric",
         minute: "2-digit",
       }).format(new Date(event.starts_at)),
@@ -110,6 +111,7 @@ export async function getPublishedEvents(): Promise<PublicEventsResult> {
           encodeURIComponent((event.venue || "") + " " + (event.city || "")),
       about: event.description || "تفاصيل الفعالية ستُضاف قريباً.",
       isTrending: !!event.is_trending,
+      isContinuous: !!event.is_continuous,
       tiers,
     };
   });
