@@ -6675,3 +6675,16 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
   font-size:17px!important;
   line-height:1.5!important;
 }
+
+
+/* Match remaining-events location/date rows and icons to trending cards */
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-info .event-list-meta p{
+  font-size:10px!important;
+  line-height:1.5!important;
+  gap:7px!important;
+}
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-info .event-list-meta p svg{
+  width:14px!important;
+  height:14px!important;
+  flex:none!important;
+}
