@@ -6419,3 +6419,15 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
   background:none!important;
   box-shadow:none!important;
 }
+
+
+/* Remove the legacy full-card vertical perforation overlay; keep the horizontal tear line */
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card::after,
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-footer::before,
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-footer::after{
+  content:none!important;
+  display:none!important;
+  border:0!important;
+  background:none!important;
+  box-shadow:none!important;
+}
