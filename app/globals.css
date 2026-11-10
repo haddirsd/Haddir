@@ -7303,3 +7303,28 @@ html[data-theme="dark"] .app-content .event-detail-layout:not(.payment-sheet) .q
   color: var(--muted) !important;
   opacity: .55 !important;
 }
+
+
+/* Dark theme: event details bottom total and ticket-count badge */
+html[data-theme="dark"] .app-content .event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer,
+.theme-dark .app-content .event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer {
+  background: color-mix(in srgb, var(--surface) 96%, #071316) !important;
+  border-color: var(--line) !important;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, .32) !important;
+}
+html[data-theme="dark"] .app-content .event-detail-layout:not(.payment-sheet) .detail-dock-summary small,
+html[data-theme="dark"] .app-content .event-detail-layout:not(.payment-sheet) .detail-dock-summary > span,
+.theme-dark .app-content .event-detail-layout:not(.payment-sheet) .detail-dock-summary small,
+.theme-dark .app-content .event-detail-layout:not(.payment-sheet) .detail-dock-summary > span {
+  color: var(--muted) !important;
+}
+html[data-theme="dark"] .app-content .event-detail-layout:not(.payment-sheet) .detail-dock-summary strong,
+.theme-dark .app-content .event-detail-layout:not(.payment-sheet) .detail-dock-summary strong {
+  color: var(--fg) !important;
+}
+html[data-theme="dark"] .app-content .event-detail-layout:not(.payment-sheet) .ticket-count-badge,
+.theme-dark .app-content .event-detail-layout:not(.payment-sheet) .ticket-count-badge {
+  background: color-mix(in srgb, var(--green) 20%, var(--surface)) !important;
+  color: #8ed5c2 !important;
+  border: 1px solid color-mix(in srgb, var(--green) 34%, var(--line)) !important;
+}
