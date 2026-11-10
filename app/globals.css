@@ -5592,3 +5592,70 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
   }
   .app-shell .home-discovery .ticket-card-footer .event-list-price{font-size:10px}
 }
+
+
+/* Improve readability and breathing room inside compact event tickets */
+.app-shell .home-discovery .event-list-card.ticket-style-card{
+  height:170px;
+}
+.app-shell .home-discovery .event-list-card.ticket-style-card{
+  grid-template-rows:minmax(0,1fr) 38px;
+}
+.app-shell .home-discovery .event-list-info{
+  padding:10px 12px 7px;
+  gap:6px;
+}
+.app-shell .home-discovery .event-list-info h3{
+  font-size:14px;
+  line-height:1.45;
+}
+.app-shell .home-discovery .event-list-info>.event-category-chip{
+  padding:3px 8px;
+  font-size:9px;
+  line-height:1.4;
+}
+.app-shell .home-discovery .event-list-info .event-list-meta{
+  gap:6px;
+  margin-top:1px;
+}
+.app-shell .home-discovery .event-list-info .event-list-meta p{
+  font-size:10px;
+  line-height:1.4;
+  gap:6px;
+}
+.app-shell .home-discovery .event-list-info .event-list-meta p svg{
+  width:12px;
+  height:12px;
+}
+@media(max-width:520px){
+  .app-shell .home-discovery .event-list-card.ticket-style-card{
+    height:148px;
+    grid-template-rows:minmax(0,1fr) 32px;
+  }
+  .app-shell .home-discovery .event-list-info{
+    padding:8px 9px 5px;
+    gap:5px;
+  }
+  .app-shell .home-discovery .event-list-info h3{
+    font-size:13px;
+    line-height:1.4;
+  }
+  .app-shell .home-discovery .event-list-info>.event-category-chip{
+    padding:3px 7px;
+    font-size:9px;
+    line-height:1.35;
+  }
+  .app-shell .home-discovery .event-list-info .event-list-meta{
+    gap:5px;
+    margin-top:1px;
+  }
+  .app-shell .home-discovery .event-list-info .event-list-meta p{
+    font-size:9.5px;
+    line-height:1.35;
+    gap:5px;
+  }
+  .app-shell .home-discovery .event-list-info .event-list-meta p svg{
+    width:11px;
+    height:11px;
+  }
+}
