@@ -5,7 +5,7 @@ import { getSupabaseBrowserClient } from "../../../lib/supabase";
 import { listAdminUsers, updateAdminUserRole as saveAdminUserRole } from "./admin-users.service";
 import type { AdminUserEventOption, AdminUserRow, AdminUsersRole } from "./admin-users.types";
 
-export function useAdminUsers(role: AdminUsersRole, searchTerm: string) {
+export function useAdminUsers(role: AdminUsersRole, searchTerm: string, roleFilter: string) {
   const [rows, setRows] = useState<AdminUserRow[]>([]);
   const [eventOptions, setEventOptions] = useState<AdminUserEventOption[]>([]);
   const [userTotal, setUserTotal] = useState(0);
@@ -20,12 +20,12 @@ export function useAdminUsers(role: AdminUsersRole, searchTerm: string) {
   const refresh = useCallback(async () => {
     const requestId = ++latestRequest.current;
     setLoading(true);
-    const result = await listAdminUsers(searchTerm);
+    const result = await listAdminUsers(searchTerm, roleFilter);
     if (requestId !== latestRequest.current) return;
     if (result.error) setError(result.error);
     else { setRows(result.rows); setEventOptions(result.eventOptions); setUserTotal(result.total); setError(""); }
     setLoading(false);
-  }, [searchTerm]);
+  }, [searchTerm, roleFilter]);
 
   useEffect(() => {
     void refresh();
