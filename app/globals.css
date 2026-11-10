@@ -6307,3 +6307,14 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
     padding:8px 11px 8px 9px;
   }
 }
+
+
+/* Keep the event price anchored to the far left of the ticket footer */
+.app-shell .home-discovery .event-list-card.ticket-style-card .ticket-card-footer{
+  direction:ltr;
+  justify-content:flex-start;
+}
+.app-shell .home-discovery .event-list-card.ticket-style-card .ticket-card-footer .event-list-price{
+  direction:rtl;
+  text-align:left;
+}
