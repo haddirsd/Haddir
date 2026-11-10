@@ -6758,3 +6758,496 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
     max-width:calc(75% - 105px)!important;
   }
 }
+
+
+/* PWA polish: event details and booking use the full safe viewport without
+   nested scrolling, clipped fixed actions, or legacy grid sizing. */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+.app-shell:has(.event-detail-page),
+.app-content:has(.event-detail-page) {
+  min-height: 100svh !important;
+  min-height: 100dvh !important;
+  height: auto !important;
+  padding-bottom: 0 !important;
+}
+.app-content:has(.event-detail-page) {
+  width: 100% !important;
+  overflow: visible !important;
+}
+.app-content .event-detail-page {
+  display: block !important;
+  width: 100% !important;
+  min-height: 100svh !important;
+  min-height: 100dvh !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  isolation: isolate;
+  animation: none !important;
+  transform: none !important;
+  will-change: auto !important;
+}
+.app-content .event-detail-layout {
+  display: flex !important;
+  flex-direction: column !important;
+  width: min(100%, 960px) !important;
+  min-height: 100svh !important;
+  min-height: 100dvh !important;
+  height: auto !important;
+  margin-inline: auto !important;
+  padding: 0 0 calc(16px + env(safe-area-inset-bottom)) !important;
+  overflow: visible !important;
+  background: var(--bg) !important;
+  color: var(--fg) !important;
+}
+.app-content .event-detail-layout .detail-sticky-controls,
+.app-content .event-detail-layout.payment-sheet .checkout-topbar {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 130 !important;
+  flex: 0 0 auto !important;
+  min-height: calc(62px + env(safe-area-inset-top)) !important;
+  height: auto !important;
+  padding: calc(8px + env(safe-area-inset-top)) clamp(14px, 4vw, 24px) 8px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--line) !important;
+  border-radius: 0 !important;
+  background: color-mix(in srgb, var(--surface-strong) 92%, transparent) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(155%) !important;
+  backdrop-filter: blur(20px) saturate(155%) !important;
+}
+.app-content .event-detail-layout .detail-sticky-back,
+.app-content .event-detail-layout .detail-sticky-share,
+.app-content .event-detail-layout .checkout-back-icon {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  border-radius: 14px !important;
+  touch-action: manipulation;
+}
+.app-content .event-detail-layout .detail-cover {
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  height: clamp(230px, 42vw, 410px) !important;
+  min-height: 0 !important;
+  max-height: 440px !important;
+  border-radius: 0 0 24px 24px !important;
+  overflow: hidden !important;
+}
+.app-content .event-detail-layout .detail-cover .event-cover-image {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+.app-content .event-detail-layout:not(.payment-sheet) .detail-content {
+  flex: 0 0 auto !important;
+  width: min(100%, 820px) !important;
+  margin-inline: auto !important;
+  padding: clamp(16px, 3vw, 26px) clamp(14px, 4vw, 24px) calc(154px + env(safe-area-inset-bottom)) !important;
+}
+.app-content .event-detail-layout:not(.payment-sheet) .detail-main {
+  display: grid !important;
+  gap: 16px !important;
+}
+.app-content .event-detail-layout:not(.payment-sheet) .detail-quick-info {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  align-items: stretch !important;
+  gap: 12px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+.app-content .event-detail-layout:not(.payment-sheet) .quick-info-row {
+  display: flex !important;
+  align-items: center !important;
+  min-width: 0 !important;
+  min-height: 78px !important;
+  gap: 11px !important;
+  padding: 12px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 16px !important;
+  background: var(--surface) !important;
+  color: var(--fg) !important;
+}
+.app-content .event-detail-layout:not(.payment-sheet) .quick-info-row > div {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  overflow-wrap: anywhere !important;
+}
+.app-content .event-detail-layout:not(.payment-sheet) .quick-info-row strong {
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+  overflow-wrap: anywhere !important;
+}
+.app-content .event-detail-layout:not(.payment-sheet) .quick-info-row small,
+.app-content .event-detail-layout:not(.payment-sheet) .quick-info-row span:not(.quick-info-icon) {
+  font-size: 10px !important;
+  line-height: 1.65 !important;
+}
+.app-content .event-detail-layout:not(.payment-sheet) .quick-info-icon {
+  flex: 0 0 42px !important;
+  width: 42px !important;
+  height: 42px !important;
+}
+.app-content .event-detail-layout:not(.payment-sheet) .detail-about,
+.app-content .event-detail-layout:not(.payment-sheet) .detail-ticket-section,
+.app-content .event-detail-layout:not(.payment-sheet) .detail-quantity {
+  border: 1px solid var(--line) !important;
+  border-radius: 18px !important;
+  background: var(--surface) !important;
+  color: var(--fg) !important;
+}
+.app-content .event-detail-layout:not(.payment-sheet) .tier-list {
+  display: grid !important;
+  gap: 10px !important;
+}
+.app-content .event-detail-layout:not(.payment-sheet) .tier-card {
+  display: grid !important;
+  grid-template-columns: 26px minmax(0, 1fr) auto !important;
+  grid-template-areas: "radio copy price" "radio availability availability" !important;
+  align-items: center !important;
+  min-width: 0 !important;
+  min-height: 76px !important;
+  gap: 5px 10px !important;
+  padding: 12px !important;
+  text-align: start !important;
+}
+.app-content .event-detail-layout:not(.payment-sheet) .tier-radio { grid-area: radio !important; }
+.app-content .event-detail-layout:not(.payment-sheet) .tier-copy { grid-area: copy !important; min-width: 0 !important; }
+.app-content .event-detail-layout:not(.payment-sheet) .tier-price { grid-area: price !important; justify-self: end !important; }
+.app-content .event-detail-layout:not(.payment-sheet) .tier-availability {
+  grid-area: availability !important;
+  justify-self: start !important;
+  margin: 0 !important;
+  text-align: start !important;
+}
+.app-content .event-detail-layout:not(.payment-sheet) .detail-quantity {
+  min-height: 68px !important;
+  margin: 0 !important;
+  padding: 12px 14px !important;
+}
+.app-content .event-detail-layout:not(.payment-sheet) .quantity-control button {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  touch-action: manipulation;
+}
+.app-content .event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer {
+  position: fixed !important;
+  inset-inline: 0 !important;
+  bottom: 0 !important;
+  z-index: 150 !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(132px, 42%) !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: min(100%, 850px) !important;
+  max-width: 850px !important;
+  margin-inline: auto !important;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom)) !important;
+  border: 1px solid var(--line) !important;
+  border-bottom: 0 !important;
+  border-radius: 18px 18px 0 0 !important;
+  background: color-mix(in srgb, var(--surface-strong) 94%, transparent) !important;
+  box-shadow: 0 -10px 30px rgba(13, 33, 37, .12) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
+  backdrop-filter: blur(20px) saturate(150%) !important;
+  transform: none !important;
+}
+.app-content .event-detail-layout:not(.payment-sheet) .detail-booking-dock .pay-button {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 46px !important;
+  margin: 0 !important;
+  padding-inline: 12px !important;
+  border-radius: 12px !important;
+  font-size: 12px !important;
+  white-space: nowrap !important;
+  touch-action: manipulation;
+}
+.app-content .event-detail-layout.payment-sheet {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 100svh !important;
+  min-height: 100dvh !important;
+  padding-bottom: max(20px, env(safe-area-inset-bottom)) !important;
+}
+.app-content .event-detail-layout.payment-sheet .checkout-topbar {
+  width: 100% !important;
+  margin: 0 !important;
+}
+.app-content .event-detail-layout.payment-sheet .payment-screen {
+  display: block !important;
+  width: min(620px, calc(100% - 32px)) !important;
+  min-height: 0 !important;
+  height: auto !important;
+  margin: 0 auto !important;
+  padding: 10px 0 calc(28px + env(safe-area-inset-bottom)) !important;
+}
+.app-content .event-detail-layout.payment-sheet .booking-steps {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+  margin: 8px 0 16px !important;
+  padding: 8px !important;
+}
+.app-content .event-detail-layout.payment-sheet .booking-steps span {
+  min-width: 0 !important;
+  min-height: 40px !important;
+  padding: 6px 4px !important;
+  font-size: 10px !important;
+  line-height: 1.5 !important;
+  overflow-wrap: anywhere !important;
+}
+.app-content .event-detail-layout.payment-sheet .checkout-form {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 0 calc(16px + env(safe-area-inset-bottom)) !important;
+}
+.app-content .event-detail-layout.payment-sheet .checkout-form > h1 {
+  margin: 0 !important;
+  font-size: clamp(22px, 5vw, 28px) !important;
+  line-height: 1.4 !important;
+}
+.app-content .event-detail-layout.payment-sheet .checkout-form > p {
+  margin: 0 !important;
+  line-height: 1.8 !important;
+}
+.app-content .event-detail-layout.payment-sheet .checkout-event {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  min-width: 0 !important;
+  padding: 12px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 16px !important;
+  background: var(--surface) !important;
+  color: var(--fg) !important;
+}
+.app-content .event-detail-layout.payment-sheet .checkout-event > div {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+}
+.app-content .event-detail-layout.payment-sheet .checkout-event strong {
+  display: block !important;
+  overflow-wrap: anywhere !important;
+  line-height: 1.5 !important;
+}
+.app-content .event-detail-layout.payment-sheet .checkout-total {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  min-width: 0 !important;
+  padding: 14px !important;
+  border: 1px solid color-mix(in srgb, var(--green) 22%, var(--line)) !important;
+  border-radius: 15px !important;
+  background: color-mix(in srgb, var(--green) 9%, var(--surface)) !important;
+  color: var(--fg) !important;
+}
+.app-content .event-detail-layout.payment-sheet .checkout-total strong {
+  color: var(--green) !important;
+  font-size: 18px !important;
+}
+.app-content .event-detail-layout.payment-sheet .checkout-section {
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: clamp(13px, 3vw, 17px) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 17px !important;
+  background: var(--surface) !important;
+  color: var(--fg) !important;
+}
+.app-content .event-detail-layout.payment-sheet .checkout-section h2 {
+  margin: 0 0 12px !important;
+  color: var(--fg) !important;
+  font-size: 14px !important;
+}
+.app-content .event-detail-layout.payment-sheet .checkout-label {
+  display: grid !important;
+  gap: 8px !important;
+  min-width: 0 !important;
+  color: var(--fg) !important;
+}
+.app-content .event-detail-layout.payment-sheet .checkout-label select {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 46px !important;
+  padding: 0 12px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 12px !important;
+  background: var(--surface-strong) !important;
+  color: var(--fg) !important;
+  font: inherit !important;
+  font-size: 13px !important;
+}
+.app-content .event-detail-layout.payment-sheet .account-details {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  min-width: 0 !important;
+}
+.app-content .event-detail-layout.payment-sheet .account-details > div {
+  min-width: 0 !important;
+  overflow-wrap: anywhere !important;
+}
+.app-content .event-detail-layout.payment-sheet .account-number-card {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  min-width: 0 !important;
+}
+.app-content .event-detail-layout.payment-sheet .account-number-card strong {
+  min-width: 0 !important;
+  overflow-wrap: anywhere !important;
+  font-variant-numeric: tabular-nums;
+}
+.app-content .event-detail-layout.payment-sheet .copy-account-button {
+  min-height: 40px !important;
+  padding: 8px 11px !important;
+  touch-action: manipulation;
+}
+.app-content .event-detail-layout.payment-sheet .receipt-upload {
+  position: relative !important;
+  display: grid !important;
+  place-items: center !important;
+  gap: 8px !important;
+  min-height: 148px !important;
+  padding: 18px 14px !important;
+  border: 1px dashed color-mix(in srgb, var(--green) 45%, var(--line)) !important;
+  border-radius: 16px !important;
+  background: color-mix(in srgb, var(--green) 4%, var(--surface)) !important;
+  color: var(--fg) !important;
+  text-align: center !important;
+}
+.app-content .event-detail-layout.payment-sheet .receipt-upload input {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 2 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 0 !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+.app-content .event-detail-layout.payment-sheet .receipt-upload:focus-within {
+  outline: 3px solid color-mix(in srgb, var(--green) 28%, transparent) !important;
+  outline-offset: 3px !important;
+}
+.app-content .event-detail-layout.payment-sheet .checkout-submit-dock {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 4px 0 calc(16px + env(safe-area-inset-bottom)) !important;
+  background: transparent !important;
+}
+.app-content .event-detail-layout.payment-sheet .checkout-submit-dock .pay-button {
+  width: 100% !important;
+  min-height: 48px !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border-radius: 13px !important;
+  touch-action: manipulation;
+}
+.app-content .event-detail-layout.payment-sheet .checkout-form .checkout-footnote {
+  margin: 0 !important;
+  font-size: 11px !important;
+  line-height: 1.8 !important;
+  overflow-wrap: anywhere !important;
+}
+.app-content .event-detail-page .booking-success-backdrop {
+  min-height: 100svh;
+  min-height: 100dvh;
+}
+@media (max-width: 600px) {
+  .app-content .event-detail-layout .detail-sticky-controls {
+    padding-inline: 14px !important;
+  }
+  .app-content .event-detail-layout .detail-cover {
+    height: clamp(220px, 36svh, 330px) !important;
+    height: clamp(220px, 36dvh, 330px) !important;
+    border-radius: 0 0 20px 20px !important;
+  }
+  .app-content .event-detail-layout:not(.payment-sheet) .detail-content {
+    padding: 15px 13px calc(148px + env(safe-area-inset-bottom)) !important;
+  }
+  .app-content .event-detail-layout:not(.payment-sheet) .detail-quick-info {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 9px !important;
+  }
+  .app-content .event-detail-layout:not(.payment-sheet) .quick-info-row {
+    min-height: 72px !important;
+  }
+  .app-content .event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer {
+    grid-template-columns: minmax(0, 1fr) minmax(112px, 40%) !important;
+    gap: 8px !important;
+    padding: 8px 11px calc(8px + env(safe-area-inset-bottom)) !important;
+  }
+  .app-content .event-detail-layout:not(.payment-sheet) .detail-dock-summary strong {
+    font-size: 15px !important;
+  }
+  .app-content .event-detail-layout:not(.payment-sheet) .detail-booking-dock .pay-button {
+    min-height: 44px !important;
+    padding-inline: 8px !important;
+    font-size: 11px !important;
+  }
+  .app-content .event-detail-layout.payment-sheet .checkout-topbar {
+    padding-inline: 14px !important;
+  }
+  .app-content .event-detail-layout.payment-sheet .payment-screen {
+    width: calc(100% - 26px) !important;
+    padding-top: 8px !important;
+  }
+  .app-content .event-detail-layout.payment-sheet .account-details {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .app-content .event-detail-layout.payment-sheet .account-number-card {
+    align-items: flex-start !important;
+  }
+}
+@media (max-width: 360px) {
+  .app-content .event-detail-layout .detail-sticky-category {
+    max-width: 42vw !important;
+    font-size: 10px !important;
+  }
+  .app-content .event-detail-layout:not(.payment-sheet) .tier-card {
+    grid-template-columns: 24px minmax(0, 1fr) !important;
+    grid-template-areas: "radio copy" "radio price" "radio availability" !important;
+  }
+  .app-content .event-detail-layout:not(.payment-sheet) .tier-price {
+    justify-self: start !important;
+  }
+  .app-content .event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer {
+    grid-template-columns: minmax(0, 1fr) minmax(104px, 40%) !important;
+  }
+}
+@media (max-height: 620px) and (orientation: landscape) {
+  .app-content .event-detail-layout .detail-cover {
+    height: 210px !important;
+  }
+  .app-content .event-detail-layout:not(.payment-sheet) .detail-content {
+    padding-bottom: calc(132px + env(safe-area-inset-bottom)) !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-content .event-detail-page,
+  .app-content .event-detail-layout .tier-card,
+  .app-content .event-detail-layout .detail-booking-dock {
+    animation: none !important;
+    transition: none !important;
+  }
+}
