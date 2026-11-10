@@ -4780,6 +4780,31 @@ html[data-theme="dark"] .app-shell .bottom-nav button.selected{
   appearance:none;-webkit-appearance:none;
 }
 .app-shell .home-discovery .home-search input::placeholder{color:var(--muted);opacity:.9}
+/* Keep the search field as one shell; remove browser/default inner search chrome. */
+.app-shell .home-discovery .home-search{
+  border-style:solid!important;
+  outline:0!important;
+  background:var(--surface-strong)!important;
+  background-image:none!important;
+}
+.app-shell .home-discovery .home-search input,
+.app-shell .home-discovery .home-search input[type="search"]{
+  border:0!important;
+  outline:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  background-image:none!important;
+  box-shadow:none!important;
+  -webkit-appearance:none!important;
+  appearance:none!important;
+}
+.app-shell .home-discovery .home-search input[type="search"]::-webkit-search-decoration,
+.app-shell .home-discovery .home-search input[type="search"]::-webkit-search-cancel-button,
+.app-shell .home-discovery .home-search input[type="search"]::-webkit-search-results-button,
+.app-shell .home-discovery .home-search input[type="search"]::-webkit-search-results-decoration{
+  -webkit-appearance:none!important;
+  appearance:none!important;
+}
 .app-shell .home-discovery .home-search>button{
   display:grid;place-items:center;flex:none;width:34px;height:34px;border:0;border-radius:50%;
   background:color-mix(in srgb,var(--green) 9%,var(--surface));color:var(--muted);
