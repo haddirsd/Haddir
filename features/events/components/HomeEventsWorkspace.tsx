@@ -142,8 +142,8 @@ export function HomeEventsWorkspace({ events, loading, error, onOpenEvent, onRet
                         {event.coverImageUrl ? <img src={event.coverImageUrl} alt={event.title} loading="lazy" /> : <span>✦</span>}
                       </div>
                       <div className="event-list-info">
-                        <span className="event-category-chip">{event.category}</span>
                         <h3>{event.title}</h3>
+                        <span className="event-category-chip">{event.category}</span>
                         <div className="event-list-meta">
                           <p><MapPin size={13} /><span>{event.venue || event.place}</span></p>
                           <p><CalendarDays size={13} /><span>{event.date} · {event.time}</span></p>
