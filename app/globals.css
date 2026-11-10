@@ -5416,3 +5416,98 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
   .app-shell .home-discovery .event-list-meta p{font-size:8.5px;gap:6px}
   .app-shell .home-discovery .event-list-meta p svg{width:11px;height:11px}
 }
+
+
+/* Final polish: readable, compact and consistently aligned event information */
+.app-shell .home-discovery .event-list-info{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:stretch;
+  gap:6px;
+  min-width:0;
+  padding:10px 13px 7px;
+  direction:rtl;
+  text-align:right;
+}
+.app-shell .home-discovery .event-list-info h3{
+  order:0;
+  width:100%;
+  margin:0;
+  color:var(--fg);
+  font-size:13px;
+  font-weight:850;
+  line-height:1.45;
+  letter-spacing:0;
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  overflow:hidden;
+}
+.app-shell .home-discovery .event-list-info>.event-category-chip{
+  order:1;
+  align-self:flex-start;
+  display:inline-flex;
+  align-items:center;
+  width:max-content;
+  max-width:100%;
+  margin:0;
+  padding:2px 8px;
+  border:1px solid color-mix(in srgb,var(--green) 18%,transparent);
+  border-radius:6px;
+  background:color-mix(in srgb,var(--green) 8%,var(--surface));
+  color:var(--green);
+  font-size:8px;
+  font-weight:750;
+  line-height:1.5;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.app-shell .home-discovery .event-list-info .event-list-meta{
+  order:2;
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:5px;
+  width:100%;
+  min-width:0;
+  margin:1px 0 0;
+}
+.app-shell .home-discovery .event-list-info .event-list-meta p{
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:flex-start;
+  gap:7px;
+  width:100%;
+  min-width:0;
+  margin:0;
+  color:var(--muted);
+  font-size:9px;
+  font-weight:500;
+  line-height:1.45;
+}
+.app-shell .home-discovery .event-list-info .event-list-meta p svg{
+  display:block;
+  flex:none;
+  width:12px;
+  height:12px;
+  padding:0;
+  color:#168bb5;
+}
+.app-shell .home-discovery .event-list-info .event-list-meta p span{
+  display:block;
+  flex:1;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+@media(max-width:520px){
+  .app-shell .home-discovery .event-list-info{gap:5px;padding:9px 10px 6px}
+  .app-shell .home-discovery .event-list-info h3{font-size:12px;line-height:1.4}
+  .app-shell .home-discovery .event-list-info>.event-category-chip{font-size:8px;padding:2px 7px}
+  .app-shell .home-discovery .event-list-info .event-list-meta{gap:4px;margin-top:1px}
+  .app-shell .home-discovery .event-list-info .event-list-meta p{font-size:8.5px;gap:6px}
+  .app-shell .home-discovery .event-list-info .event-list-meta p svg{width:11px;height:11px}
+}
