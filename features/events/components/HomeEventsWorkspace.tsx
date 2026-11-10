@@ -26,6 +26,7 @@ export function HomeEventsWorkspace({ events, loading, error, onOpenEvent, onRet
 
   const trendingEvents = filteredEvents.filter((event) => event.isTrending);
   const otherEvents = filteredEvents.filter((event) => !event.isTrending);
+  const displayedEvents = normalizedQuery ? filteredEvents : otherEvents;
   const trendingDisplayEvents = [...trendingEvents].reverse();
   const trendingLoopEvents = trendingDisplayEvents.length > 1
     ? [...trendingDisplayEvents, ...trendingDisplayEvents, ...trendingDisplayEvents]
@@ -129,9 +130,9 @@ export function HomeEventsWorkspace({ events, loading, error, onOpenEvent, onRet
             </section>}
 
             <section className="more-events redesigned-more">
-              <div className="redesign-section-head"><h2>{normalizedQuery ? "نتائج البحث" : "فعاليات أخرى"}</h2><span>{filteredEvents.length} فعالية</span></div>
-              {filteredEvents.length ? <div className="event-list">
-                {(normalizedQuery ? filteredEvents : otherEvents).map((event) => (
+              <div className="redesign-section-head"><h2>{normalizedQuery ? "نتائج البحث" : "بقية الفعاليات"}</h2><span>{displayedEvents.length} فعالية</span></div>
+              {displayedEvents.length ? <div className="event-list">
+                {displayedEvents.map((event) => (
                   <article className="event-list-card event-card-clickable ticket-style-card" key={event.id}
                     role="button" tabIndex={0} aria-label={"عرض تفاصيل " + event.title}
                     onClick={() => onOpenEvent(event.id)}
