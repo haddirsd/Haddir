@@ -4815,7 +4815,7 @@ html[data-theme="dark"] .app-shell .bottom-nav button.selected{
   box-shadow:0 0 0 4px rgba(239,82,101,.11);
   animation:haddirHomePulse 1.8s ease-in-out infinite;
 }
-@keyframes hadd ir-home-pulse{0%,100%{box-shadow:0 0 0 3px rgba(239,82,101,.10)}50%{box-shadow:0 0 0 7px rgba(239,82,101,.035)}}
+@keyframes haddirHomePulse{0%,100%{box-shadow:0 0 0 3px rgba(239,82,101,.10)}50%{box-shadow:0 0 0 7px rgba(239,82,101,.035)}}
 .app-shell .home-discovery .trending-carousel{
   display:flex;align-items:stretch;gap:14px;width:100%;
   padding:4px 2px 13px;overflow-x:auto;overflow-y:hidden;
@@ -4945,7 +4945,7 @@ html[data-theme="dark"] .app-shell .bottom-nav button.selected{
   width:25px;height:25px;border:3px solid color-mix(in srgb,var(--green) 18%,transparent);
   border-top-color:var(--green);border-radius:50%;animation:haddirHomeSpin .8s linear infinite;
 }
-@keyframes hadd ir-home-spin{to{transform:rotate(360deg)}}
+@keyframes haddirHomeSpin{to{transform:rotate(360deg)}}
 html[data-theme="dark"] .app-shell .home-discovery .event-list-card.ticket-style-card{
   background:var(--surface);box-shadow:0 5px 18px rgba(0,0,0,.16);
 }
