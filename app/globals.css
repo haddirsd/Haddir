@@ -6690,15 +6690,12 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
 }
 
 
-/* Reduce the selected navigation item's expansion by about 25% */
+/* Restore the original navigation item sizing; keep press feedback from shrinking the bar. */
 .app-shell .bottom-nav button.selected{
-  flex:0 1 auto!important;
+  flex:1 1 auto!important;
   width:auto!important;
-  max-width:40%!important;
-  transition:flex .35s cubic-bezier(.4,0,.2,1),width .35s cubic-bezier(.4,0,.2,1),max-width .35s cubic-bezier(.4,0,.2,1),background .25s ease,color .25s ease,box-shadow .25s ease!important;
+  max-width:none!important;
 }
-/* Keep press feedback subtle; the width expansion is controlled above. */
 .app-shell .bottom-nav button:active{
-  transform:scale(.98)!important;
-  transform-origin:center center!important;
+  transform:none!important;
 }
