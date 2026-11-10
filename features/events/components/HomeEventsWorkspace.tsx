@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { CalendarDays, MapPin } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { CalendarDays, MapPin, Search, Ticket } from "lucide-react";
 import type { EventItem } from "../events.types";
 
 type HomeEventsWorkspaceProps = {
@@ -12,19 +12,24 @@ type HomeEventsWorkspaceProps = {
   onRetry: () => void;
 };
 
-export function HomeEventsWorkspace({
-  events,
-  loading,
-  error,
-  onOpenEvent,
-  onRetry,
-}: HomeEventsWorkspaceProps) {
-  const trendingEvents = events.filter((event) => event.isTrending);
+export function HomeEventsWorkspace({ events, loading, error, onOpenEvent, onRetry }: HomeEventsWorkspaceProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const normalizedQuery = searchQuery.trim().toLocaleLowerCase("ar");
+  const filteredEvents = useMemo(() => {
+    if (!normalizedQuery) return events;
+    return events.filter((event) =>
+      [event.title, event.category, event.venue, event.place]
+        .filter(Boolean)
+        .some((value) => String(value).toLocaleLowerCase("ar").includes(normalizedQuery))
+    );
+  }, [events, normalizedQuery]);
+
+  const trendingEvents = filteredEvents.filter((event) => event.isTrending);
+  const otherEvents = filteredEvents.filter((event) => !event.isTrending);
   const trendingDisplayEvents = [...trendingEvents].reverse();
-  const trendingLoopEvents =
-    trendingDisplayEvents.length > 1
-      ? [...trendingDisplayEvents, ...trendingDisplayEvents, ...trendingDisplayEvents]
-      : trendingDisplayEvents;
+  const trendingLoopEvents = trendingDisplayEvents.length > 1
+    ? [...trendingDisplayEvents, ...trendingDisplayEvents, ...trendingDisplayEvents]
+    : trendingDisplayEvents;
   const trendingCarouselRef = useRef<HTMLDivElement | null>(null);
   const trendingPausedRef = useRef(false);
   const trendingIndexRef = useRef(0);
@@ -32,229 +37,117 @@ export function HomeEventsWorkspace({
   const syncTrendingIndex = () => {
     const carousel = trendingCarouselRef.current;
     if (!carousel) return;
-    const cards = Array.from(
-      carousel.querySelectorAll<HTMLElement>(".trending-card")
-    );
+    const cards = Array.from(carousel.querySelectorAll<HTMLElement>(".trending-card"));
     const center = carousel.getBoundingClientRect().left + carousel.clientWidth / 2;
     let nearestIndex = trendingIndexRef.current;
     let nearestDistance = Number.POSITIVE_INFINITY;
-
     cards.forEach((card, index) => {
       const rect = card.getBoundingClientRect();
       const distance = Math.abs(rect.left + rect.width / 2 - center);
-      if (distance < nearestDistance) {
-        nearestDistance = distance;
-        nearestIndex = index;
-      }
+      if (distance < nearestDistance) { nearestDistance = distance; nearestIndex = index; }
     });
-
     trendingIndexRef.current = nearestIndex;
   };
-
-  const pauseTrending = () => {
-    syncTrendingIndex();
-    trendingPausedRef.current = true;
-  };
-
-  const resumeTrending = () => {
-    syncTrendingIndex();
-    trendingPausedRef.current = false;
-  };
+  const pauseTrending = () => { syncTrendingIndex(); trendingPausedRef.current = true; };
+  const resumeTrending = () => { syncTrendingIndex(); trendingPausedRef.current = false; };
 
   useEffect(() => {
     const count = trendingEvents.length;
     const carousel = trendingCarouselRef.current;
     if (count < 2 || !carousel) return;
-
     const centerCard = (cardIndex: number, behavior: ScrollBehavior) => {
-      const cards = carousel.querySelectorAll<HTMLElement>(".trending-card");
-      const card = cards[cardIndex];
+      const card = carousel.querySelectorAll<HTMLElement>(".trending-card")[cardIndex];
       if (!card) return;
       const box = carousel.getBoundingClientRect();
       const rect = card.getBoundingClientRect();
-      const left =
-        rect.left -
-        box.left +
-        carousel.scrollLeft -
-        (carousel.clientWidth - card.clientWidth) / 2;
-
+      const left = rect.left - box.left + carousel.scrollLeft - (carousel.clientWidth - card.clientWidth) / 2;
       if (behavior === "auto") {
         carousel.style.scrollBehavior = "auto";
         carousel.scrollLeft = left;
         carousel.style.scrollBehavior = "";
-      } else {
-        carousel.scrollTo({ left, behavior });
-      }
+      } else carousel.scrollTo({ left, behavior });
     };
-
     trendingIndexRef.current = count * 2 - 1;
-    const initialFrame = window.requestAnimationFrame(() =>
-      centerCard(trendingIndexRef.current, "auto")
-    );
-
+    const initialFrame = window.requestAnimationFrame(() => centerCard(trendingIndexRef.current, "auto"));
     const interval = window.setInterval(() => {
       if (trendingPausedRef.current) return;
-
       const nextIndex = trendingIndexRef.current - 1;
       if (nextIndex < count - 1) {
         trendingIndexRef.current = count * 2 - 1;
         centerCard(trendingIndexRef.current, "auto");
         return;
       }
-
       trendingIndexRef.current = nextIndex;
       centerCard(nextIndex, "smooth");
     }, 3000);
-
-    return () => {
-      window.cancelAnimationFrame(initialFrame);
-      window.clearInterval(interval);
-    };
+    return () => { window.cancelAnimationFrame(initialFrame); window.clearInterval(interval); };
   }, [trendingEvents.length]);
 
   return (
     <section className="home-discovery redesigned-home" id="events">
       <div className="container">
+        <div className="home-search" role="search">
+          <Search size={18} aria-hidden="true" />
+          <input type="search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="ابحث عن فعالية أو مكان..." aria-label="ابحث عن فعالية أو مكان" />
+          {searchQuery && <button type="button" onClick={() => setSearchQuery("")} aria-label="مسح البحث">×</button>}
+        </div>
+
         {loading ? (
-          <div className="empty-state">
-            <strong>جاري تحميل الفعاليات...</strong>
-          </div>
+          <div className="empty-state" role="status"><span className="home-loading-mark" aria-hidden="true" /><strong>جاري تحميل الفعاليات...</strong></div>
         ) : error ? (
-          <div className="empty-state" role="alert">
-            <strong>ما قدرنا نحمّل الفعاليات</strong>
-            <p>{error}</p>
-            <button className="btn btn-outline" onClick={onRetry}>
-              إعادة المحاولة
-            </button>
-          </div>
+          <div className="empty-state" role="alert"><strong>ما قدرنا نحمّل الفعاليات</strong><p>{error}</p><button className="btn btn-outline" onClick={onRetry}>إعادة المحاولة</button></div>
+        ) : normalizedQuery && filteredEvents.length === 0 ? (
+          <div className="empty-state"><strong>ما لقينا فعاليات مطابقة</strong><p>جرّب كلمة بحث مختلفة أو امسح البحث لعرض كل الفعاليات.</p><button className="btn btn-outline" onClick={() => setSearchQuery("")}>عرض كل الفعاليات</button></div>
         ) : (
           <>
-            <section className="trending-section">
-              <div className="redesign-section-head">
-                <div className="redesign-title">
-                  <h2>رائج الآن</h2>
-                  <span className="trending-dot" aria-hidden="true" />
-                </div>
-              </div>
+            {!normalizedQuery && <section className="trending-section">
+              <div className="redesign-section-head"><div className="redesign-title"><span className="trending-dot" aria-hidden="true" /><h2>رائج الآن</h2></div></div>
               {trendingEvents.length ? (
-                <div
-                  ref={trendingCarouselRef}
-                  className="trending-carousel hide-scrollbar"
-                  dir="ltr"
-                  onMouseEnter={pauseTrending}
-                  onMouseLeave={resumeTrending}
-                  onTouchStart={pauseTrending}
-                  onTouchEnd={resumeTrending}
-                  onTouchCancel={resumeTrending}
-                  onScroll={syncTrendingIndex}
-                >
-                  {trendingLoopEvents.map((event, index) => (
-                    <article
-                      className="trending-card snap-item"
-                      key={event.id + "-loop-" + index}
-                      role="button"
-                      tabIndex={index < trendingEvents.length || index >= trendingEvents.length * 2 ? -1 : 0}
-                      aria-hidden={index < trendingEvents.length || index >= trendingEvents.length * 2}
-                      aria-label={"عرض تفاصيل " + event.title}
-                      onClick={() => onOpenEvent(event.id)}
-                      onKeyDown={(keyboardEvent) => {
-                        if (
-                          keyboardEvent.key === "Enter" ||
-                          keyboardEvent.key === " "
-                        ) {
-                          keyboardEvent.preventDefault();
-                          onOpenEvent(event.id);
-                        }
-                      }}
-                    >
+                <div ref={trendingCarouselRef} className="trending-carousel hide-scrollbar" dir="ltr"
+                  onMouseEnter={pauseTrending} onMouseLeave={resumeTrending} onTouchStart={pauseTrending}
+                  onTouchEnd={resumeTrending} onTouchCancel={resumeTrending} onScroll={syncTrendingIndex}>
+                  {trendingLoopEvents.map((event, index) => {
+                    const isClone = index < trendingEvents.length || index >= trendingEvents.length * 2;
+                    return <article className="trending-card snap-item" key={event.id + "-loop-" + index}
+                      role="button" tabIndex={isClone ? -1 : 0} aria-hidden={isClone}
+                      aria-label={"عرض تفاصيل " + event.title} onClick={() => onOpenEvent(event.id)}
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpenEvent(event.id); } }}>
                       <div className={"trending-card-media " + event.cover}>
-                        {event.coverImageUrl ? (
-                          <img
-                            src={event.coverImageUrl}
-                            alt={index < trendingEvents.length || index >= trendingEvents.length * 2 ? "" : event.title}
-                            loading="lazy"
-                          />
-                        ) : (
-                          <span className="trending-placeholder">✦</span>
-                        )}
+                        {event.coverImageUrl ? <img src={event.coverImageUrl} alt={isClone ? "" : event.title} loading="lazy" /> : <span className="trending-placeholder">✦</span>}
                         <div className="trending-overlay" />
-                        <span className="trending-category">{event.category}</span>
-                        <span className="trending-price">{event.price}</span>
-                        <div className="trending-card-copy">
-                          <h3>{event.title}</h3>
-                          <div>
-                            <CalendarDays size={14} />
-                            <span>{event.date} · {event.time}</span>
-                          </div>
-                          <div>
-                            <MapPin size={14} />
-                            <span>{event.venue || event.place}</span>
-                          </div>
+                        <span className="trending-category">{event.category}</span><span className="trending-price">{event.price}</span>
+                        <div className="trending-card-copy"><h3>{event.title}</h3>
+                          <div><CalendarDays size={14} /><span>{event.date} · {event.time}</span></div>
+                          <div><MapPin size={14} /><span>{event.venue || event.place}</span></div>
                         </div>
                       </div>
-                    </article>
-                  ))}
+                    </article>;
+                  })}
                 </div>
-              ) : (
-                <div className="empty-state">ما في فعاليات رائجة حالياً.</div>
-              )}
-            </section>
+              ) : <div className="empty-state">ما في فعاليات رائجة حالياً.</div>}
+            </section>}
 
             <section className="more-events redesigned-more">
-              <div className="redesign-section-head">
-                <h2>فعاليات أخرى</h2>
-                <span>{events.filter((event) => !event.isTrending).length} فعاليات</span>
-              </div>
-              {events.some((event) => !event.isTrending) ? (
-                <div className="event-list">
-                  {events
-                    .filter((event) => !event.isTrending)
-                    .map((event) => (
-                      <article
-                        className="event-list-card event-card-clickable"
-                        key={event.id}
-                        role="button"
-                        tabIndex={0}
-                        aria-label={"عرض تفاصيل " + event.title}
-                        onClick={() => onOpenEvent(event.id)}
-                        onKeyDown={(keyboardEvent) => {
-                          if (
-                            keyboardEvent.key === "Enter" ||
-                            keyboardEvent.key === " "
-                          ) {
-                            keyboardEvent.preventDefault();
-                            onOpenEvent(event.id);
-                          }
-                        }}
-                      >
-                        <div className={"event-list-thumb " + event.cover}>
-                          {event.coverImageUrl ? (
-                            <img src={event.coverImageUrl} alt={event.title} loading="lazy" />
-                          ) : (
-                            <span>✦</span>
-                          )}
-                        </div>
-                        <div className="event-list-info">
-                          <h3>{event.title}</h3>
-                          <div className="event-list-top">
-                            <span>{event.category}</span>
-                            <strong>{event.price}</strong>
-                          </div>
-                          <p>
-                            <CalendarDays size={13} />
-                            {event.date} · {event.time}
-                          </p>
-                          <p>
-                            <MapPin size={13} />
-                            {event.venue || event.place}
-                          </p>
-                        </div>
-                      </article>
-                    ))}
-                </div>
-              ) : (
-                <div className="empty-state">ما في فعاليات أخرى حالياً.</div>
-              )}
+              <div className="redesign-section-head"><h2>{normalizedQuery ? "نتائج البحث" : "فعاليات أخرى"}</h2><span>{filteredEvents.length} فعالية</span></div>
+              {filteredEvents.length ? <div className="event-list">
+                {(normalizedQuery ? filteredEvents : otherEvents).map((event) => (
+                  <article className="event-list-card event-card-clickable ticket-style-card" key={event.id}
+                    role="button" tabIndex={0} aria-label={"عرض تفاصيل " + event.title}
+                    onClick={() => onOpenEvent(event.id)}
+                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpenEvent(event.id); } }}>
+                    <span className="ticket-notch ticket-notch-right" aria-hidden="true" /><span className="ticket-notch ticket-notch-left" aria-hidden="true" />
+                    <div className="event-list-main">
+                      <div className="event-list-thumb">{event.coverImageUrl ? <img src={event.coverImageUrl} alt={event.title} loading="lazy" /> : <span>✦</span>}</div>
+                      <div className="event-list-info"><span className="event-category-chip">{event.category}</span><h3>{event.title}</h3>
+                        <p><MapPin size={13} />{event.venue || event.place}</p><p><CalendarDays size={13} />{event.date} · {event.time}</p>
+                      </div>
+                    </div>
+                    <div className="ticket-perforation" aria-hidden="true"><span /></div>
+                    <div className="ticket-card-footer"><div><small>يبدأ من</small><strong>{event.price}</strong></div><span className="ticket-book-link"><Ticket size={15} /> احجز تذكرتك</span></div>
+                  </article>
+                ))}
+              </div> : <div className="empty-state">ما في فعاليات أخرى حالياً.</div>}
             </section>
           </>
         )}
