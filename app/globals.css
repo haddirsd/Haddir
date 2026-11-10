@@ -7251,3 +7251,37 @@ html {
     transition: none !important;
   }
 }
+
+
+/* Haddir PWA checkout account number readability */
+.app-content .event-detail-layout.payment-sheet .account-number-card {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  justify-items: start !important;
+  align-items: start !important;
+  justify-content: start !important;
+  gap: 7px !important;
+  text-align: right !important;
+}
+.app-content .event-detail-layout.payment-sheet .account-number-card small {
+  justify-self: start !important;
+  font-size: 11px !important;
+  line-height: 1.5 !important;
+}
+.app-content .event-detail-layout.payment-sheet .account-number-card strong {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  font-size: clamp(20px, 5.2vw, 24px) !important;
+  line-height: 1.45 !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.035em !important;
+  direction: ltr !important;
+  text-align: left !important;
+  font-variant-numeric: tabular-nums !important;
+  overflow-wrap: anywhere !important;
+}
+.app-content .event-detail-layout.payment-sheet .account-number-card .copy-account-button {
+  justify-self: start !important;
+  margin-top: 2px !important;
+}
