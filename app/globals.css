@@ -4757,71 +4757,217 @@ html[data-theme="dark"] .app-shell .bottom-nav button.selected{
 }
 
 
-/* Haddir home template: compact search and perforated ticket cards */
-.redesigned-home{padding-top:16px!important}
-.redesigned-home>.container{width:min(100% - 28px,760px)}
-.home-search{
-  display:flex;align-items:center;gap:11px;width:100%;min-height:48px;
-  margin:0 0 24px;padding:0 15px;border:1px solid var(--line);
-  border-radius:17px;background:var(--surface-strong);color:var(--muted);
-  box-shadow:0 4px 14px rgba(12,45,55,.045);transition:border-color .2s,box-shadow .2s;
+
+/* Home page — one scoped layout system */
+.app-shell .home-discovery{
+  width:100%;
+  min-height:0;
+  padding:clamp(18px,3vw,30px) 0 112px;
+  background:transparent;
 }
-.home-search:focus-within{border-color:color-mix(in srgb,var(--green) 55%,var(--line));box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 12%,transparent)}
-.home-search>svg{flex:none;color:var(--green)}
-.home-search input{width:100%;min-width:0;height:46px;border:0;outline:0;background:transparent;color:var(--fg);font:inherit;font-size:13px}
-.home-search input::placeholder{color:var(--muted)}
-.home-search input::-webkit-search-cancel-button{-webkit-appearance:none}
-.home-search>button{display:grid;place-items:center;flex:none;width:28px;height:28px;border:0;border-radius:50%;background:var(--bg);color:var(--muted);font-size:20px;line-height:1}
-.trending-section{margin-bottom:22px!important}
-.redesign-title{gap:9px!important}
-.redesign-title h2,.redesign-section-head h2{font-size:17px!important}
-.trending-dot{width:8px;height:8px;flex:none;border-radius:50%;background:#ef5265;box-shadow:0 0 0 4px rgba(239,82,101,.10);animation:haddir-trending-pulse 1.8s ease-in-out infinite}
-@keyframes haddir-trending-pulse{0%,100%{box-shadow:0 0 0 3px rgba(239,82,101,.10)}50%{box-shadow:0 0 0 7px rgba(239,82,101,.04)}}
-.trending-carousel{gap:12px!important;padding:4px 0 14px!important;justify-content:flex-start!important}
-.trending-carousel .trending-card{flex:0 0 min(100%,620px)!important;width:min(100%,620px)!important;max-width:min(100%,620px)!important;border-radius:23px!important}
-.trending-card-media{height:224px!important}
-.trending-card-copy{right:16px!important;left:16px!important;bottom:15px!important;gap:7px!important}
-.trending-card-copy h3{font-size:17px!important}
-.redesigned-more{padding-top:4px!important}
-.event-list{grid-template-columns:1fr!important;gap:13px!important}
-.event-list-card.ticket-style-card{
-  position:relative;display:flex;flex-direction:column;align-items:stretch;gap:0;
-  padding:0!important;overflow:hidden;border:1px solid var(--line)!important;
-  border-radius:22px!important;background:var(--surface-strong)!important;
-  box-shadow:0 5px 17px rgba(10,43,52,.045);cursor:pointer;
+.app-shell .home-discovery>.container{
+  width:min(calc(100% - 32px),760px);
+  margin-inline:auto;
 }
-.event-list-card.ticket-style-card:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--green) 40%,var(--line))!important}
-.event-list-main{display:flex;align-items:center;gap:13px;min-width:0;padding:13px 14px 14px}
-.event-list-thumb{width:88px!important;height:88px!important;border-radius:16px!important;background:var(--bg)!important}
-.event-list-info{min-width:0}
-.event-category-chip{display:inline-flex;max-width:100%;padding:3px 9px;border-radius:999px;background:color-mix(in srgb,var(--green) 10%,var(--surface));color:var(--green);font-size:10px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.event-list-info h3{margin:7px 0 6px!important;font-size:13px!important}
-.event-list-info p{margin:5px 0!important;font-size:10px!important}
-.ticket-notch{position:absolute;z-index:2;top:66%;width:18px;height:18px;border-radius:50%;background:var(--bg);pointer-events:none}
-.ticket-notch-right{right:-10px}
-.ticket-notch-left{left:-10px}
-.ticket-perforation{position:relative;display:flex;align-items:center;padding:0 19px}
-.ticket-perforation span{display:block;width:100%;border-top:1.5px dashed color-mix(in srgb,var(--muted) 30%,var(--line))}
-.ticket-card-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 16px 12px;background:color-mix(in srgb,var(--bg) 55%,var(--surface))}
-.ticket-card-footer>div{display:grid;gap:3px}
-.ticket-card-footer small{color:var(--muted);font-size:9px}
-.ticket-card-footer strong{color:var(--green);font-size:14px;font-weight:900}
-.ticket-book-link{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:11px;background:var(--green);color:#fff;font-size:10px;font-weight:800}
-.home-loading-mark{width:25px;height:25px;border:3px solid color-mix(in srgb,var(--green) 18%,transparent);border-top-color:var(--green);border-radius:50%;animation:haddir-home-spin .8s linear infinite}
-@keyframes haddir-home-spin{to{transform:rotate(360deg)}}
-.theme-dark .event-list-card.ticket-style-card{background:var(--surface)!important;box-shadow:0 7px 20px rgba(0,0,0,.13)}
-.theme-dark .ticket-card-footer{background:color-mix(in srgb,var(--bg) 72%,var(--surface))}
-.theme-dark .ticket-book-link{background:#167f91;color:#fff}
+.app-shell .home-discovery .home-search{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  width:100%;
+  min-height:50px;
+  margin:0 0 28px;
+  padding:0 16px;
+  border:1px solid var(--line);
+  border-radius:15px;
+  background:var(--surface-strong);
+  color:var(--muted);
+  box-shadow:0 3px 12px rgba(12,45,55,.045);
+}
+.app-shell .home-discovery .home-search:focus-within{
+  border-color:color-mix(in srgb,var(--green) 55%,var(--line));
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 11%,transparent);
+}
+.app-shell .home-discovery .home-search>svg{flex:none;color:var(--green)}
+.app-shell .home-discovery .home-search input{
+  width:100%;min-width:0;height:48px;padding:0;border:0;outline:0;
+  background:transparent;color:var(--fg);font:inherit;font-size:13px;
+}
+.app-shell .home-discovery .home-search input::placeholder{color:var(--muted)}
+.app-shell .home-discovery .home-search input::-webkit-search-cancel-button{-webkit-appearance:none}
+.app-shell .home-discovery .home-search>button{
+  display:grid;place-items:center;flex:none;width:29px;height:29px;
+  border:0;border-radius:50%;background:var(--bg);color:var(--muted);
+  font:inherit;font-size:19px;line-height:1;
+}
+.app-shell .home-discovery .trending-section{margin:0 0 28px}
+.app-shell .home-discovery .redesign-section-head{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  min-height:30px;margin:0 0 13px;
+}
+.app-shell .home-discovery .redesign-title{display:flex;align-items:center;gap:10px}
+.app-shell .home-discovery .redesign-section-head h2,
+.app-shell .home-discovery .redesign-title h2{
+  margin:0;color:var(--fg);font-size:17px;font-weight:800;line-height:1.5;
+}
+.app-shell .home-discovery .redesign-section-head>span{color:var(--muted);font-size:11px}
+.app-shell .home-discovery .trending-dot{
+  width:8px;height:8px;flex:none;border-radius:50%;background:#ef5265;
+  box-shadow:0 0 0 4px rgba(239,82,101,.11);
+  animation:haddirHomePulse 1.8s ease-in-out infinite;
+}
+@keyframes hadd ir-home-pulse{0%,100%{box-shadow:0 0 0 3px rgba(239,82,101,.10)}50%{box-shadow:0 0 0 7px rgba(239,82,101,.035)}}
+.app-shell .home-discovery .trending-carousel{
+  display:flex;align-items:stretch;gap:14px;width:100%;
+  padding:4px 2px 13px;overflow-x:auto;overflow-y:hidden;
+  justify-content:flex-start;scroll-snap-type:x mandatory;
+  scroll-padding-inline:5%;overscroll-behavior-inline:contain;
+  -webkit-overflow-scrolling:touch;touch-action:pan-x;
+}
+.app-shell .home-discovery .trending-carousel .trending-card{
+  display:block;flex:0 0 min(88%,560px);width:min(88%,560px);max-width:560px;
+  overflow:hidden;border-radius:19px;scroll-snap-align:center;
+  background:var(--surface);box-shadow:0 8px 22px rgba(8,39,48,.10);
+}
+.app-shell .home-discovery .trending-card-media{
+  position:relative;width:100%;height:clamp(205px,43vw,270px);
+  min-height:0;overflow:hidden;background:#14596a;color:#fff;
+}
+.app-shell .home-discovery .trending-card-media>img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+}
+.app-shell .home-discovery .trending-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.06) 10%,rgba(0,0,0,.12) 42%,rgba(0,0,0,.78) 100%);
+}
+.app-shell .home-discovery .trending-category,
+.app-shell .home-discovery .trending-price{
+  position:absolute;z-index:2;top:13px;
+  max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  padding:6px 10px;border-radius:999px;
+  background:rgba(8,34,41,.55);color:#fff;font-size:10px;font-weight:700;
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+}
+.app-shell .home-discovery .trending-category{right:13px}
+.app-shell .home-discovery .trending-price{left:13px}
+.app-shell .home-discovery .trending-card-copy{
+  position:absolute;z-index:2;right:16px;left:16px;bottom:15px;
+  display:grid;gap:7px;color:#fff;
+}
+.app-shell .home-discovery .trending-card-copy h3{
+  margin:0;font-size:17px;font-weight:800;line-height:1.5;
+}
+.app-shell .home-discovery .trending-card-copy>div{
+  display:flex;align-items:center;gap:7px;min-width:0;
+  color:rgba(255,255,255,.9);font-size:10px;line-height:1.5;
+}
+.app-shell .home-discovery .trending-card-copy>div span{
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.app-shell .home-discovery .trending-card-copy svg{flex:none}
+.app-shell .home-discovery .redesigned-more{padding:0;margin:0}
+.app-shell .home-discovery .event-list{
+  display:grid;grid-template-columns:minmax(0,1fr);gap:12px;width:100%;
+}
+.app-shell .home-discovery .event-list-card.ticket-style-card{
+  position:relative;display:flex;flex-direction:column;align-items:stretch;
+  min-width:0;gap:0;padding:0;overflow:hidden;
+  border:1px solid var(--line);border-radius:18px;
+  background:var(--surface-strong);box-shadow:0 4px 14px rgba(10,43,52,.045);
+  cursor:pointer;transition:border-color .18s ease,box-shadow .18s ease;
+}
+.app-shell .home-discovery .event-list-card.ticket-style-card:hover,
+.app-shell .home-discovery .event-list-card.ticket-style-card:focus-visible{
+  border-color:color-mix(in srgb,var(--green) 42%,var(--line));
+  box-shadow:0 8px 20px rgba(10,43,52,.08);outline:none;
+}
+.app-shell .home-discovery .event-list-main{
+  display:flex;align-items:center;gap:13px;min-width:0;
+  padding:13px 14px 14px;
+}
+.app-shell .home-discovery .event-list-thumb{
+  position:relative;display:grid;place-items:center;flex:0 0 94px;
+  width:94px;height:94px;min-height:94px;overflow:hidden;
+  border-radius:13px;background:var(--bg);color:var(--green);font-size:25px;
+}
+.app-shell .home-discovery .event-list-thumb img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+}
+.app-shell .home-discovery .event-list-info{display:grid;align-content:center;gap:5px;min-width:0}
+.app-shell .home-discovery .event-category-chip{
+  display:inline-flex;justify-self:start;max-width:100%;padding:3px 8px;
+  overflow:hidden;border-radius:999px;
+  background:color-mix(in srgb,var(--green) 10%,var(--surface));
+  color:var(--green);font-size:9px;font-weight:800;
+  text-overflow:ellipsis;white-space:nowrap;
+}
+.app-shell .home-discovery .event-list-info h3{
+  margin:0;color:var(--fg);font-size:13px;font-weight:800;line-height:1.55;
+  overflow-wrap:anywhere;
+}
+.app-shell .home-discovery .event-list-info p{
+  display:flex;align-items:center;gap:6px;min-width:0;
+  margin:0;color:var(--muted);font-size:10px;line-height:1.5;
+}
+.app-shell .home-discovery .event-list-info p svg{flex:none;color:var(--green)}
+.app-shell .home-discovery .ticket-perforation{
+  display:flex;align-items:center;min-height:1px;padding:0 15px;
+}
+.app-shell .home-discovery .ticket-perforation span{
+  display:block;width:100%;border-top:1px dashed color-mix(in srgb,var(--muted) 32%,var(--line));
+}
+.app-shell .home-discovery .ticket-card-footer{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:10px 15px 11px;background:color-mix(in srgb,var(--bg) 62%,var(--surface));
+}
+.app-shell .home-discovery .ticket-card-footer>div{display:grid;gap:3px}
+.app-shell .home-discovery .ticket-card-footer small{color:var(--muted);font-size:9px}
+.app-shell .home-discovery .ticket-card-footer strong{color:var(--green);font-size:14px;font-weight:900}
+.app-shell .home-discovery .ticket-book-link{
+  display:inline-flex;align-items:center;gap:6px;padding:7px 10px;
+  border-radius:10px;background:var(--green);color:#fff;
+  font-size:10px;font-weight:800;white-space:nowrap;
+}
+.app-shell .home-discovery .ticket-notch{
+  position:absolute;z-index:2;top:calc(100% - 54px);
+  width:17px;height:17px;border-radius:50%;background:var(--bg);pointer-events:none;
+}
+.app-shell .home-discovery .ticket-notch-right{right:-9px}
+.app-shell .home-discovery .ticket-notch-left{left:-9px}
+.app-shell .home-discovery .empty-state{
+  display:grid;justify-items:center;gap:10px;
+  margin:0;padding:28px 18px;border:1px dashed var(--line);
+  border-radius:16px;background:var(--surface-strong);
+  color:var(--muted);text-align:center;font-size:12px;line-height:1.8;
+}
+.app-shell .home-discovery .empty-state strong{color:var(--fg);font-size:13px}
+.app-shell .home-discovery .empty-state p{margin:0}
+.app-shell .home-discovery .home-loading-mark{
+  width:25px;height:25px;border:3px solid color-mix(in srgb,var(--green) 18%,transparent);
+  border-top-color:var(--green);border-radius:50%;animation:haddirHomeSpin .8s linear infinite;
+}
+@keyframes hadd ir-home-spin{to{transform:rotate(360deg)}}
+html[data-theme="dark"] .app-shell .home-discovery .event-list-card.ticket-style-card{
+  background:var(--surface);box-shadow:0 5px 18px rgba(0,0,0,.16);
+}
+html[data-theme="dark"] .app-shell .home-discovery .ticket-card-footer{
+  background:color-mix(in srgb,var(--bg) 70%,var(--surface));
+}
+html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:#167f91}
 @media(min-width:700px){
- .redesigned-home>.container{width:min(100% - 40px,900px)}
- .trending-carousel .trending-card{flex-basis:min(100%,620px)!important;width:min(100%,620px)!important;max-width:min(100%,620px)!important}
- .trending-card-media{height:270px!important}
+  .app-shell .home-discovery>.container{width:min(calc(100% - 48px),820px)}
+  .app-shell .home-discovery .trending-carousel .trending-card{flex-basis:min(78%,560px);width:min(78%,560px)}
 }
-@media(max-width:390px){
- .home-search{min-height:46px;margin-bottom:21px}
- .event-list-thumb{width:76px!important;height:80px!important}
- .event-list-main{gap:10px;padding:11px}
- .ticket-card-footer{padding-inline:13px}
- .ticket-book-link{padding:7px 9px;font-size:9px}
+@media(max-width:420px){
+  .app-shell .home-discovery>.container{width:calc(100% - 26px)}
+  .app-shell .home-discovery .home-search{margin-bottom:23px}
+  .app-shell .home-discovery .event-list-main{gap:10px;padding:11px}
+  .app-shell .home-discovery .event-list-thumb{flex-basis:78px;width:78px;height:82px;min-height:82px}
+  .app-shell .home-discovery .event-list-info h3{font-size:12px}
+  .app-shell .home-discovery .ticket-card-footer{padding-inline:12px}
+  .app-shell .home-discovery .ticket-book-link{padding:7px 8px;font-size:9px}
 }
-@media(prefers-reduced-motion:reduce){.trending-dot,.home-loading-mark{animation:none}}
+@media(prefers-reduced-motion:reduce){
+  .app-shell .home-discovery .trending-dot,
+  .app-shell .home-discovery .home-loading-mark{animation:none}
+  .app-shell .home-discovery .trending-carousel{scroll-behavior:auto}
+}
