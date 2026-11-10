@@ -5418,15 +5418,15 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
 }
 
 
-/* Final polish: readable, compact and consistently aligned event information */
+/* Final event-info spacing: larger metadata anchored toward the bottom */
 .app-shell .home-discovery .event-list-info{
   display:flex;
   flex-direction:column;
-  justify-content:center;
+  justify-content:flex-start;
   align-items:stretch;
   gap:6px;
   min-width:0;
-  padding:10px 13px 7px;
+  padding:10px 13px 8px;
   direction:rtl;
   text-align:right;
 }
@@ -5468,30 +5468,30 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
   order:2;
   display:grid;
   grid-template-columns:minmax(0,1fr);
-  gap:5px;
+  gap:7px;
   width:100%;
   min-width:0;
-  margin:1px 0 0;
+  margin:auto 0 0;
 }
 .app-shell .home-discovery .event-list-info .event-list-meta p{
   display:flex;
   flex-direction:row;
   align-items:center;
   justify-content:flex-start;
-  gap:7px;
+  gap:8px;
   width:100%;
   min-width:0;
   margin:0;
   color:var(--muted);
-  font-size:9px;
-  font-weight:500;
-  line-height:1.45;
+  font-size:10.5px;
+  font-weight:550;
+  line-height:1.5;
 }
 .app-shell .home-discovery .event-list-info .event-list-meta p svg{
   display:block;
   flex:none;
-  width:12px;
-  height:12px;
+  width:14px;
+  height:14px;
   padding:0;
   color:#168bb5;
 }
@@ -5504,10 +5504,10 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
   white-space:nowrap;
 }
 @media(max-width:520px){
-  .app-shell .home-discovery .event-list-info{gap:5px;padding:9px 10px 6px}
+  .app-shell .home-discovery .event-list-info{gap:5px;padding:9px 10px 8px}
   .app-shell .home-discovery .event-list-info h3{font-size:12px;line-height:1.4}
   .app-shell .home-discovery .event-list-info>.event-category-chip{font-size:8px;padding:2px 7px}
-  .app-shell .home-discovery .event-list-info .event-list-meta{gap:4px;margin-top:1px}
-  .app-shell .home-discovery .event-list-info .event-list-meta p{font-size:8.5px;gap:6px}
-  .app-shell .home-discovery .event-list-info .event-list-meta p svg{width:11px;height:11px}
+  .app-shell .home-discovery .event-list-info .event-list-meta{gap:6px;margin:auto 0 0}
+  .app-shell .home-discovery .event-list-info .event-list-meta p{font-size:10px;gap:6px;line-height:1.45}
+  .app-shell .home-discovery .event-list-info .event-list-meta p svg{width:13px;height:13px}
 }
