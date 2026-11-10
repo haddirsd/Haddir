@@ -6318,3 +6318,16 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
   direction:rtl;
   text-align:left;
 }
+
+/* Keep the vertical ticket seam outside the image, on the details edge */
+.app-shell .home-discovery .event-list-card.ticket-style-card .event-list-thumb{
+  border-left:0!important;
+}
+.app-shell .home-discovery .event-list-card.ticket-style-card .event-list-thumb::before,
+.app-shell .home-discovery .event-list-card.ticket-style-card .event-list-thumb::after{
+  content:none!important;
+  display:none!important;
+}
+.app-shell .home-discovery .event-list-card.ticket-style-card .event-list-info{
+  border-right:2px dashed color-mix(in srgb,var(--muted) 30%,transparent);
+}
