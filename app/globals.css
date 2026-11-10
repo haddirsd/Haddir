@@ -6364,3 +6364,39 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
     padding:7px 11px!important;
   }
 }
+
+
+/* Compact only the remaining-events cards by 15%; remove the vertical image seam */
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-main{
+  min-height:105px!important;
+}
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-thumb,
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-info{
+  min-height:105px!important;
+}
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-info{
+  border-right:0!important;
+}
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-thumb{
+  border:0!important;
+}
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-thumb::before,
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-thumb::after{
+  content:none!important;
+  display:none!important;
+}
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-footer{
+  padding:8.5px 17px 10px!important;
+}
+@media(max-width:520px){
+  .app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-main{
+    min-height:99px!important;
+  }
+  .app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-thumb,
+  .app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-info{
+    min-height:99px!important;
+  }
+  .app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-footer{
+    padding:7.5px 15px 9px!important;
+  }
+}
