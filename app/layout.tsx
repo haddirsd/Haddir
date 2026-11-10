@@ -1,12 +1,21 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { PwaRegistration } from "./PwaRegistration";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#eef6f9" },
+    { media: "(prefers-color-scheme: dark)", color: "#051218" },
+  ],
+};
 
 export const metadata: Metadata = {
   title: "حاضر | فعاليات السودان في مكان واحد",
   description: "اكتشف الفعاليات القادمة واحجز تذكرتك بسهولة مع حاضر.",
   manifest: "/manifest.webmanifest",
-  themeColor: "#051218",
   appleWebApp: {
     capable: true,
     title: "حاضر",
