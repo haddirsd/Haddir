@@ -143,8 +143,10 @@ export function HomeEventsWorkspace({ events, loading, error, onOpenEvent, onRet
                       <div className="event-list-info">
                         <h3>{event.title}</h3>
                         <span className="event-category-chip">{event.category}</span>
-                        <p><CalendarDays size={13} /><span>{event.date} · {event.time}</span></p>
-                        <p><MapPin size={13} /><span>{event.venue || event.place}</span></p>
+                        <div className="event-list-meta">
+                          <p><CalendarDays size={13} /><span>{event.date} · {event.time}</span></p>
+                          <p><MapPin size={13} /><span>{event.venue || event.place}</span></p>
+                        </div>
                       </div>
                     </div>
                     <div className="ticket-card-footer">
