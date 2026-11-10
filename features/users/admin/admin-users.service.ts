@@ -1,12 +1,12 @@
 import { getSupabaseBrowserClient } from "../../../lib/supabase";
 import type { AdminUserEventOption, AdminUserRow, AdminUsersResult } from "./admin-users.types";
 
-export async function listAdminUsers(searchTerm: string): Promise<AdminUsersResult> {
+export async function listAdminUsers(searchTerm: string, roleFilter = "all"): Promise<AdminUsersResult> {
   const supabase = getSupabaseBrowserClient();
   if (!supabase) return { rows: [], eventOptions: [], total: 0, error: "تعذر الاتصال بقاعدة البيانات." };
   const term = searchTerm.trim().replace(/[(),]/g, " ").replace(/[%_]/g, "");
   const [{ data: userRows, error: userError }, { count, error: countError }] = await Promise.all([
-    supabase.rpc("admin_search_profiles", { p_query: term || null, p_limit: 100, p_offset: 0 }),
+    supabase.rpc("admin_search_profiles", { p_query: term || null, p_limit: 200, p_offset: 0, p_role: roleFilter === "all" ? null : roleFilter }),
     supabase.from("profiles").select("id", { count: "exact", head: true }),
   ]);
   if (userError || countError) return { rows: [], eventOptions: [], total: count || 0, error: (userError || countError)?.message || "تعذر تحميل المستخدمين." };
