@@ -176,12 +176,6 @@ export function EventDetailWorkspace({
           </div>
 
           <div className="payment-screen">
-            <div className="booking-steps" aria-label="خطوات الحجز">
-              <span className="step-done">١. اختيار الفئة</span>
-              <span className="step-done">٢. مراجعة الحجز</span>
-              <span className="step-current">٣. الدفع</span>
-            </div>
-
             {!tier ? (
               <div className="empty-state" role="alert">
                 <strong>فئة التذكرة المحددة غير متاحة.</strong>
