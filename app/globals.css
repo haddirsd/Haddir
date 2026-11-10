@@ -7285,3 +7285,36 @@ html {
   justify-self: start !important;
   margin-top: 2px !important;
 }
+
+
+/* Dark theme: ticket quantity selector and count contrast */
+html[data-theme="dark"] .app-content .event-detail-layout:not(.payment-sheet) .detail-quantity,
+.theme-dark .app-content .event-detail-layout:not(.payment-sheet) .detail-quantity {
+  background: var(--surface-strong, var(--surface)) !important;
+  border-color: var(--line) !important;
+  color: var(--fg) !important;
+  box-shadow: var(--haddir-glass-shadow) !important;
+}
+html[data-theme="dark"] .app-content .event-detail-layout:not(.payment-sheet) .quantity-heading h3,
+.theme-dark .app-content .event-detail-layout:not(.payment-sheet) .quantity-heading h3,
+html[data-theme="dark"] .app-content .event-detail-layout:not(.payment-sheet) .quantity-control strong,
+.theme-dark .app-content .event-detail-layout:not(.payment-sheet) .quantity-control strong {
+  color: var(--fg) !important;
+}
+html[data-theme="dark"] .app-content .event-detail-layout:not(.payment-sheet) .quantity-heading span,
+.theme-dark .app-content .event-detail-layout:not(.payment-sheet) .quantity-heading span {
+  color: var(--muted) !important;
+}
+html[data-theme="dark"] .app-content .event-detail-layout:not(.payment-sheet) .quantity-control button,
+.theme-dark .app-content .event-detail-layout:not(.payment-sheet) .quantity-control button {
+  background: color-mix(in srgb, var(--green) 14%, var(--surface-strong, var(--surface))) !important;
+  border-color: color-mix(in srgb, var(--green) 35%, var(--line)) !important;
+  color: var(--green) !important;
+}
+html[data-theme="dark"] .app-content .event-detail-layout:not(.payment-sheet) .quantity-control button:disabled,
+.theme-dark .app-content .event-detail-layout:not(.payment-sheet) .quantity-control button:disabled {
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
+  color: var(--muted) !important;
+  opacity: .55 !important;
+}
