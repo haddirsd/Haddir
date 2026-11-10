@@ -6221,3 +6221,30 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
   .app-shell .home-discovery .event-list-card.ticket-style-card .event-list-info .event-list-meta p{font-size:9.5px}
   .app-shell .home-discovery .event-list-card.ticket-style-card .ticket-card-footer{padding:9px 15px 11px}
 }
+
+
+/* Final alignment fixes: perforation cut-outs belong to the horizontal tear line */
+.app-shell .home-discovery .event-list-card.ticket-style-card .event-list-thumb::after{
+  content:none!important;
+  display:none!important;
+}
+.app-shell .home-discovery .event-list-card.ticket-style-card .ticket-card-perforation{
+  position:relative;
+  isolation:isolate;
+}
+.app-shell .home-discovery .event-list-card.ticket-style-card .ticket-card-perforation::before,
+.app-shell .home-discovery .event-list-card.ticket-style-card .ticket-card-perforation::after{
+  content:"";
+  position:absolute;
+  z-index:5;
+  top:50%;
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  background:var(--bg);
+  transform:translateY(-50%);
+  pointer-events:none;
+}
+.app-shell .home-discovery .event-list-card.ticket-style-card .ticket-card-perforation::before{right:-10px}
+.app-shell .home-discovery .event-list-card.ticket-style-card .ticket-card-perforation::after{left:-10px}
+.app-shell .home-discovery .event-list-card.ticket-style-card .ticket-notch{display:none!important}
