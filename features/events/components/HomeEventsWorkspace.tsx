@@ -145,11 +145,12 @@ export function HomeEventsWorkspace({ events, loading, error, onOpenEvent, onRet
                         <span className="event-category-chip">{event.category}</span>
                         <p><CalendarDays size={13} /><span>{event.date} · {event.time}</span></p>
                         <p><MapPin size={13} /><span>{event.venue || event.place}</span></p>
-                        <strong className="event-list-price">{event.price}</strong>
                       </div>
                     </div>
-                    <div className="ticket-perforation" aria-hidden="true"><span /></div>
-                    <div className="ticket-card-footer"><span className="ticket-book-link"><Ticket size={15} /> احجز تذكرتك</span></div>
+                    <div className="ticket-card-footer">
+                      <strong className="event-list-price">{event.price}</strong>
+                      <span className="ticket-book-link"><Ticket size={15} /> احجز الآن</span>
+                    </div>
                   </article>
                 ))}
               </div> : <div className="empty-state">ما في فعاليات أخرى حالياً.</div>}
