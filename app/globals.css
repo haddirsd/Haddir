@@ -6739,3 +6739,21 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
 .app-shell .bottom-nav button:active{
   transform:none!important;
 }
+
+
+/* Reduce only the selected navigation item's expansion by 25%; keep idle buttons unchanged. */
+.app-shell .bottom-nav{
+  justify-content:space-between!important;
+}
+.app-shell .bottom-nav button.selected{
+  flex:0 0 calc(50px + (100% - 215px)*.75)!important;
+  width:calc(50px + (100% - 215px)*.75)!important;
+  max-width:calc(50px + (100% - 215px)*.75)!important;
+}
+@media(max-width:520px){
+  .app-shell .bottom-nav button.selected{
+    flex:0 0 calc(48px + (100% - 204px)*.75)!important;
+    width:calc(48px + (100% - 204px)*.75)!important;
+    max-width:calc(48px + (100% - 204px)*.75)!important;
+  }
+}
