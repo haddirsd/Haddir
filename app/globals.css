@@ -5418,15 +5418,15 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
 }
 
 
-/* Final event-info spacing: larger metadata anchored toward the bottom */
+/* Compact, balanced event details: category and metadata flow together */
 .app-shell .home-discovery .event-list-info{
   display:flex;
   flex-direction:column;
   justify-content:flex-start;
   align-items:stretch;
-  gap:6px;
+  gap:7px;
   min-width:0;
-  padding:10px 13px 8px;
+  padding:11px 12px 9px;
   direction:rtl;
   text-align:right;
 }
@@ -5437,8 +5437,7 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
   color:var(--fg);
   font-size:13px;
   font-weight:850;
-  line-height:1.45;
-  letter-spacing:0;
+  line-height:1.4;
   display:-webkit-box;
   -webkit-box-orient:vertical;
   -webkit-line-clamp:2;
@@ -5452,14 +5451,14 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
   width:max-content;
   max-width:100%;
   margin:0;
-  padding:2px 8px;
+  padding:3px 8px;
   border:1px solid color-mix(in srgb,var(--green) 18%,transparent);
   border-radius:6px;
   background:color-mix(in srgb,var(--green) 8%,var(--surface));
   color:var(--green);
-  font-size:8px;
+  font-size:8.5px;
   font-weight:750;
-  line-height:1.5;
+  line-height:1.4;
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
@@ -5471,27 +5470,27 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
   gap:7px;
   width:100%;
   min-width:0;
-  margin:auto 0 0;
+  margin:2px 0 0;
 }
 .app-shell .home-discovery .event-list-info .event-list-meta p{
   display:flex;
   flex-direction:row;
   align-items:center;
   justify-content:flex-start;
-  gap:8px;
+  gap:7px;
   width:100%;
   min-width:0;
   margin:0;
   color:var(--muted);
-  font-size:10.5px;
+  font-size:10px;
   font-weight:550;
-  line-height:1.5;
+  line-height:1.45;
 }
 .app-shell .home-discovery .event-list-info .event-list-meta p svg{
   display:block;
   flex:none;
-  width:14px;
-  height:14px;
+  width:13px;
+  height:13px;
   padding:0;
   color:#168bb5;
 }
@@ -5504,10 +5503,10 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
   white-space:nowrap;
 }
 @media(max-width:520px){
-  .app-shell .home-discovery .event-list-info{gap:5px;padding:9px 10px 8px}
+  .app-shell .home-discovery .event-list-info{gap:6px;padding:10px 10px 8px}
   .app-shell .home-discovery .event-list-info h3{font-size:12px;line-height:1.4}
   .app-shell .home-discovery .event-list-info>.event-category-chip{font-size:8px;padding:2px 7px}
-  .app-shell .home-discovery .event-list-info .event-list-meta{gap:6px;margin:auto 0 0}
-  .app-shell .home-discovery .event-list-info .event-list-meta p{font-size:10px;gap:6px;line-height:1.45}
-  .app-shell .home-discovery .event-list-info .event-list-meta p svg{width:13px;height:13px}
+  .app-shell .home-discovery .event-list-info .event-list-meta{gap:6px;margin:1px 0 0}
+  .app-shell .home-discovery .event-list-info .event-list-meta p{font-size:9.5px;gap:6px;line-height:1.4}
+  .app-shell .home-discovery .event-list-info .event-list-meta p svg{width:12px;height:12px}
 }
