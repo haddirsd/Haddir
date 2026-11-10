@@ -5029,3 +5029,128 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
   .app-shell .home-discovery .ticket-book-link{min-height:38px;padding:7px 12px;font-size:10px}
   .app-shell .home-discovery .ticket-notch{bottom:49px}
 }
+
+
+/* Compact ticket proportions: content-led height, clean independent zones */
+.app-shell .home-discovery .event-list-card.ticket-style-card{
+  display:flex;
+  flex-direction:column;
+  border-radius:22px;
+  overflow:hidden;
+}
+.app-shell .home-discovery .event-list-main{
+  min-height:0;
+  height:148px;
+  flex:0 0 148px;
+  align-items:stretch;
+}
+.app-shell .home-discovery .event-list-thumb{
+  flex:0 0 34%;
+  width:34%;
+  min-height:0;
+  height:148px;
+  border-radius:0 21px 21px 0;
+}
+.app-shell .home-discovery .event-list-thumb img{
+  border-radius:0 21px 21px 0;
+}
+.app-shell .home-discovery .event-list-thumb::after{
+  top:9px;
+  bottom:9px;
+  left:0;
+  border-left:1px dashed rgba(25,116,139,.5);
+}
+.app-shell .home-discovery .event-list-info{
+  min-height:0;
+  height:148px;
+  padding:10px 13px 9px;
+  gap:5px;
+  justify-content:flex-start;
+}
+.app-shell .home-discovery .event-list-info h3{
+  font-size:13px;
+  line-height:1.4;
+  -webkit-line-clamp:2;
+}
+.app-shell .home-discovery .event-list-info .event-category-chip{
+  align-self:flex-start;
+  margin:0;
+  padding:3px 9px;
+  font-size:9px;
+}
+.app-shell .home-discovery .event-list-info p{
+  font-size:9px;
+  line-height:1.35;
+  gap:6px;
+}
+.app-shell .home-discovery .event-list-info p svg{
+  width:12px;
+  height:12px;
+}
+.app-shell .home-discovery .event-list-info .event-list-price{
+  margin-top:auto;
+  padding-top:1px;
+  font-size:12px;
+  line-height:1.3;
+}
+.app-shell .home-discovery .ticket-perforation{
+  flex:0 0 1px;
+  height:1px;
+  margin:0 13px;
+}
+.app-shell .home-discovery .ticket-card-footer{
+  flex:0 0 49px;
+  min-height:49px;
+  height:49px;
+  padding:5px 13px;
+}
+.app-shell .home-discovery .ticket-card-footer:before{
+  top:5px;
+  bottom:5px;
+  right:34%;
+}
+.app-shell .home-discovery .ticket-book-link{
+  min-height:34px;
+  padding:6px 12px;
+  border-radius:10px;
+  font-size:10px;
+}
+.app-shell .home-discovery .ticket-notch{
+  bottom:40px;
+  width:15px;
+  height:15px;
+}
+.app-shell .home-discovery .ticket-notch-right{right:-8px}
+.app-shell .home-discovery .ticket-notch-left{left:-8px}
+@media(max-width:520px){
+  .app-shell .home-discovery .event-list{gap:11px}
+  .app-shell .home-discovery .event-list-card.ticket-style-card{border-radius:21px}
+  .app-shell .home-discovery .event-list-main{
+    height:145px;
+    flex-basis:145px;
+  }
+  .app-shell .home-discovery .event-list-thumb{
+    flex-basis:34%;
+    width:34%;
+    height:145px;
+    min-height:0;
+    border-radius:0 20px 20px 0;
+  }
+  .app-shell .home-discovery .event-list-thumb img{border-radius:0 20px 20px 0}
+  .app-shell .home-discovery .event-list-info{
+    height:145px;
+    min-height:0;
+    padding:9px 10px 8px;
+    gap:5px;
+  }
+  .app-shell .home-discovery .event-list-info h3{font-size:12px;line-height:1.4}
+  .app-shell .home-discovery .event-list-info .event-category-chip{font-size:8px;padding:3px 8px}
+  .app-shell .home-discovery .event-list-info p{font-size:8.5px;gap:5px}
+  .app-shell .home-discovery .event-list-info p svg{width:11px;height:11px}
+  .app-shell .home-discovery .event-list-info .event-list-price{font-size:11px}
+  .app-shell .home-discovery .ticket-perforation{margin-inline:11px}
+  .app-shell .home-discovery .ticket-card-footer{height:46px;min-height:46px;flex-basis:46px;padding:5px 11px}
+  .app-shell .home-discovery .ticket-card-footer:before{right:34%;top:5px;bottom:5px}
+  .app-shell .home-discovery .ticket-book-link{min-height:32px;padding:5px 10px;font-size:9px}
+  .app-shell .home-discovery .ticket-notch{bottom:38px}
+}
