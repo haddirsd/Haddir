@@ -6654,3 +6654,17 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
 @media(prefers-reduced-motion:reduce){
   .app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card{transition:none!important}
 }
+
+
+/* Match remaining-events card typography to the trending-now card scale */
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-info h3{
+  font-size:17px!important;
+  line-height:1.5!important;
+}
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-info>.event-category-chip{
+  font-size:10px!important;
+}
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-info .event-list-meta p{
+  font-size:10px!important;
+  line-height:1.5!important;
+}
