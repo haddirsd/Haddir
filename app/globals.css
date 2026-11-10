@@ -4764,15 +4764,30 @@ html[data-theme="dark"] .app-shell .bottom-nav button.selected{
 }
 .app-shell .home-discovery>.container{width:min(calc(100% - 32px),760px);margin-inline:auto}
 .app-shell .home-discovery .home-search{
-  display:flex;align-items:center;gap:11px;width:100%;min-height:50px;margin:0 0 28px;padding:0 16px;
-  border:1px solid var(--line);border-radius:15px;background:var(--surface-strong);color:var(--muted);
-  box-shadow:0 3px 12px rgba(12,45,55,.045)
+  display:flex;align-items:center;gap:12px;width:100%;min-height:54px;margin:0 0 25px;padding:0 17px;
+  border:1px solid var(--line);border-radius:17px;background:var(--surface-strong);color:var(--muted);
+  box-shadow:0 5px 18px rgba(12,45,55,.055);
+  transition:border-color .18s ease,box-shadow .18s ease,background-color .18s ease;
 }
-.app-shell .home-discovery .home-search:focus-within{border-color:color-mix(in srgb,var(--green) 55%,var(--line));box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 11%,transparent)}
-.app-shell .home-discovery .home-search>svg{flex:none;color:var(--green)}
-.app-shell .home-discovery .home-search input{width:100%;min-width:0;height:48px;padding:0;border:0;outline:0;background:transparent;color:var(--fg);font:inherit;font-size:13px}
-.app-shell .home-discovery .home-search input::placeholder{color:var(--muted)}
-.app-shell .home-discovery .home-search>button{display:grid;place-items:center;flex:none;width:29px;height:29px;border:0;border-radius:50%;background:var(--bg);color:var(--muted);font:inherit;font-size:19px}
+.app-shell .home-discovery .home-search:focus-within{
+  border-color:color-mix(in srgb,var(--green) 62%,var(--line));
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 13%,transparent),0 7px 20px rgba(12,45,55,.06);
+}
+.app-shell .home-discovery .home-search>svg{flex:none;width:19px;height:19px;color:var(--green)}
+.app-shell .home-discovery .home-search input{
+  width:100%;min-width:0;height:52px;padding:0;border:0;outline:0;background:transparent;
+  color:var(--fg);font:inherit;font-size:14px;line-height:1.5;
+  appearance:none;-webkit-appearance:none;
+}
+.app-shell .home-discovery .home-search input::placeholder{color:var(--muted);opacity:.9}
+.app-shell .home-discovery .home-search>button{
+  display:grid;place-items:center;flex:none;width:34px;height:34px;border:0;border-radius:50%;
+  background:color-mix(in srgb,var(--green) 9%,var(--surface));color:var(--muted);
+  font:inherit;font-size:20px;line-height:1;transition:background-color .18s ease,color .18s ease;
+}
+.app-shell .home-discovery .home-search>button:hover{background:color-mix(in srgb,var(--green) 16%,var(--surface));color:var(--green)}
+.app-shell .home-discovery .home-search>button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.app-shell .home-discovery .home-search,.app-shell .home-discovery .home-search>button{transition:none}}
 .app-shell .home-discovery .trending-section{margin:0 0 30px}
 .app-shell .home-discovery .redesign-section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:30px;margin:0 0 14px}
 .app-shell .home-discovery .redesign-title{display:flex;align-items:center;gap:10px}
