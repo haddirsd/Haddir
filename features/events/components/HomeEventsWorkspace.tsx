@@ -142,12 +142,10 @@ export function HomeEventsWorkspace({ events, loading, error, onOpenEvent, onRet
                       <div className="event-list-thumb">{event.coverImageUrl ? <img src={event.coverImageUrl} alt={event.title} loading="lazy" /> : <span>✦</span>}</div>
                       <div className="event-list-info">
                         <h3>{event.title}</h3>
-                        <div className="event-list-classification">
-                          <span className="event-category-chip">{event.category}</span>
-                          <strong className="event-list-price">{event.price}</strong>
-                        </div>
+                        <span className="event-category-chip">{event.category}</span>
                         <p><CalendarDays size={13} /><span>{event.date} · {event.time}</span></p>
                         <p><MapPin size={13} /><span>{event.venue || event.place}</span></p>
+                        <strong className="event-list-price">{event.price}</strong>
                       </div>
                     </div>
                     <div className="ticket-perforation" aria-hidden="true"><span /></div>
