@@ -6648,7 +6648,7 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
     font-size:2rem!important;
   }
   .app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-footer .event-list-price{
-    font-size:1.3rem!important;
+    font-size:17px!important;
   }
 }
 @media(prefers-reduced-motion:reduce){
@@ -6666,5 +6666,12 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
 }
 .app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-info .event-list-meta p{
   font-size:10px!important;
+  line-height:1.5!important;
+}
+
+
+/* Price uses the same 17px type size as the event title */
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-footer .event-list-price{
+  font-size:17px!important;
   line-height:1.5!important;
 }
