@@ -140,12 +140,18 @@ export function HomeEventsWorkspace({ events, loading, error, onOpenEvent, onRet
                     <span className="ticket-notch ticket-notch-right" aria-hidden="true" /><span className="ticket-notch ticket-notch-left" aria-hidden="true" />
                     <div className="event-list-main">
                       <div className="event-list-thumb">{event.coverImageUrl ? <img src={event.coverImageUrl} alt={event.title} loading="lazy" /> : <span>✦</span>}</div>
-                      <div className="event-list-info"><span className="event-category-chip">{event.category}</span><h3>{event.title}</h3>
-                        <p><MapPin size={13} />{event.venue || event.place}</p><p><CalendarDays size={13} />{event.date} · {event.time}</p>
+                      <div className="event-list-info">
+                        <h3>{event.title}</h3>
+                        <div className="event-list-classification">
+                          <span className="event-category-chip">{event.category}</span>
+                          <strong className="event-list-price">{event.price}</strong>
+                        </div>
+                        <p><CalendarDays size={13} /><span>{event.date} · {event.time}</span></p>
+                        <p><MapPin size={13} /><span>{event.venue || event.place}</span></p>
                       </div>
                     </div>
                     <div className="ticket-perforation" aria-hidden="true"><span /></div>
-                    <div className="ticket-card-footer"><div><small>يبدأ من</small><strong>{event.price}</strong></div><span className="ticket-book-link"><Ticket size={15} /> احجز تذكرتك</span></div>
+                    <div className="ticket-card-footer"><span className="ticket-book-link"><Ticket size={15} /> احجز تذكرتك</span></div>
                   </article>
                 ))}
               </div> : <div className="empty-state">ما في فعاليات أخرى حالياً.</div>}
