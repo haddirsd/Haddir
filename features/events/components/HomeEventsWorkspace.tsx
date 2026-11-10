@@ -137,18 +137,22 @@ export function HomeEventsWorkspace({ events, loading, error, onOpenEvent, onRet
                     role="button" tabIndex={0} aria-label={"عرض تفاصيل " + event.title}
                     onClick={() => onOpenEvent(event.id)}
                     onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpenEvent(event.id); } }}>
-                    <span className="ticket-notch ticket-notch-right" aria-hidden="true" /><span className="ticket-notch ticket-notch-left" aria-hidden="true" />
+                    <span className="ticket-notch ticket-notch-right" aria-hidden="true" />
+                    <span className="ticket-notch ticket-notch-left" aria-hidden="true" />
                     <div className="event-list-main">
-                      <div className="event-list-thumb">{event.coverImageUrl ? <img src={event.coverImageUrl} alt={event.title} loading="lazy" /> : <span>✦</span>}</div>
+                      <div className="event-list-thumb">
+                        {event.coverImageUrl ? <img src={event.coverImageUrl} alt={event.title} loading="lazy" /> : <span>✦</span>}
+                      </div>
                       <div className="event-list-info">
-                        <h3>{event.title}</h3>
                         <span className="event-category-chip">{event.category}</span>
+                        <h3>{event.title}</h3>
                         <div className="event-list-meta">
-                          <p><CalendarDays size={13} /><span>{event.date} · {event.time}</span></p>
                           <p><MapPin size={13} /><span>{event.venue || event.place}</span></p>
+                          <p><CalendarDays size={13} /><span>{event.date} · {event.time}</span></p>
                         </div>
                       </div>
                     </div>
+                    <div className="ticket-card-perforation" aria-hidden="true"><span /></div>
                     <div className="ticket-card-footer">
                       <strong className="event-list-price">{event.price}</strong>
                     </div>
