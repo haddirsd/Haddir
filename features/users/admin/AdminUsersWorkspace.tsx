@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { useAdminUsers } from "./useAdminUsers";
 import type { AdminUsersRole } from "./admin-users.types";
@@ -9,10 +10,11 @@ const fmt = (value: unknown) => value == null || value === "" ? "—" : String(v
 export default function AdminUsersWorkspace({
   role, searchTerm, onSearchTermChange,
 }: { role: AdminUsersRole; searchTerm: string; onSearchTermChange: (value: string) => void }) {
+  const [roleFilter, setRoleFilter] = useState("all");
   const {
     rows, eventOptions, userTotal, loading, error, message, updatingUserId,
     roleDrafts, setRoleDrafts, assignmentEventIds, setAssignmentEventIds, refresh, updateRole,
-  } = useAdminUsers(role, searchTerm);
+  } = useAdminUsers(role, searchTerm, roleFilter);
   const roleNames: Record<string,string> = {
     owner:"مالك المنصة", admin:"مشرف إداري", supervisor:"موظف حاضر",
     organizer:"منظم حاضر", gatekeeper:"منظم حاضر", advertiser:"مُعلن", customer:"عميل",
@@ -23,7 +25,8 @@ export default function AdminUsersWorkspace({
       <div><h3>المستخدمون والصلاحيات</h3><p>إدارة أدوار الحسابات وربط المنظم والمعلن بفعالياتهم</p></div>
       <div className="admin-panel-actions">
         <label className="admin-search-box"><span>بحث بالرقم أو البريد أو الهاتف</span><input type="search" value={searchTerm} onChange={event=>onSearchTermChange(event.target.value)} placeholder="رقم الهاتف أو البريد الإلكتروني"/></label>
-        <span className="admin-user-total">عدد المستخدمين: {userTotal.toLocaleString("ar-SD-u-nu-latn")}</span>
+        <label className="admin-search-box"><span>تصفية حسب الدور</span><select value={roleFilter} onChange={event=>setRoleFilter(event.target.value)}><option value="all">كل الأدوار</option><option value="customer">العملاء</option><option value="supervisor">موظفو حاضر</option><option value="gatekeeper">البوابون</option><option value="organizer">المنظمون</option><option value="advertiser">المعلنون</option><option value="admin">المشرفون الإداريون</option><option value="owner">مالك المنصة</option></select></label>
+        <span className="admin-user-total">عدد النتائج: {rows.length.toLocaleString("ar-SD-u-nu-latn")} من {userTotal.toLocaleString("ar-SD-u-nu-latn")}</span>
         <button className="admin-refresh" type="button" onClick={()=>void refresh()} disabled={loading}><RefreshCw size={16}/> تحديث</button>
       </div>
     </div>
