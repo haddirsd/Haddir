@@ -6741,19 +6741,20 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
 }
 
 
-/* Reduce only the selected navigation item's expansion by 25%; keep idle buttons unchanged. */
+/* Reduce the selected navigation item's extra width by exactly 25%.
+   Use additive calc() terms for broad browser support; idle buttons stay unchanged. */
 .app-shell .bottom-nav{
   justify-content:space-between!important;
 }
 .app-shell .bottom-nav button.selected{
-  flex:0 0 calc(50px + (100% - 215px)*.75)!important;
-  width:calc(50px + (100% - 215px)*.75)!important;
-  max-width:calc(50px + (100% - 215px)*.75)!important;
+  flex:0 0 calc(75% - 111.25px)!important;
+  width:calc(75% - 111.25px)!important;
+  max-width:calc(75% - 111.25px)!important;
 }
 @media(max-width:520px){
   .app-shell .bottom-nav button.selected{
-    flex:0 0 calc(48px + (100% - 204px)*.75)!important;
-    width:calc(48px + (100% - 204px)*.75)!important;
-    max-width:calc(48px + (100% - 204px)*.75)!important;
+    flex:0 0 calc(75% - 105px)!important;
+    width:calc(75% - 105px)!important;
+    max-width:calc(75% - 105px)!important;
   }
 }
