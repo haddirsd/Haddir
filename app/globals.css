@@ -6364,19 +6364,3 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
     padding:7px 11px!important;
   }
 }
-
-
-/* Increase the four event-card detail lines by 25% */
-.app-shell .home-discovery .event-list-card.ticket-style-card .event-list-info h3{
-  font-size:17.5px!important;
-}
-.app-shell .home-discovery .event-list-card.ticket-style-card .event-list-info>.event-category-chip{
-  font-size:12.5px!important;
-}
-.app-shell .home-discovery .event-list-card.ticket-style-card .event-list-info .event-list-meta p{
-  font-size:12.5px!important;
-}
-.app-shell .home-discovery .event-list-card.ticket-style-card .event-list-info .event-list-meta p svg{
-  width:16.25px!important;
-  height:16.25px!important;
-}
