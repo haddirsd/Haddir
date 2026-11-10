@@ -149,7 +149,6 @@ export function HomeEventsWorkspace({ events, loading, error, onOpenEvent, onRet
                     </div>
                     <div className="ticket-card-footer">
                       <strong className="event-list-price">{event.price}</strong>
-                      <span className="ticket-book-link"><Ticket size={15} /> احجز الآن</span>
                     </div>
                   </article>
                 ))}
