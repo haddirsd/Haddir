@@ -1,3 +1,6 @@
+drop function if exists public.admin_search_profiles(text,integer,integer);
+drop function if exists private.admin_search_profiles(text,integer,integer);
+
 create or replace function private.admin_search_profiles(
   p_query text default null,
   p_limit integer default 100,
