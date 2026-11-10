@@ -6400,3 +6400,22 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
     padding:7.5px 15px 9px!important;
   }
 }
+
+
+/* Remove the dashed overlay drawn inside the event cover image itself */
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-thumb,
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-thumb img{
+  border:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+}
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-thumb::before,
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-thumb::after,
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-thumb img::before,
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-thumb img::after{
+  content:none!important;
+  display:none!important;
+  border:0!important;
+  background:none!important;
+  box-shadow:none!important;
+}
