@@ -137,8 +137,6 @@ export function HomeEventsWorkspace({ events, loading, error, onOpenEvent, onRet
                     role="button" tabIndex={0} aria-label={"عرض تفاصيل " + event.title}
                     onClick={() => onOpenEvent(event.id)}
                     onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpenEvent(event.id); } }}>
-                    <span className="ticket-notch ticket-notch-right" aria-hidden="true" />
-                    <span className="ticket-notch ticket-notch-left" aria-hidden="true" />
                     <div className="event-list-main">
                       <div className="event-list-thumb">
                         {event.coverImageUrl ? <img src={event.coverImageUrl} alt={event.title} loading="lazy" /> : <span>✦</span>}
