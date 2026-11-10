@@ -6688,3 +6688,14 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
   height:14px!important;
   flex:none!important;
 }
+
+
+/* Reduce bottom navigation expansion on press by 25% */
+.app-shell .bottom-nav button:active{
+  transform:scale(.75)!important;
+  transition:transform .14s ease!important;
+  transform-origin:center center!important;
+}
+@media(prefers-reduced-motion:reduce){
+  .app-shell .bottom-nav button:active{transition:none!important}
+}
