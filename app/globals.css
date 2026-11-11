@@ -8511,7 +8511,7 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
   background:color-mix(in srgb,var(--primary) 9%,var(--surface))!important;
 }
 .app-shell :is(.info-strip,.checkout-total,.account-details>div,
-.guest-label,.notification-state,.notification-filters button.active){
+.guest-label,.notification-state){
   border-color:color-mix(in srgb,var(--primary) 18%,var(--line))!important;
   background:color-mix(in srgb,var(--primary) 7%,var(--surface))!important;
   color:var(--text-2)!important;
