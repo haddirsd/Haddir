@@ -10155,3 +10155,37 @@ html[data-theme="dark"] .auth-gate,
   .admin-shell .admin-panel-head{gap:10px}
   .admin-shell .admin-panel-actions{min-width:0}
 }
+
+
+/* The expanded customer ticket is a single clean white paper card in both themes. */
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket{
+  background:#FFFFFF!important;
+  background-color:#FFFFFF!important;
+  color:#1A1533!important;
+  border-color:rgba(91,46,255,.18)!important;
+}
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket > *,
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket .haddir-ticket-footer{
+  background-color:#FFFFFF!important;
+  color:#1A1533!important;
+}
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket :is(
+  .haddir-ticket-event h2,
+  .haddir-ticket-meta strong,
+  .haddir-ticket-code strong
+){color:#1A1533!important}
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket :is(
+  .haddir-ticket-event small,
+  .haddir-ticket-meta small,
+  .haddir-ticket-code small,
+  .haddir-ticket-qr small
+){color:#6B6590!important}
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket .haddir-ticket-qr,
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket .haddir-ticket-qr svg{
+  background:#FFFFFF!important;
+  background-color:#FFFFFF!important;
+  color:#1A1533!important;
+}
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket .ticket-confirmed{
+  color:#0B7F6C!important;
+}
