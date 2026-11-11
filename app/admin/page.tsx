@@ -83,8 +83,10 @@ export default function AdminPage() {
       <div className="admin-content">
         <div className="admin-welcome"><div><span className="admin-eyebrow">لوحة التحكم</span><h2>مرحباً، {name}</h2><p>{supervisor?"راجع الحجوزات وإثباتات التحويل.":"تابع أداء منصة حاضر وأدر عملياتها من مكان واحد."}</p></div><div className="admin-welcome-mark"><LayoutDashboard size={30}/></div></div>
         {error&&<div className="admin-notice" role="status">{error}</div>}
-        {section==="overview"&&<AdminOverviewWorkspace role={role} onNavigate={setSection}/>}
-        {section==="events"?<AdminEventsWorkspace role={role}/>:section==="bookings"?<AdminBookingsWorkspace/>:section==="payments"?<AdminPaymentsWorkspace/>:section==="users"?<AdminUsersWorkspace role={role} searchTerm={userSearchTerm} onSearchTermChange={setUserSearchTerm}/>:section==="activity"?<AdminActivityWorkspace/>:section==="reports"?<AdminReportsWorkspace/>:null}
+        <div key={section} className="admin-section-transition">
+          {section==="overview"&&<AdminOverviewWorkspace role={role} onNavigate={setSection}/>}
+          {section==="events"?<AdminEventsWorkspace role={role}/>:section==="bookings"?<AdminBookingsWorkspace/>:section==="payments"?<AdminPaymentsWorkspace/>:section==="users"?<AdminUsersWorkspace role={role} searchTerm={userSearchTerm} onSearchTermChange={setUserSearchTerm}/>:section==="activity"?<AdminActivityWorkspace/>:section==="reports"?<AdminReportsWorkspace/>:null}
+        </div>
         <footer className="admin-footer">حاضر · نظام إدارة الفعاليات والتذاكر <span>{roleLabel}</span></footer>
       </div>
     </section>
