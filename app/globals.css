@@ -7617,3 +7617,19 @@ html[data-theme="dark"] .admin-panel .admin-event-editor-page .admin-event-form-
 @media(max-width:480px){
   .profile-avatar-wrap{width:64px;height:64px}
 }
+
+/* Calm text interaction in customer-facing app screens */
+.app-shell,
+.app-shell .app-content,
+.app-shell .app-content * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Keep form controls and intentionally copyable account/ticket values usable */
+.app-shell .app-content :is(input, textarea, select, [contenteditable="true"], [contenteditable=""], .copy-account-button, .account-number-card strong, .haddir-ticket-code strong) {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
