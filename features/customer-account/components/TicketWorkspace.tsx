@@ -70,7 +70,7 @@ export function TicketWorkspace({
 
             {expandedTicketId === ticket.id && <div className="ticket-expanded-panel">
               <article className="haddir-ticket">
-                <div className="haddir-ticket-head"><img className="haddir-ticket-logo" src="/ticket.svg" alt="ختم حاضر" /><span className="ticket-confirmed">{ticket.status === "valid" ? "تذكرة صالحة" : ticket.status === "used" ? "تم استخدامها" : ticket.status}</span></div>
+                <div className="haddir-ticket-head"><img className="haddir-ticket-logo" src="/ticket.svg" alt="ختم حاضر" /><span className={"ticket-confirmed " + (ticket.status === "used" ? "used" : "valid")}>{ticket.status === "valid" ? "تذكرة صالحة" : ticket.status === "used" ? "تم استخدامها" : ticket.status}</span></div>
                 <div className="haddir-ticket-event"><small>تذكرة دخول</small><h2>{ticket.events?.title || "فعالية"}</h2></div>
                 <div className="haddir-ticket-meta">
                   <div><small>نوع التذكرة</small><strong>{ticket.ticket_types?.name || "تذكرة"}</strong></div>
