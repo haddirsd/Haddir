@@ -9400,3 +9400,27 @@ html[data-theme="dark"] .auth-gate,
   width:42px!important;
   height:42px!important;
 }
+
+
+/* Ensure the official day/night logo remains visible in the customer home header. */
+.app-shell>.topbar .header-inner>.brand-button{
+  display:flex!important;
+  flex:0 0 auto!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  min-width:112px!important;
+  min-height:52px!important;
+  padding:0!important;
+  overflow:visible!important;
+}
+.app-shell>.topbar .header-inner>.brand-button>.brand-logo{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  width:112px!important;
+  height:52px!important;
+  max-width:none!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  flex:none!important;
+}
