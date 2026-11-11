@@ -9459,3 +9459,251 @@ html[data-theme="dark"] .auth-gate,
   border-color:#5B2EFF!important;
   color:#FFFFFF!important;
 }
+
+
+/* Final legacy-teal cleanup: Haddir brand purple in both themes.
+   Success/availability/confirmed-ticket teal is intentionally preserved. */
+.app-shell:not(.theme-dark) .detail-screen{
+  background-color:#F6F4FF!important;
+  background-image:radial-gradient(ellipse at 50% 0,rgba(91,46,255,.075),transparent 44%)!important;
+}
+.app-shell.theme-dark .detail-screen{
+  background-color:#1D135D!important;
+  background-image:radial-gradient(ellipse at 50% 0,rgba(185,168,255,.12),transparent 46%)!important;
+}
+.app-shell:not(.theme-dark) .detail-screen .map-link{
+  color:#5B2EFF!important;
+  border-color:rgba(91,46,255,.18)!important;
+  background:linear-gradient(115deg,#EEEAFB 0%,#FFFFFF 100%)!important;
+}
+.app-shell.theme-dark .detail-screen .map-link{
+  color:#B9A8FF!important;
+  border-color:rgba(185,168,255,.24)!important;
+  background:linear-gradient(115deg,#241E43 0%,#1A1633 100%)!important;
+}
+.app-shell:not(.theme-dark) .detail-screen .map-link svg:first-child{
+  color:#5B2EFF!important;background:#E3DCFF!important;
+}
+.app-shell.theme-dark .detail-screen .map-link svg:first-child{
+  color:#B9A8FF!important;background:#30215F!important;
+}
+.app-shell:not(.theme-dark) .tier-card.tier-selected{
+  border-color:#5B2EFF!important;
+  background:#EEEAFB!important;
+  box-shadow:0 8px 24px rgba(91,46,255,.09)!important;
+}
+.app-shell:not(.theme-dark) .tier-card.tier-selected .tier-radio{
+  background:#5B2EFF!important;border-color:#5B2EFF!important;
+}
+.app-shell.theme-dark .tier-card.tier-selected{
+  border-color:#B9A8FF!important;
+  background:rgba(91,46,255,.22)!important;
+  box-shadow:0 8px 24px rgba(5,3,28,.2)!important;
+}
+.app-shell.theme-dark .tier-card.tier-selected .tier-radio{
+  background:#5B2EFF!important;border-color:#B9A8FF!important;
+}
+.app-shell .trending-card:focus-visible{outline-color:#B9A8FF!important}
+.app-shell .trending-card-media{
+  background:linear-gradient(135deg,#5B2EFF,#1D135D)!important;
+}
+.app-shell .trending-card-copy svg{color:#B9A8FF!important}
+.app-shell:not(.theme-dark) .event-list-card:hover{
+  border-color:rgba(91,46,255,.38)!important;
+}
+.app-shell.theme-dark .event-list-card:hover{
+  border-color:rgba(185,168,255,.48)!important;
+}
+.app-shell:not(.theme-dark) .event-list-top>span,
+.app-shell:not(.theme-dark) .event-list-info p svg{
+  color:#5B2EFF!important;
+}
+.app-shell.theme-dark .event-list-top>span,
+.app-shell.theme-dark .event-list-info p svg{
+  color:#B9A8FF!important;
+}
+.app-shell:not(.theme-dark) .theme-dark .category.active,
+.app-shell:not(.theme-dark) .category.active{
+  background:#5B2EFF!important;border-color:#5B2EFF!important;color:#FFFFFF!important;
+}
+.app-shell.theme-dark .category.active{
+  background:#5B2EFF!important;border-color:#5B2EFF!important;color:#FFFFFF!important;
+}
+
+/* Administration: purple replaces inherited teal accents; status colors remain semantic. */
+.admin-shell:not(.theme-dark){
+  --admin-brand:#5B2EFF;
+  --admin-brand-soft:#EEEAFB;
+  --admin-brand-border:rgba(91,46,255,.18);
+  background:#F6F4FF!important;color:#1A1533!important;
+}
+.admin-shell:not(.theme-dark) .admin-sidebar,
+.admin-shell:not(.theme-dark) .admin-topbar,
+.admin-shell:not(.theme-dark) .admin-panel,
+.admin-shell:not(.theme-dark) .admin-metric,
+.admin-shell:not(.theme-dark) .admin-shortcuts button{
+  border-color:var(--admin-brand-border)!important;
+}
+.admin-shell:not(.theme-dark) .admin-brand,
+.admin-shell:not(.theme-dark) .admin-metric>span,
+.admin-shell:not(.theme-dark) .admin-mini-profile>span,
+.admin-shell:not(.theme-dark) .admin-avatar,
+.admin-shell:not(.theme-dark) .admin-shortcuts button>span,
+.admin-shell:not(.theme-dark) .admin-empty-icon,
+.admin-shell:not(.theme-dark) .admin-activity-stats article>span,
+.admin-shell:not(.theme-dark) .admin-activity-item-rail>span,
+.admin-shell:not(.theme-dark) .admin-activity-empty>span{
+  color:#5B2EFF!important;
+}
+.admin-shell:not(.theme-dark) .admin-metric>span,
+.admin-shell:not(.theme-dark) .admin-mini-profile>span,
+.admin-shell:not(.theme-dark) .admin-avatar,
+.admin-shell:not(.theme-dark) .admin-shortcuts button>span,
+.admin-shell:not(.theme-dark) .admin-empty-icon,
+.admin-shell:not(.theme-dark) .admin-activity-stats article>span,
+.admin-shell:not(.theme-dark) .admin-activity-item-rail>span,
+.admin-shell:not(.theme-dark) .admin-activity-empty>span{
+  background:#EEEAFB!important;
+}
+.admin-shell:not(.theme-dark) .admin-sidebar nav button.active,
+.admin-shell:not(.theme-dark) .admin-create-button,
+.admin-shell:not(.theme-dark) .admin-denied button,
+.admin-shell:not(.theme-dark) .admin-activity-empty button{
+  background:#5B2EFF!important;border-color:#5B2EFF!important;color:#FFFFFF!important;
+}
+.admin-shell:not(.theme-dark) .admin-metric strong,
+.admin-shell:not(.theme-dark) .admin-footer span,
+.admin-shell:not(.theme-dark) .admin-form-message,
+.admin-shell:not(.theme-dark) .admin-activity-eyebrow,
+.admin-shell:not(.theme-dark) .admin-activity-action>b,
+.admin-shell:not(.theme-dark) .admin-activity-entity strong{
+  color:#5B2EFF!important;
+}
+.admin-shell:not(.theme-dark) .admin-event-form input:focus,
+.admin-shell:not(.theme-dark) .admin-event-form textarea:focus,
+.admin-shell:not(.theme-dark) .admin-event-form select:focus,
+.admin-shell:not(.theme-dark) .admin-search-box input:focus,
+.admin-shell:not(.theme-dark) .admin-users-table select:focus{
+  border-color:#5B2EFF!important;box-shadow:0 0 0 3px rgba(91,46,255,.1)!important;
+}
+.admin-shell:not(.theme-dark) .admin-event-form input,
+.admin-shell:not(.theme-dark) .admin-event-form textarea,
+.admin-shell:not(.theme-dark) .admin-event-form select,
+.admin-shell:not(.theme-dark) .admin-users-table select{
+  accent-color:#5B2EFF;
+}
+.admin-shell:not(.theme-dark) .admin-data-table th,
+.admin-shell:not(.theme-dark) .admin-users-table th{
+  background:#EEEAFB!important;color:#1A1533!important;border-color:rgba(91,46,255,.14)!important;
+}
+.admin-shell:not(.theme-dark) .admin-activity-heading,
+.admin-shell:not(.theme-dark) .admin-activity-stats article,
+.admin-shell:not(.theme-dark) .admin-activity-filter-panel,
+.admin-shell:not(.theme-dark) .admin-activity-item{
+  border-color:rgba(91,46,255,.14)!important;
+}
+.admin-shell:not(.theme-dark) .admin-activity-stats article,
+.admin-shell:not(.theme-dark) .admin-activity-filter-panel,
+.admin-shell:not(.theme-dark) .admin-activity-item{
+  background:#FFFFFF!important;
+}
+.admin-shell:not(.theme-dark) .admin-activity-filter-title button,
+.admin-shell:not(.theme-dark) .admin-activity-actor span,
+.admin-shell:not(.theme-dark) .admin-activity-action>span{
+  background:#EEEAFB!important;color:#6B6590!important;
+}
+.admin-shell:not(.theme-dark) .admin-activity-item-rail:after{
+  background:rgba(91,46,255,.16)!important;
+}
+.admin-shell:not(.theme-dark) .admin-activity-empty{border-color:rgba(91,46,255,.25)!important}
+
+/* Dark administration palette: lavender accents on deep-violet surfaces. */
+.admin-shell.theme-dark{
+  background:#1D135D!important;color:#F4F2FF!important;
+}
+.admin-shell.theme-dark .admin-sidebar,
+.admin-shell.theme-dark .admin-topbar,
+.admin-shell.theme-dark .admin-panel,
+.admin-shell.theme-dark .admin-metric,
+.admin-shell.theme-dark .admin-shortcuts button,
+.admin-shell.theme-dark .admin-users-table-wrap,
+.admin-shell.theme-dark .admin-activity-stats article,
+.admin-shell.theme-dark .admin-activity-filter-panel,
+.admin-shell.theme-dark .admin-activity-item{
+  background:#1A1633!important;
+  border-color:rgba(185,168,255,.2)!important;
+  color:#F4F2FF!important;
+}
+.admin-shell.theme-dark .admin-sidebar{border-left-color:rgba(185,168,255,.2)!important}
+.admin-shell.theme-dark .admin-topbar{border-bottom-color:rgba(185,168,255,.2)!important}
+.admin-shell.theme-dark .admin-sidebar nav button.active,
+.admin-shell.theme-dark .admin-activity-filter-title button,
+.admin-shell.theme-dark .admin-activity-actor span,
+.admin-shell.theme-dark .admin-activity-action>span{
+  background:rgba(91,46,255,.24)!important;color:#B9A8FF!important;
+}
+.admin-shell.theme-dark .admin-brand,
+.admin-shell.theme-dark .admin-metric strong,
+.admin-shell.theme-dark .admin-footer span,
+.admin-shell.theme-dark .admin-form-message,
+.admin-shell.theme-dark .admin-activity-eyebrow,
+.admin-shell.theme-dark .admin-activity-action>b,
+.admin-shell.theme-dark .admin-activity-entity strong,
+.admin-shell.theme-dark .admin-metric>span,
+.admin-shell.theme-dark .admin-mini-profile>span,
+.admin-shell.theme-dark .admin-avatar,
+.admin-shell.theme-dark .admin-shortcuts button>span,
+.admin-shell.theme-dark .admin-empty-icon,
+.admin-shell.theme-dark .admin-activity-stats article>span,
+.admin-shell.theme-dark .admin-activity-item-rail>span,
+.admin-shell.theme-dark .admin-activity-empty>span{
+  color:#B9A8FF!important;
+}
+.admin-shell.theme-dark .admin-metric>span,
+.admin-shell.theme-dark .admin-mini-profile>span,
+.admin-shell.theme-dark .admin-avatar,
+.admin-shell.theme-dark .admin-shortcuts button>span,
+.admin-shell.theme-dark .admin-empty-icon,
+.admin-shell.theme-dark .admin-activity-stats article>span,
+.admin-shell.theme-dark .admin-activity-item-rail>span,
+.admin-shell.theme-dark .admin-activity-empty>span{
+  background:rgba(91,46,255,.22)!important;
+}
+.admin-shell.theme-dark .admin-create-button,
+.admin-shell.theme-dark .admin-denied button,
+.admin-shell.theme-dark .admin-activity-empty button{
+  background:#5B2EFF!important;border-color:#5B2EFF!important;color:#FFFFFF!important;
+}
+.admin-shell.theme-dark .admin-data-table th,
+.admin-shell.theme-dark .admin-users-table th{
+  background:#241E43!important;color:#F4F2FF!important;border-color:rgba(185,168,255,.2)!important;
+}
+.admin-shell.theme-dark .admin-event-form input:focus,
+.admin-shell.theme-dark .admin-event-form textarea:focus,
+.admin-shell.theme-dark .admin-event-form select:focus,
+.admin-shell.theme-dark .admin-users-table select:focus,
+.admin-shell.theme-dark .admin-search-box input:focus{
+  border-color:#B9A8FF!important;box-shadow:0 0 0 3px rgba(185,168,255,.12)!important;
+}
+.admin-shell.theme-dark .admin-event-form input,
+.admin-shell.theme-dark .admin-event-form textarea,
+.admin-shell.theme-dark .admin-event-form select,
+.admin-shell.theme-dark .admin-users-table select,
+.admin-shell.theme-dark .admin-search-box input,
+.admin-shell.theme-dark .admin-activity-filters select,
+.admin-shell.theme-dark .admin-activity-search{
+  background:#12102B!important;border-color:rgba(185,168,255,.22)!important;color:#F4F2FF!important;
+}
+.admin-shell.theme-dark .admin-activity-item-rail:after{
+  background:rgba(185,168,255,.2)!important;
+}
+.admin-shell.theme-dark .admin-activity-changes{
+  background:#241E43!important;
+}
+.admin-shell.theme-dark .admin-activity-empty{border-color:rgba(185,168,255,.3)!important}
+.admin-shell.theme-dark .admin-loading,
+.admin-shell.theme-dark .admin-denied,
+.theme-dark.admin-loading,
+.theme-dark.admin-denied{
+  background:#1D135D!important;color:#F4F2FF!important;
+}
