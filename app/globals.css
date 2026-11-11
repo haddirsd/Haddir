@@ -9853,3 +9853,305 @@ html[data-theme="dark"] .auth-gate,
   box-shadow:none!important;
   filter:none!important;
 }
+
+
+/* Haddir dashboard visual audit — unified admin, supervisor, advertiser and gatekeeper surfaces. */
+.admin-shell{
+  --primary:#5B2EFF;
+  --primary-soft:rgba(91,46,255,.09);
+  --bg:#F6F4FF;
+  --surface:#FFFFFF;
+  --surface-strong:#FFFFFF;
+  --surface-soft:#F6F4FF;
+  --fg:#1A1533;
+  --muted:#6B6590;
+  --line:rgba(91,46,255,.14);
+  --green:#0B7F6C;
+  background:var(--bg)!important;
+  color:var(--fg)!important;
+}
+.admin-shell.theme-dark{
+  --bg:#1D135D;
+  --surface:#1A1633;
+  --surface-strong:#1A1633;
+  --surface-soft:#241B49;
+  --fg:#F4F2FF;
+  --muted:#A9A3C9;
+  --line:rgba(185,168,255,.20);
+  --primary:#5B2EFF;
+  --primary-soft:rgba(91,46,255,.18);
+  --green:#14D3B4;
+  background:#1D135D!important;
+  color:var(--fg)!important;
+}
+.admin-shell .admin-sidebar,
+.admin-shell .admin-topbar{
+  background:var(--surface)!important;
+  color:var(--fg)!important;
+  border-color:var(--line)!important;
+}
+.admin-shell .admin-brand,
+.admin-shell .admin-topbar h1,
+.admin-shell .admin-content,
+.admin-shell .admin-panel,
+.admin-shell .admin-metric,
+.admin-shell .admin-shortcuts button,
+.admin-shell .admin-event-card,
+.admin-shell .admin-booking-card,
+.admin-shell .admin-payment-card,
+.admin-shell .admin-users-table-wrap,
+.admin-shell .admin-users-table tr,
+.admin-shell .admin-stats-note,
+.admin-shell .admin-selected-event,
+.admin-shell .admin-event-form{
+  color:var(--fg)!important;
+}
+.admin-shell .admin-panel,
+.admin-shell .admin-metric,
+.admin-shell .admin-event-card,
+.admin-shell .admin-booking-card,
+.admin-shell .admin-payment-card,
+.admin-shell .admin-users-table-wrap,
+.admin-shell .admin-users-table tr,
+.admin-shell .admin-selected-event{
+  background:var(--surface)!important;
+  border-color:var(--line)!important;
+  box-shadow:none!important;
+}
+.admin-shell .admin-topbar,
+.admin-shell .admin-sidebar,
+.admin-shell .admin-mini-profile,
+.admin-shell .admin-event-card-actions,
+.admin-shell .admin-booking-card-head,
+.admin-shell .admin-payment-card-head,
+.admin-shell .admin-payment-actions,
+.admin-shell .admin-users-table th,
+.admin-shell .admin-users-table td{
+  border-color:var(--line)!important;
+}
+.admin-shell :is(.admin-topbar>div:first-child>span,.admin-top-user,
+.admin-shell .admin-side-caption,.admin-mini-profile small,.admin-footer,
+.admin-panel-head p,.admin-event-card-meta,.admin-booking-card-grid small,
+.admin-payment-card-grid small,.admin-form-hint,.admin-stat-hint,
+.admin-empty-panel p,.admin-empty-panel small,.admin-user-email){
+  color:var(--muted)!important;
+}
+.admin-shell .admin-welcome,
+.admin-shell.theme-dark .admin-welcome{
+  background:linear-gradient(115deg,#5B2EFF 0%,#4320C8 58%,#1D135D 100%)!important;
+  color:#FFFFFF!important;
+}
+.admin-shell .admin-welcome :is(h2,p,.admin-eyebrow),
+.admin-shell .admin-welcome .admin-welcome-mark{color:#FFFFFF!important}
+.admin-shell .admin-sidebar nav button{
+  color:var(--muted)!important;
+  background:transparent!important;
+  border:1px solid transparent!important;
+  box-shadow:none!important;
+}
+.admin-shell .admin-sidebar nav button.active,
+.admin-shell.theme-dark .admin-sidebar nav button.active{
+  color:#FFFFFF!important;
+  background:#5B2EFF!important;
+  border-color:#5B2EFF!important;
+  box-shadow:0 6px 16px rgba(91,46,255,.22)!important;
+}
+.admin-shell .admin-sidebar nav button.active svg,
+.admin-shell .admin-sidebar nav button.active span{color:#FFFFFF!important;stroke:#FFFFFF!important}
+.admin-shell :is(.admin-create-button,.admin-user-save-role,.admin-activity-empty button,.admin-denied button){
+  background:#5B2EFF!important;
+  border:1px solid #5B2EFF!important;
+  color:#FFFFFF!important;
+  box-shadow:0 6px 16px rgba(91,46,255,.18)!important;
+}
+.admin-shell :is(.admin-event-edit,.admin-payment-approve){
+  background:#E5F5F0!important;
+  border:1px solid #B8E3D5!important;
+  color:#0B6B58!important;
+}
+.admin-shell :is(.admin-event-delete,.admin-payment-reject){
+  background:#FFF0F2!important;
+  border:1px solid #FFD0D8!important;
+  color:#B4233C!important;
+}
+.admin-shell :is(.admin-event-status.status-published,.admin-user-role,.admin-users-success){
+  background:#E5F5F0!important;
+  border-color:#B8E3D5!important;
+  color:#0B6B58!important;
+}
+.admin-shell :is(.admin-event-status.status-cancelled){
+  background:#FFF0F2!important;
+  border-color:#FFD0D8!important;
+  color:#B4233C!important;
+}
+.admin-shell :is(input,textarea,select,.admin-event-stat-select select,.admin-users-table select){
+  background:var(--surface)!important;
+  color:var(--fg)!important;
+  border-color:var(--line)!important;
+  accent-color:#5B2EFF;
+}
+.admin-shell input::placeholder,
+.admin-shell textarea::placeholder{color:var(--muted)!important;opacity:.82}
+.admin-shell :is(input,textarea,select,button):focus-visible{
+  outline:2px solid #5B2EFF!important;
+  outline-offset:2px!important;
+}
+.admin-shell .admin-event-form,
+.admin-shell .admin-payment-note,
+.admin-shell .admin-booking-card-event,
+.admin-shell .admin-stats-note,
+.admin-shell .admin-selected-event,
+.admin-shell .admin-event-stat-select select{
+  background:var(--surface-soft)!important;
+  border-color:var(--line)!important;
+  color:var(--fg)!important;
+}
+.admin-shell .admin-users-table th{
+  background:var(--surface-soft)!important;
+  color:var(--muted)!important;
+}
+.admin-shell .admin-users-table td{color:var(--fg)!important}
+.admin-shell .admin-users-table tbody tr:hover{background:var(--primary-soft)!important}
+.admin-shell .admin-footer span{color:var(--muted)!important}
+.admin-shell .admin-notice{
+  background:#FFF8E8!important;
+  border-color:#F2D9A6!important;
+  color:#805B16!important;
+}
+.admin-shell.theme-dark .admin-notice{
+  background:#302448!important;
+  border-color:rgba(255,176,32,.3)!important;
+  color:#FFD98A!important;
+}
+.admin-shell .admin-spinner{
+  border-color:rgba(91,46,255,.18)!important;
+  border-top-color:#5B2EFF!important;
+}
+.admin-shell.theme-dark .admin-spinner{
+  border-color:rgba(185,168,255,.2)!important;
+  border-top-color:#B9A8FF!important;
+}
+.admin-shell .admin-mini-profile>span,
+.admin-shell .admin-metric>span,
+.admin-shell .admin-shortcuts button>span,
+.admin-shell .admin-empty-icon,
+.admin-shell .admin-avatar{
+  background:var(--primary-soft)!important;
+  color:#5B2EFF!important;
+  border-color:var(--line)!important;
+}
+.admin-shell.theme-dark :is(.admin-mini-profile>span,.admin-metric>span,
+.admin-shortcuts button>span,.admin-empty-icon,.admin-avatar){
+  background:rgba(91,46,255,.2)!important;
+  color:#B9A8FF!important;
+  border-color:var(--line)!important;
+}
+.admin-shell .admin-metric strong,
+.admin-shell .admin-stats-heading,
+.admin-shell .admin-event-card-title h4,
+.admin-shell .admin-booking-card-head h4,
+.admin-shell .admin-payment-card-head h4,
+.admin-shell .admin-event-card-meta b,
+.admin-shell .admin-booking-card-grid strong,
+.admin-shell .admin-payment-card-grid strong,
+.admin-shell .admin-selected-event h3{color:var(--fg)!important}
+.admin-shell.theme-dark .admin-event-form label,
+.admin-shell.theme-dark .admin-payment-reject-box label{color:var(--muted)!important}
+.admin-shell .admin-table-wrap{border-color:var(--line)!important;background:var(--surface)!important}
+.admin-shell .admin-table-wrap :is(th,td){border-color:var(--line)!important}
+.admin-shell .admin-table-wrap th{background:var(--surface-soft)!important;color:var(--muted)!important}
+.admin-shell .admin-table-wrap td{color:var(--fg)!important}
+.admin-shell .admin-event-card-actions small,
+.admin-shell .admin-user-saving,
+.admin-shell .admin-payment-receipt{color:#5B2EFF!important}
+.admin-shell.theme-dark .admin-event-card-actions small,
+.admin-shell.theme-dark .admin-user-saving,
+.admin-shell.theme-dark .admin-payment-receipt{color:#B9A8FF!important}
+
+/* Advertiser and gatekeeper workspaces live inside the main app shell. */
+.app-shell .advertiser-profile-stats,
+.app-shell .advertiser-statistics-panel,
+.app-shell .advertiser-event-summary,
+.app-shell .advertiser-metric-grid article,
+.app-shell .advertiser-finance-card,
+.app-shell .advertiser-ticket-table,
+.app-shell .gatekeeper-workspace,
+.app-shell .gatekeeper-task-grid article,
+.app-shell .gatekeeper-assigned-event,
+.app-shell .gatekeeper-counter-grid article{
+  border-color:var(--line)!important;
+  background:var(--surface)!important;
+  color:var(--fg)!important;
+  box-shadow:none;
+}
+.app-shell.theme-dark .advertiser-profile-stats,
+.app-shell.theme-dark .advertiser-event-summary,
+.app-shell.theme-dark .advertiser-metric-grid article,
+.app-shell.theme-dark .advertiser-finance-card,
+.app-shell.theme-dark .advertiser-ticket-table,
+.app-shell.theme-dark .gatekeeper-workspace,
+.app-shell.theme-dark .gatekeeper-task-grid article,
+.app-shell.theme-dark .gatekeeper-assigned-event,
+.app-shell.theme-dark .gatekeeper-counter-grid article{
+  background:#1A1633!important;
+  border-color:rgba(185,168,255,.2)!important;
+  color:#F4F2FF!important;
+}
+.app-shell :is(.advertiser-stats-heading,.advertiser-event-summary h3,
+.advertiser-metric-grid strong,.advertiser-finance-card strong,
+.gatekeeper-workspace-head h2,.gatekeeper-task-grid strong,
+.gatekeeper-assigned-event strong,.gatekeeper-counter-grid strong,
+.gatekeeper-result-details){color:var(--fg)!important}
+.app-shell :is(.advertiser-stats-heading small,.advertiser-event-summary p,
+.advertiser-metric-grid small,.advertiser-finance-card small,
+.advertiser-stats-note,.gatekeeper-workspace-head small,
+.gatekeeper-assigned-event small,.gatekeeper-assigned-event span,
+.gatekeeper-task-grid small){color:var(--muted)!important}
+.app-shell .advertiser-ticket-table th{
+  background:var(--surface-soft)!important;
+  color:var(--muted)!important;
+}
+.app-shell .advertiser-ticket-table :is(th,td){border-color:var(--line)!important}
+.app-shell.theme-dark .advertiser-ticket-table th{background:#241B49!important;color:#A9A3C9!important}
+.app-shell .gatekeeper-task-grid article{color:#5B2EFF!important}
+.app-shell.theme-dark .gatekeeper-task-grid article{color:#B9A8FF!important}
+.app-shell .gatekeeper-workspace-head p{color:#0B7F6C!important}
+.app-shell.theme-dark .gatekeeper-workspace-head p{color:#14D3B4!important}
+.app-shell .gatekeeper-result.valid,
+.app-shell .gatekeeper-network.online{
+  background:#E5F5F0!important;border-color:#B8E3D5!important;color:#0B6B58!important;
+}
+.app-shell.theme-dark .gatekeeper-result.valid,
+.app-shell.theme-dark .gatekeeper-network.online{
+  background:rgba(20,211,180,.12)!important;border-color:rgba(20,211,180,.28)!important;color:#14D3B4!important;
+}
+.app-shell .gatekeeper-result.invalid,
+.app-shell .gatekeeper-result.error,
+.app-shell .gatekeeper-network.offline{
+  background:#FFF0F2!important;border-color:#FFD0D8!important;color:#B4233C!important;
+}
+.app-shell.theme-dark .gatekeeper-result.invalid,
+.app-shell.theme-dark .gatekeeper-result.error,
+.app-shell.theme-dark .gatekeeper-network.offline{
+  background:rgba(255,84,112,.12)!important;border-color:rgba(255,84,112,.28)!important;color:#FF7B91!important;
+}
+.app-shell .gatekeeper-result.used{
+  background:#FFF8E8!important;border-color:#F2D9A6!important;color:#805B16!important;
+}
+.app-shell.theme-dark .gatekeeper-result.used{
+  background:rgba(255,176,32,.12)!important;border-color:rgba(255,176,32,.28)!important;color:#FFB020!important;
+}
+.app-shell .gatekeeper-manual-form input,
+.app-shell.theme-dark .gatekeeper-manual-form input{
+  background:var(--surface)!important;color:var(--fg)!important;border-color:var(--line)!important;
+}
+@media(max-width:620px){
+  .admin-shell .admin-sidebar{background:var(--surface)!important;border-top:1px solid var(--line)!important}
+  .admin-shell .admin-sidebar nav button{min-width:0}
+}
+@media(max-width:390px){
+  .admin-shell .admin-topbar{gap:8px}
+  .admin-shell .admin-content{min-width:0}
+  .admin-shell .admin-panel-head{gap:10px}
+  .admin-shell .admin-panel-actions{min-width:0}
+}
