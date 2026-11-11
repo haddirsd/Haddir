@@ -40,7 +40,7 @@ export function TicketWorkspace({
 
   return (
     <section className="screen container tickets-screen">
-      {loading ? <div className="empty-state">جاري تحميل تذاكرك...</div> : error ? <div className="empty-state" role="alert">{error}</div> : <>
+      {loading ? <div className="empty-state motion-loading" role="status"><span className="haddir-loading-indicator" aria-hidden="true"/><span>جاري تحميل تذاكرك...</span></div> : error ? <div className="empty-state" role="alert">{error}</div> : <>
         <div className="ticket-tabs" role="tablist" aria-label="حالة التذاكر">
           <button type="button" role="tab" aria-selected={filter === "new"} className={filter === "new" ? "active" : ""} onClick={() => onFilterChange("new")}>
             تذاكر جديدة <span>{tickets.filter((ticket) => ticket.status === "valid").length}</span>
