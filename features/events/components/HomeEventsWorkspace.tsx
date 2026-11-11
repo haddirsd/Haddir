@@ -55,7 +55,7 @@ export function HomeEventsWorkspace({ events, loading, error, onOpenEvent, onRet
   useEffect(() => {
     const count = trendingEvents.length;
     const carousel = trendingCarouselRef.current;
-    if (count < 2 || !carousel) return;
+    if (count < 2 || !carousel || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const centerCard = (cardIndex: number, behavior: ScrollBehavior) => {
       const card = carousel.querySelectorAll<HTMLElement>(".trending-card")[cardIndex];
       if (!card) return;
