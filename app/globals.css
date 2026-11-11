@@ -8743,3 +8743,13 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
 .app-shell .trending-section .redesign-title .trending-dot{
   order:1!important;
 }
+
+
+/* Force gold pricing on the remaining homepage event cards in dark mode,
+   whether the theme class is applied to the shell or an ancestor. */
+.app-shell.theme-dark .home-discovery .more-events .event-list-price,
+.theme-dark .app-shell .home-discovery .more-events .event-list-price,
+.theme-dark .home-discovery .more-events .event-list-price{
+  color:#FFB020!important;
+  -webkit-text-fill-color:#FFB020!important;
+}
