@@ -7749,3 +7749,214 @@ html[data-theme="dark"] .admin-panel .admin-event-editor-page .admin-event-form-
     transition: none !important;
   }
 }
+
+
+/* Haddir visual identity — 60 / 30 / 10 color system */
+:root,
+html[data-theme="light"]{
+  --primary:#5B2EFF;
+  --accent:#FFB020;
+  --success:#0B7F6C;
+  --success-bright:#14D3B4;
+  --danger:#FF5470;
+  --bg:#F6F4FF;
+  --surface:#FFFFFF;
+  --surface-soft:#EEEAFB;
+  --text:#1A1533;
+  --text-2:#6B6590;
+  --fg:var(--text);
+  --muted:var(--text-2);
+  --green:var(--primary);
+  --dark:#4320C8;
+  --line:rgba(91,46,255,.13);
+  color-scheme:light;
+}
+html[data-theme="dark"],
+.theme-dark{
+  --primary:#5B2EFF;
+  --accent:#FFB020;
+  --success:#14D3B4;
+  --success-bright:#14D3B4;
+  --danger:#FF5470;
+  --bg:#0E0B1F;
+  --surface:#1A1633;
+  --surface-soft:#241E43;
+  --text:#F4F2FF;
+  --text-2:#A9A3C9;
+  --fg:var(--text);
+  --muted:var(--text-2);
+  --green:var(--primary);
+  --dark:#B9A8FF;
+  --line:rgba(185,168,255,.17);
+  color-scheme:dark;
+}
+html,body{background:var(--bg);color:var(--text)}
+.app-shell,.admin-shell,.admin-loading,.admin-denied,
+.detail-screen,.event-detail-layout{background:var(--bg);color:var(--text)}
+.app-shell :is(.topbar,.screen-topbar,.bottom-nav,.detail-sticky-controls,.detail-topbar,.checkout-topbar),
+.admin-shell :is(.admin-sidebar,.admin-topbar){
+  background:var(--surface)!important;
+  border-color:var(--line)!important;
+}
+.app-shell :is(.event-card,.event-list-card,.ticket-preview-card,.haddir-ticket,
+.notification-item,.notifications-toolbar,.profile-card,.profile-form,.profile-account-card,
+.profile-settings-panel,.empty-panel,.settings-row,.role-workspace-button,
+.gatekeeper-workspace,.gatekeeper-assigned-event,.checkout-section,.checkout-event,
+.payment-summary,.payment-placeholder,.account-details,.account-number-card,
+.receipt-upload,.tier-card,.detail-quick-info,.detail-about,.detail-ticket-section,
+.detail-facts>div,.detail-quantity,.booking-steps),
+.admin-shell :is(.admin-panel,.admin-metric,.admin-event-card,.admin-booking-card,
+.admin-payment-card,.admin-event-form,.admin-ticket-editor,.admin-ticket-row,
+.admin-selected-event,.admin-users-table-wrap,.admin-table-wrap,.admin-data-table,
+.admin-users-table,.admin-stat-card,.admin-shortcuts button,.admin-activity-stats article,
+.admin-activity-filter-panel,.admin-activity-item){
+  background:var(--surface)!important;
+  border-color:var(--line)!important;
+  color:var(--text);
+}
+.app-shell :is(.event-title,.detail-title-row h1,.detail-section h2,.screen-heading h1,
+.profile-card strong,.notification-item strong,.tier-name,.haddir-ticket-event h2),
+.admin-shell :is(.admin-panel-head h3,.admin-metric strong,.admin-event-card-title h4,
+.admin-booking-card-head h4,.admin-payment-card-head h4,.admin-stats-heading,
+.admin-selected-event h3,.admin-activity-results-head h4){
+  color:var(--text);
+}
+.app-shell :is(.event-meta,.detail-section>p,.detail-facts small,.screen-heading p,
+.profile-card p,.notification-item p,.notification-item small,.tier-note),
+.admin-shell :is(.admin-panel-head p,.admin-footer,.admin-event-card-meta,
+.admin-booking-card-grid small,.admin-booking-card-head small,
+.admin-payment-card-grid small,.admin-payment-card-head small,.admin-form-hint,
+.admin-stat-hint,.admin-user-email){
+  color:var(--text-2);
+}
+.brand,.brand-button,.admin-brand{color:var(--primary)!important}
+.brand-mark,.admin-brand>span,.admin-avatar{
+  background:var(--primary)!important;
+  color:#fff!important;
+}
+.theme-dark :is(.brand,.brand-button,.admin-brand,.app-shell h1,.app-shell h2,
+.admin-shell h1,.admin-shell h2){
+  color:#B9A8FF!important;
+}
+.app-shell :is(.text-link,.map-link,.detail-back,.detail-share,.bottom-nav button.selected,
+.tickets-screen .ticket-tabs button.active,.notification-filters button.active){
+  color:var(--primary)!important;
+}
+.theme-dark .app-shell :is(.text-link,.map-link,.detail-back,.detail-share,
+.bottom-nav button.selected,.tickets-screen .ticket-tabs button.active,
+.notification-filters button.active){
+  color:#B9A8FF!important;
+}
+.app-shell :is(.category.active,.tier-card.tier-selected),
+.admin-shell .admin-sidebar nav button.active,
+.admin-shell .admin-stat-tabs button.active{
+  background:var(--primary)!important;
+  border-color:var(--primary)!important;
+  color:#fff!important;
+}
+.theme-dark .app-shell :is(.category.active,.tier-card.tier-selected),
+.theme-dark.admin-shell .admin-sidebar nav button.active,
+.theme-dark.admin-shell .admin-stat-tabs button.active{
+  background:var(--primary)!important;
+  border-color:#8B70FF!important;
+  color:#fff!important;
+}
+.app-shell :is(.category,.ticket-tabs,.notification-filters button),
+.admin-shell :is(.admin-stat-tabs button,.admin-search-box input,.admin-event-stat-select select){
+  border-color:var(--line);
+}
+.app-shell :is(.search-box,.home-search,.profile-form input,.profile-form textarea,
+.profile-form select,.checkout-label input,.checkout-label select),
+.admin-shell :is(.admin-event-form input,.admin-event-form textarea,
+.admin-event-form select,.admin-users-table select,.admin-search-box input,
+.admin-event-stat-select select,.admin-payment-reject-box textarea){
+  background:var(--surface)!important;
+  color:var(--text)!important;
+  border-color:var(--line)!important;
+}
+.app-shell :is(input,textarea,select)::placeholder,
+.admin-shell :is(input,textarea,select)::placeholder{color:var(--text-2)!important}
+.app-shell .detail-booking-dock,
+.app-shell .checkout-submit-dock{
+  background:var(--surface)!important;
+  border-color:var(--line)!important;
+}
+.app-shell .event-detail-layout:not(.payment-sheet) .detail-booking-dock .pay-button,
+.app-shell .event-detail-layout.payment-sheet .checkout-submit-dock .pay-button{
+  background:var(--accent)!important;
+  border-color:var(--accent)!important;
+  color:#1A1533!important;
+  box-shadow:0 7px 20px rgba(255,176,32,.22)!important;
+}
+.app-shell .event-detail-layout:not(.payment-sheet) .detail-booking-dock .pay-button:disabled,
+.app-shell .event-detail-layout.payment-sheet .checkout-submit-dock .pay-button:disabled{
+  opacity:.48!important;
+  box-shadow:none!important;
+}
+.app-shell :is(.event-status,.admin-event-status.status-published,
+.gatekeeper-result.valid,.gatekeeper-network.online,.save-confirm){
+  background:rgba(20,211,180,.13)!important;
+  border-color:rgba(20,211,180,.32)!important;
+  color:var(--success)!important;
+}
+.theme-dark .app-shell :is(.event-status,.admin-event-status.status-published,
+.gatekeeper-result.valid,.gatekeeper-network.online,.save-confirm){
+  color:#14D3B4!important;
+}
+.app-shell :is(.event-status.status-low,.admin-event-status.status-cancelled,
+.gatekeeper-result.invalid,.gatekeeper-result.error,.gatekeeper-network.offline){
+  background:rgba(255,84,112,.12)!important;
+  border-color:rgba(255,84,112,.3)!important;
+  color:var(--danger)!important;
+}
+.app-shell .haddir-ticket-qr{
+  background:#fff!important;
+  color:#1A1533!important;
+  border-color:#fff!important;
+}
+.app-shell .haddir-ticket-qr svg{background:#fff!important}
+.app-shell :is(.account-number-card,.account-details,.payment-method-card,
+.bank-account-card,.checkout-bank-card){
+  background:#fff;
+}
+.theme-dark .app-shell :is(.account-number-card,.account-details,.payment-method-card,
+.bank-account-card,.checkout-bank-card){
+  background:#fff!important;
+  color:#1A1533!important;
+}
+.theme-dark .app-shell :is(.account-number-card,.account-details,.payment-method-card,
+.bank-account-card,.checkout-bank-card) :is(p,small,strong,span){
+  color:inherit;
+}
+.admin-shell .admin-create-button,
+.admin-shell .admin-user-save-role{
+  background:var(--primary)!important;
+  border-color:var(--primary)!important;
+  color:#fff!important;
+}
+.admin-shell .admin-payment-approve{
+  background:rgba(20,211,180,.15)!important;
+  color:var(--success)!important;
+}
+.admin-shell .admin-payment-reject,
+.admin-shell .admin-event-delete{
+  background:rgba(255,84,112,.12)!important;
+  color:var(--danger)!important;
+}
+.theme-dark .admin-shell :is(.admin-event-form label,.admin-payment-reject-box label,
+.admin-event-stat-select label){color:var(--text-2)!important}
+.theme-dark .admin-shell :is(.admin-data-table th,.admin-users-table th){
+  background:var(--surface-soft)!important;
+  color:var(--text-2)!important;
+}
+.theme-dark .admin-shell :is(.admin-data-table td,.admin-users-table td,
+.admin-event-card-meta b,.admin-booking-card-grid strong,.admin-payment-card-grid strong){
+  color:var(--text)!important;
+}
+.theme-dark .admin-shell :is(.admin-event-form input,.admin-event-form textarea,
+.admin-event-form select,.admin-users-table select,.admin-search-box input,
+.admin-event-stat-select select,.admin-payment-reject-box textarea){
+  background:var(--bg)!important;
+  color:var(--text)!important;
+  border-color:var(--line)!important;
+}
