@@ -8787,3 +8787,29 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
     backdrop-filter:blur(10px) saturate(135%)!important;
   }
 }
+
+
+/* Unified dark-mode canvas color across customer, staff, admin and authentication screens. */
+html[data-theme="dark"],
+html[data-theme="dark"] body,
+.theme-dark,
+.app-shell.theme-dark,
+.admin-shell.theme-dark,
+.theme-dark.admin-denied{
+  --bg:#1D135D!important;
+}
+html[data-theme="dark"] body,
+html[data-theme="dark"] .app-shell,
+html[data-theme="dark"] .admin-shell,
+html[data-theme="dark"] .admin-loading,
+html[data-theme="dark"] .admin-denied,
+html[data-theme="dark"] .detail-screen,
+html[data-theme="dark"] .event-detail-layout,
+html[data-theme="dark"] .auth-gate,
+.theme-dark.app-shell,
+.theme-dark.admin-shell,
+.theme-dark.admin-loading,
+.theme-dark.admin-denied,
+.theme-dark .auth-gate{
+  background-color:#1D135D!important;
+}
