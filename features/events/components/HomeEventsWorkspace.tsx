@@ -115,7 +115,7 @@ export function HomeEventsWorkspace({ events, loading, error, onOpenEvent, onRet
                       aria-label={"عرض تفاصيل " + event.title} onClick={() => onOpenEvent(event.id)}
                       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpenEvent(event.id); } }}>
                       <div className={"trending-card-media " + event.cover}>
-                        {event.coverImageUrl ? <img src={event.coverImageUrl} alt={isClone ? "" : event.title} loading="lazy" /> : <span className="trending-placeholder">✦</span>}
+                        {event.coverImageUrl ? <img src={event.coverImageUrl} alt={isClone ? "" : event.title} loading="lazy" decoding="async" /> : <span className="trending-placeholder">✦</span>}
                         <div className="trending-overlay" />
                         <span className="trending-category">{event.category}</span><span className="trending-price">{event.price}</span>
                         <div className="trending-card-copy"><h3>{event.title}</h3>
@@ -139,7 +139,7 @@ export function HomeEventsWorkspace({ events, loading, error, onOpenEvent, onRet
                     onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpenEvent(event.id); } }}>
                     <div className="event-list-main">
                       <div className="event-list-thumb">
-                        {event.coverImageUrl ? <img src={event.coverImageUrl} alt={event.title} loading="lazy" /> : <span>✦</span>}
+                        {event.coverImageUrl ? <img src={event.coverImageUrl} alt={event.title} loading="lazy" decoding="async" /> : <span>✦</span>}
                       </div>
                       <div className="event-list-info">
                         <h3>{event.title}</h3>
