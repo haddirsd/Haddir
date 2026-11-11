@@ -10202,3 +10202,61 @@ html[data-theme="dark"] .auth-gate,
   border:1px solid rgba(91,46,255,.18)!important;
   color:#6B6590!important;
 }
+
+
+/* Mobile/PWA finishing pass for the four customer tabs. */
+@media (max-width: 700px) {
+  .app-shell > .topbar,
+  .app-shell > .screen-topbar {
+    height: auto !important;
+    min-height: calc(64px + env(safe-area-inset-top)) !important;
+    padding-top: calc(8px + env(safe-area-inset-top)) !important;
+  }
+  .app-shell > .screen-topbar:not(.gatekeeper-page-topbar) {
+    padding-bottom: 8px !important;
+  }
+  .app-shell .bottom-nav {
+    bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+  }
+  .app-shell {
+    padding-bottom: calc(104px + env(safe-area-inset-bottom)) !important;
+  }
+  .app-shell .home-discovery {
+    padding-bottom: calc(112px + env(safe-area-inset-bottom)) !important;
+  }
+}
+.app-shell .notifications-screen :is(.notification-mark-all,.notification-toggle-read) {
+  min-height: 44px !important;
+  padding: 9px 12px !important;
+  border-radius: 11px !important;
+  touch-action: manipulation;
+}
+.app-shell :is(.bottom-nav button,.ticket-preview-card,.notification-open,.notification-toggle-read,
+  .notification-mark-all,.profile-settings-panel button,.profile-edit-actions button,
+  .role-workspace-button,.profile-logout-button,.home-search button) {
+  touch-action: manipulation;
+}
+.app-shell :is(button,a,[role="button"],input,select,textarea):focus-visible {
+  outline: 3px solid rgba(91,46,255,.58) !important;
+  outline-offset: 3px !important;
+}
+.app-shell.theme-dark :is(button,a,[role="button"],input,select,textarea):focus-visible {
+  outline-color: rgba(185,168,255,.82) !important;
+}
+@media (max-width: 360px) {
+  .app-shell .screen-topbar { padding-inline: 12px !important; }
+  .app-shell .notifications-toolbar { align-items: flex-start !important; }
+  .app-shell .notification-mark-all { max-width: 132px; white-space: normal; line-height: 1.45; }
+  .app-shell .profile-account-head { gap: 11px !important; }
+  .app-shell .profile-avatar-wrap,
+  .app-shell .profile-account-head .profile-avatar-large { width: 62px !important; height: 62px !important; flex-basis: 62px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  .app-shell *, .app-shell *::before, .app-shell *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
