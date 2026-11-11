@@ -90,7 +90,7 @@
 .ticket-card-wrap{display:flex;justify-content:center;margin:10px 0 22px}
 .haddir-ticket{width:min(100%,430px);overflow:hidden;padding:22px;border:1px solid #d9edf1;border-radius:23px;background:#fff;box-shadow:0 18px 45px #14434c12}
 .haddir-ticket-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:17px;border-bottom:1px dashed #d1e5e9}
-.haddir-ticket-logo{display:block;width:76px;height:76px;object-fit:contain;flex:none}
+.haddir-ticket-logo{display:block;width:112px;height:56px;object-fit:contain;flex:none}
 .ticket-confirmed{padding:6px 9px;border-radius:99px;background:#fff4df;color:#94651d;font-size:9px;font-weight:800}
 .haddir-ticket-event{padding:20px 0 13px}
 .haddir-ticket-event small,.haddir-ticket-meta small,.haddir-ticket-code small{display:block;margin-bottom:6px;color:#92869c;font-size:10px}
@@ -1398,7 +1398,7 @@ body{font-size:16px}
 .admin-event-report{display:grid;gap:22px;margin-top:22px;color:#17343a}
 .admin-report-page{position:relative;display:flex;flex-direction:column;gap:20px;max-width:980px;min-height:690px;margin:0 auto;padding:42px 46px 58px;background:#fff;border:1px solid #e3ecee;border-radius:18px;box-shadow:0 12px 36px rgba(12,45,52,.08);overflow:hidden}
 .admin-report-topline{display:flex;align-items:center;gap:12px;padding-bottom:15px;border-bottom:1px solid #dce8ea;color:#287e8c;font-weight:900}
-.admin-report-topline img{width:48px;height:48px;object-fit:contain}
+.admin-report-topline img{width:92px;height:46px;object-fit:contain}
 .admin-report-topline small{margin-inline-start:auto;color:#71868a;font-size:11px}
 .admin-report-cover{justify-content:space-between;background:linear-gradient(145deg,#f6fbfc 0%,#fff 65%);border-top:8px solid #318a99}
 .admin-report-cover-image{width:100%;max-height:250px;object-fit:cover;border-radius:14px}
