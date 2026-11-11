@@ -8813,3 +8813,22 @@ html[data-theme="dark"] .auth-gate,
 .theme-dark .auth-gate{
   background-color:#1D135D!important;
 }
+
+
+/* Dark-mode contrast fixes for homepage event categories and metadata icons. */
+.app-shell.theme-dark .home-discovery .trending-category{
+  color:#B9A8FF!important;
+  -webkit-text-fill-color:#B9A8FF!important;
+  background:rgba(29,19,93,.78)!important;
+  border:1px solid rgba(185,168,255,.38)!important;
+}
+.app-shell.theme-dark .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-info>.event-category-chip{
+  color:#B9A8FF!important;
+  -webkit-text-fill-color:#B9A8FF!important;
+  background:rgba(91,46,255,.16)!important;
+  border-color:rgba(185,168,255,.3)!important;
+}
+.app-shell.theme-dark .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-info .event-list-meta p svg{
+  color:#B9A8FF!important;
+  stroke:#B9A8FF!important;
+}
