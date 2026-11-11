@@ -8500,3 +8500,134 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
   border-color:rgba(185,168,255,.2)!important;
   color:#F4F2FF!important;
 }
+
+
+/* Haddir identity completion: replace remaining legacy teal/blue accents. */
+.app-shell :is(.header-icon:not(.theme-toggle),.screen-icon,.empty-illustration,
+.notification-icon.system,.profile-avatar,.payment-icon,.upload-symbol,.upload-action,
+.detail-share,.share-round,.quantity-control button){
+  color:var(--dark)!important;
+  border-color:color-mix(in srgb,var(--primary) 22%,var(--line))!important;
+  background:color-mix(in srgb,var(--primary) 9%,var(--surface))!important;
+}
+.app-shell :is(.info-strip,.checkout-total,.account-details>div,
+.guest-label,.notification-state,.notification-filters button.active){
+  border-color:color-mix(in srgb,var(--primary) 18%,var(--line))!important;
+  background:color-mix(in srgb,var(--primary) 7%,var(--surface))!important;
+  color:var(--text-2)!important;
+}
+.app-shell .checkout-total strong,
+.app-shell .payment-summary strong,
+.app-shell .payment-placeholder{
+  color:var(--dark)!important;
+}
+.app-shell .receipt-upload{
+  border-color:color-mix(in srgb,var(--primary) 34%,var(--line))!important;
+  background:color-mix(in srgb,var(--primary) 4%,var(--surface))!important;
+}
+.app-shell .map-link{
+  border-color:color-mix(in srgb,var(--primary) 22%,var(--line))!important;
+  background:linear-gradient(115deg,
+    color-mix(in srgb,var(--primary) 9%,var(--surface)) 0%,
+    var(--surface) 100%)!important;
+  color:var(--dark)!important;
+}
+.app-shell .map-link svg:first-child{
+  background:color-mix(in srgb,var(--primary) 13%,var(--surface))!important;
+}
+.app-shell .event-card-clickable:hover,
+.app-shell .event-card-clickable:focus-visible{
+  border-color:color-mix(in srgb,var(--primary) 42%,var(--line))!important;
+  box-shadow:0 18px 38px color-mix(in srgb,var(--primary) 12%,transparent)!important;
+}
+.app-shell .header-icon.theme-toggle{
+  border-color:color-mix(in srgb,var(--primary) 24%,var(--line))!important;
+  background:color-mix(in srgb,var(--primary) 8%,var(--surface))!important;
+  color:var(--dark)!important;
+}
+.app-shell .theme-toggle-knob{
+  background:linear-gradient(145deg,#FFFFFF,#EEEAFB)!important;
+  color:#5B2EFF!important;
+}
+.app-shell .trending-card-media{
+  background:linear-gradient(145deg,#4320C8 0%,#1A1633 72%,#0E0B1F 100%)!important;
+}
+.app-shell .trending-category{
+  border-color:rgba(185,168,255,.34)!important;
+  background:rgba(26,22,51,.78)!important;
+  color:#B9A8FF!important;
+}
+.app-shell .trending-price{
+  border-color:#5B2EFF!important;
+  background:#5B2EFF!important;
+  color:#FFFFFF!important;
+  box-shadow:0 6px 16px rgba(91,46,255,.28)!important;
+}
+.app-shell .trending-card-copy svg{color:#B9A8FF!important}
+
+/* Admin workspace accents use the same purple identity, not the retired teal. */
+.admin-shell .admin-welcome{
+  background:linear-gradient(115deg,#5B2EFF 0%,#4320C8 58%,#281568 100%)!important;
+}
+.admin-shell :is(.admin-metric>span,.admin-shortcuts button>span,
+.admin-empty-icon,.admin-mini-profile>span,.admin-mini-avatar,
+.admin-activity-stats article>span,.admin-activity-item-rail>span,
+.admin-activity-empty>span,.admin-avatar){
+  border-color:color-mix(in srgb,var(--primary) 20%,var(--line))!important;
+  background:color-mix(in srgb,var(--primary) 9%,var(--surface))!important;
+  color:var(--dark)!important;
+}
+.admin-shell :is(.admin-activity-eyebrow,.admin-activity-action>b,
+.admin-event-editor-eyebrow,.admin-event-section-title>span){
+  color:var(--dark)!important;
+}
+.admin-shell :is(.admin-user-role,.admin-activity-actor span,
+.admin-activity-action>span,.admin-activity-filter-title button){
+  border-color:color-mix(in srgb,var(--primary) 16%,var(--line))!important;
+  background:color-mix(in srgb,var(--primary) 8%,var(--surface))!important;
+  color:var(--dark)!important;
+}
+.admin-shell :is(.admin-create-button,.admin-user-save-role,.admin-activity-empty button,
+.admin-denied button){
+  background:var(--primary)!important;
+  border-color:var(--primary)!important;
+  color:#FFFFFF!important;
+  box-shadow:0 7px 18px color-mix(in srgb,var(--primary) 18%,transparent)!important;
+}
+.admin-shell .admin-spinner{
+  border-color:color-mix(in srgb,var(--primary) 16%,var(--surface))!important;
+  border-top-color:var(--primary)!important;
+}
+.admin-shell :is(.admin-event-form input:focus,.admin-event-form textarea:focus,
+.admin-activity-filters select:focus,.admin-activity-search:focus-within){
+  border-color:var(--primary)!important;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 12%,transparent)!important;
+}
+
+/* Night mode keeps the same identity while retaining turquoise only for success states. */
+.app-shell.theme-dark :is(.info-strip,.checkout-total,.account-details>div,
+.guest-label,.notification-state,.receipt-upload){
+  background:color-mix(in srgb,#5B2EFF 13%,#1A1633)!important;
+  border-color:rgba(185,168,255,.2)!important;
+  color:#A9A3C9!important;
+}
+.app-shell.theme-dark :is(.header-icon:not(.theme-toggle),.screen-icon,
+.empty-illustration,.notification-icon.system,.profile-avatar,.payment-icon,
+.upload-symbol,.upload-action,.detail-share,.share-round,.quantity-control button){
+  background:color-mix(in srgb,#5B2EFF 16%,#1A1633)!important;
+  border-color:rgba(185,168,255,.22)!important;
+  color:#B9A8FF!important;
+}
+.admin-shell.theme-dark :is(.admin-metric>span,.admin-shortcuts button>span,
+.admin-empty-icon,.admin-mini-profile>span,.admin-mini-avatar,
+.admin-activity-stats article>span,.admin-activity-item-rail>span,
+.admin-activity-empty>span,.admin-avatar,.admin-user-role,
+.admin-activity-actor span,.admin-activity-action>span,
+.admin-activity-filter-title button){
+  background:color-mix(in srgb,#5B2EFF 16%,#1A1633)!important;
+  border-color:rgba(185,168,255,.22)!important;
+  color:#B9A8FF!important;
+}
+.admin-shell.theme-dark .admin-welcome{
+  background:linear-gradient(115deg,#5B2EFF 0%,#281568 58%,#0E0B1F 100%)!important;
+}
