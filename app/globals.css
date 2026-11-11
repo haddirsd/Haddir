@@ -8737,3 +8737,9 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
   color:#FFB020!important;
   box-shadow:0 6px 16px rgba(255,176,32,.2)!important;
 }
+
+
+/* Keep the trending indicator to the left of the RTL heading. */
+.app-shell .trending-section .redesign-title .trending-dot{
+  order:1!important;
+}
