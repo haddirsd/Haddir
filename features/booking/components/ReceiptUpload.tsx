@@ -26,8 +26,8 @@ export function ReceiptUpload({ receipt, onReceiptChange }: ReceiptUploadProps) 
         />
         <span className="upload-symbol"><CreditCard size={20} /></span>
         <strong>{receipt ? receipt.name : "ارفع صورة إيصال التحويل"}</strong>
-        <small>JPG أو PNG أو WebP · بحد أقصى 5 ميجابايت</small>
-        <span className="upload-action">{receipt ? "تغيير الصورة" : "اختيار صورة"}</span>
+        <small>ارفع صورة إيصال التحويل الفعلية فقط (JPG أو PNG أو WebP) · بحد أقصى 5 ميجابايت</small>
+        <span className="upload-action">{receipt ? "تغيير صورة الإيصال" : "اضغط هنا لاختيار صورة الإيصال"}</span>
       </label>
     </section>
   );
