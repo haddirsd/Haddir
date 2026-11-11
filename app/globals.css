@@ -9290,3 +9290,27 @@ html[data-theme="dark"] .auth-gate,
   color:#FFFFFF!important;
   -webkit-text-fill-color:#FFFFFF!important;
 }
+
+
+/* Align customer section titles to the right in tickets, notifications and profile. */
+.app-shell>.screen-topbar:not(.gatekeeper-page-topbar){
+  display:flex!important;
+  flex-direction:row!important;
+  direction:rtl!important;
+  justify-content:flex-start!important;
+  align-items:center!important;
+  gap:12px!important;
+}
+.app-shell>.screen-topbar:not(.gatekeeper-page-topbar) .screen-topbar-spacer{
+  display:none!important;
+}
+.app-shell>.screen-topbar:not(.gatekeeper-page-topbar)>strong{
+  flex:0 1 auto!important;
+  margin:0!important;
+  text-align:right!important;
+  justify-self:auto!important;
+}
+.app-shell>.screen-topbar:not(.gatekeeper-page-topbar)>.screen-icon{
+  flex:0 0 42px!important;
+  justify-self:auto!important;
+}
