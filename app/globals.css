@@ -8424,3 +8424,23 @@ html[data-theme="dark"]{
   --bg:#5D2FFF;
   background:linear-gradient(155deg,#5D2FFF 0%,#281568 48%,#000000 100%)!important;
 }
+
+
+/* Dark theme canvas must cover the document, not only the app root. */
+html[data-theme="dark"],
+html[data-theme="dark"] body {
+  background:linear-gradient(155deg,#5D2FFF 0%,#281568 48%,#000000 100%)!important;
+  background-attachment:fixed!important;
+}
+html[data-theme="dark"] .app-shell,
+html[data-theme="dark"] .admin-shell {
+  background:transparent!important;
+}
+html[data-theme="dark"] .app-shell .app-content,
+html[data-theme="dark"] .app-shell .home-discovery,
+html[data-theme="dark"] .app-shell .home-events,
+html[data-theme="dark"] .app-shell .screen,
+html[data-theme="dark"] .admin-shell .admin-main,
+html[data-theme="dark"] .admin-shell .admin-content {
+  background:transparent!important;
+}
