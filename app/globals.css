@@ -9424,3 +9424,38 @@ html[data-theme="dark"] .auth-gate,
   object-position:center!important;
   flex:none!important;
 }
+
+
+/* Day mode: selected ticket tier uses a soft violet surface with readable brand-contrast text. */
+.app-shell:not(.theme-dark) .event-detail-layout .tier-card.tier-selected,
+.app-shell:not(.theme-dark) .detail-sheet .tier-card.tier-selected{
+  background:#EEEAFB!important;
+  border:1.5px solid #5B2EFF!important;
+  color:#1A1533!important;
+  box-shadow:0 6px 18px rgba(91,46,255,.10)!important;
+}
+.app-shell:not(.theme-dark) .event-detail-layout .tier-card.tier-selected .tier-name,
+.app-shell:not(.theme-dark) .detail-sheet .tier-card.tier-selected .tier-name,
+.app-shell:not(.theme-dark) .detail-sheet .tier-card.tier-selected .tier-copy small{
+  color:#1A1533!important;
+  -webkit-text-fill-color:#1A1533!important;
+}
+.app-shell:not(.theme-dark) .event-detail-layout .tier-card.tier-selected .tier-availability,
+.app-shell:not(.theme-dark) .detail-sheet .tier-card.tier-selected .tier-availability,
+.app-shell:not(.theme-dark) .detail-sheet .tier-card.tier-selected .tier-copy small{
+  color:#6B6590!important;
+  -webkit-text-fill-color:#6B6590!important;
+}
+.app-shell:not(.theme-dark) .event-detail-layout .tier-card.tier-selected .tier-price,
+.app-shell:not(.theme-dark) .event-detail-layout .tier-card.tier-selected>strong,
+.app-shell:not(.theme-dark) .detail-sheet .tier-card.tier-selected .tier-price,
+.app-shell:not(.theme-dark) .detail-sheet .tier-card.tier-selected>strong{
+  color:#5B2EFF!important;
+  -webkit-text-fill-color:#5B2EFF!important;
+}
+.app-shell:not(.theme-dark) .event-detail-layout .tier-card.tier-selected .tier-radio,
+.app-shell:not(.theme-dark) .detail-sheet .tier-card.tier-selected .tier-radio{
+  background:#5B2EFF!important;
+  border-color:#5B2EFF!important;
+  color:#FFFFFF!important;
+}
