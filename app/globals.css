@@ -9838,3 +9838,18 @@ html[data-theme="dark"] .auth-gate,
     backdrop-filter:blur(20px) saturate(175%) contrast(106%)!important;
   }
 }
+
+
+/* Remove only the broad container shadow beneath the trending section; preserve each trending card's own shadow. */
+.app-shell .home-discovery .trending-section,
+.app-shell .home-discovery .trending-section > .trending-carousel{
+  box-shadow:none!important;
+  filter:none!important;
+}
+.app-shell .home-discovery .trending-section::before,
+.app-shell .home-discovery .trending-section::after,
+.app-shell .home-discovery .trending-carousel::before,
+.app-shell .home-discovery .trending-carousel::after{
+  box-shadow:none!important;
+  filter:none!important;
+}
