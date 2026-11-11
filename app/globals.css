@@ -8156,3 +8156,20 @@ html[data-theme="dark"]{
   border-color:#FFB020!important;
   color:#1A1533!important;
 }
+
+
+/* Win against the legacy html[data-theme] navigation override. */
+html[data-theme="dark"] .app-shell.theme-dark .bottom-nav{
+  background:#1A1633!important;
+  border-color:rgba(185,168,255,.2)!important;
+  box-shadow:0 14px 36px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+html[data-theme="dark"] .app-shell.theme-dark .bottom-nav button{
+  color:#A9A3C9!important;
+  background:transparent!important;
+}
+html[data-theme="dark"] .app-shell.theme-dark .bottom-nav button.selected{
+  color:#FFFFFF!important;
+  background:#5B2EFF!important;
+  border-color:#8B70FF!important;
+}
