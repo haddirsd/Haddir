@@ -8702,3 +8702,23 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
 .admin-shell:not(.theme-dark) .admin-sidebar nav button.active svg{
   stroke:#FFFFFF!important;
 }
+
+
+/* Trending heading: title on the right, live dot immediately to its left. */
+.app-shell .trending-section .redesign-section-head{
+  justify-content:flex-start!important;
+}
+.app-shell .trending-section .redesign-title{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:10px!important;
+  direction:rtl!important;
+}
+.app-shell .trending-section .redesign-title h2{
+  color:#000000!important;
+}
+.app-shell.theme-dark .trending-section .redesign-title h2{
+  color:#FFFFFF!important;
+}
