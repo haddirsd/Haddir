@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1D135D">
+  <title>حاضر | بدون اتصال</title>
+  <style>
+    *{box-sizing:border-box}
+    html,body{min-height:100%;margin:0}
+    body{display:grid;place-items:center;padding:24px max(20px,env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));background:#1D135D;color:#F4F2FF;font-family:Arial,sans-serif;text-align:center}
+    main{width:min(100%,420px);padding:30px 22px;border:1px solid rgba(185,168,255,.24);border-radius:26px;background:#1A1633;box-shadow:0 20px 60px rgba(0,0,0,.24)}
+    img{width:110px;height:70px;object-fit:contain;margin-bottom:12px}
+    h1{margin:8px 0 12px;font-size:23px}
+    p{margin:0;color:#A9A3C9;font-size:14px;line-height:2}
+    button{min-height:48px;margin-top:24px;padding:0 24px;border:0;border-radius:14px;background:#5B2EFF;color:white;font:inherit;font-weight:700}
+  </style>
+</head>
+<body>
+  <main>
+    <img src="/dark.svg" alt="حاضر">
+    <h1>أنت غير متصل بالإنترنت</h1>
+    <p>الفعاليات والحجوزات تحتاج اتصالاً بالشبكة. اتصل بالإنترنت ثم أعد المحاولة لعرض أحدث بياناتك.</p>
+    <button type="button" onclick="location.reload()">إعادة المحاولة</button>
+  </main>
+</body>
+</html>
