@@ -9824,37 +9824,17 @@ html[data-theme="dark"] .auth-gate,
 }
 
 
-/* Dark-mode glass motion: a soft moving light reflection on the active bottom-nav control.
-   This is decorative only; button sizing, position, and navigation behavior stay unchanged. */
-.app-shell.theme-dark .bottom-nav button{
-  position:relative!important;
-  isolation:isolate;
-  overflow:hidden!important;
+/* True dark glass navigation: background content is blurred and refracted through the translucent bar. */
+.app-shell.theme-dark .bottom-nav{
+  background:linear-gradient(125deg,rgba(93,47,255,.28) 0%,rgba(29,19,93,.34) 48%,rgba(14,11,31,.42) 100%)!important;
+  border:1px solid rgba(185,168,255,.28)!important;
+  box-shadow:0 16px 42px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.20),inset 0 -1px 0 rgba(185,168,255,.08)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(185%) contrast(108%)!important;
+  backdrop-filter:blur(24px) saturate(185%) contrast(108%)!important;
 }
-.app-shell.theme-dark .bottom-nav button.selected::after{
-  content:""!important;
-  position:absolute!important;
-  inset:-45% auto -45% -65%!important;
-  width:42%!important;
-  height:190%!important;
-  border:0!important;
-  border-radius:999px!important;
-  background:linear-gradient(105deg,transparent 0%,rgba(255,255,255,0) 28%,rgba(255,255,255,.10) 45%,rgba(255,255,255,.48) 50%,rgba(255,255,255,.12) 56%,transparent 76%)!important;
-  box-shadow:none!important;
-  pointer-events:none!important;
-  transform:translateX(-150%) skewX(-18deg)!important;
-  animation:haddir-nav-glass-sheen 4.8s ease-in-out infinite!important;
-  z-index:2!important;
-}
-@keyframes haddir-nav-glass-sheen{
-  0%,18%{transform:translateX(-150%) skewX(-18deg);opacity:0}
-  28%{opacity:1}
-  58%{transform:translateX(430%) skewX(-18deg);opacity:.8}
-  68%,100%{transform:translateX(430%) skewX(-18deg);opacity:0}
-}
-@media(prefers-reduced-motion:reduce){
-  .app-shell.theme-dark .bottom-nav button.selected::after{
-    animation:none!important;
-    opacity:0!important;
+@media(max-width:767px){
+  .app-shell.theme-dark .bottom-nav{
+    -webkit-backdrop-filter:blur(20px) saturate(175%) contrast(106%)!important;
+    backdrop-filter:blur(20px) saturate(175%) contrast(106%)!important;
   }
 }
