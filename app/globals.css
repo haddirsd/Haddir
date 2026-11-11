@@ -8631,3 +8631,57 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
 .admin-shell.theme-dark .admin-welcome{
   background:linear-gradient(115deg,#5B2EFF 0%,#281568 58%,#0E0B1F 100%)!important;
 }
+
+
+/* Navigation controls — final brand pass for both themes; geometry remains unchanged. */
+.app-shell .bottom-nav{
+  background:linear-gradient(135deg,#FFFFFF 0%,#F6F4FF 100%)!important;
+  border:1px solid rgba(91,46,255,.18)!important;
+  box-shadow:0 14px 34px rgba(36,20,91,.14),inset 0 1px 0 rgba(255,255,255,.95)!important;
+}
+.app-shell .bottom-nav button{
+  color:#6B6590!important;
+  background:transparent!important;
+}
+.app-shell .bottom-nav button.selected{
+  color:#FFFFFF!important;
+  background:linear-gradient(135deg,#5D2FFF 0%,#4820D6 100%)!important;
+  border-color:#5D2FFF!important;
+  box-shadow:0 7px 18px rgba(93,47,255,.28)!important;
+}
+.app-shell.theme-dark .bottom-nav{
+  background:linear-gradient(135deg,#5D2FFF 0%,#281568 42%,#0E0B1F 100%)!important;
+  border-color:rgba(185,168,255,.28)!important;
+  box-shadow:0 16px 40px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.12)!important;
+}
+.app-shell.theme-dark .bottom-nav button{
+  color:#D0C8F2!important;
+  background:transparent!important;
+}
+.app-shell.theme-dark .bottom-nav button.selected{
+  color:#FFFFFF!important;
+  background:linear-gradient(135deg,#5D2FFF 0%,#4320C8 100%)!important;
+  border-color:#B9A8FF!important;
+  box-shadow:0 7px 20px rgba(93,47,255,.42)!important;
+}
+.admin-shell .admin-sidebar nav button{
+  color:#6B6590!important;
+  background:transparent!important;
+  border:1px solid transparent!important;
+}
+.admin-shell .admin-sidebar nav button.active{
+  color:#FFFFFF!important;
+  background:linear-gradient(135deg,#5D2FFF 0%,#4820D6 100%)!important;
+  border-color:#5D2FFF!important;
+  box-shadow:0 7px 18px rgba(93,47,255,.22)!important;
+}
+.admin-shell.theme-dark .admin-sidebar nav button{
+  color:#A9A3C9!important;
+  background:transparent!important;
+}
+.admin-shell.theme-dark .admin-sidebar nav button.active{
+  color:#FFFFFF!important;
+  background:linear-gradient(135deg,#5D2FFF 0%,#281568 100%)!important;
+  border-color:#8B70FF!important;
+  box-shadow:0 7px 20px rgba(93,47,255,.34)!important;
+}
