@@ -45,7 +45,7 @@ export function NotificationsWorkspace({
 }: NotificationsWorkspaceProps) {
   return (
     <section className="screen container notifications-screen">
-      {loading ? <div className="empty-state">جاري تحميل الإشعارات...</div> : error ? <div className="empty-state" role="alert">{error}</div> : <>
+      {loading ? <div className="empty-state motion-loading" role="status"><span className="haddir-loading-indicator" aria-hidden="true"/><span>جاري تحميل الإشعارات...</span></div> : error ? <div className="empty-state" role="alert">{error}</div> : <>
         <div className="notifications-toolbar">
           <div><strong>إشعاراتك</strong><small>{unreadCount} غير مقروء</small></div>
           <button type="button" className="notification-mark-all" onClick={onMarkAllRead} disabled={!unreadCount}>تعليم الكل كمقروء</button>
