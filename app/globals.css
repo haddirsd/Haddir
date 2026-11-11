@@ -7686,3 +7686,66 @@ html[data-theme="dark"] .admin-panel .admin-event-editor-page .admin-event-form-
   font-size: 13px;
   line-height: 1.8;
 }
+
+
+/* Unified Haddir transitions and loading motion — lightweight and reduced-motion aware. */
+@keyframes haddir-screen-enter {
+  from { opacity: 0; transform: translate3d(0, 9px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes haddir-loader-spin { to { transform: rotate(360deg); } }
+@keyframes haddir-loader-pulse {
+  0%, 100% { opacity: .55; transform: scale(.88); }
+  50% { opacity: 1; transform: scale(1); }
+}
+.app-content > .screen,
+.app-content > .event-detail-layout,
+.app-content > .home-discovery,
+.app-content > .gatekeeper-screen {
+  animation: haddir-screen-enter .28s cubic-bezier(.2,.75,.25,1) both;
+}
+.admin-section-transition {
+  min-width: 0;
+  animation: haddir-screen-enter .26s cubic-bezier(.2,.75,.25,1) both;
+}
+.haddir-loading-indicator {
+  display: inline-block;
+  width: 27px;
+  height: 27px;
+  flex: 0 0 27px;
+  border: 3px solid color-mix(in srgb, var(--green, #0d9488) 18%, transparent);
+  border-top-color: var(--green, #0d9488);
+  border-right-color: var(--green, #0d9488);
+  border-radius: 50%;
+  animation: haddir-loader-spin .78s linear infinite;
+}
+.motion-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 150px;
+  color: var(--muted);
+  text-align: center;
+}
+.motion-loading .haddir-loading-indicator { width: 34px; height: 34px; flex-basis: 34px; }
+.admin-loading .admin-spinner {
+  animation: haddir-loader-spin .78s linear infinite;
+}
+.home-loading-mark {
+  animation: haddir-loader-pulse 1.15s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-content > .screen,
+  .app-content > .event-detail-layout,
+  .app-content > .home-discovery,
+  .app-content > .gatekeeper-screen,
+  .admin-section-transition,
+  .haddir-loading-indicator,
+  .admin-loading .admin-spinner,
+  .home-loading-mark {
+    animation: none !important;
+    transition: none !important;
+  }
+}
