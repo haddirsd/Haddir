@@ -9742,3 +9742,34 @@ html[data-theme="dark"] .auth-gate,
   color:#FFFFFF!important;
   stroke:currentColor!important;
 }
+
+
+/* Profile avatar edit control: explicit day/night contrast and consistent Haddir styling. */
+.app-shell:not(.theme-dark) .profile-avatar-wrap .profile-avatar-edit{
+  background:linear-gradient(145deg,#6B45FF 0%,#5B2EFF 100%)!important;
+  border:2px solid #FFFFFF!important;
+  color:#FFFFFF!important;
+  -webkit-text-fill-color:#FFFFFF!important;
+  box-shadow:0 4px 12px rgba(91,46,255,.32)!important;
+}
+.app-shell:not(.theme-dark) .profile-avatar-wrap .profile-avatar-edit svg{
+  color:#FFFFFF!important;stroke:#FFFFFF!important;
+}
+.app-shell.theme-dark .profile-avatar-wrap .profile-avatar-edit{
+  background:linear-gradient(145deg,#C9BCFF 0%,#B9A8FF 100%)!important;
+  border:2px solid #1A1633!important;
+  color:#1D135D!important;
+  -webkit-text-fill-color:#1D135D!important;
+  box-shadow:0 4px 14px rgba(0,0,0,.38)!important;
+}
+.app-shell.theme-dark .profile-avatar-wrap .profile-avatar-edit svg{
+  color:#1D135D!important;stroke:#1D135D!important;
+}
+.app-shell .profile-avatar-wrap .profile-avatar-edit:hover{
+  transform:translateY(-1px) scale(1.04);
+  filter:brightness(1.04);
+}
+.app-shell .profile-avatar-wrap .profile-avatar-edit:focus-visible{
+  outline:3px solid rgba(185,168,255,.8)!important;
+  outline-offset:3px!important;
+}
