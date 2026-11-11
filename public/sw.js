@@ -1,17 +1,23 @@
-const CACHE_NAME = "haddir-static-v6";
-const PRECACHE_URLS = ["/icons/icon-192.svg", "/icons/icon-512.svg", "/light.svg", "/dark.svg", "/ticket.svg"];
+const CACHE_NAME = "haddir-static-v7";
+const PRECACHE_URLS = [
+  "/icons/icon-192.svg",
+  "/icons/icon-512.svg",
+  "/light.svg",
+  "/dark.svg",
+  "/ticket.svg",
+  "/offline.html",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(PRECACHE_URLS))
+    caches.open(CACHE_NAME).then(async (cache) => {
+      await Promise.allSettled(PRECACHE_URLS.map((url) => cache.add(url)));
+    })
   );
 });
 
 self.addEventListener("message", (event) => {
-  if (event.data?.type === "SKIP_WAITING") {
-    self.skipWaiting();
-  }
+  if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
@@ -33,9 +39,24 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
+  // Keep the app shell available as a clear offline fallback without caching
+  // authenticated page responses or user-specific account data.
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request).catch(async () => {
+        const offlinePage = await caches.match("/offline.html");
+        return offlinePage || new Response(
+          "<!doctype html><html lang='ar' dir='rtl'><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>حاضر - بدون اتصال</title><body style='font-family:Arial,sans-serif;padding:32px;background:#1D135D;color:#F4F2FF;text-align:center'><h1>أنت غير متصل بالإنترنت</h1><p>اتصل بالشبكة ثم أعد المحاولة لعرض فعالياتك وتذاكرك.</p></body></html>",
+          { headers: { "Content-Type": "text/html; charset=utf-8" } }
+        );
+      })
+    );
+    return;
+  }
+
   const isHashedNextAsset = url.pathname.startsWith("/_next/static/");
-  const isPublicAppIcon = PRECACHE_URLS.includes(url.pathname);
-  if (!isHashedNextAsset && !isPublicAppIcon) return;
+  const isPublicAppAsset = PRECACHE_URLS.includes(url.pathname);
+  if (!isHashedNextAsset && !isPublicAppAsset) return;
 
   event.respondWith(
     caches.match(request).then(async (cached) => {
