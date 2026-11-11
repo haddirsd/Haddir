@@ -8412,3 +8412,15 @@ html[data-theme="dark"]{
 }
 .admin-report-page :is(h1,h2,h3,strong,th){color:#1A1533}
 .admin-report-page :is(p,small,td,.admin-report-subtitle,.admin-report-note){color:#6B6590}
+
+
+/* Night mode background: Haddir purple fading smoothly into black. */
+.app-shell.theme-dark,
+.admin-shell.theme-dark {
+  --bg:#5D2FFF;
+  background:linear-gradient(155deg,#5D2FFF 0%,#281568 48%,#000000 100%)!important;
+}
+.app-shell.theme-dark .detail-screen {
+  --bg:#5D2FFF;
+  background:linear-gradient(155deg,#5D2FFF 0%,#281568 48%,#000000 100%)!important;
+}
