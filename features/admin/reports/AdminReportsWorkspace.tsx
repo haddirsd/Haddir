@@ -80,7 +80,7 @@ export default function AdminReportsWorkspace() {
                 <div className="admin-selected-event"><div><small>الفعالية المحددة</small><h3>{event.title}</h3><span>{statusLabels[event.status]||event.status} · عمولة المنصة {Number(event.platform_fee_percent||0)}%</span></div><button className="admin-print-button" type="button" onClick={()=>window.print()}>تحميل تقرير الفعالية PDF</button></div>
                 <div className="admin-event-report" dir="rtl">
                   <section className="admin-report-page admin-report-cover">
-                    <div className="admin-report-topline"><img src="/haddir_for_ticket.svg" alt="حاضر" /><span>حاضِر · منصة الفعاليات</span><small>تقرير فعالية تفصيلي</small></div>
+                    <div className="admin-report-topline"><img src="/ticket.svg" alt="ختم حاضر" /><span>حاضِر · منصة الفعاليات</span><small>تقرير فعالية تفصيلي</small></div>
                     {event.cover_image_url&&<img className="admin-report-cover-image" src={event.cover_image_url} alt="" />}
                     <div className="admin-report-cover-content">
                       <span className="admin-report-kicker">تقرير الأداء والتشغيل</span>
