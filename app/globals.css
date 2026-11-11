@@ -9370,3 +9370,33 @@ html[data-theme="dark"] .auth-gate,
   .app-shell .topbar .header-icon.theme-toggle,.app-shell .topbar .theme-toggle-knob,
   .app-shell .topbar .theme-toggle-symbol{transition:none!important}
 }
+
+
+/* Explicitly pin customer page title to the right and its icon to the left. */
+.app-shell>.screen-topbar:not(.gatekeeper-page-topbar){
+  display:grid!important;
+  grid-template-columns:42px minmax(0,1fr)!important;
+  grid-template-rows:1fr!important;
+  direction:rtl!important;
+  justify-content:stretch!important;
+  align-items:center!important;
+  column-gap:12px!important;
+}
+.app-shell>.screen-topbar:not(.gatekeeper-page-topbar)>.screen-topbar-spacer{
+  display:none!important;
+}
+.app-shell>.screen-topbar:not(.gatekeeper-page-topbar)>strong{
+  grid-column:2!important;
+  grid-row:1!important;
+  justify-self:stretch!important;
+  width:100%!important;
+  margin:0!important;
+  text-align:right!important;
+}
+.app-shell>.screen-topbar:not(.gatekeeper-page-topbar)>.screen-icon{
+  grid-column:1!important;
+  grid-row:1!important;
+  justify-self:start!important;
+  width:42px!important;
+  height:42px!important;
+}
