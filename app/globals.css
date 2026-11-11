@@ -7948,3 +7948,211 @@ html,body{background:var(--bg);color:var(--text)}
   color:var(--text)!important;
   border-color:var(--line)!important;
 }
+
+
+/* Corrected theme scoping: the theme class is on the app root itself. */
+:root{
+  --primary:#5B2EFF;
+  --accent:#FFB020;
+  --success:#0B7F6C;
+  --success-bright:#14D3B4;
+  --danger:#FF5470;
+  --bg:#F6F4FF;
+  --surface:#FFFFFF;
+  --surface-soft:#EEEAFB;
+  --text:#1A1533;
+  --text-2:#6B6590;
+  --fg:var(--text);
+  --muted:var(--text-2);
+  --green:var(--primary);
+  --dark:#4320C8;
+  --line:rgba(91,46,255,.13);
+  --haddir-accent:var(--primary);
+  --haddir-accent-strong:#4320C8;
+  --haddir-glass:rgba(255,255,255,.94);
+  --surface-strong:#FFFFFF;
+  --glass-bg:#FFFFFF;
+  --glass-bg-strong:rgba(255,255,255,.97);
+  color-scheme:light;
+}
+html[data-theme="dark"]{
+  --bg:#0E0B1F;
+  --surface:#1A1633;
+  --surface-soft:#241E43;
+  --text:#F4F2FF;
+  --text-2:#A9A3C9;
+  --fg:var(--text);
+  --muted:var(--text-2);
+  --green:var(--primary);
+  --dark:#B9A8FF;
+  --line:rgba(185,168,255,.17);
+  --haddir-accent:var(--primary);
+  --haddir-accent-strong:#B9A8FF;
+  --haddir-glass:rgba(26,22,51,.96);
+  --surface-strong:#1A1633;
+  --glass-bg:#1A1633;
+  --glass-bg-strong:rgba(26,22,51,.98);
+  color-scheme:dark;
+}
+.app-shell.theme-dark,
+.admin-shell.theme-dark,
+.theme-dark.admin-loading,
+.theme-dark.admin-denied{
+  --bg:#0E0B1F;
+  --surface:#1A1633;
+  --surface-soft:#241E43;
+  --text:#F4F2FF;
+  --text-2:#A9A3C9;
+  --fg:var(--text);
+  --muted:var(--text-2);
+  --green:var(--primary);
+  --dark:#B9A8FF;
+  --line:rgba(185,168,255,.17);
+  --haddir-accent:var(--primary);
+  --haddir-accent-strong:#B9A8FF;
+  --haddir-glass:rgba(26,22,51,.96);
+  --surface-strong:#1A1633;
+  --glass-bg:#1A1633;
+  --glass-bg-strong:rgba(26,22,51,.98);
+  color-scheme:dark;
+  background:var(--bg)!important;
+  color:var(--text)!important;
+}
+.app-shell:not(.theme-dark),
+.admin-shell:not(.theme-dark){
+  --bg:#F6F4FF;
+  --surface:#FFFFFF;
+  --surface-soft:#EEEAFB;
+  --text:#1A1533;
+  --text-2:#6B6590;
+  --fg:var(--text);
+  --muted:var(--text-2);
+  --green:var(--primary);
+  --dark:#4320C8;
+  --line:rgba(91,46,255,.13);
+  --haddir-glass:rgba(255,255,255,.94);
+  --surface-strong:#FFFFFF;
+  --glass-bg:#FFFFFF;
+  --glass-bg-strong:rgba(255,255,255,.97);
+  color-scheme:light;
+  background:var(--bg)!important;
+  color:var(--text)!important;
+}
+
+/* Navigation: consistent surfaces and a clearly selected purple destination. */
+.app-shell .bottom-nav{
+  background:rgba(255,255,255,.97)!important;
+  border:1px solid rgba(91,46,255,.16)!important;
+  box-shadow:0 12px 32px rgba(36,20,91,.13),inset 0 1px 0 rgba(255,255,255,.9)!important;
+}
+.app-shell .bottom-nav button{
+  color:#6B6590!important;
+  background:transparent!important;
+}
+.app-shell .bottom-nav button.selected{
+  color:#FFFFFF!important;
+  background:#5B2EFF!important;
+  border-color:#5B2EFF!important;
+  box-shadow:0 6px 16px rgba(91,46,255,.24)!important;
+}
+.app-shell.theme-dark .bottom-nav{
+  background:#1A1633!important;
+  border-color:rgba(185,168,255,.2)!important;
+  box-shadow:0 14px 36px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+.app-shell.theme-dark .bottom-nav button{
+  color:#A9A3C9!important;
+  background:transparent!important;
+}
+.app-shell.theme-dark .bottom-nav button.selected{
+  color:#FFFFFF!important;
+  background:#5B2EFF!important;
+  border-color:#8B70FF!important;
+  box-shadow:0 6px 18px rgba(91,46,255,.32)!important;
+}
+
+/* Theme-specific app chrome and content surfaces. */
+.app-shell:not(.theme-dark) :is(.topbar,.screen-topbar,.detail-sticky-controls,.detail-topbar,.checkout-topbar),
+.admin-shell:not(.theme-dark) :is(.admin-sidebar,.admin-topbar){
+  background:#FFFFFF!important;
+  border-color:var(--line)!important;
+  color:var(--text)!important;
+}
+.app-shell.theme-dark :is(.topbar,.screen-topbar,.detail-sticky-controls,.detail-topbar,.checkout-topbar),
+.admin-shell.theme-dark :is(.admin-sidebar,.admin-topbar){
+  background:#1A1633!important;
+  border-color:var(--line)!important;
+  color:var(--text)!important;
+}
+.app-shell.theme-dark :is(.event-card,.event-list-card,.trending-card,.ticket-preview-card,
+.haddir-ticket,.notification-item,.notifications-toolbar,.profile-card,.profile-form,
+.profile-account-card,.profile-settings-panel,.empty-panel,.settings-row,
+.role-workspace-button,.gatekeeper-workspace,.gatekeeper-assigned-event,
+.checkout-section,.checkout-event,.payment-summary,.payment-placeholder,
+.account-details,.account-number-card,.receipt-upload,.tier-card,
+.detail-quick-info,.detail-about,.detail-ticket-section,.detail-facts>div,
+.detail-quantity,.booking-steps){
+  background:#1A1633!important;
+  border-color:var(--line)!important;
+  color:#F4F2FF!important;
+}
+.app-shell.theme-dark :is(.event-title,.event-list-info h3,.detail-title-row h1,
+.detail-section h2,.screen-heading h1,.profile-card strong,.notification-item strong,
+.tier-name,.haddir-ticket-event h2,.detail-dock-summary strong){
+  color:#F4F2FF!important;
+}
+.app-shell.theme-dark :is(.event-meta,.event-list-meta,.detail-section>p,
+.detail-facts small,.screen-heading p,.profile-card p,.notification-item p,
+.notification-item small,.tier-note,.detail-dock-summary small,.detail-dock-summary>span){
+  color:#A9A3C9!important;
+}
+.app-shell.theme-dark :is(input,textarea,select){
+  background:#0E0B1F!important;
+  color:#F4F2FF!important;
+  border-color:var(--line)!important;
+}
+.app-shell.theme-dark :is(input,textarea,select)::placeholder{color:#A9A3C9!important}
+.admin-shell.theme-dark :is(.admin-panel,.admin-metric,.admin-event-card,
+.admin-booking-card,.admin-payment-card,.admin-event-form,.admin-ticket-editor,
+.admin-ticket-row,.admin-selected-event,.admin-users-table-wrap,.admin-table-wrap,
+.admin-data-table,.admin-users-table,.admin-stat-card,.admin-shortcuts button,
+.admin-activity-stats article,.admin-activity-filter-panel,.admin-activity-item){
+  background:#1A1633!important;
+  border-color:var(--line)!important;
+  color:#F4F2FF!important;
+}
+.admin-shell.theme-dark :is(.admin-welcome,.admin-panel-head h3,.admin-metric strong,
+.admin-event-card-title h4,.admin-booking-card-head h4,.admin-payment-card-head h4,
+.admin-stats-heading,.admin-selected-event h3,.admin-activity-results-head h4,
+.admin-data-table td,.admin-users-table td){
+  color:#F4F2FF!important;
+}
+.admin-shell.theme-dark :is(.admin-panel-head p,.admin-footer,.admin-event-card-meta,
+.admin-booking-card-grid small,.admin-booking-card-head small,
+.admin-payment-card-grid small,.admin-payment-card-head small,.admin-form-hint,
+.admin-stat-hint,.admin-user-email,.admin-sidebar nav button:not(.active)){
+  color:#A9A3C9!important;
+}
+.admin-shell.theme-dark :is(input,textarea,select){
+  background:#0E0B1F!important;
+  color:#F4F2FF!important;
+  border-color:var(--line)!important;
+}
+.admin-shell.theme-dark :is(.admin-data-table th,.admin-users-table th){
+  background:#241E43!important;
+  color:#B9A8FF!important;
+}
+
+/* Keep brand actions purple; reserve gold only for the main booking/payment action. */
+.app-shell .event-detail-layout:not(.payment-sheet) .detail-booking-dock .pay-button,
+.app-shell .event-detail-layout.payment-sheet .checkout-submit-dock .pay-button{
+  background:#FFB020!important;
+  border-color:#FFB020!important;
+  color:#1A1533!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-booking-dock .pay-button,
+.app-shell.theme-dark .event-detail-layout.payment-sheet .checkout-submit-dock .pay-button{
+  background:#FFB020!important;
+  border-color:#FFB020!important;
+  color:#1A1533!important;
+}
