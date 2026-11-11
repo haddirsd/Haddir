@@ -9707,3 +9707,38 @@ html[data-theme="dark"] .auth-gate,
 .theme-dark.admin-denied{
   background:#1D135D!important;color:#F4F2FF!important;
 }
+
+
+/* Welcome banner: consistent high-contrast typography on the purple surface in both themes. */
+.admin-shell .admin-content .admin-welcome,
+.admin-shell.theme-dark .admin-content .admin-welcome{
+  color:#FFFFFF!important;
+  background:linear-gradient(115deg,#5B2EFF 0%,#4320C8 58%,#281568 100%)!important;
+}
+.admin-shell .admin-content .admin-welcome .admin-eyebrow,
+.admin-shell.theme-dark .admin-content .admin-welcome .admin-eyebrow{
+  color:#E6DEFF!important;
+  opacity:1!important;
+}
+.admin-shell .admin-content .admin-welcome h2,
+.admin-shell.theme-dark .admin-content .admin-welcome h2{
+  color:#FFFFFF!important;
+  -webkit-text-fill-color:#FFFFFF!important;
+}
+.admin-shell .admin-content .admin-welcome p,
+.admin-shell.theme-dark .admin-content .admin-welcome p{
+  color:#F0ECFF!important;
+  -webkit-text-fill-color:#F0ECFF!important;
+  opacity:1!important;
+}
+.admin-shell .admin-content .admin-welcome-mark,
+.admin-shell.theme-dark .admin-content .admin-welcome-mark{
+  color:#FFFFFF!important;
+  border-color:rgba(255,255,255,.42)!important;
+  background:rgba(255,255,255,.16)!important;
+}
+.admin-shell .admin-content .admin-welcome-mark svg,
+.admin-shell.theme-dark .admin-content .admin-welcome-mark svg{
+  color:#FFFFFF!important;
+  stroke:currentColor!important;
+}
