@@ -8962,3 +8962,237 @@ html[data-theme="dark"] .auth-gate,
   border:1px solid rgba(185,168,255,.28)!important;
   color:#B9A8FF!important;
 }
+
+
+/* Customer tickets and notifications — final Haddir brand palette in both themes. */
+.app-shell:not(.theme-dark) .tickets-screen,
+.app-shell:not(.theme-dark) .notifications-screen{
+  color:#1A1533!important;
+}
+.app-shell:not(.theme-dark) .tickets-screen .ticket-tabs{
+  border-color:rgba(91,46,255,.16)!important;
+}
+.app-shell:not(.theme-dark) .tickets-screen .ticket-tabs button.active,
+.app-shell:not(.theme-dark) .notifications-screen .notification-filters button.active{
+  color:#5B2EFF!important;
+}
+.app-shell:not(.theme-dark) .tickets-screen .ticket-tabs button.active::after{
+  background:#5B2EFF!important;
+}
+.app-shell:not(.theme-dark) .tickets-screen .ticket-tabs button span,
+.app-shell:not(.theme-dark) .notifications-screen .notification-filters button.active{
+  background:#EEEAFB!important;
+  border-color:rgba(91,46,255,.2)!important;
+}
+.app-shell:not(.theme-dark) .tickets-screen .ticket-preview-card,
+.app-shell:not(.theme-dark) .notifications-screen .notifications-toolbar,
+.app-shell:not(.theme-dark) .notifications-screen .notification-item,
+.app-shell:not(.theme-dark) .tickets-screen>.empty-state,
+.app-shell:not(.theme-dark) .notifications-screen>.empty-state{
+  background:#FFFFFF!important;
+  border-color:rgba(91,46,255,.14)!important;
+  color:#1A1533!important;
+  box-shadow:0 8px 24px rgba(36,20,91,.055)!important;
+}
+.app-shell:not(.theme-dark) .tickets-screen .ticket-preview-copy>strong,
+.app-shell:not(.theme-dark) .notifications-screen .notification-copy strong,
+.app-shell:not(.theme-dark) .notifications-screen .notifications-toolbar strong{
+  color:#1A1533!important;
+}
+.app-shell:not(.theme-dark) .tickets-screen .ticket-preview-copy>span,
+.app-shell:not(.theme-dark) .notifications-screen .notification-copy p,
+.app-shell:not(.theme-dark) .notifications-screen .notification-copy small,
+.app-shell:not(.theme-dark) .notifications-screen .notifications-toolbar small{
+  color:#6B6590!important;
+}
+.app-shell:not(.theme-dark) .tickets-screen .ticket-preview-status{
+  background:rgba(11,127,108,.12)!important;
+  color:#0B7F6C!important;
+}
+.app-shell:not(.theme-dark) .tickets-screen .ticket-preview-status.used{
+  background:#EEEAFB!important;
+  color:#6B6590!important;
+}
+.app-shell:not(.theme-dark) .tickets-screen .ticket-preview-image::after{
+  background:#FFFFFF!important;
+  box-shadow:0 0 0 1px rgba(91,46,255,.16)!important;
+}
+.app-shell:not(.theme-dark) .tickets-screen .ticket-preview-fallback{
+  background:linear-gradient(145deg,#EEEAFB,#DCD3FF)!important;
+  color:#5B2EFF!important;
+}
+.app-shell:not(.theme-dark) .notifications-screen .notification-icon{
+  background:rgba(91,46,255,.1)!important;
+  color:#5B2EFF!important;
+}
+.app-shell:not(.theme-dark) .notifications-screen .notification-icon.booking{
+  background:rgba(11,127,108,.12)!important;
+  color:#0B7F6C!important;
+}
+.app-shell:not(.theme-dark) .notifications-screen .notification-icon.event{
+  background:#EEEAFB!important;
+  color:#5B2EFF!important;
+}
+.app-shell:not(.theme-dark) .notifications-screen .notification-state{
+  background:#EEEAFB!important;
+  color:#5B2EFF!important;
+}
+.app-shell:not(.theme-dark) .notifications-screen .notification-item.is-unread{
+  background:#F6F4FF!important;
+  border-color:rgba(91,46,255,.3)!important;
+}
+.app-shell:not(.theme-dark) .notifications-screen .notification-mark-all,
+.app-shell:not(.theme-dark) .notifications-screen .notification-toggle-read{
+  color:#5B2EFF!important;
+}
+.app-shell:not(.theme-dark) .notifications-screen .notification-mark-all:disabled{
+  color:#A9A3C9!important;
+}
+.app-shell:not(.theme-dark) .tickets-screen .ticket-expanded-panel>.pay-button{
+  background:#FFFFFF!important;
+  border-color:rgba(91,46,255,.24)!important;
+  color:#5B2EFF!important;
+}
+
+/* The printable ticket remains a white document so its QR is always high-contrast. */
+.app-shell .tickets-screen .haddir-ticket{
+  background:#FFFFFF!important;
+  color:#1A1533!important;
+  border-color:rgba(91,46,255,.2)!important;
+}
+.app-shell .tickets-screen .haddir-ticket-head{
+  color:#5B2EFF!important;
+  border-color:rgba(91,46,255,.22)!important;
+}
+.app-shell .tickets-screen .haddir-ticket-event h2,
+.app-shell .tickets-screen .haddir-ticket-meta strong,
+.app-shell .tickets-screen .haddir-ticket-code strong{
+  color:#1A1533!important;
+}
+.app-shell .tickets-screen .haddir-ticket-event small,
+.app-shell .tickets-screen .haddir-ticket-meta small,
+.app-shell .tickets-screen .haddir-ticket-code small,
+.app-shell .tickets-screen .haddir-ticket-qr small{
+  color:#6B6590!important;
+}
+.app-shell .tickets-screen .haddir-ticket-qr,
+.app-shell .tickets-screen .haddir-ticket-qr svg{
+  background:#FFFFFF!important;
+  color:#1A1533!important;
+  border-color:#FFFFFF!important;
+}
+.app-shell .tickets-screen .haddir-ticket-footer{
+  background:#F6F4FF!important;
+  color:#5B2EFF!important;
+}
+
+/* Dark mode: purple canvas, deep-violet cards, lavender text and controlled success teal. */
+.app-shell.theme-dark .tickets-screen,
+.app-shell.theme-dark .notifications-screen{
+  color:#F4F2FF!important;
+}
+.app-shell.theme-dark .tickets-screen .ticket-tabs{
+  border-color:rgba(185,168,255,.22)!important;
+}
+.app-shell.theme-dark .tickets-screen .ticket-tabs button{
+  color:#A9A3C9!important;
+}
+.app-shell.theme-dark .tickets-screen .ticket-tabs button.active,
+.app-shell.theme-dark .notifications-screen .notification-filters button.active{
+  color:#B9A8FF!important;
+}
+.app-shell.theme-dark .tickets-screen .ticket-tabs button.active::after{
+  background:#B9A8FF!important;
+}
+.app-shell.theme-dark .tickets-screen .ticket-tabs button span,
+.app-shell.theme-dark .notifications-screen .notification-filters button.active{
+  background:rgba(91,46,255,.22)!important;
+  border-color:rgba(185,168,255,.28)!important;
+  color:#B9A8FF!important;
+}
+.app-shell.theme-dark .tickets-screen .ticket-preview-card,
+.app-shell.theme-dark .notifications-screen .notifications-toolbar,
+.app-shell.theme-dark .notifications-screen .notification-item,
+.app-shell.theme-dark .tickets-screen>.empty-state,
+.app-shell.theme-dark .notifications-screen>.empty-state{
+  background:#1A1633!important;
+  border-color:rgba(185,168,255,.2)!important;
+  color:#F4F2FF!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.18)!important;
+}
+.app-shell.theme-dark .tickets-screen .ticket-preview-copy>strong,
+.app-shell.theme-dark .notifications-screen .notification-copy strong,
+.app-shell.theme-dark .notifications-screen .notifications-toolbar strong{
+  color:#F4F2FF!important;
+}
+.app-shell.theme-dark .tickets-screen .ticket-preview-copy>span,
+.app-shell.theme-dark .notifications-screen .notification-copy p,
+.app-shell.theme-dark .notifications-screen .notification-copy small,
+.app-shell.theme-dark .notifications-screen .notifications-toolbar small{
+  color:#A9A3C9!important;
+}
+.app-shell.theme-dark .tickets-screen .ticket-preview-status{
+  background:rgba(20,211,180,.14)!important;
+  color:#14D3B4!important;
+}
+.app-shell.theme-dark .tickets-screen .ticket-preview-status.used{
+  background:#241E43!important;
+  color:#A9A3C9!important;
+}
+.app-shell.theme-dark .tickets-screen .ticket-preview-image::after{
+  background:#1A1633!important;
+  box-shadow:0 0 0 1px rgba(185,168,255,.22)!important;
+}
+.app-shell.theme-dark .tickets-screen .ticket-preview-fallback{
+  background:linear-gradient(145deg,#241E43,#30215F)!important;
+  color:#B9A8FF!important;
+}
+.app-shell.theme-dark .notifications-screen .notification-icon{
+  background:rgba(91,46,255,.2)!important;
+  color:#B9A8FF!important;
+}
+.app-shell.theme-dark .notifications-screen .notification-icon.booking{
+  background:rgba(20,211,180,.13)!important;
+  color:#14D3B4!important;
+}
+.app-shell.theme-dark .notifications-screen .notification-icon.event{
+  background:rgba(91,46,255,.2)!important;
+  color:#B9A8FF!important;
+}
+.app-shell.theme-dark .notifications-screen .notification-state{
+  background:rgba(91,46,255,.2)!important;
+  color:#B9A8FF!important;
+}
+.app-shell.theme-dark .notifications-screen .notification-item.is-unread{
+  background:rgba(91,46,255,.13)!important;
+  border-color:rgba(185,168,255,.4)!important;
+}
+.app-shell.theme-dark .notifications-screen .notification-mark-all,
+.app-shell.theme-dark .notifications-screen .notification-toggle-read{
+  color:#B9A8FF!important;
+}
+.app-shell.theme-dark .notifications-screen .notification-mark-all:disabled{
+  color:#6B6590!important;
+}
+.app-shell.theme-dark .tickets-screen .ticket-expanded-panel>.pay-button{
+  background:#241E43!important;
+  border-color:rgba(185,168,255,.3)!important;
+  color:#B9A8FF!important;
+}
+
+/* Empty states and counters follow the same palette without adding decorative blur. */
+.app-shell:not(.theme-dark) :is(.tickets-screen,.notifications-screen)>.empty-state{
+  color:#6B6590!important;
+}
+.app-shell.theme-dark :is(.tickets-screen,.notifications-screen)>.empty-state{
+  color:#A9A3C9!important;
+}
+.app-shell.theme-dark :is(.tickets-screen,.notifications-screen)>.empty-state strong{
+  color:#F4F2FF!important;
+}
+.app-shell:not(.theme-dark) .notifications-screen .notification-item.is-read{
+  opacity:.88;
+}
+.app-shell.theme-dark .notifications-screen .notification-item.is-read{
+  opacity:.86;
+}
