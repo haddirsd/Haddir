@@ -103,7 +103,7 @@ export function HomeEventsWorkspace({ events, loading, error, onOpenEvent, onRet
         ) : (
           <>
             {!normalizedQuery && <section className="trending-section">
-              <div className="redesign-section-head"><div className="redesign-title"><span className="trending-dot" aria-hidden="true" /><h2>رائج الآن</h2></div></div>
+              <div className="redesign-section-head"><div className="redesign-title"><h2>رائج الآن</h2><span className="trending-dot" aria-hidden="true" /></div></div>
               {trendingEvents.length ? (
                 <div ref={trendingCarouselRef} className="trending-carousel hide-scrollbar" dir="ltr"
                   onMouseEnter={pauseTrending} onMouseLeave={resumeTrending} onTouchStart={pauseTrending}
