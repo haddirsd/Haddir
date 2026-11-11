@@ -9880,7 +9880,7 @@ html[data-theme="dark"] .auth-gate,
   --line:rgba(185,168,255,.20);
   --primary:#5B2EFF;
   --primary-soft:rgba(91,46,255,.18);
-  --green:#14D3B4;
+  --green:#34D399;
   background:#1D135D!important;
   color:var(--fg)!important;
 }
@@ -10116,14 +10116,14 @@ html[data-theme="dark"] .auth-gate,
 .app-shell .gatekeeper-task-grid article{color:#5B2EFF!important}
 .app-shell.theme-dark .gatekeeper-task-grid article{color:#B9A8FF!important}
 .app-shell .gatekeeper-workspace-head p{color:#0B7F6C!important}
-.app-shell.theme-dark .gatekeeper-workspace-head p{color:#14D3B4!important}
+.app-shell.theme-dark .gatekeeper-workspace-head p{color:#34D399!important}
 .app-shell .gatekeeper-result.valid,
 .app-shell .gatekeeper-network.online{
   background:#E5F5F0!important;border-color:#B8E3D5!important;color:#0B6B58!important;
 }
 .app-shell.theme-dark .gatekeeper-result.valid,
 .app-shell.theme-dark .gatekeeper-network.online{
-  background:rgba(20,211,180,.12)!important;border-color:rgba(20,211,180,.28)!important;color:#14D3B4!important;
+  background:rgba(20,211,180,.12)!important;border-color:rgba(20,211,180,.28)!important;color:#34D399!important;
 }
 .app-shell .gatekeeper-result.invalid,
 .app-shell .gatekeeper-result.error,
