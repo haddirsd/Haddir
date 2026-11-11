@@ -8444,3 +8444,59 @@ html[data-theme="dark"] .admin-shell .admin-main,
 html[data-theme="dark"] .admin-shell .admin-content {
   background:transparent!important;
 }
+
+
+/* Final dark-mode legacy color cleanup: remove old teal/blue UI surfaces. */
+html[data-theme="dark"] .app-shell.theme-dark :is(.welcome-motion,.welcome-spark,.welcome-brand-mark,
+.theme-toggle-knob,.gatekeeper-task-grid article,.gatekeeper-assigned-event,
+.gatekeeper-counter-grid article,.gatekeeper-manual-form input,
+.booking-success-dialog,.booking-success-dialog .success-summary,
+.admin-activity-stats article,.admin-activity-filter-panel,.admin-activity-item,
+.admin-activity-filter-title button,.admin-activity-actor span,
+.admin-activity-action>span,.admin-activity-filters select,.admin-activity-search,
+.admin-activity-changes,.admin-mini-avatar){
+  background:#1A1633!important;
+  border-color:rgba(185,168,255,.2)!important;
+  color:#F4F2FF!important;
+}
+html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-sidebar nav button.active,
+.admin-stat-tabs button.active,.admin-create-button,.admin-brand>span,.admin-avatar){
+  background:#5B2EFF!important;
+  border-color:#5B2EFF!important;
+  color:#FFFFFF!important;
+}
+html[data-theme="dark"] .app-shell.theme-dark :is(.btn-primary,.role-workspace-button.active){
+  background:#5B2EFF!important;
+  border-color:#5B2EFF!important;
+  color:#FFFFFF!important;
+}
+html[data-theme="dark"] .app-shell.theme-dark .pay-button,
+html[data-theme="dark"] .app-shell.theme-dark .actionable-footer .pay-button{
+  background:#FFB020!important;
+  border-color:#FFB020!important;
+  color:#1A1533!important;
+}
+html[data-theme="dark"] .app-shell.theme-dark .bottom-nav button.selected{
+  background:#5B2EFF!important;
+  border-color:#5B2EFF!important;
+  color:#FFFFFF!important;
+}
+html[data-theme="dark"] .app-shell.theme-dark .home-discovery .ticket-book-link{
+  background:#5B2EFF!important;
+  border-color:#5B2EFF!important;
+  color:#FFFFFF!important;
+}
+html[data-theme="dark"] .app-shell.theme-dark .trending-card-media{
+  background:linear-gradient(145deg,#281568,#0E0B1F)!important;
+}
+html[data-theme="dark"] .app-shell.theme-dark .detail-booking-dock.actionable-footer,
+html[data-theme="dark"] .app-shell.theme-dark .event-detail-layout .detail-booking-dock{
+  background:#1A1633!important;
+  border-color:rgba(185,168,255,.2)!important;
+}
+html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
+.admin-activity-search,.admin-activity-filters select,.admin-payment-reject-box textarea){
+  background:#0E0B1F!important;
+  border-color:rgba(185,168,255,.2)!important;
+  color:#F4F2FF!important;
+}
