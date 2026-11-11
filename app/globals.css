@@ -8173,3 +8173,242 @@ html[data-theme="dark"] .app-shell.theme-dark .bottom-nav button.selected{
   background:#5B2EFF!important;
   border-color:#8B70FF!important;
 }
+
+
+/* Haddir 60-30-10 palette — final semantic pass across customer and admin screens. */
+:root{
+  --primary:#5B2EFF;
+  --accent:#FFB020;
+  --success:#0B7F6C;
+  --success-bright:#14D3B4;
+  --danger:#FF5470;
+  --bg:#F6F4FF;
+  --surface:#FFFFFF;
+  --surface-soft:#EEEAFB;
+  --text:#1A1533;
+  --text-2:#6B6590;
+  --purple-soft:#B9A8FF;
+}
+html[data-theme="dark"]{
+  --bg:#0E0B1F;
+  --surface:#1A1633;
+  --surface-soft:#241E43;
+  --text:#F4F2FF;
+  --text-2:#A9A3C9;
+  --success:#14D3B4;
+}
+.app-shell:not(.theme-dark),.admin-shell:not(.theme-dark){
+  --success:#0B7F6C;
+}
+.app-shell.theme-dark,.admin-shell.theme-dark{
+  --success:#14D3B4;
+}
+
+/* Replace legacy teal/blue accents with the approved purple identity. */
+.app-shell :is(.event-date,.event-list-price,.event-list-meta p svg,
+.event-list-info p svg,.event-category-chip,.home-search>button,
+.text-link,.map-link,.detail-share,.detail-back,.profile-avatar-edit,
+.tickets-screen .ticket-tabs button.active,.notification-filters button.active),
+.admin-shell :is(.admin-event-editor-eyebrow,.admin-event-section-title>span,
+.admin-stat-tabs button.active,.admin-sidebar nav button.active){
+  color:var(--primary)!important;
+}
+.app-shell :is(.event-category-chip,.event-list-info>.event-category-chip,
+.home-search>button,.screen-icon,.empty-illustration,.profile-avatar,
+.notification-icon,.admin-brand>span){
+  border-color:color-mix(in srgb,var(--primary) 22%,var(--line));
+  background:color-mix(in srgb,var(--primary) 9%,var(--surface))!important;
+}
+.app-shell :is(.category.active,.ticket-tabs button.active,
+.notification-filters button.active,.tier-card.tier-selected),
+.admin-shell :is(.admin-sidebar nav button.active,.admin-stat-tabs button.active){
+  background:var(--primary)!important;
+  border-color:var(--primary)!important;
+  color:#fff!important;
+}
+.app-shell :is(.btn-primary,.profile-avatar-edit,.role-workspace-button.active),
+.admin-shell :is(.admin-create-button,.admin-user-save-role){
+  background:var(--primary)!important;
+  border-color:var(--primary)!important;
+  color:#fff!important;
+}
+.app-shell :is(.btn-outline,.btn-light,.detail-glass-button),
+.admin-shell :is(.admin-refresh,.admin-event-edit,.admin-event-editor-cancel,
+.admin-event-editor-close,.admin-print-button){
+  background:var(--surface)!important;
+  border-color:var(--line)!important;
+  color:var(--text)!important;
+}
+.app-shell :is(.event-list-card.ticket-style-card,.trending-card,
+.ticket-preview-card,.event-card,.detail-quick-info,.detail-about,
+.detail-ticket-section,.detail-facts>div,.detail-quantity,.booking-steps),
+.admin-shell :is(.admin-panel,.admin-metric,.admin-event-card,.admin-booking-card,
+.admin-payment-card,.admin-event-form,.admin-ticket-editor,.admin-ticket-row,
+.admin-selected-event,.admin-users-table-wrap,.admin-table-wrap,
+.admin-data-table,.admin-users-table,.admin-stat-card,.admin-activity-item){
+  background:var(--surface)!important;
+  border-color:var(--line)!important;
+  color:var(--text)!important;
+}
+.app-shell :is(.event-title,.event-list-info h3,.detail-title-row h1,
+.detail-section h2,.screen-heading h1,.profile-card strong,
+.notification-item strong,.tier-name,.detail-dock-summary strong),
+.admin-shell :is(.admin-panel-head h3,.admin-metric strong,
+.admin-event-card-title h4,.admin-booking-card-head h4,
+.admin-payment-card-head h4,.admin-stats-heading,.admin-selected-event h3,
+.admin-activity-results-head h4){
+  color:var(--text)!important;
+}
+.app-shell :is(.event-meta,.event-list-meta,.detail-section>p,.detail-facts small,
+.screen-heading p,.profile-card p,.notification-item p,.notification-item small,
+.tier-note,.detail-dock-summary small,.detail-dock-summary>span),
+.admin-shell :is(.admin-panel-head p,.admin-footer,.admin-event-card-meta,
+.admin-booking-card-grid small,.admin-booking-card-head small,
+.admin-payment-card-grid small,.admin-payment-card-head small,
+.admin-form-hint,.admin-stat-hint,.admin-user-email){
+  color:var(--text-2)!important;
+}
+.app-shell.theme-dark :is(.event-title,.event-list-info h3,.detail-title-row h1,
+.detail-section h2,.screen-heading h1,.profile-card strong,
+.notification-item strong,.tier-name,.detail-dock-summary strong),
+.admin-shell.theme-dark :is(.admin-panel-head h3,.admin-metric strong,
+.admin-event-card-title h4,.admin-booking-card-head h4,
+.admin-payment-card-head h4,.admin-stats-heading,.admin-selected-event h3,
+.admin-data-table td,.admin-users-table td){
+  color:#F4F2FF!important;
+}
+.app-shell.theme-dark :is(.event-meta,.event-list-meta,.detail-section>p,
+.detail-facts small,.screen-heading p,.profile-card p,.notification-item p,
+.notification-item small,.tier-note,.detail-dock-summary small),
+.admin-shell.theme-dark :is(.admin-panel-head p,.admin-footer,.admin-event-card-meta,
+.admin-booking-card-grid small,.admin-booking-card-head small,
+.admin-payment-card-grid small,.admin-payment-card-head small,
+.admin-form-hint,.admin-stat-hint,.admin-user-email){
+  color:#A9A3C9!important;
+}
+.app-shell.theme-dark :is(.event-card,.event-list-card,.trending-card,
+.ticket-preview-card,.notification-item,.profile-card,.profile-form,
+.profile-account-card,.profile-settings-panel,.empty-panel,.settings-row,
+.role-workspace-button,.gatekeeper-workspace,.gatekeeper-assigned-event,
+.checkout-section,.checkout-event,.payment-summary,.payment-placeholder,
+.account-details,.account-number-card,.receipt-upload,.tier-card,
+.detail-quick-info,.detail-about,.detail-ticket-section,.detail-facts>div,
+.detail-quantity,.booking-steps,.haddir-ticket){
+  background:#1A1633!important;
+  border-color:var(--line)!important;
+  color:#F4F2FF!important;
+}
+.admin-shell.theme-dark :is(.admin-panel,.admin-metric,.admin-event-card,
+.admin-booking-card,.admin-payment-card,.admin-event-form,.admin-ticket-editor,
+.admin-ticket-row,.admin-selected-event,.admin-users-table-wrap,
+.admin-table-wrap,.admin-data-table,.admin-users-table,.admin-stat-card,
+.admin-shortcuts button,.admin-activity-stats article,
+.admin-activity-filter-panel,.admin-activity-item){
+  background:#1A1633!important;
+  border-color:var(--line)!important;
+  color:#F4F2FF!important;
+}
+
+/* Inputs and table surfaces follow the active theme. */
+.app-shell :is(input,textarea,select),.admin-shell :is(input,textarea,select){
+  border-color:var(--line);
+}
+.app-shell:not(.theme-dark) :is(input,textarea,select),
+.admin-shell:not(.theme-dark) :is(input,textarea,select){
+  background:#fff;
+  color:#1A1533;
+}
+.app-shell.theme-dark :is(input,textarea,select),
+.admin-shell.theme-dark :is(input,textarea,select){
+  background:#0E0B1F!important;
+  color:#F4F2FF!important;
+  border-color:var(--line)!important;
+}
+.app-shell :is(input,textarea,select)::placeholder,
+.admin-shell :is(input,textarea,select)::placeholder{color:var(--text-2)!important}
+.admin-shell :is(.admin-data-table th,.admin-users-table th){
+  background:var(--surface-soft)!important;
+  color:var(--text-2)!important;
+  border-color:var(--line)!important;
+}
+.admin-shell.theme-dark :is(.admin-data-table th,.admin-users-table th){
+  background:#241E43!important;
+  color:#B9A8FF!important;
+}
+
+/* Semantic states: turquoise success/available, red failure/sold out. */
+.app-shell :is(.ticket-confirmed,.ticket-preview-status.valid,
+.event-status.status-available,.event-status.status-published,
+.gatekeeper-result.valid,.gatekeeper-network.online,.save-confirm,
+.admin-event-status.status-published,.admin-payment-approve){
+  background:color-mix(in srgb,var(--success-bright) 14%,var(--surface))!important;
+  border-color:color-mix(in srgb,var(--success-bright) 34%,var(--line))!important;
+  color:var(--success)!important;
+}
+.app-shell :is(.event-status.status-sold-out,.event-status.status-cancelled,
+.event-status.status-rejected,.ticket-preview-status.invalid,
+.gatekeeper-result.invalid,.gatekeeper-result.error,.gatekeeper-network.offline,
+.admin-event-status.status-cancelled,.admin-payment-reject,.admin-event-delete){
+  background:color-mix(in srgb,var(--danger) 12%,var(--surface))!important;
+  border-color:color-mix(in srgb,var(--danger) 30%,var(--line))!important;
+  color:var(--danger)!important;
+}
+.theme-dark .app-shell :is(.ticket-confirmed,.ticket-preview-status.valid,
+.event-status.status-available,.event-status.status-published,
+.gatekeeper-result.valid,.gatekeeper-network.online,.save-confirm),
+.theme-dark .admin-shell .admin-payment-approve{
+  color:#14D3B4!important;
+}
+.app-shell :is(.vip-badge,.event-vip-badge){
+  background:#FFB020!important;
+  border-color:#FFB020!important;
+  color:#1A1533!important;
+}
+
+/* Gold is reserved for the single main booking/payment action. */
+.app-shell :is(.pay-button,.detail-booking-dock .pay-button,
+.checkout-submit-dock .pay-button){
+  background:#FFB020!important;
+  border-color:#FFB020!important;
+  color:#1A1533!important;
+  box-shadow:0 7px 20px rgba(255,176,32,.2)!important;
+}
+.app-shell :is(.pay-button,.detail-booking-dock .pay-button,
+.checkout-submit-dock .pay-button):disabled{
+  opacity:.48!important;
+  box-shadow:none!important;
+}
+
+/* Keep provider artwork and account branding on white, and QR strictly white. */
+.app-shell :is(.payment-provider-card,.payment-method-logo-wrap,
+.payment-provider-logo,.bank-logo-card,.payment-brand-card){
+  background:#fff!important;
+}
+.app-shell .haddir-ticket-qr,
+.app-shell .haddir-ticket-qr svg{
+  background:#fff!important;
+  color:#1A1533!important;
+}
+.app-shell .haddir-ticket{
+  background:#fff!important;
+  color:#1A1533!important;
+}
+.app-shell .haddir-ticket :is(.haddir-ticket-event h2,.haddir-ticket-meta strong,
+.haddir-ticket-code strong){color:#1A1533!important}
+.app-shell .haddir-ticket :is(.haddir-ticket-event small,.haddir-ticket-meta small,
+.haddir-ticket-code small,.haddir-ticket-qr small){color:#6B6590!important}
+.app-shell .haddir-ticket-footer{
+  background:#F6F4FF!important;
+  color:#0B7F6C!important;
+}
+
+/* Reports are print-first documents: white paper with the approved purple identity. */
+.admin-event-report,.admin-report-page{
+  background:#fff!important;
+  color:#1A1533!important;
+}
+.admin-report-topline,.admin-report-kicker,.admin-report-section-head{
+  color:#5B2EFF!important;
+}
+.admin-report-page :is(h1,h2,h3,strong,th){color:#1A1533}
+.admin-report-page :is(p,small,td,.admin-report-subtitle,.admin-report-note){color:#6B6590}
