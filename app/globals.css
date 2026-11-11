@@ -9775,30 +9775,16 @@ html[data-theme="dark"] .auth-gate,
 }
 
 
-/* 3px ticket outline follows the rounded card and both semicircular notches. */
-.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card{
-  border:3px solid #5B2EFF!important;
-  border-radius:18px!important;
-  overflow:visible!important;
-  box-sizing:border-box!important;
-}
-.app-shell.theme-dark .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card{
-  border-color:#B9A8FF!important;
-}
+/* Ticket notches: clean page-background cut-outs at both ends of the price divider.
+   Keep the card rectangular with soft corners; no colored fill or extra footer quarters. */
 .app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-perforation::before,
 .app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-perforation::after{
   top:-16px!important;
   width:32px!important;
   height:32px!important;
-  border:3px solid #5B2EFF!important;
   border-radius:50%!important;
   background:var(--bg)!important;
   box-shadow:none!important;
-  box-sizing:border-box!important;
-}
-.app-shell.theme-dark .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-perforation::before,
-.app-shell.theme-dark .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-perforation::after{
-  border-color:#B9A8FF!important;
 }
 .app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-footer::before,
 .app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-footer::after{
