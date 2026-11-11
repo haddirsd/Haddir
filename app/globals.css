@@ -7633,26 +7633,3 @@ html[data-theme="dark"] .admin-panel .admin-event-editor-page .admin-event-form-
   user-select: text;
   -webkit-touch-callout: default;
 }
-
-
-/* Mobile scroll performance: avoid repaint-heavy backdrop filters on fixed UI. */
-@media (max-width: 768px) {
-  .app-content .event-detail-layout .detail-sticky-controls,
-  .app-content .event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer {
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-    background: var(--surface-strong, var(--surface)) !important;
-  }
-
-  .app-shell .home-discovery .trending-category,
-  .app-shell .home-discovery .trending-price {
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-    background: rgba(8, 34, 41, .88) !important;
-  }
-
-  .app-shell .home-discovery .trending-dot {
-    animation: none !important;
-    box-shadow: 0 0 0 3px rgba(239, 82, 101, .10) !important;
-  }
-}
