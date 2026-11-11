@@ -8833,3 +8833,132 @@ html[data-theme="dark"] .auth-gate,
   color:#B9A8FF!important;
   stroke:#B9A8FF!important;
 }
+
+
+/* Event details — dedicated dark palette, scoped to the details page only. */
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet){
+  color:#F4F2FF!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-sticky-controls{
+  background:#1A1633!important;
+  border-color:rgba(185,168,255,.2)!important;
+  box-shadow:0 6px 18px rgba(0,0,0,.2)!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) :is(.detail-sticky-back,.detail-sticky-share,.detail-sticky-category){
+  color:#B9A8FF!important;
+  background:#241E43!important;
+  border:1px solid rgba(185,168,255,.22)!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-sticky-category{
+  color:#F4F2FF!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-cover-title h1{
+  color:#FFFFFF!important;
+  text-shadow:0 2px 14px rgba(0,0,0,.55)!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-quick-info .quick-info-row{
+  color:#F4F2FF!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-quick-info .quick-info-row :is(small,span:not(.quick-info-icon)){
+  color:#A9A3C9!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-quick-info .quick-info-row strong{
+  color:#F4F2FF!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .quick-info-icon{
+  background:rgba(91,46,255,.2)!important;
+  color:#B9A8FF!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .quick-location-row>svg{
+  color:#B9A8FF!important;
+  stroke:#B9A8FF!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) :is(.detail-about,.detail-ticket-section){
+  background:#1A1633!important;
+  border:1px solid rgba(185,168,255,.18)!important;
+  color:#F4F2FF!important;
+  box-shadow:0 12px 28px rgba(0,0,0,.16)!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-section h2{
+  color:#F4F2FF!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-about p{
+  color:#A9A3C9!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-sheet .detail-about h2:before{
+  background:#B9A8FF!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .tier-heading>span{
+  color:#A9A3C9!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .tier-card{
+  background:#241E43!important;
+  border-color:rgba(185,168,255,.2)!important;
+  color:#F4F2FF!important;
+  box-shadow:none!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .tier-card .tier-name{
+  color:#F4F2FF!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .tier-card .tier-price{
+  color:#B9A8FF!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .tier-card .tier-availability{
+  color:#A9A3C9!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .tier-card .tier-radio{
+  border-color:rgba(185,168,255,.55)!important;
+  color:#1A1633!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .tier-card.tier-selected{
+  background:rgba(91,46,255,.22)!important;
+  border-color:#B9A8FF!important;
+  box-shadow:0 0 0 1px rgba(185,168,255,.12)!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .tier-card.tier-selected .tier-radio{
+  background:#B9A8FF!important;
+  border-color:#B9A8FF!important;
+  color:#1A1633!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-quantity{
+  background:#1A1633!important;
+  border:1px solid rgba(185,168,255,.2)!important;
+  color:#F4F2FF!important;
+  box-shadow:none!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .quantity-heading :is(h3,strong){
+  color:#F4F2FF!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .quantity-heading span{
+  color:#A9A3C9!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .quantity-control button{
+  background:#241E43!important;
+  border-color:rgba(185,168,255,.28)!important;
+  color:#B9A8FF!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .quantity-control strong{
+  color:#F4F2FF!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer{
+  background:#1A1633!important;
+  border:1px solid rgba(185,168,255,.22)!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.28)!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-dock-summary :is(small,span){
+  color:#A9A3C9!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-dock-summary strong{
+  color:#F4F2FF!important;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .ticket-count-badge{
+  background:rgba(91,46,255,.24)!important;
+  border:1px solid rgba(185,168,255,.28)!important;
+  color:#B9A8FF!important;
+}
