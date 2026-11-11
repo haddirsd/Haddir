@@ -22,9 +22,12 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
   },
   icons: {
-    icon: [{ url: "/haddir_icon.svg", type: "image/svg+xml", sizes: "any" }],
-    shortcut: [{ url: "/haddir_icon.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/haddir_icon.svg", type: "image/svg+xml" }],
+    icon: [
+      { url: "/icons/icon-192.svg", type: "image/svg+xml", sizes: "192x192" },
+      { url: "/icons/icon-512.svg", type: "image/svg+xml", sizes: "512x512" },
+    ],
+    shortcut: [{ url: "/icons/icon-192.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/icons/icon-512.svg", type: "image/svg+xml" }],
   },
 };
 
