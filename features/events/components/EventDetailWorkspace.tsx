@@ -111,7 +111,7 @@ export function EventDetailWorkspace({
           </div>
           <div className={"detail-cover event-cover " + event.cover}>
             {event.coverImageUrl && (
-              <img className="event-cover-image" src={event.coverImageUrl} alt={event.title} />
+              <img className="event-cover-image" src={event.coverImageUrl} alt={event.title} decoding="async" />
             )}
             <div className="detail-cover-shade" />
             <div className="detail-cover-title">
