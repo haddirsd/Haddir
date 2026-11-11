@@ -67,7 +67,14 @@ export function PaymentCheckout({
         onCopyAccount={onCopyAccount}
       />
 
-      <ReceiptUpload receipt={receipt} onReceiptChange={onReceiptChange} />
+      {paymentMethod ? (
+        <ReceiptUpload receipt={receipt} onReceiptChange={onReceiptChange} />
+      ) : (
+        <section className="checkout-section receipt-locked" aria-live="polite">
+          <h2>إرفاق إيصال التحويل</h2>
+          <p>اختَر البنك أو حساب التحويل أولاً، وبعدها سيظهر لك زر إرفاق صورة الإيصال.</p>
+        </section>
+      )}
 
       {bookingError && <p className="checkout-footnote" role="alert">{bookingError}</p>}
       <p className="checkout-footnote">
