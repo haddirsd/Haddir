@@ -9822,3 +9822,39 @@ html[data-theme="dark"] .auth-gate,
   content:none!important;
   display:none!important;
 }
+
+
+/* Dark-mode glass motion: a soft moving light reflection on the active bottom-nav control.
+   This is decorative only; button sizing, position, and navigation behavior stay unchanged. */
+.app-shell.theme-dark .bottom-nav button{
+  position:relative!important;
+  isolation:isolate;
+  overflow:hidden!important;
+}
+.app-shell.theme-dark .bottom-nav button.selected::after{
+  content:""!important;
+  position:absolute!important;
+  inset:-45% auto -45% -65%!important;
+  width:42%!important;
+  height:190%!important;
+  border:0!important;
+  border-radius:999px!important;
+  background:linear-gradient(105deg,transparent 0%,rgba(255,255,255,0) 28%,rgba(255,255,255,.10) 45%,rgba(255,255,255,.48) 50%,rgba(255,255,255,.12) 56%,transparent 76%)!important;
+  box-shadow:none!important;
+  pointer-events:none!important;
+  transform:translateX(-150%) skewX(-18deg)!important;
+  animation:haddir-nav-glass-sheen 4.8s ease-in-out infinite!important;
+  z-index:2!important;
+}
+@keyframes haddir-nav-glass-sheen{
+  0%,18%{transform:translateX(-150%) skewX(-18deg);opacity:0}
+  28%{opacity:1}
+  58%{transform:translateX(430%) skewX(-18deg);opacity:.8}
+  68%,100%{transform:translateX(430%) skewX(-18deg);opacity:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .app-shell.theme-dark .bottom-nav button.selected::after{
+    animation:none!important;
+    opacity:0!important;
+  }
+}
