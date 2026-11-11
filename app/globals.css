@@ -8764,3 +8764,26 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
 .app-shell.theme-dark .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-perforation::after{
   background:#FF7EB6!important;
 }
+
+
+/* Floating bottom navigation: restrained glass treatment in both themes. */
+.app-shell .bottom-nav{
+  background:rgba(246,244,255,.72)!important;
+  border:1px solid rgba(91,46,255,.22)!important;
+  box-shadow:0 14px 34px rgba(36,20,91,.16),inset 0 1px 0 rgba(255,255,255,.82)!important;
+  -webkit-backdrop-filter:blur(14px) saturate(145%)!important;
+  backdrop-filter:blur(14px) saturate(145%)!important;
+}
+.app-shell.theme-dark .bottom-nav{
+  background:linear-gradient(135deg,rgba(93,47,255,.58),rgba(40,21,104,.58) 48%,rgba(14,11,31,.72))!important;
+  border-color:rgba(185,168,255,.3)!important;
+  box-shadow:0 16px 40px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.16)!important;
+  -webkit-backdrop-filter:blur(14px) saturate(150%)!important;
+  backdrop-filter:blur(14px) saturate(150%)!important;
+}
+@media(max-width:767px){
+  .app-shell .bottom-nav{
+    -webkit-backdrop-filter:blur(10px) saturate(135%)!important;
+    backdrop-filter:blur(10px) saturate(135%)!important;
+  }
+}
