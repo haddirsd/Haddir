@@ -8753,3 +8753,14 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
   color:#FFB020!important;
   -webkit-text-fill-color:#FFB020!important;
 }
+
+
+/* Pink accents on the homepage search icon and remaining-event ticket cut-outs in dark mode. */
+.app-shell.theme-dark .home-discovery .home-search>svg{
+  color:#FF7EB6!important;
+  stroke:#FF7EB6!important;
+}
+.app-shell.theme-dark .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-perforation::before,
+.app-shell.theme-dark .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-perforation::after{
+  background:#FF7EB6!important;
+}
