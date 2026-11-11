@@ -8762,7 +8762,8 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
 }
 .app-shell.theme-dark .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-perforation::before,
 .app-shell.theme-dark .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-perforation::after{
-  background:#FF7EB6!important;
+  background:#EF5265!important;
+  box-shadow:0 0 0 3px rgba(239,82,101,.12),0 0 10px rgba(239,82,101,.42)!important;
 }
 
 
