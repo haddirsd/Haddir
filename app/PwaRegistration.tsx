@@ -100,7 +100,7 @@ export function PwaRegistration() {
         bottom: "calc(86px + env(safe-area-inset-bottom))",
         maxWidth: 520, marginInline: "auto", padding: 15,
         display: "flex", alignItems: "center", gap: 12,
-        border: "1px solid rgba(44,141,160,.25)", borderRadius: 17,
+        border: "1px solid rgba(91,46,255,.22)", borderRadius: 17,
         background: "var(--surface, #fff)", color: "var(--fg, #18343a)",
         boxShadow: "0 12px 36px rgba(12,48,57,.2)",
         fontFamily: "var(--font-sans, sans-serif)",
@@ -109,7 +109,7 @@ export function PwaRegistration() {
       <span aria-hidden="true" style={{
         display: "grid", placeItems: "center", flex: "0 0 38px",
         width: 38, height: 38, borderRadius: 12,
-        background: "rgba(44,141,160,.12)", color: "#2c8da0", fontSize: 20,
+        background: "rgba(91,46,255,.11)", color: "#5B2EFF", fontSize: 20,
       }}>↻</span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <strong style={{ display: "block", fontSize: 13 }}>تحديث جديد لحاضر جاهز</strong>
@@ -119,7 +119,7 @@ export function PwaRegistration() {
       </div>
       <button type="button" onClick={applyUpdate} disabled={installingUpdate} style={{
         flex: "0 0 auto", border: 0, borderRadius: 10, padding: "10px 13px",
-        background: "#2c8da0", color: "#fff", font: "inherit",
+        background: "#5B2EFF", color: "#fff", font: "inherit",
         fontSize: 11, fontWeight: 800, opacity: installingUpdate ? .65 : 1,
       }}>{installingUpdate ? "جارٍ التحديث..." : "حدّث الآن"}</button>
       <button type="button" aria-label="لاحقاً" onClick={() => setUpdateReady(false)} style={{
