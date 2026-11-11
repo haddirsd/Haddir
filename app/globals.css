@@ -8722,3 +8722,18 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
 .app-shell.theme-dark .trending-section .redesign-title h2{
   color:#FFFFFF!important;
 }
+
+
+/* Homepage event prices use the approved gold accent. */
+.app-shell:not(.theme-dark) .home-discovery .event-list-price{
+  color:#A96500!important;
+}
+.app-shell.theme-dark .home-discovery .event-list-price{
+  color:#FFB020!important;
+}
+.app-shell .home-discovery .trending-price{
+  border-color:#FFB020!important;
+  background:rgba(26,22,51,.88)!important;
+  color:#FFB020!important;
+  box-shadow:0 6px 16px rgba(255,176,32,.2)!important;
+}
