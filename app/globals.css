@@ -9791,3 +9791,34 @@ html[data-theme="dark"] .auth-gate,
   content:none!important;
   display:none!important;
 }
+
+
+/* Restore the two inward semicircular ticket cut-outs using the card's actual notch elements. */
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card{
+  overflow:hidden!important;
+}
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-notch{
+  display:block!important;
+  position:absolute!important;
+  z-index:5!important;
+  top:calc(100% - 59px)!important;
+  width:32px!important;
+  height:32px!important;
+  border-radius:50%!important;
+  background:var(--bg,#F6F4FF)!important;
+  box-shadow:none!important;
+  pointer-events:none!important;
+}
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-notch-right{
+  right:-16px!important;
+  left:auto!important;
+}
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-notch-left{
+  left:-16px!important;
+  right:auto!important;
+}
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-perforation::before,
+.app-shell .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-perforation::after{
+  content:none!important;
+  display:none!important;
+}
