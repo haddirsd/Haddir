@@ -10408,6 +10408,10 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 #haddir-splash .notch{animation:hs-pop .35s cubic-bezier(.3,1.5,.5,1) both,hs-fade .3s ease-in .75s both}
 #haddir-splash .L{animation:hs-fold .45s cubic-bezier(.3,1.4,.5,1) both}
 #haddir-splash .hp{animation:hs-tear .5s cubic-bezier(.3,1.3,.5,1) both}
+#haddir-splash .hp-one{--x:-70px;--y:30px;--r:-14deg}
+#haddir-splash .hp-two{--x:0;--y:-70px;--r:10deg}
+#haddir-splash .hp-three{--x:70px;--y:30px;--r:14deg}
+#haddir-splash .tilt-left{--s:-5deg}
 #haddir-splash .icon{animation:hs-stamp .4s ease-out 1.5s both}
 #haddir-splash .hx{animation:hs-fade-in .3s ease-out 1.0s both}
 #haddir-splash .march{stroke-dasharray:7 6;animation:hs-march 1s linear infinite}
