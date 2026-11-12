@@ -20,8 +20,8 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/icons/icon-192.svg", type: "image/svg+xml", sizes: "192x192" },
-      { url: "/icons/icon-512.svg", type: "image/svg+xml", sizes: "512x512" },
+      { url: "/icons/icon-192-brand.svg", type: "image/svg+xml", sizes: "192x192" },
+      { url: "/icons/icon-512-brand.svg", type: "image/svg+xml", sizes: "512x512" },
     ],
   },
 };
