@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Ticket, RefreshCw } from "lucide-react";
+import { HaddirDialog } from "../../../components/ui/HaddirDialog";
 import { reviewAdminPayment } from "./admin-payments.service";
 import { useAdminPayments } from "./useAdminPayments";
 import type { AdminPaymentDecision, AdminPaymentRow } from "./admin-payments.types";
@@ -16,11 +17,12 @@ export default function AdminPaymentsWorkspace() {
   const [actionMessage, setActionMessage] = useState("");
   const [actionError, setActionError] = useState("");
   const [reviewing, setReviewing] = useState(false);
+  const [approvalTarget,setApprovalTarget]=useState<AdminPaymentRow|null>(null);
 
   const reviewPayment = async (row: AdminPaymentRow, decision: AdminPaymentDecision) => {
     const reason = decision === "reject" ? (rejectionReasons[row.id] || "").trim() : null;
     if (decision === "reject" && !reason) { setActionError("اكتب سبب الرفض أولاً حتى نرسله للعميل."); return; }
-    if (decision === "approve" && !window.confirm("تأكيد قبول الدفع وإصدار تذاكر برموز دخول من 10 أرقام؟")) return;
+    if (decision === "approve") { setApprovalTarget(row); return; }
     setReviewing(true); setActionError(""); setActionMessage("");
     try {
       const result = await reviewAdminPayment(row.id, decision, reason);
@@ -79,5 +81,6 @@ export default function AdminPaymentsWorkspace() {
         </article>;
       })}
     </div>}
+    {approvalTarget&&<HaddirDialog open title="اعتماد الدفع وإصدار التذاكر؟" description="سيتم اعتماد إثبات التحويل وإصدار تذاكر برموز دخول من 10 أرقام وإرسال إشعار للعميل." confirmLabel="اعتماد الدفع" tone="success" busy={reviewing} onCancel={()=>setApprovalTarget(null)} onConfirm={async()=>{const row=approvalTarget;setApprovalTarget(null);await reviewPayment(row,"approve");}}/>}
   </section>;
 }
