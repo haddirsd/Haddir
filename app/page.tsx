@@ -17,7 +17,7 @@ export default function Home(){
  const [fullName,setFullName]=useState(""),[email,setEmail]=useState(""),[phone,setPhone]=useState(""),[avatarUrl,setAvatarUrl]=useState(""),[profileEditing,setProfileEditing]=useState(false),[saved,setSaved]=useState(false),[profileSaving,setProfileSaving]=useState(false);
  const [authUser,setAuthUser]=useState<{id:string;email?:string;user_metadata?:Record<string,unknown>}|null>(null),[userRole,setUserRole]=useState("customer"),[authMessage,setAuthMessage]=useState(""),[activeWorkspace,setActiveWorkspace]=useState<"customer"|"organizer"|"gatekeeper"|"advertiser"|"admin"|"owner"|null>(null);
  const [isGatekeeperPage,setIsGatekeeperPage]=useState(false);
- const [showWelcome,setShowWelcome]=useState(true),[welcomeGreeting,setWelcomeGreeting]=useState("أهلاً بيك في حاضر");
+ const [showWelcome,setShowWelcome]=useState(true),[welcomeFading,setWelcomeFading]=useState(false),[welcomeGreeting,setWelcomeGreeting]=useState("أهلاً بيك في حاضر");
  const [assignedEvent,setAssignedEvent]=useState<any|null>(null);
  const [myTickets,setMyTickets]=useState<any[]>([]),[myNotifications,setMyNotifications]=useState<any[]>([]),[accountDataLoading,setAccountDataLoading]=useState(false),[accountDataError,setAccountDataError]=useState("");
  const [notificationFilter,setNotificationFilter]=useState<"unread"|"read">("unread");
@@ -54,7 +54,7 @@ export default function Home(){
  },[authUser]);
  useEffect(()=>{const saved=window.localStorage.getItem("haddir-theme");const prefersDark=window.matchMedia?.("(prefers-color-scheme: dark)").matches;setDarkMode(saved?saved==="dark":!!prefersDark);},[]);
  useEffect(()=>{document.documentElement.dataset.theme=darkMode?"dark":"light";document.documentElement.style.colorScheme=darkMode?"dark":"light";window.localStorage.setItem("haddir-theme",darkMode?"dark":"light");const themeMeta=document.querySelector('meta[name="theme-color"]');themeMeta?.setAttribute("content",darkMode?"#1D135D":"#F6F4FF");},[darkMode]);
- useEffect(()=>{const hour=Number(new Intl.DateTimeFormat("en-GB",{timeZone:"Africa/Khartoum",hour:"2-digit",hourCycle:"h23"}).format(new Date()));setWelcomeGreeting(hour>=5&&hour<11?"صباح الخير":hour>=11&&hour<17?"نهارك سعيد":hour>=17&&hour<23?"مساء الخير":"ليلة سعيدة");const timer=window.setTimeout(()=>setShowWelcome(false),3050);return()=>window.clearTimeout(timer);},[]);
+ useEffect(()=>{const hour=Number(new Intl.DateTimeFormat("en-GB",{timeZone:"Africa/Khartoum",hour:"2-digit",hourCycle:"h23"}).format(new Date()));setWelcomeGreeting(hour>=5&&hour<11?"صباح الخير":hour>=11&&hour<17?"نهارك سعيد":hour>=17&&hour<23?"مساء الخير":"ليلة سعيدة");let seen=false;try{seen=sessionStorage.getItem("haddir_splash")==="1";}catch(e){}if(seen){setShowWelcome(false);return;}try{sessionStorage.setItem("haddir_splash","1");}catch(e){}let removeTimer: number|undefined;const fadeTimer=window.setTimeout(()=>{setWelcomeFading(true);removeTimer=window.setTimeout(()=>setShowWelcome(false),450);},2600);return()=>{window.clearTimeout(fadeTimer);if(removeTimer!==undefined)window.clearTimeout(removeTimer);};},[]);
  useEffect(()=>{const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("تسجيل الدخول يحتاج إعداد مفاتيح Supabase في بيئة الموقع.");return;}let alive=true;const load=async(user:{id:string;email?:string;user_metadata?:Record<string,unknown>}|null)=>{if(!alive)return;setAuthUser(user as typeof authUser);if(user){const {data}=await supabase.from("profiles").select("role,full_name,phone").eq("id",user.id).maybeSingle();if(!alive)return;setUserRole(data?.role||"customer");const {data:assignmentRows}=await supabase.from("event_role_assignments").select("event_id,assignment_role,events(id,title,venue,city,starts_at,status)").eq("user_id",user.id).in("assignment_role",["gatekeeper","organizer","advertiser"]).limit(1);if(!alive)return;setAssignedEvent(assignmentRows?.[0]||null);const metadataName=String(user.user_metadata?.full_name||user.user_metadata?.name||"");const metadataAvatar=String(user.user_metadata?.avatar_url||user.user_metadata?.picture||"");setFullName(String(data?.full_name||metadataName||""));setPhone(String(data?.phone||""));setEmail(user.email||"");setAvatarUrl(metadataAvatar);setProfileEditing(false);setSaved(false);}else{setUserRole("customer");setAssignedEvent(null);setGatekeeperResult(null);setGatekeeperCode("");setFullName("");setEmail("");setPhone("");setAvatarUrl("");setProfileEditing(false);setSaved(false);setActiveWorkspace(null);}};supabase.auth.getSession().then(({data})=>load(data.session?.user??null));const {data:{subscription}}=supabase.auth.onAuthStateChange((_event,session)=>{void load(session?.user??null);});return()=>{alive=false;subscription.unsubscribe();};},[]);
  const gatekeeper = useGatekeeper({ authUser, assignedEvent, userRole, isGatekeeperPage, activeWorkspace });
  const {
@@ -118,32 +118,38 @@ export default function Home(){
  <>
  {!isEventDetailOpen&&(showPrivacySecurity&&!isGatekeeperPage?<header className="screen-topbar privacy-screen-topbar"><button type="button" className="privacy-back-button" onClick={()=>setShowPrivacySecurity(false)}><ChevronLeft size={18}/> رجوع</button><strong>الخصوصية والأمان</strong><span className="screen-icon"><ShieldCheck/></span></header>:isGatekeeperPage?<header className="screen-topbar gatekeeper-page-topbar"><button type="button" className="btn btn-outline" onClick={()=>{setIsGatekeeperPage(false);setActiveWorkspace(null);const url=new URL(window.location.href);url.searchParams.delete("workspace");window.location.assign(url.pathname+url.search+url.hash);}}>العودة للملف الشخصي</button><strong>مسح التذاكر</strong><span className="screen-icon"><ScanLine/></span></header>:activeTab==="home"?<header className="topbar"><div className="container header-inner"><button className="brand brand-button" onClick={()=>go("home")}><img className="brand-logo" src={darkMode?"/dark.svg?v=20261111-home-logo":"/light.svg?v=20261111-home-logo"} alt="حاضر" /></button><div className="desktop-greeting">من السودان، لكل لحظة تستاهل الحضور.</div><button className="header-icon theme-toggle" type="button" aria-label={darkMode?"تفعيل الوضع النهاري":"تفعيل الوضع الليلي"} aria-pressed={darkMode} title={darkMode?"تفعيل الوضع النهاري":"تفعيل الوضع الليلي"} onClick={()=>setDarkMode(v=>!v)}><span className="theme-toggle-track" aria-hidden="true"><span className="theme-toggle-knob">{darkMode?<Sun size={17} strokeWidth={2.3}/>:<Moon size={16} strokeWidth={2.3}/>}</span></span></button></div></header>:<header className="screen-topbar"><span className="screen-topbar-spacer" aria-hidden="true"/><strong>{({tickets:"تذاكري",notifications:"الإشعارات",profile:"الملف الشخصي"} as Record<string,string>)[activeTab]}</strong><span className="screen-icon">{activeTab==="tickets"?<Ticket/>:activeTab==="notifications"?<Bell/>:<UserRound/>}</span></header>)}
  <div className="app-content">
- {showWelcome&&<button type="button" className="haddir-launch-splash" aria-label="تخطي شاشة البداية" onClick={()=>setShowWelcome(false)}>
-  <svg className="haddir-original-logo" viewBox="0 0 520 210" role="img" aria-label="Haddir">
-    <g className="haddir-wordmark" aria-hidden="true">
-      <text className="haddir-letter haddir-letter-h" x="24" y="112">H</text>
-      <text className="haddir-letter haddir-letter-a" x="112" y="112">A</text>
-      <text className="haddir-letter haddir-letter-d1" x="198" y="112">D</text>
-      <text className="haddir-letter haddir-letter-d2" x="286" y="112">D</text>
-      <text className="haddir-letter haddir-letter-i" x="374" y="112">I</text>
-      <text className="haddir-letter haddir-letter-r" x="414" y="112">R</text>
-    </g>
-    <g className="haddir-ticket-line" aria-hidden="true">
-      <path className="haddir-perforation" d="M24 145H496"/>
-      <path className="haddir-perforation-cover" d="M24 145H496"/>
-      <circle className="haddir-notch haddir-notch-left" cx="24" cy="145" r="10"/>
-      <circle className="haddir-notch haddir-notch-right" cx="496" cy="145" r="10"/>
-    </g>
-    <g className="haddir-stamp" aria-hidden="true" transform="translate(238 160)">
-      <path d="M0 -19h44a8 8 0 0 1 8 8v8a8 8 0 0 0 0 16v8a8 8 0 0 1-8 8H0a8 8 0 0 1-8-8v-8a8 8 0 0 0 0-16v-8a8 8 0 0 1 8-8Z"/>
-      <path className="haddir-stamp-cut" d="M22 -14v44"/>
-    </g>
-    <g className="haddir-h-tear" aria-hidden="true">
-      <path d="M34 39l24 0v25H34z"/><path d="M34 70h24v25H34z"/>
+ {showWelcome&&<div id="haddir-splash" className={welcomeFading?"out":""} role="img" aria-label="حاضر" onClick={()=>{if(!welcomeFading){setWelcomeFading(true);window.setTimeout(()=>setShowWelcome(false),450);}}}>
+  <svg viewBox="30 370 905 230" aria-hidden="true">
+    <g className="logo p">
+      <path className="line" d="M60 484H905" stroke="#fff" strokeWidth="4" strokeDasharray="12 9" strokeLinecap="round" fill="none"/>
+      <rect className="cover" x="40" y="470" width="885" height="28" fill="#5B2EFF"/>
+      <g fill="#fff">
+        <path className="notch p" style={{animationDelay:".05s, .75s"}} d="M49 480a11 11 0 0 1 22 0zM49 488a11 11 0 0 0 22 0z"/>
+        <path className="notch p" style={{animationDelay:".15s, .75s"}} d="M199 480a11 11 0 0 1 22 0zM199 488a11 11 0 0 0 22 0z"/>
+        <path className="notch p" style={{animationDelay:".25s, .75s"}} d="M377 480a11 11 0 0 1 22 0zM377 488a11 11 0 0 0 22 0z"/>
+        <path className="notch p" style={{animationDelay:".35s, .75s"}} d="M553 480a11 11 0 0 1 22 0zM553 488a11 11 0 0 0 22 0z"/>
+        <path className="notch p" style={{animationDelay:".45s, .75s"}} d="M706 480a11 11 0 0 1 22 0zM706 488a11 11 0 0 0 22 0z"/>
+        <path className="notch p" style={{animationDelay:".55s, .75s"}} d="M755 480a11 11 0 0 1 22 0zM755 488a11 11 0 0 0 22 0z"/>
+        <path className="notch p" style={{animationDelay:".6s, .75s"}} d="M894 480a11 11 0 0 1 22 0zM894 488a11 11 0 0 0 22 0z"/>
+      </g>
+      <g fill="#fff">
+        <path className="hp p" style={{"--x":"-70px","--y":"30px","--r":"-14deg",animationDelay:".5s"}} d="M60 410h48v148H60z"/>
+        <path className="hp p" style={{"--x":"0","--y":"-70px","--r":"10deg",animationDelay:".6s"}} d="M108 476h47v39h-47z"/>
+        <path className="hp p" style={{"--x":"70px","--y":"30px","--r":"14deg",animationDelay:".7s"}} d="M155 410h48v148h-48z"/>
+        <g className="hx"><g fill="#5B2EFF"><circle cx="60" cy="430" r="7"/><circle cx="108" cy="430" r="7"/><circle cx="155" cy="536" r="7"/><circle cx="203" cy="536" r="7"/></g>
+          <path className="march" d="M155 443h48M60 536h48" stroke="#5B2EFF" strokeWidth="3" fill="none"/></g>
+        <g className="L p" style={{animationDelay:".75s"}}><path d="M256 410h80l37 148h-50l-27-118-27 118h-51z"/></g>
+        <g className="L p" style={{animationDelay:".88s","--s":"-5deg"}}><path d="M402 411h70c50 0 81 28 81 73s-31 74-81 74h-70z"/>
+          <g className="icon p"><rect x="444" y="435" width="55" height="102" rx="7" fill="#5B2EFF"/>
+            <path className="march" d="M444 460h55" stroke="#fff" strokeWidth="3" fill="none"/>
+            <circle cx="471" cy="435" r="8" fill="#fff"/><circle cx="471" cy="537" r="8" fill="#fff"/></g></g>
+        <g className="L p" style={{animationDelay:"1.01s"}}><path d="M585 420h42c55 0 67 38 67 64s-12 64-67 64h-42z" fill="none" stroke="#fff" strokeWidth="19"/></g>
+        <g className="L p" style={{animationDelay:"1.14s","--s":"-5deg"}}><rect x="730" y="410" width="20" height="148"/><path className="march" d="M730 443h20" stroke="#5B2EFF" strokeWidth="3"/></g>
+        <g className="L p" style={{animationDelay:"1.27s"}}><path d="M792 558V420h53c40 0 52 20 52 42 0 26-17 43-47 46 8 32 25 45 55 41" fill="none" stroke="#fff" strokeWidth="19"/></g>
+      </g>
     </g>
   </svg>
-  <span className="haddir-launch-skip">اضغط للتخطي</span>
-</button>}
+</div>}
  <EventsWorkspace
   showHome={!isGatekeeperPage&&activeTab==="home"}
   resetKey={eventResetKey}
