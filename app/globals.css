@@ -10394,3 +10394,23 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 .app-shell .privacy-danger-button:disabled{opacity:.6;cursor:wait}
 .app-shell .privacy-delete-error{margin-top:12px!important;padding:10px 12px;border-radius:10px;background:rgba(255,84,112,.10);color:#D92D50!important;font-size:12px!important;line-height:1.8}
 .app-shell.theme-dark .privacy-delete-error{color:#FF8296!important}
+
+
+/* Full-screen launch animation: shown on every fresh app/site entry */
+.haddir-launch-splash{position:fixed;z-index:9999;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;width:100%;height:100%;min-height:100dvh;padding:24px max(20px,env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));overflow:hidden;border:0;border-radius:0;background:#5B2EFF;color:#fff;text-align:center;cursor:pointer;animation:haddir-splash-in .35s ease both}
+.haddir-launch-mark{display:grid;place-items:center;width:clamp(112px,30vw,154px);height:clamp(112px,30vw,154px);margin-bottom:5px}
+.haddir-launch-mark svg{display:block;width:100%;height:100%;overflow:visible}
+.launch-ticket-body{fill:none;stroke:#fff;stroke-width:7;stroke-linejoin:round;stroke-dasharray:520;stroke-dashoffset:520;animation:haddir-ticket-draw 1s cubic-bezier(.65,0,.35,1) .12s forwards}
+.launch-ticket-cut{fill:none;stroke:#fff;stroke-width:4;stroke-linecap:round;stroke-dasharray:5 8;opacity:0;animation:haddir-cut-in .35s ease 1.02s forwards}
+.launch-piece{fill:#fff;opacity:0;transform-box:fill-box;transform-origin:center;animation:haddir-piece-in .48s cubic-bezier(.2,.8,.2,1) forwards}
+.launch-piece-one{animation-delay:.48s}.launch-piece-two{animation-delay:.62s}.launch-piece-three{animation-delay:.76s}.launch-piece-four{animation-delay:.9s}
+.haddir-launch-word{font-size:clamp(34px,8vw,46px);font-weight:900;letter-spacing:-1px;line-height:1.2;opacity:0;animation:haddir-text-in .5s ease 1.12s forwards}
+.haddir-launch-splash strong{margin-top:12px;font-size:clamp(20px,5vw,26px);font-weight:800;opacity:0;animation:haddir-text-in .45s ease 1.42s forwards}
+.haddir-launch-caption{font-size:13px;color:#e4dcff;opacity:0;animation:haddir-text-in .45s ease 1.62s forwards}
+.haddir-launch-skip{position:absolute;bottom:calc(24px + env(safe-area-inset-bottom));font-size:11px;color:#e4dcff;opacity:.72}
+@keyframes haddir-splash-in{from{opacity:0}to{opacity:1}}
+@keyframes haddir-ticket-draw{to{stroke-dashoffset:0}}
+@keyframes haddir-cut-in{to{opacity:.88}}
+@keyframes haddir-piece-in{0%{opacity:0;transform:translateY(12px) scale(.55) rotate(-18deg)}75%{opacity:1;transform:translateY(-2px) scale(1.08) rotate(3deg)}100%{opacity:1;transform:translateY(0) scale(1) rotate(0)}}
+@keyframes haddir-text-in{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.haddir-launch-splash,.launch-ticket-body,.launch-ticket-cut,.launch-piece,.haddir-launch-word,.haddir-launch-splash strong,.haddir-launch-caption{animation:none!important;opacity:1!important;stroke-dashoffset:0!important;transform:none!important}}
