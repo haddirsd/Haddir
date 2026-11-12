@@ -11,7 +11,9 @@ type EventsWorkspaceProps = {
   resetKey: number;
   onEventOpenChange: (open: boolean) => void;
   authUser: { id: string; email?: string; user_metadata?: Record<string, unknown> } | null;
+  phone: string;
   onRequireLogin: () => void;
+  onRequirePhone: () => void;
   onBookingSuccess: () => void;
   onGoNotifications: () => void;
 };
@@ -22,7 +24,9 @@ export function EventsWorkspace({
   resetKey,
   onEventOpenChange,
   authUser,
+  phone,
   onRequireLogin,
+  onRequirePhone,
   onBookingSuccess,
   onGoNotifications,
 }: EventsWorkspaceProps) {
@@ -30,7 +34,9 @@ export function EventsWorkspace({
   const workspace = useEventWorkspace({
     events,
     authUser,
+    phone,
     onRequireLogin,
+    onRequirePhone,
     onBookingSuccess,
   });
   const {
