@@ -1,8 +1,5 @@
-const CACHE_NAME = "haddir-static-v8";
+const CACHE_NAME = "haddir-static-v9";
 const PRECACHE_URLS = [
-  "/icons/apple-touch-icon.png",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png",
   "/icons/icon-192.svg",
   "/icons/icon-512.svg",
   "/light.svg",
