@@ -1,6 +1,7 @@
 "use client";
 
 import { Bell, CalendarDays, CheckCircle2, Sparkles } from "lucide-react";
+import { PushNotificationSettings } from "./PushNotificationSettings";
 
 export type CustomerNotification = {
   id: string;
@@ -13,6 +14,7 @@ export type CustomerNotification = {
 };
 
 type NotificationsWorkspaceProps = {
+  userId: string | null;
   loading: boolean;
   error: string;
   notifications: CustomerNotification[];
@@ -32,6 +34,7 @@ function notificationKind(type: string) {
 }
 
 export function NotificationsWorkspace({
+  userId,
   loading,
   error,
   notifications,
@@ -45,6 +48,7 @@ export function NotificationsWorkspace({
 }: NotificationsWorkspaceProps) {
   return (
     <section className="screen container notifications-screen">
+      <PushNotificationSettings userId={userId} />
       {loading ? <div className="empty-state motion-loading" role="status"><span className="haddir-loading-indicator" aria-hidden="true"/><span>جاري تحميل الإشعارات...</span></div> : error ? <div className="empty-state" role="alert">{error}</div> : <>
         <div className="notifications-toolbar">
           <div><strong>إشعاراتك</strong><small>{unreadCount} غير مقروء</small></div>
