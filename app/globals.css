@@ -10385,3 +10385,12 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 .app-shell .privacy-back-button{display:inline-flex;align-items:center;gap:5px;justify-self:start;min-height:42px;padding:7px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);font-size:12px;font-weight:800}
 .app-shell .privacy-screen-topbar{grid-template-columns:1fr auto 1fr}
 @media(max-width:520px){.app-shell .privacy-screen{padding:16px 14px 30px;gap:14px}.app-shell .privacy-section-card{padding:18px;border-radius:17px}.app-shell .privacy-screen-topbar{gap:7px;padding-inline:12px!important}.app-shell .privacy-back-button{font-size:11px;padding-inline:7px}.app-shell .privacy-section-card h2{font-size:19px}}
+
+
+.app-shell .privacy-data-group p b{display:block;margin-top:9px;color:var(--fg);font-weight:850}
+.app-shell .privacy-danger-button{display:inline-flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:48px;margin-top:16px;padding:11px 16px;border:1px solid rgba(255,84,112,.45);border-radius:13px;background:rgba(255,84,112,.10);color:#D92D50;font:inherit;font-size:14px;font-weight:900;cursor:pointer;transition:background .18s ease,transform .18s ease}
+.app-shell.theme-dark .privacy-danger-button{color:#FF7188;background:rgba(255,84,112,.12);border-color:rgba(255,84,112,.42)}
+.app-shell .privacy-danger-button:active{transform:scale(.985)}
+.app-shell .privacy-danger-button:disabled{opacity:.6;cursor:wait}
+.app-shell .privacy-delete-error{margin-top:12px!important;padding:10px 12px;border-radius:10px;background:rgba(255,84,112,.10);color:#D92D50!important;font-size:12px!important;line-height:1.8}
+.app-shell.theme-dark .privacy-delete-error{color:#FF8296!important}
