@@ -54,7 +54,7 @@ export default function Home(){
  },[authUser]);
  useEffect(()=>{const saved=window.localStorage.getItem("haddir-theme");const prefersDark=window.matchMedia?.("(prefers-color-scheme: dark)").matches;setDarkMode(saved?saved==="dark":!!prefersDark);},[]);
  useEffect(()=>{document.documentElement.dataset.theme=darkMode?"dark":"light";document.documentElement.style.colorScheme=darkMode?"dark":"light";window.localStorage.setItem("haddir-theme",darkMode?"dark":"light");const themeMeta=document.querySelector('meta[name="theme-color"]');themeMeta?.setAttribute("content",darkMode?"#1D135D":"#F6F4FF");},[darkMode]);
- useEffect(()=>{const hour=Number(new Intl.DateTimeFormat("en-GB",{timeZone:"Africa/Khartoum",hour:"2-digit",hourCycle:"h23"}).format(new Date()));setWelcomeGreeting(hour>=5&&hour<11?"صباح الخير":hour>=11&&hour<17?"نهارك سعيد":hour>=17&&hour<23?"مساء الخير":"ليلة سعيدة");const timer=window.setTimeout(()=>setShowWelcome(false),2800);return()=>window.clearTimeout(timer);},[]);
+ useEffect(()=>{const hour=Number(new Intl.DateTimeFormat("en-GB",{timeZone:"Africa/Khartoum",hour:"2-digit",hourCycle:"h23"}).format(new Date()));setWelcomeGreeting(hour>=5&&hour<11?"صباح الخير":hour>=11&&hour<17?"نهارك سعيد":hour>=17&&hour<23?"مساء الخير":"ليلة سعيدة");const timer=window.setTimeout(()=>setShowWelcome(false),3050);return()=>window.clearTimeout(timer);},[]);
  useEffect(()=>{const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("تسجيل الدخول يحتاج إعداد مفاتيح Supabase في بيئة الموقع.");return;}let alive=true;const load=async(user:{id:string;email?:string;user_metadata?:Record<string,unknown>}|null)=>{if(!alive)return;setAuthUser(user as typeof authUser);if(user){const {data}=await supabase.from("profiles").select("role,full_name,phone").eq("id",user.id).maybeSingle();if(!alive)return;setUserRole(data?.role||"customer");const {data:assignmentRows}=await supabase.from("event_role_assignments").select("event_id,assignment_role,events(id,title,venue,city,starts_at,status)").eq("user_id",user.id).in("assignment_role",["gatekeeper","organizer","advertiser"]).limit(1);if(!alive)return;setAssignedEvent(assignmentRows?.[0]||null);const metadataName=String(user.user_metadata?.full_name||user.user_metadata?.name||"");const metadataAvatar=String(user.user_metadata?.avatar_url||user.user_metadata?.picture||"");setFullName(String(data?.full_name||metadataName||""));setPhone(String(data?.phone||""));setEmail(user.email||"");setAvatarUrl(metadataAvatar);setProfileEditing(false);setSaved(false);}else{setUserRole("customer");setAssignedEvent(null);setGatekeeperResult(null);setGatekeeperCode("");setFullName("");setEmail("");setPhone("");setAvatarUrl("");setProfileEditing(false);setSaved(false);setActiveWorkspace(null);}};supabase.auth.getSession().then(({data})=>load(data.session?.user??null));const {data:{subscription}}=supabase.auth.onAuthStateChange((_event,session)=>{void load(session?.user??null);});return()=>{alive=false;subscription.unsubscribe();};},[]);
  const gatekeeper = useGatekeeper({ authUser, assignedEvent, userRole, isGatekeeperPage, activeWorkspace });
  const {
@@ -118,7 +118,32 @@ export default function Home(){
  <>
  {!isEventDetailOpen&&(showPrivacySecurity&&!isGatekeeperPage?<header className="screen-topbar privacy-screen-topbar"><button type="button" className="privacy-back-button" onClick={()=>setShowPrivacySecurity(false)}><ChevronLeft size={18}/> رجوع</button><strong>الخصوصية والأمان</strong><span className="screen-icon"><ShieldCheck/></span></header>:isGatekeeperPage?<header className="screen-topbar gatekeeper-page-topbar"><button type="button" className="btn btn-outline" onClick={()=>{setIsGatekeeperPage(false);setActiveWorkspace(null);const url=new URL(window.location.href);url.searchParams.delete("workspace");window.location.assign(url.pathname+url.search+url.hash);}}>العودة للملف الشخصي</button><strong>مسح التذاكر</strong><span className="screen-icon"><ScanLine/></span></header>:activeTab==="home"?<header className="topbar"><div className="container header-inner"><button className="brand brand-button" onClick={()=>go("home")}><img className="brand-logo" src={darkMode?"/dark.svg?v=20261111-home-logo":"/light.svg?v=20261111-home-logo"} alt="حاضر" /></button><div className="desktop-greeting">من السودان، لكل لحظة تستاهل الحضور.</div><button className="header-icon theme-toggle" type="button" aria-label={darkMode?"تفعيل الوضع النهاري":"تفعيل الوضع الليلي"} aria-pressed={darkMode} title={darkMode?"تفعيل الوضع النهاري":"تفعيل الوضع الليلي"} onClick={()=>setDarkMode(v=>!v)}><span className="theme-toggle-track" aria-hidden="true"><span className="theme-toggle-knob">{darkMode?<Sun size={17} strokeWidth={2.3}/>:<Moon size={16} strokeWidth={2.3}/>}</span></span></button></div></header>:<header className="screen-topbar"><span className="screen-topbar-spacer" aria-hidden="true"/><strong>{({tickets:"تذاكري",notifications:"الإشعارات",profile:"الملف الشخصي"} as Record<string,string>)[activeTab]}</strong><span className="screen-icon">{activeTab==="tickets"?<Ticket/>:activeTab==="notifications"?<Bell/>:<UserRound/>}</span></header>)}
  <div className="app-content">
- {showWelcome&&<button type="button" className="haddir-launch-splash" aria-label="تخطي شاشة البداية" onClick={()=>setShowWelcome(false)}><span className="haddir-launch-mark" aria-hidden="true"><svg viewBox="0 0 180 180" role="img"><path className="launch-ticket-body" d="M43 35h94a10 10 0 0 1 10 10v22a17 17 0 0 0 0 34v22a10 10 0 0 1-10 10H43a10 10 0 0 1-10-10v-22a17 17 0 0 0 0-34V45a10 10 0 0 1 10-10Z"/><path className="launch-ticket-cut" d="M90 43v94" /><path className="launch-piece launch-piece-one" d="M56 58h20v20H56z"/><path className="launch-piece launch-piece-two" d="M104 58h20v20h-20z"/><path className="launch-piece launch-piece-three" d="M56 102h20v20H56z"/><path className="launch-piece launch-piece-four" d="M104 102h20v20h-20z"/></svg></span><span className="haddir-launch-word">حاضِر</span><strong>{welcomeGreeting}</strong><span className="haddir-launch-caption">أهلاً بيك في حاضر</span><span className="haddir-launch-skip">اضغط للتخطي</span></button>}
+ {showWelcome&&<button type="button" className="haddir-launch-splash" aria-label="تخطي شاشة البداية" onClick={()=>setShowWelcome(false)}>
+  <svg className="haddir-original-logo" viewBox="0 0 520 210" role="img" aria-label="Haddir">
+    <g className="haddir-wordmark" aria-hidden="true">
+      <text className="haddir-letter haddir-letter-h" x="24" y="112">H</text>
+      <text className="haddir-letter haddir-letter-a" x="112" y="112">A</text>
+      <text className="haddir-letter haddir-letter-d1" x="198" y="112">D</text>
+      <text className="haddir-letter haddir-letter-d2" x="286" y="112">D</text>
+      <text className="haddir-letter haddir-letter-i" x="374" y="112">I</text>
+      <text className="haddir-letter haddir-letter-r" x="414" y="112">R</text>
+    </g>
+    <g className="haddir-ticket-line" aria-hidden="true">
+      <path className="haddir-perforation" d="M24 145H496"/>
+      <path className="haddir-perforation-cover" d="M24 145H496"/>
+      <circle className="haddir-notch haddir-notch-left" cx="24" cy="145" r="10"/>
+      <circle className="haddir-notch haddir-notch-right" cx="496" cy="145" r="10"/>
+    </g>
+    <g className="haddir-stamp" aria-hidden="true" transform="translate(238 160)">
+      <path d="M0 -19h44a8 8 0 0 1 8 8v8a8 8 0 0 0 0 16v8a8 8 0 0 1-8 8H0a8 8 0 0 1-8-8v-8a8 8 0 0 0 0-16v-8a8 8 0 0 1 8-8Z"/>
+      <path className="haddir-stamp-cut" d="M22 -14v44"/>
+    </g>
+    <g className="haddir-h-tear" aria-hidden="true">
+      <path d="M34 39l24 0v25H34z"/><path d="M34 70h24v25H34z"/>
+    </g>
+  </svg>
+  <span className="haddir-launch-skip">اضغط للتخطي</span>
+</button>}
  <EventsWorkspace
   showHome={!isGatekeeperPage&&activeTab==="home"}
   resetKey={eventResetKey}
