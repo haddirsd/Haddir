@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { RefreshCw } from "lucide-react";
+import { HaddirDialog } from "../../../components/ui/HaddirDialog";
+import { HaddirSelect } from "../../../components/ui/HaddirSelect";
 import { useAdminUsers } from "./useAdminUsers";
 import type { AdminUsersRole } from "./admin-users.types";
 
@@ -11,6 +13,7 @@ export default function AdminUsersWorkspace({
   role, searchTerm, onSearchTermChange,
 }: { role: AdminUsersRole; searchTerm: string; onSearchTermChange: (value: string) => void }) {
   const [roleFilter, setRoleFilter] = useState("all");
+  const [pendingRole,setPendingRole]=useState<{row:(typeof rows)[number];nextRole:string;eventId:string|null}|null>(null);
   const {
     rows, eventOptions, userTotal, loading, error, message, updatingUserId,
     roleDrafts, setRoleDrafts, assignmentEventIds, setAssignmentEventIds, refresh, updateRole,
@@ -25,7 +28,7 @@ export default function AdminUsersWorkspace({
       <div><h3>المستخدمون والصلاحيات</h3><p>إدارة أدوار الحسابات وربط المنظم والمعلن بفعالياتهم</p></div>
       <div className="admin-panel-actions">
         <label className="admin-search-box"><span>بحث بالرقم أو البريد أو الهاتف</span><input type="search" value={searchTerm} onChange={event=>onSearchTermChange(event.target.value)} placeholder="رقم الهاتف أو البريد الإلكتروني"/></label>
-        <label className="admin-search-box"><span>تصفية حسب الدور</span><select value={roleFilter} onChange={event=>setRoleFilter(event.target.value)}><option value="all">كل الأدوار</option><option value="customer">العملاء</option><option value="supervisor">موظفو حاضر</option><option value="gatekeeper">البوابون</option><option value="organizer">المنظمون</option><option value="advertiser">المعلنون</option><option value="admin">المشرفون الإداريون</option><option value="owner">مالك المنصة</option></select></label>
+        <label className="admin-search-box"><span>تصفية حسب الدور</span><HaddirSelect value={roleFilter} onChange={setRoleFilter} ariaLabel="تصفية حسب الدور" options={[{value:"all",label:"كل الأدوار"},{value:"customer",label:"العملاء"},{value:"supervisor",label:"موظفو حاضر"},{value:"gatekeeper",label:"البوابون"},{value:"organizer",label:"المنظمون"},{value:"advertiser",label:"المعلنون"},{value:"admin",label:"المشرفون الإداريون"},{value:"owner",label:"مالك المنصة"}]}/></label>
         <span className="admin-user-total">عدد النتائج: {rows.length.toLocaleString("ar-SD-u-nu-latn")} من {userTotal.toLocaleString("ar-SD-u-nu-latn")}</span>
         <button className="admin-refresh" type="button" onClick={()=>void refresh()} disabled={loading}><RefreshCw size={16}/> تحديث</button>
       </div>
@@ -46,18 +49,15 @@ export default function AdminUsersWorkspace({
             <td data-label="تاريخ التسجيل">{row.created_at?new Date(row.created_at).toLocaleDateString("ar-SD-u-nu-latn"):"—"}</td>
             <td data-label="تعديل الدور / الفعالية">
               <div className="admin-user-role-editor">
-                <select aria-label={"تعديل دور "+(row.full_name||"المستخدم")} value={draftRole} disabled={updatingUserId===row.id||protectedUser} onChange={event=>setRoleDrafts(current=>({...current,[row.id]:event.target.value}))}>
-                  <option value="customer">عميل</option>
-                  {(role==="owner"||row.role==="admin")&&<option value="admin">مشرف إداري</option>}
-                  <option value="supervisor">موظف حاضر</option><option value="gatekeeper">منظم حاضر (بواب)</option><option value="advertiser">مُعلن</option>
-                  {row.role==="organizer"&&<option value="organizer">منظم حاضر</option>}
-                  {protectedUser&&<option value={row.role}>{roleNames[row.role]||row.role}</option>}
-                </select>
-                {(draftRole==="gatekeeper"||draftRole==="advertiser"||draftRole==="organizer")&&<select aria-label="اختيار الفعالية" value={selectedEvent} disabled={updatingUserId===row.id} onChange={event=>setAssignmentEventIds(current=>({...current,[row.id]:event.target.value}))}>
-                  <option value="">اختر الفعالية (تشمل المسودات)</option>
-                  {eventOptions.map(option=><option key={option.id} value={option.id}>{option.title} · {option.status==="draft"?"مسودة":option.status==="published"?"منشورة":option.status}</option>)}
-                </select>}
-                {!protectedUser&&<button type="button" className="admin-user-save-role" disabled={updatingUserId===row.id||draftRole==="organizer"||(draftRole==="admin"&&role!=="owner")||((draftRole==="gatekeeper"||draftRole==="advertiser")&&!selectedEvent)||draftRole===row.role&&((draftRole!=="gatekeeper"&&draftRole!=="advertiser")||selectedEvent===(row.assignment_event_id||""))} onClick={()=>void updateRole(row,draftRole,(draftRole==="gatekeeper"||draftRole==="advertiser")?selectedEvent:null)}>{updatingUserId===row.id?"جاري الحفظ…":"حفظ"}</button>}
+                <HaddirSelect ariaLabel={"تعديل دور "+(row.full_name||"المستخدم")} value={draftRole} disabled={updatingUserId===row.id||protectedUser} onChange={value=>setRoleDrafts(current=>({...current,[row.id]:value}))} options={[
+                  {value:"customer",label:"عميل"},
+                  ...((role==="owner"||row.role==="admin")?[{value:"admin",label:"مشرف إداري"}]:[]),
+                  {value:"supervisor",label:"موظف حاضر"},{value:"gatekeeper",label:"منظم حاضر (بواب)"},{value:"advertiser",label:"مُعلن"},
+                  ...(row.role==="organizer"?[{value:"organizer",label:"منظم حاضر"}]:[]),
+                  ...(protectedUser?[{value:row.role,label:roleNames[row.role]||row.role}]:[])
+                ]}/>
+                {(draftRole==="gatekeeper"||draftRole==="advertiser"||draftRole==="organizer")&&<HaddirSelect ariaLabel="اختيار الفعالية" value={selectedEvent} disabled={updatingUserId===row.id} placeholder="اختر الفعالية (تشمل المسودات)" onChange={value=>setAssignmentEventIds(current=>({...current,[row.id]:value}))} options={[{value:"",label:"اختر الفعالية (تشمل المسودات)"},...eventOptions.map(option=>({value:option.id,label:option.title+" · "+(option.status==="draft"?"مسودة":option.status==="published"?"منشورة":option.status)}))]}/>
+                {!protectedUser&&<button type="button" className="admin-user-save-role" disabled={updatingUserId===row.id||draftRole==="organizer"||(draftRole==="admin"&&role!=="owner")||((draftRole==="gatekeeper"||draftRole==="advertiser")&&!selectedEvent)||draftRole===row.role&&((draftRole!=="gatekeeper"&&draftRole!=="advertiser")||selectedEvent===(row.assignment_event_id||""))} onClick={()=>setPendingRole({row,nextRole:draftRole,eventId:(draftRole==="gatekeeper"||draftRole==="advertiser")?selectedEvent:null})}>{updatingUserId===row.id?"جاري الحفظ…":"حفظ"}</button>}
               </div>
               {updatingUserId===row.id&&<small className="admin-user-saving">جاري الحفظ…</small>}
             </td>
@@ -66,5 +66,6 @@ export default function AdminUsersWorkspace({
       </table>
       {rows.length===0&&<p className="admin-no-data">لا يوجد مستخدمون مسجلون حتى الآن.</p>}
     </div>}
+    {pendingRole&&<HaddirDialog open title="تأكيد تغيير الصلاحية؟" description={"سيتم تغيير دور "+(pendingRole.row.full_name||"هذا المستخدم")+" إلى "+(roleNames[pendingRole.nextRole]||pendingRole.nextRole)+"."} confirmLabel="حفظ الصلاحية" onCancel={()=>setPendingRole(null)} onConfirm={async()=>{const target=pendingRole;setPendingRole(null);await updateRole(target.row,target.nextRole,target.eventId);}}/>}
   </section>;
 }
