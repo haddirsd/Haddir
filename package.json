@@ -6,9 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "predev": "node scripts/generate-pwa-icons.mjs",
-    "prebuild": "node scripts/generate-pwa-icons.mjs"
+    "lint": "eslint"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
@@ -17,8 +15,7 @@
     "react-dom": "^19.0.0",
     "qrcode.react": "^4.2.0",
     "@supabase/supabase-js": "^2.57.0",
-    "@zxing/browser": "^0.1.5",
-    "sharp": "^0.34.3"
+    "@zxing/browser": "^0.1.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.6",
