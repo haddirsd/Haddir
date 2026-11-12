@@ -10,7 +10,9 @@ type AuthUser = { id: string; email?: string; user_metadata?: Record<string, unk
 type UseEventWorkspaceOptions = {
   events: EventItem[];
   authUser: AuthUser;
+  phone: string;
   onRequireLogin: () => void;
+  onRequirePhone: () => void;
   onBookingSuccess?: () => void;
 };
 
@@ -18,10 +20,12 @@ type UseEventWorkspaceOptions = {
 export function useEventWorkspace({
   events,
   authUser,
+  phone,
   onRequireLogin,
+  onRequirePhone,
   onBookingSuccess,
 }: UseEventWorkspaceOptions) {
-  const navigation = useEventNavigation({ events, authUser, onRequireLogin });
+  const navigation = useEventNavigation({ events, authUser, phone, onRequireLogin, onRequirePhone });
   const booking = useBooking({
     authUser,
     selected: navigation.selectedEvent,
