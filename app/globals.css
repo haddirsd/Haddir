@@ -10425,3 +10425,21 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 @keyframes hs-settle{50%{transform:scale(1.04)}}
 @keyframes hs-march{to{stroke-dashoffset:-26}}
 @media (prefers-reduced-motion:reduce){#haddir-splash *{animation:none!important}}
+
+
+/* Prominent profile-completion gate shown before checkout. */
+.app-shell .booking-gate-backdrop{position:fixed;inset:0;z-index:100500;display:grid;place-items:center;padding:22px;background:rgba(14,11,31,.70);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.app-shell .booking-gate-dialog{width:min(100%,430px);padding:28px 22px 20px;border-radius:24px;border:1px solid rgba(91,46,255,.18);background:#FFFFFF;color:#1A1533;box-shadow:0 28px 90px rgba(14,11,31,.35);text-align:center;animation:booking-gate-enter .22s ease-out both}
+.app-shell .booking-gate-icon{width:64px;height:64px;margin:0 auto 16px;border-radius:20px;display:grid;place-items:center;background:rgba(91,46,255,.10);color:#5B2EFF}
+.app-shell .booking-gate-dialog h2{margin:0 0 10px;font-size:21px;line-height:1.55;font-weight:900;color:#1A1533}
+.app-shell .booking-gate-dialog p{margin:0 0 22px;color:#6B6590;font-size:14px;line-height:1.9}
+.app-shell .booking-gate-primary,.app-shell .booking-gate-secondary{width:100%;min-height:50px;border-radius:14px;font:inherit;font-weight:850;cursor:pointer}
+.app-shell .booking-gate-primary{border:1px solid #5B2EFF;background:#5B2EFF;color:#FFFFFF}
+.app-shell .booking-gate-secondary{margin-top:9px;border:1px solid transparent;background:transparent;color:#6B6590}
+.app-shell.theme-dark .booking-gate-backdrop{background:rgba(7,5,24,.78)}
+.app-shell.theme-dark .booking-gate-dialog{background:#1A1633;color:#F4F2FF;border-color:rgba(185,168,255,.24);box-shadow:0 28px 90px rgba(0,0,0,.48)}
+.app-shell.theme-dark .booking-gate-icon{background:rgba(185,168,255,.14);color:#B9A8FF}
+.app-shell.theme-dark .booking-gate-dialog h2{color:#F4F2FF}
+.app-shell.theme-dark .booking-gate-dialog p,.app-shell.theme-dark .booking-gate-secondary{color:#A9A3C9}
+@keyframes booking-gate-enter{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){.app-shell .booking-gate-dialog{animation:none}}
