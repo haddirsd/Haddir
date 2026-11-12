@@ -13,6 +13,7 @@ import { Bell, CheckCircle2, House, Sparkles, Ticket, UserRound, ChevronLeft, Sc
 type Tab="home"|"tickets"|"notifications"|"profile";
 export default function Home(){
  const [activeTab,setActiveTab]=useState<Tab>("home"),[darkMode,setDarkMode]=useState(false),[showPrivacySecurity,setShowPrivacySecurity]=useState(false),[deletingAccount,setDeletingAccount]=useState(false);
+ const [bookingGate,setBookingGate]=useState<"login"|"phone"|null>(null);
  const [eventResetKey,setEventResetKey]=useState(0),[isEventDetailOpen,setIsEventDetailOpen]=useState(false);
  const [fullName,setFullName]=useState(""),[email,setEmail]=useState(""),[phone,setPhone]=useState(""),[avatarUrl,setAvatarUrl]=useState(""),[profileEditing,setProfileEditing]=useState(false),[saved,setSaved]=useState(false),[profileSaving,setProfileSaving]=useState(false);
  const [authUser,setAuthUser]=useState<{id:string;email?:string;user_metadata?:Record<string,unknown>}|null>(null),[userRole,setUserRole]=useState("customer"),[authMessage,setAuthMessage]=useState(""),[activeWorkspace,setActiveWorkspace]=useState<"customer"|"organizer"|"gatekeeper"|"advertiser"|"admin"|"owner"|null>(null);
@@ -155,7 +156,9 @@ export default function Home(){
   resetKey={eventResetKey}
   authUser={authUser}
   onEventOpenChange={setIsEventDetailOpen}
-  onRequireLogin={()=>{setAuthMessage("سجّل الدخول أولاً عشان نكمل حجزك. الفعاليات متاحة للتصفح بدون حساب.");setActiveTab("profile");}}
+  phone={phone}
+  onRequireLogin={()=>setBookingGate("login")}
+  onRequirePhone={()=>setBookingGate("phone")}
   onBookingSuccess={()=>{}}
   onGoNotifications={()=>go("notifications")}
  />
@@ -249,6 +252,7 @@ export default function Home(){
    onClose={()=>{const url=new URL(window.location.href);url.searchParams.delete("workspace");url.searchParams.set("tab","profile");window.location.assign(url.pathname+url.search+url.hash);}}
   />}
  </div>
+ {bookingGate&&<div className="booking-gate-backdrop" role="presentation"><section className="booking-gate-dialog" role="dialog" aria-modal="true" aria-labelledby="booking-gate-title"><span className="booking-gate-icon"><UserRound size={28}/></span><h2 id="booking-gate-title">{bookingGate==="phone"?"أضف رقم جوالك لإكمال الحجز":"سجّل الدخول لإكمال الحجز"}</h2><p>{bookingGate==="phone"?"باقي خطوة واحدة! أضف رقم جوالك عشان نقدر نكمل حجزك ونتواصل معاك عند الحاجة.":"تحتاج تسجّل الدخول أولاً عشان نربط الحجز بحسابك ونقدر نتابع تذكرتك."}</p><button type="button" className="booking-gate-primary" onClick={()=>{const gate=bookingGate;setBookingGate(null);setEventResetKey(value=>value+1);setActiveTab("profile");setAuthMessage(gate==="login"?"سجّل الدخول لمواصلة الحجز.":"أضف رقم جوالك لمواصلة الحجز.");if(gate==="phone")setProfileEditing(true);window.scrollTo({top:0,behavior:"smooth"});}}>{bookingGate==="phone"?"إضافة رقم الجوال":"الانتقال لتسجيل الدخول"}</button><button type="button" className="booking-gate-secondary" onClick={()=>setBookingGate(null)}>لاحقاً</button></section></div>}
  {!isGatekeeperPage&&!isEventDetailOpen&&<nav className="bottom-nav" aria-label="التنقل الرئيسي"><button type="button" aria-current={activeTab==="home"?"page":undefined} aria-label="الرئيسية" className={activeTab==="home"?"selected":""} onClick={()=>go("home")}><House size={21}/><span className="nav-label">الرئيسية</span></button><button type="button" aria-current={activeTab==="tickets"?"page":undefined} aria-label="تذاكري" className={activeTab==="tickets"?"selected":""} onClick={()=>go("tickets")}><Ticket size={21}/><span className="nav-label">تذاكري</span></button><button type="button" aria-current={activeTab==="notifications"?"page":undefined} aria-label="الإشعارات" className={activeTab==="notifications"?"selected":""} onClick={()=>go("notifications")}><span className="nav-icon-wrap"><Bell size={21}/>{unreadNotificationCount>0&&<i className="nav-notification-dot" aria-label={`${unreadNotificationCount} إشعارات غير مقروءة`}/>}</span><span className="nav-label">الإشعارات</span></button><button type="button" aria-current={activeTab==="profile"?"page":undefined} aria-label="الملف الشخصي" className={activeTab==="profile"?"selected":""} onClick={()=>go("profile")}><UserRound size={21}/><span className="nav-label">الملف الشخصي</span></button></nav>}
  </>
  
