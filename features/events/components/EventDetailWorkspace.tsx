@@ -1,6 +1,7 @@
 "use client";
 
-import type { FormEvent } from "react";
+import { useState, type FormEvent } from "react";
+import { HaddirDialog } from "../../../components/ui/HaddirDialog";
 import { ArrowLeft, CalendarDays, ExternalLink, MapPin, Share2, Wallet } from "lucide-react";
 import type { EventItem } from "../events.types";
 import type { EventPaymentAccount } from "../../booking/booking.types";
@@ -64,6 +65,7 @@ export function EventDetailWorkspace({
   onSubmitBooking,
   onGoNotifications,
 }: EventDetailWorkspaceProps) {
+  const [shareNotice,setShareNotice]=useState("");
   const tier = event.tiers[selectedTier];
   const totalLabel = tier
     ? tier.price === "مجاناً"
@@ -96,11 +98,11 @@ export function EventDetailWorkspace({
                       });
                     } else {
                       await navigator.clipboard.writeText(eventUrl.toString());
-                      alert("تم نسخ رابط الفعالية");
+                      setShareNotice("تم نسخ رابط الفعالية.");
                     }
                   } catch (error) {
                     if (error instanceof Error && error.name !== "AbortError") {
-                      alert("تعذر مشاركة الفعالية حالياً.");
+                      setShareNotice("تعذر مشاركة الفعالية حالياً.");
                     }
                   }
                 }}
@@ -211,6 +213,7 @@ export function EventDetailWorkspace({
           </div>
         </div>
       )}
+      {shareNotice&&<HaddirDialog open title="تنبيه من حاضر" description={shareNotice} confirmLabel="حسناً" onConfirm={()=>setShareNotice("")} onCancel={()=>setShareNotice("")}/>}
     </section>
   );
 }
