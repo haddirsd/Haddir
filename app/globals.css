@@ -10450,3 +10450,41 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 .app-shell select:focus{border-color:#5B2EFF;box-shadow:0 0 0 3px rgba(91,46,255,.12)}
 .app-shell.theme-dark select:focus{border-color:#B9A8FF;box-shadow:0 0 0 3px rgba(185,168,255,.13)}
 .app-shell select:disabled{opacity:.55;cursor:not-allowed}
+
+/* Haddir native-feeling in-app dialogs and selectors */
+.app-shell .haddir-dialog-backdrop{position:fixed;inset:0;z-index:110000;display:grid;place-items:center;padding:20px;background:rgba(14,11,31,.68);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.app-shell .haddir-dialog{position:relative;width:min(100%,440px);max-height:min(88dvh,720px);overflow:auto;padding:28px 22px 20px;border:1px solid rgba(91,46,255,.18);border-radius:24px;background:#fff;color:#1A1533;box-shadow:0 28px 90px rgba(14,11,31,.38);text-align:center;animation:haddir-dialog-in .2s ease-out both}
+.app-shell .haddir-dialog-close{position:absolute;inset-block-start:13px;inset-inline-start:13px;width:34px;height:34px;display:grid;place-items:center;border:0;border-radius:11px;background:rgba(91,46,255,.07);color:#6B6590}
+.app-shell .haddir-dialog-icon{width:62px;height:62px;margin:0 auto 15px;border-radius:20px;display:grid;place-items:center;background:rgba(91,46,255,.10);color:#5B2EFF}
+.app-shell .haddir-dialog-icon.tone-danger{background:rgba(255,84,112,.12);color:#D92D50}
+.app-shell .haddir-dialog-icon.tone-success{background:rgba(20,211,180,.13);color:#087A68}
+.app-shell .haddir-dialog h2{margin:0 0 9px;color:#1A1533;font-size:20px;font-weight:900;line-height:1.6}
+.app-shell .haddir-dialog>p{margin:0 0 18px;color:#6B6590;font-size:13px;line-height:1.9}
+.app-shell .haddir-dialog-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:20px}
+.app-shell .haddir-dialog-actions button{min-height:48px;border-radius:13px;font:inherit;font-size:13px;font-weight:900;cursor:pointer}
+.app-shell .haddir-dialog-confirm{border:1px solid #5B2EFF;background:#5B2EFF;color:#fff}
+.app-shell .haddir-dialog-confirm.tone-danger{border-color:#FF5470;background:#FF5470;color:#1A1533}
+.app-shell .haddir-dialog-confirm.tone-success{border-color:#0B7F6C;background:#0B7F6C;color:#fff}
+.app-shell .haddir-dialog-cancel{border:1px solid rgba(107,101,144,.2);background:#F6F4FF;color:#6B6590}
+.app-shell .haddir-dialog-actions button:disabled,.app-shell .haddir-dialog-close:disabled{opacity:.55;cursor:wait}
+.app-shell .haddir-dialog-input{width:100%;min-height:48px;padding:11px 13px;border:1px solid rgba(91,46,255,.22);border-radius:12px;background:#F6F4FF;color:#1A1533;font:inherit;text-align:start;direction:ltr}
+.app-shell.theme-dark .haddir-dialog-backdrop{background:rgba(7,5,24,.8)}
+.app-shell.theme-dark .haddir-dialog{background:#1A1633;color:#F4F2FF;border-color:rgba(185,168,255,.24);box-shadow:0 28px 90px rgba(0,0,0,.5)}
+.app-shell.theme-dark .haddir-dialog-close{background:rgba(185,168,255,.12);color:#B9A8FF}
+.app-shell.theme-dark .haddir-dialog h2{color:#F4F2FF}
+.app-shell.theme-dark .haddir-dialog>p{color:#A9A3C9}
+.app-shell.theme-dark .haddir-dialog-cancel{background:#0E0B1F;border-color:rgba(185,168,255,.2);color:#C9C3E8}
+.app-shell.theme-dark .haddir-dialog-input{background:#0E0B1F;border-color:rgba(185,168,255,.28);color:#F4F2FF}
+.app-shell .haddir-select{position:relative;width:100%;min-width:0}
+.app-shell .haddir-select-trigger{width:100%;min-height:46px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 13px;border:1px solid var(--line,rgba(91,46,255,.2));border-radius:12px;background:var(--surface,#fff);color:var(--fg,#1A1533);font:inherit;font-size:13px;text-align:start;cursor:pointer}
+.app-shell .haddir-select-trigger svg{flex:0 0 auto;color:#5B2EFF}
+.app-shell.theme-dark .haddir-select-trigger svg{color:#B9A8FF}
+.app-shell .haddir-select-trigger .is-placeholder{color:var(--muted,#6B6590)}
+.app-shell .haddir-select-dismiss{position:fixed;inset:0;z-index:110010;border:0;background:transparent}
+.app-shell .haddir-select-menu{position:absolute;inset-inline:0;top:calc(100% + 7px);z-index:110011;max-height:260px;overflow:auto;padding:6px;border:1px solid var(--line,rgba(91,46,255,.2));border-radius:14px;background:var(--surface,#fff);box-shadow:0 16px 42px rgba(14,11,31,.2)}
+.app-shell .haddir-select-option{width:100%;min-height:43px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;border:0;border-radius:9px;background:transparent;color:var(--fg,#1A1533);font:inherit;font-size:13px;text-align:start;cursor:pointer}
+.app-shell .haddir-select-option:hover,.app-shell .haddir-select-option.is-selected{background:rgba(91,46,255,.09);color:#5B2EFF}
+.app-shell.theme-dark .haddir-select-option:hover,.app-shell.theme-dark .haddir-select-option.is-selected{background:rgba(185,168,255,.13);color:#B9A8FF}
+.app-shell .haddir-select-option:disabled{opacity:.45;cursor:not-allowed}
+@keyframeshadd ir-dialog-in{from{opacity:0;transform:translateY(9px) scale(.985)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.app-shell .haddir-dialog{animation:none}}
