@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { RefreshCw } from "lucide-react";
+import { HaddirSelect } from "../../../components/ui/HaddirSelect";
 import { useAdminReports } from "./useAdminReports";
 import type { AdminReportRow } from "./admin-reports.types";
 
@@ -75,7 +76,7 @@ export default function AdminReportsWorkspace() {
               <div className="admin-table-wrap"><table className="admin-data-table"><thead><tr><th>الفعالية</th><th>الحالة</th><th>الحجوزات</th><th>التذاكر المؤكدة</th><th>قيد الدفع/المراجعة</th><th>السعة</th><th>المتبقي فعلياً</th><th>المبيعات المعتمدة</th><th>دخل المنصة</th></tr></thead><tbody>{data.events.map(e=>{const eb=data.bookings.filter(b=>b.event_id===e.id);const ec=eb.filter(b=>b.status==="confirmed");const issued=sum(ec.flatMap(b=>b.booking_items||[]),"quantity");const ep=eb.filter(b=>["pending_payment","under_review"].includes(b.status));const reserved=sum(ep.flatMap(b=>b.booking_items||[]),"quantity");const sales=ec.map(b=>({currency:b.currency,value:Number(b.subtotal||0)}));const fees=ec.map(b=>({currency:b.currency,value:Math.round((Number(b.subtotal||0)*Number(e.platform_fee_percent||0)/100)*100)/100}));const caps=e.ticket_types||[];return <tr key={e.id}><td>{e.title}</td><td>{statusLabels[e.status]||e.status}</td><td>{fmtCount(eb.length)}</td><td>{fmtCount(issued)}</td><td>{fmtCount(reserved)}</td><td>{fmtCount(sum(caps,"quantity_total"))}</td><td>{fmtCount(Math.max(0,sum(caps,"quantity_total")-sum(caps,"quantity_sold")))}</td><td>{moneyLines(sales,"value")}</td><td>{moneyLines(fees,"value")}</td></tr>;})}</tbody></table></div>
               <p className="admin-stats-note">المبيعات تشمل الحجوزات المؤكدة فقط. دخل المنصة هو قيمة العمولة المحسوبة من نسبة كل فعالية، قبل المصروفات التشغيلية. الطلبات المرفوضة والمعلقة لا تدخل في الإيرادات.</p>
             </>:<>
-              <div className="admin-event-stat-select"><label htmlFor="stats-event-select">اختار الفعالية</label><select id="stats-event-select" value={statsEventId} onChange={e=>setStatsEventId(e.target.value)}><option value="">اختر فعالية...</option>{data.events.map(e=><option key={e.id} value={e.id}>{e.title} — {statusLabels[e.status]||e.status}</option>)}</select></div>
+              <div className="admin-event-stat-select"><label htmlFor="stats-event-select">اختار الفعالية</label><HaddirSelect ariaLabel="اختيار الفعالية للإحصائيات" value={statsEventId} onChange={setStatsEventId} placeholder="اختر فعالية..." options={[{value:"",label:"اختر فعالية..."},...data.events.map(e=>({value:e.id,label:e.title+" — "+(statusLabels[e.status]||e.status)}))]}/></div>
               {!event?<p className="admin-no-data">اختار فعالية عشان تظهر إحصائياتها.</p>:<>
                 <div className="admin-selected-event"><div><small>الفعالية المحددة</small><h3>{event.title}</h3><span>{statusLabels[event.status]||event.status} · عمولة المنصة {Number(event.platform_fee_percent||0)}%</span></div><button className="admin-print-button" type="button" onClick={()=>window.print()}>تحميل تقرير الفعالية PDF</button></div>
                 <div className="admin-event-report" dir="rtl">
