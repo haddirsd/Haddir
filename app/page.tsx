@@ -126,6 +126,7 @@ export default function Home(){
   formatEventDate={formatEventDate}
  />}
  {!isGatekeeperPage&&activeTab==="notifications"&&<NotificationsWorkspace
+  userId={authUser?.id ?? null}
   loading={accountDataLoading}
   error={accountDataError}
   notifications={myNotifications}
