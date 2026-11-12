@@ -8,7 +8,9 @@ type AuthUser = { id: string; email?: string; user_metadata?: Record<string, unk
 type UseEventNavigationOptions = {
   events: EventItem[];
   authUser: AuthUser;
+  phone: string;
   onRequireLogin: () => void;
+  onRequirePhone: () => void;
 };
 
 const clampQuantity = (value: string | null) => {
@@ -19,7 +21,9 @@ const clampQuantity = (value: string | null) => {
 export function useEventNavigation({
   events,
   authUser,
+  phone,
   onRequireLogin,
+  onRequirePhone,
 }: UseEventNavigationOptions) {
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [selectedTier, setSelectedTier] = useState(0);
@@ -130,19 +134,15 @@ export function useEventNavigation({
     if (!tierChosen || !selectedEvent) return;
 
     if (!authUser) {
-      const url = new URL(window.location.href);
-      url.searchParams.delete("event");
-      url.searchParams.delete("checkout");
-      url.searchParams.delete("tier");
-      url.searchParams.delete("qty");
-      window.history.replaceState({}, "", url.pathname + url.search + url.hash);
-      setSelectedEventId(null);
-      setSelectedTier(0);
-      setTierChosen(false);
-      setShowPayment(false);
-      setTicketCount(1);
       onRequireLogin();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    const normalizedPhone = phone
+      .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
+      .replace(/\s+/g, "");
+    if (!/^0\d{9}$/.test(normalizedPhone)) {
+      onRequirePhone();
       return;
     }
 
@@ -161,7 +161,7 @@ export function useEventNavigation({
     );
     setShowPayment(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [authUser, onRequireLogin, selectedEvent, selectedEventId, selectedTier, ticketCount, tierChosen]);
+  }, [authUser, phone, onRequireLogin, onRequirePhone, selectedEvent, selectedEventId, selectedTier, ticketCount, tierChosen]);
 
   const backToDetails = useCallback(() => {
     if ((window.history.state as { haddirPage?: string } | null)?.haddirPage === "event-payment") {
