@@ -12,7 +12,7 @@ import { Bell, CheckCircle2, House, Sparkles, Ticket, UserRound, ChevronLeft, Sc
 
 type Tab="home"|"tickets"|"notifications"|"profile";
 export default function Home(){
- const [activeTab,setActiveTab]=useState<Tab>("home"),[darkMode,setDarkMode]=useState(false),[showPrivacySecurity,setShowPrivacySecurity]=useState(false);
+ const [activeTab,setActiveTab]=useState<Tab>("home"),[darkMode,setDarkMode]=useState(false),[showPrivacySecurity,setShowPrivacySecurity]=useState(false),[deletingAccount,setDeletingAccount]=useState(false);
  const [eventResetKey,setEventResetKey]=useState(0),[isEventDetailOpen,setIsEventDetailOpen]=useState(false);
  const [fullName,setFullName]=useState(""),[email,setEmail]=useState(""),[phone,setPhone]=useState(""),[avatarUrl,setAvatarUrl]=useState(""),[profileEditing,setProfileEditing]=useState(false),[saved,setSaved]=useState(false),[profileSaving,setProfileSaving]=useState(false);
  const [authUser,setAuthUser]=useState<{id:string;email?:string;user_metadata?:Record<string,unknown>}|null>(null),[userRole,setUserRole]=useState("customer"),[authMessage,setAuthMessage]=useState(""),[activeWorkspace,setActiveWorkspace]=useState<"customer"|"organizer"|"gatekeeper"|"advertiser"|"admin"|"owner"|null>(null);
@@ -65,6 +65,20 @@ export default function Home(){
  } = gatekeeper;
  const signInWithGoogle=async()=>{const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("إعدادات تسجيل الدخول غير مكتملة على الموقع.");return;}const {error}=await supabase.auth.signInWithOAuth({provider:"google",options:{redirectTo:window.location.origin}});if(error)setAuthMessage(error.message);};
  const saveProfile=async()=>{if(!authUser){setAuthMessage("سجّل الدخول أولاً لحفظ بياناتك.");return;}const normalizedPhone=phone.replace(/[٠-٩]/g,d=>String("٠١٢٣٤٥٦٧٨٩".indexOf(d))).replace(/\s+/g,"");if(!/^0\d{9}$/.test(normalizedPhone)){setAuthMessage("رقم الهاتف لازم يكون 10 خانات بالضبط ويبدأ بصفر، مثال: 09XXXXXXXX.");return;}const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("تعذر الاتصال بقاعدة البيانات حالياً.");return;}setProfileSaving(true);setSaved(false);setAuthMessage("");const {data,error}=await supabase.from("profiles").update({phone:normalizedPhone}).eq("id",authUser.id).select("phone").single();setProfileSaving(false);if(error){setAuthMessage("ما قدرنا نحفظ رقمك. تأكد من الاتصال وحاول مرة تانية.");return;}setPhone(data.phone||normalizedPhone);setProfileEditing(false);setSaved(true);};
+ const deleteAccount=async()=>{
+  if(!authUser?.email){setAuthMessage("سجّل الدخول أولاً عشان تقدر تحذف حسابك.");return;}
+  const confirmedEmail=window.prompt("لتأكيد الحذف النهائي، اكتب البريد الإلكتروني المرتبط بحسابك:");
+  if(confirmedEmail===null)return;
+  if(confirmedEmail.trim().toLowerCase()!==authUser.email.toLowerCase()){setAuthMessage("البريد الإلكتروني غير مطابق. لم يتم حذف أي بيانات.");return;}
+  if(!window.confirm("تنبيه أخير: سيتم حذف حسابك وإيصالات التحويل والبيانات الشخصية. ستبقى سجلات المعاملات اللازمة محفوظة بعد إزالة بيانات تعريفك. هل تريد المتابعة؟"))return;
+  const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("تعذر الاتصال بالخدمة حالياً.");return;}
+  setDeletingAccount(true);setAuthMessage("");
+  const {data,error}=await supabase.functions.invoke("delete-customer-account",{body:{confirm_email:confirmedEmail.trim()}});
+  setDeletingAccount(false);
+  if(error||!data?.success){setAuthMessage(data?.error||"تعذر حذف الحساب حالياً. لم نتمكن من تأكيد اكتمال العملية.");return;}
+  await supabase.auth.signOut();
+  window.location.assign("/?tab=profile");
+ };
  const signOut=async()=>{if(!window.confirm("هل تريد تسجيل الخروج من حسابك؟ ستعود إلى شاشة تسجيل الدخول."))return;const supabase=getSupabaseBrowserClient();if(supabase){const {error}=await supabase.auth.signOut();if(error){setAuthMessage("تعذر تسجيل الخروج حالياً. حاول مرة أخرى.");return;}}setAuthMessage("تم تسجيل الخروج بنجاح. يمكنك تسجيل الدخول مرة أخرى في أي وقت.");};
 
  const markNotificationRead=async(notification:any)=>{
@@ -169,7 +183,7 @@ export default function Home(){
   </article>
   <article className="privacy-section-card">
    <span className="privacy-icon"><CloudUpload size={25}/></span><h2>البيانات المجمّعة</h2><p>قد يجمع التطبيق البيانات التالية بحسب استخدامك:</p>
-   <div className="privacy-data-group"><strong><UserRound size={17}/> المعلومات الشخصية</strong><p>البريد الإلكتروني المرتبط بالحساب، والاسم ورقم الهاتف إذا أضفتهما إلى ملفك الشخصي.</p></div>
+   <div className="privacy-data-group"><strong><UserRound size={17}/> المعلومات الشخصية</strong><p>نجمع الاسم ورقم الجوال والبريد الإلكتروني المرتبط بالحساب بحسب ما تقدمه عند التسجيل أو تحديث الملف الشخصي.</p><p><b>لماذا نحتاج رقم الجوال؟</b> للتواصل معك عند وجود مشكلة في الحجز أو الدفع، ومساعدتك في تأكيد التذكرة أو حل مشكلة متعلقة بالدخول للفعالية. لا نستخدمه للتسويق العشوائي.</p><p><b>لماذا نحتاج البريد الإلكتروني؟</b> لإنشاء الحساب وتسجيل الدخول، وربط حجوزاتك بحسابك، وإرسال رسائل تأكيد الحجز والتحديثات المهمة، والمساعدة في استعادة الوصول إلى الحساب.</p><p className="privacy-note">قد يكون رقم الجوال مطلوباً لبعض خطوات الحجز والتواصل التشغيلي، بينما يبقى البريد الإلكتروني معرّف الحساب الأساسي.</p></div>
    <div className="privacy-data-group"><strong><Ticket size={17}/> بيانات الحجوزات والتذاكر</strong><p>الفعاليات التي تحجزها، تفاصيل التذاكر، وحالة الحجز والإشعارات المرتبطة به.</p></div>
    <div className="privacy-data-group"><strong><Share2 size={17}/> بيانات الدفع</strong><p>إيصال التحويل الذي ترفعه لإثبات الدفع، ومعلومات المعاملة اللازمة لمراجعة الحجز. لا تطلب منك صفحة حاضر إدخال كلمة مرور حسابك البنكي.</p></div>
    <div className="privacy-data-group"><strong><LockKeyhole size={17}/> بيانات تقنية</strong><p>قد تُعالج معلومات تقنية لازمة لتشغيل التطبيق وحماية الحساب وتحسين استقراره.</p></div>
@@ -179,8 +193,8 @@ export default function Home(){
   </article>
   <article className="privacy-section-card privacy-delete-card">
    <span className="privacy-icon"><Trash2 size={25}/></span><h2>حذف البيانات</h2><p>يمكنك طلب حذف حسابك والبيانات المرتبطة به، أو طلب حذف بيانات محددة دون حذف الحساب بالكامل.</p>
-   <div className="privacy-delete-option"><h3>حذف حساب التطبيق</h3><p>يشمل طلب حذف الحساب إزالة الحساب والبيانات المرتبطة به وفق المتطلبات القانونية والتشغيلية اللازمة.</p><span className="privacy-pending-label">طلب الحذف المباشر من التطبيق قيد التجهيز</span></div>
-   <div className="privacy-delete-option"><h3>إدارة بيانات التطبيق</h3><p>يمكن أن يشمل الطلب بيانات النشاط وسجل المعاملات والصور وإيصالات التحويل، مع مراعاة ما يلزم الاحتفاظ به لإثبات المعاملات أو الامتثال.</p><span className="privacy-pending-label">إدارة طلبات حذف البيانات قيد التجهيز</span></div>
+   <div className="privacy-delete-option"><h3>حذف حساب التطبيق</h3><p>سيتم حذف تسجيل الدخول والملف الشخصي وإيصالات التحويل والإشعارات واشتراكات الإشعارات. وستُزال بيانات الاسم والبريد والجوال من سجل الحجوزات مع الإبقاء على السجلات المالية الضرورية بصورة مجهّلة لأغراض التدقيق وحماية حقوق الأطراف.</p>{authUser?<button type="button" className="privacy-danger-button" onClick={deleteAccount} disabled={deletingAccount}><Trash2 size={17}/>{deletingAccount?"جارٍ حذف الحساب...":"حذف حسابي نهائياً"}</button>:<p className="privacy-pending-label">سجّل الدخول إلى حسابك لطلب الحذف</p>}{authMessage&&<p className="privacy-delete-error" role="alert">{authMessage}</p>}</div>
+   <div className="privacy-delete-option"><h3>إدارة بيانات التطبيق</h3><p>حذف الحساب يزيل بيانات الملف الشخصي وإيصالات الدفع المرتبطة بحجوزاتك. أما سجلات المعاملات والتذاكر اللازمة للتدقيق وإثبات العمليات فتبقى محفوظة بعد إزالة بيانات تعريفك الشخصية.</p></div>
   </article>
  </section>}
   {isGatekeeperPage&&<GatekeeperWorkspace
