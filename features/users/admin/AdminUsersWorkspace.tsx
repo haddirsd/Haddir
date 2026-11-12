@@ -5,7 +5,7 @@ import { RefreshCw } from "lucide-react";
 import { HaddirDialog } from "../../../components/ui/HaddirDialog";
 import { HaddirSelect } from "../../../components/ui/HaddirSelect";
 import { useAdminUsers } from "./useAdminUsers";
-import type { AdminUsersRole } from "./admin-users.types";
+import type { AdminUserRow, AdminUsersRole } from "./admin-users.types";
 
 const fmt = (value: unknown) => value == null || value === "" ? "—" : String(value);
 
@@ -13,7 +13,7 @@ export default function AdminUsersWorkspace({
   role, searchTerm, onSearchTermChange,
 }: { role: AdminUsersRole; searchTerm: string; onSearchTermChange: (value: string) => void }) {
   const [roleFilter, setRoleFilter] = useState("all");
-  const [pendingRole,setPendingRole]=useState<{row:(typeof rows)[number];nextRole:string;eventId:string|null}|null>(null);
+  const [pendingRole,setPendingRole]=useState<{row:AdminUserRow;nextRole:string;eventId:string|null}|null>(null);
   const {
     rows, eventOptions, userTotal, loading, error, message, updatingUserId,
     roleDrafts, setRoleDrafts, assignmentEventIds, setAssignmentEventIds, refresh, updateRole,
