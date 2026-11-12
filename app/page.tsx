@@ -8,11 +8,11 @@ import { TicketWorkspace } from "../features/customer-account/components/TicketW
 import { NotificationsWorkspace } from "../features/customer-account/components/NotificationsWorkspace";
 import { useGatekeeper } from "../features/gatekeeper/useGatekeeper";
 import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
-import { Bell, CheckCircle2, House, Sparkles, Ticket, UserRound, ChevronLeft, ScanLine, ShieldCheck, ClipboardList, Pencil, Sun, Moon } from "lucide-react";
+import { Bell, CheckCircle2, House, Sparkles, Ticket, UserRound, ChevronLeft, ScanLine, ShieldCheck, ClipboardList, Pencil, Sun, Moon, Share2, CloudUpload, LockKeyhole, Trash2 } from "lucide-react";
 
 type Tab="home"|"tickets"|"notifications"|"profile";
 export default function Home(){
- const [activeTab,setActiveTab]=useState<Tab>("home"),[darkMode,setDarkMode]=useState(false);
+ const [activeTab,setActiveTab]=useState<Tab>("home"),[darkMode,setDarkMode]=useState(false),[showPrivacySecurity,setShowPrivacySecurity]=useState(false);
  const [eventResetKey,setEventResetKey]=useState(0),[isEventDetailOpen,setIsEventDetailOpen]=useState(false);
  const [fullName,setFullName]=useState(""),[email,setEmail]=useState(""),[phone,setPhone]=useState(""),[avatarUrl,setAvatarUrl]=useState(""),[profileEditing,setProfileEditing]=useState(false),[saved,setSaved]=useState(false),[profileSaving,setProfileSaving]=useState(false);
  const [authUser,setAuthUser]=useState<{id:string;email?:string;user_metadata?:Record<string,unknown>}|null>(null),[userRole,setUserRole]=useState("customer"),[authMessage,setAuthMessage]=useState(""),[activeWorkspace,setActiveWorkspace]=useState<"customer"|"organizer"|"gatekeeper"|"advertiser"|"admin"|"owner"|null>(null);
@@ -102,7 +102,7 @@ export default function Home(){
 
  return <main dir="rtl" lang="ar" className={"app-shell"+(darkMode?" theme-dark":"")}>
  <>
- {!isEventDetailOpen&&(isGatekeeperPage?<header className="screen-topbar gatekeeper-page-topbar"><button type="button" className="btn btn-outline" onClick={()=>{setIsGatekeeperPage(false);setActiveWorkspace(null);const url=new URL(window.location.href);url.searchParams.delete("workspace");window.location.assign(url.pathname+url.search+url.hash);}}>العودة للملف الشخصي</button><strong>مسح التذاكر</strong><span className="screen-icon"><ScanLine/></span></header>:activeTab==="home"?<header className="topbar"><div className="container header-inner"><button className="brand brand-button" onClick={()=>go("home")}><img className="brand-logo" src={darkMode?"/dark.svg?v=20261111-home-logo":"/light.svg?v=20261111-home-logo"} alt="حاضر" /></button><div className="desktop-greeting">من السودان، لكل لحظة تستاهل الحضور.</div><button className="header-icon theme-toggle" type="button" aria-label={darkMode?"تفعيل الوضع النهاري":"تفعيل الوضع الليلي"} aria-pressed={darkMode} title={darkMode?"تفعيل الوضع النهاري":"تفعيل الوضع الليلي"} onClick={()=>setDarkMode(v=>!v)}><span className="theme-toggle-track" aria-hidden="true"><span className="theme-toggle-knob">{darkMode?<Sun size={17} strokeWidth={2.3}/>:<Moon size={16} strokeWidth={2.3}/>}</span></span></button></div></header>:<header className="screen-topbar"><span className="screen-topbar-spacer" aria-hidden="true"/><strong>{({tickets:"تذاكري",notifications:"الإشعارات",profile:"الملف الشخصي"} as Record<string,string>)[activeTab]}</strong><span className="screen-icon">{activeTab==="tickets"?<Ticket/>:activeTab==="notifications"?<Bell/>:<UserRound/>}</span></header>)}
+ {!isEventDetailOpen&&(showPrivacySecurity&&!isGatekeeperPage?<header className="screen-topbar privacy-screen-topbar"><button type="button" className="privacy-back-button" onClick={()=>setShowPrivacySecurity(false)}><ChevronLeft size={18}/> رجوع</button><strong>الخصوصية والأمان</strong><span className="screen-icon"><ShieldCheck/></span></header>:isGatekeeperPage?<header className="screen-topbar gatekeeper-page-topbar"><button type="button" className="btn btn-outline" onClick={()=>{setIsGatekeeperPage(false);setActiveWorkspace(null);const url=new URL(window.location.href);url.searchParams.delete("workspace");window.location.assign(url.pathname+url.search+url.hash);}}>العودة للملف الشخصي</button><strong>مسح التذاكر</strong><span className="screen-icon"><ScanLine/></span></header>:activeTab==="home"?<header className="topbar"><div className="container header-inner"><button className="brand brand-button" onClick={()=>go("home")}><img className="brand-logo" src={darkMode?"/dark.svg?v=20261111-home-logo":"/light.svg?v=20261111-home-logo"} alt="حاضر" /></button><div className="desktop-greeting">من السودان، لكل لحظة تستاهل الحضور.</div><button className="header-icon theme-toggle" type="button" aria-label={darkMode?"تفعيل الوضع النهاري":"تفعيل الوضع الليلي"} aria-pressed={darkMode} title={darkMode?"تفعيل الوضع النهاري":"تفعيل الوضع الليلي"} onClick={()=>setDarkMode(v=>!v)}><span className="theme-toggle-track" aria-hidden="true"><span className="theme-toggle-knob">{darkMode?<Sun size={17} strokeWidth={2.3}/>:<Moon size={16} strokeWidth={2.3}/>}</span></span></button></div></header>:<header className="screen-topbar"><span className="screen-topbar-spacer" aria-hidden="true"/><strong>{({tickets:"تذاكري",notifications:"الإشعارات",profile:"الملف الشخصي"} as Record<string,string>)[activeTab]}</strong><span className="screen-icon">{activeTab==="tickets"?<Ticket/>:activeTab==="notifications"?<Bell/>:<UserRound/>}</span></header>)}
  <div className="app-content">
  {!isGatekeeperPage&&activeTab==="home"&&showWelcome&&<div className="welcome-overlay" role="status" aria-live="polite"><div className="welcome-motion"><span className="welcome-spark"><Sparkles size={22}/></span><img className="welcome-brand-logo" src={darkMode?"/dark.svg?v=20261111-home-logo":"/light.svg?v=20261111-home-logo"} alt="حاضر" /><strong>{welcomeGreeting}</strong><p>أهلاً بيك في حاضر</p><span className="welcome-orbit" aria-hidden="true">✦</span></div></div>}
  <EventsWorkspace
@@ -138,7 +138,7 @@ export default function Home(){
   onOpenNotification={(notification)=>void openNotification(notification)}
   onToggleRead={(notification)=>void markNotificationRead(notification)}
  />}
- {!isGatekeeperPage&&activeTab==="profile"&&<section className="screen container profile-screen">
+ {!isGatekeeperPage&&activeTab==="profile"&&!showPrivacySecurity&&<section className="screen container profile-screen">
    <div className="profile-card profile-account-card">
     <div className="profile-account-head">
      <div className="profile-avatar-wrap"><div className="profile-avatar profile-avatar-large">{avatarUrl?<img src={avatarUrl} alt="صورة المستخدم"/>:<UserRound size={34}/>}</div>{authUser&&!profileEditing&&<button className="profile-avatar-edit" type="button" aria-label="تعديل البيانات" title="تعديل البيانات" onClick={()=>{setProfileEditing(true);setAuthMessage("");setSaved(false);}}><Pencil size={15}/></button>}</div>
@@ -156,9 +156,32 @@ export default function Home(){
   {userRole==="advertiser"&&<AdvertiserWorkspace authUser={authUser} userRole={userRole}/>}
 
  </section>}
+ <button type="button" className="role-workspace-button privacy-entry-button" onClick={()=>{setShowPrivacySecurity(true);window.scrollTo({top:0,behavior:"auto"});}}><span className="role-workspace-icon"><ShieldCheck size={21}/></span><span><strong>الخصوصية والأمان</strong><small>معلومات بياناتك وكيفية حمايتها وإدارتها</small></span><ChevronLeft size={18}/></button>
  <div className="profile-settings-panel"><div><strong>إعدادات العرض</strong><p>غيّر مظهر التطبيق في كل الصفحات.</p></div><button className="btn btn-outline" type="button" onClick={()=>setDarkMode(v=>!v)}>{darkMode?"☀ الوضع النهاري":"☾ الوضع الليلي"}</button></div>
  {authUser&&<button className="btn profile-logout-button role-logout-button" type="button" onClick={signOut}>تسجيل الخروج</button>}
  {authMessage&&<p className="save-confirm">{authMessage}</p>}
+ </section>}
+
+ {!isGatekeeperPage&&activeTab==="profile"&&showPrivacySecurity&&<section className="screen container privacy-screen">
+  <div className="privacy-intro"><span className="privacy-eyebrow">حاضر • الخصوصية والأمان</span><h1>أمان البيانات</h1><p>نوضح ليك هنا أنواع المعلومات التي قد يجمعها تطبيق حاضر، وكيفية استخدامها وحمايتها. قد تختلف بعض الممارسات حسب طريقة استخدامك للتطبيق والميزات التي تستعملها.</p></div>
+  <article className="privacy-section-card">
+   <span className="privacy-icon"><Share2 size={25}/></span><h2>مشاركة البيانات</h2><h3>لا نبيع بياناتك ولا نستخدمها للإعلانات</h3><p>لا يبيع حاضر بيانات المستخدمين ولا يشاركها مع جهات خارجية لأغراض إعلانية. نستعين بمزوّدي خدمات تقنية لتشغيل التطبيق، وقد تتم معالجة البيانات الضرورية لديهم، مثل الاستضافة وقاعدة البيانات وتسجيل الدخول.</p><p className="privacy-note">قد يشمل ذلك خدمات Supabase وVercel، وخدمة Google عند اختيار تسجيل الدخول باستخدام Google.</p>
+  </article>
+  <article className="privacy-section-card">
+   <span className="privacy-icon"><CloudUpload size={25}/></span><h2>البيانات المجمّعة</h2><p>قد يجمع التطبيق البيانات التالية بحسب استخدامك:</p>
+   <div className="privacy-data-group"><strong><UserRound size={17}/> المعلومات الشخصية</strong><p>البريد الإلكتروني المرتبط بالحساب، والاسم ورقم الهاتف إذا أضفتهما إلى ملفك الشخصي.</p></div>
+   <div className="privacy-data-group"><strong><Ticket size={17}/> بيانات الحجوزات والتذاكر</strong><p>الفعاليات التي تحجزها، تفاصيل التذاكر، وحالة الحجز والإشعارات المرتبطة به.</p></div>
+   <div className="privacy-data-group"><strong><Share2 size={17}/> بيانات الدفع</strong><p>إيصال التحويل الذي ترفعه لإثبات الدفع، ومعلومات المعاملة اللازمة لمراجعة الحجز. لا تطلب منك صفحة حاضر إدخال كلمة مرور حسابك البنكي.</p></div>
+   <div className="privacy-data-group"><strong><LockKeyhole size={17}/> بيانات تقنية</strong><p>قد تُعالج معلومات تقنية لازمة لتشغيل التطبيق وحماية الحساب وتحسين استقراره.</p></div>
+  </article>
+  <article className="privacy-section-card">
+   <span className="privacy-icon"><LockKeyhole size={25}/></span><h2>الممارسات المتعلقة بالأمان</h2><div className="privacy-security-row"><LockKeyhole size={21}/><div><strong>تشفير البيانات أثناء النقل</strong><p>يتم نقل البيانات عبر اتصال آمن مشفّر (HTTPS/TLS) بين جهازك وخدمات التطبيق.</p></div></div><p className="privacy-note">نطبّق ضوابط وصول لحماية بيانات الحساب، ولا نعرض بياناتك الخاصة للمستخدمين الآخرين.</p>
+  </article>
+  <article className="privacy-section-card privacy-delete-card">
+   <span className="privacy-icon"><Trash2 size={25}/></span><h2>حذف البيانات</h2><p>يمكنك طلب حذف حسابك والبيانات المرتبطة به، أو طلب حذف بيانات محددة دون حذف الحساب بالكامل.</p>
+   <div className="privacy-delete-option"><h3>حذف حساب التطبيق</h3><p>يشمل طلب حذف الحساب إزالة الحساب والبيانات المرتبطة به وفق المتطلبات القانونية والتشغيلية اللازمة.</p><span className="privacy-pending-label">طلب الحذف المباشر من التطبيق قيد التجهيز</span></div>
+   <div className="privacy-delete-option"><h3>إدارة بيانات التطبيق</h3><p>يمكن أن يشمل الطلب بيانات النشاط وسجل المعاملات والصور وإيصالات التحويل، مع مراعاة ما يلزم الاحتفاظ به لإثبات المعاملات أو الامتثال.</p><span className="privacy-pending-label">إدارة طلبات حذف البيانات قيد التجهيز</span></div>
+  </article>
  </section>}
   {isGatekeeperPage&&<GatekeeperWorkspace
    userRole={userRole}
