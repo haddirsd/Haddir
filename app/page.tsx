@@ -70,12 +70,12 @@ export default function Home(){
   const confirmedEmail=window.prompt("لتأكيد الحذف النهائي، اكتب البريد الإلكتروني المرتبط بحسابك:");
   if(confirmedEmail===null)return;
   if(confirmedEmail.trim().toLowerCase()!==authUser.email.toLowerCase()){setAuthMessage("البريد الإلكتروني غير مطابق. لم يتم حذف أي بيانات.");return;}
-  if(!window.confirm("تنبيه أخير: سيتم حذف حسابك وإيصالات التحويل والبيانات الشخصية. ستبقى سجلات المعاملات اللازمة محفوظة بعد إزالة بيانات تعريفك. هل تريد المتابعة؟"))return;
+  if(!window.confirm("تنبيه أخير: سيتم حذف حسابك وإيصالات التحويل والبيانات الشخصية. ستبقى سجلات المعاملات اللازمة محفوظة بعد إزالة بيانات تعريفك. هل تريد المتابعة؟ لن يسمح النظام بالحذف إذا كانت لديك تذكرة مؤكدة لفعالية قادمة."))return;
   const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("تعذر الاتصال بالخدمة حالياً.");return;}
   setDeletingAccount(true);setAuthMessage("");
   const {data,error}=await supabase.functions.invoke("delete-customer-account",{body:{confirm_email:confirmedEmail.trim()}});
   setDeletingAccount(false);
-  if(error||!data?.success){setAuthMessage(data?.error||"تعذر حذف الحساب حالياً. لم نتمكن من تأكيد اكتمال العملية.");return;}
+  if(error||!data?.success){let failureMessage=data?.error;try{if(!failureMessage&&error)failureMessage=(await (error as any).context?.json?.())?.error;}catch{}setAuthMessage(failureMessage||"تعذر حذف الحساب حالياً. لم نتمكن من تأكيد اكتمال العملية.");return;}
   await supabase.auth.signOut();
   window.location.assign("/?tab=profile");
  };
