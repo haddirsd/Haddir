@@ -1,4 +1,4 @@
-const CACHE_NAME = "haddir-static-v12";
+const CACHE_NAME = "haddir-static-v13";
 const PRECACHE_URLS = [
   "/icons/icon-192-brand.svg",
   "/icons/icon-512-brand.svg",
