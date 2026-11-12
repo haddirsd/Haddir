@@ -46,7 +46,6 @@ export function useAdminUsers(role: AdminUsersRole, searchTerm: string, roleFilt
     if (nextRole === "admin" && role !== "owner") { setError("تعيين المشرف الإداري من صلاحيات مالك المنصة فقط."); return; }
     if (nextRole === "organizer") return;
     if ((nextRole === "gatekeeper" || nextRole === "advertiser") && !eventId) { setError("اختار الفعالية أولاً لهذا المستخدم."); return; }
-    if (!window.confirm("تأكيد تغيير دور " + (userRow.full_name || "هذا المستخدم") + "؟")) return;
     setUpdatingUserId(userRow.id); setError(""); setMessage("");
     try {
       const result = await saveAdminUserRole(userRow.id, nextRole, eventId);
