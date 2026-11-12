@@ -11,6 +11,7 @@ import AdminActivityWorkspace from "../../features/admin/activity/AdminActivityW
 import AdminReportsWorkspace from "../../features/admin/reports/AdminReportsWorkspace";
 import AdminOverviewWorkspace from "../../features/admin/overview/AdminOverviewWorkspace";
 import { Activity, BadgeCheck, Banknote, CalendarDays, ClipboardCheck, LayoutDashboard, LogOut, Shield, Ticket, Users } from "lucide-react";
+import { HaddirDialog } from "../../components/ui/HaddirDialog";
 
 type AdminRole = "owner" | "admin" | "supervisor";
 type Section = "overview" | "events" | "bookings" | "payments" | "users" | "reports" | "activity";
@@ -26,6 +27,7 @@ export default function AdminPage() {
   const [error, setError] = useState("");
   const [userSearchTerm,setUserSearchTerm]=useState("");
   const [darkMode,setDarkMode]=useState(false);
+  const [showLogoutConfirm,setShowLogoutConfirm]=useState(false);
 
   useEffect(() => {
     const syncTheme = () => {
@@ -64,7 +66,8 @@ export default function AdminPage() {
 
   const nav = useMemo(() => role === "supervisor" ? (["overview","bookings","payments"] as Section[]) : (["overview","events","bookings","payments","users","reports","activity"] as Section[]), [role]);
 
-  const signOut = async () => { const supabase = getSupabaseBrowserClient(); if (supabase) await supabase.auth.signOut(); router.replace("/"); };
+  const signOut = () => setShowLogoutConfirm(true);
+  const confirmSignOut = async () => { setShowLogoutConfirm(false); const supabase = getSupabaseBrowserClient(); if (supabase) await supabase.auth.signOut(); router.replace("/"); };
 
   if (loading) return <main className={"admin-loading"+(darkMode?" theme-dark":"")} dir="rtl"><div className="admin-spinner"/><p>جاري التحقق من صلاحياتك...</p></main>;
   if (!role) return <main className={"admin-denied"+(darkMode?" theme-dark":"")} dir="rtl"><Shield size={34}/><h1>الوصول غير متاح</h1><p>{error || "هذه الصفحة مخصصة لفريق إدارة حاضر."}</p><button onClick={() => router.replace("/")}>العودة للرئيسية</button></main>;
@@ -90,5 +93,6 @@ export default function AdminPage() {
         <footer className="admin-footer">حاضر · نظام إدارة الفعاليات والتذاكر <span>{roleLabel}</span></footer>
       </div>
     </section>
+    {showLogoutConfirm&&<HaddirDialog open title="تسجيل الخروج من لوحة التحكم؟" description="هل تريد إنهاء جلسة فريق الإدارة والعودة إلى واجهة حاضر؟" confirmLabel="تسجيل الخروج" onConfirm={confirmSignOut} onCancel={()=>setShowLogoutConfirm(false)}/>}
   </main>;
 }
