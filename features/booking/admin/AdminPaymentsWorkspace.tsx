@@ -18,6 +18,7 @@ export default function AdminPaymentsWorkspace() {
   const [actionError, setActionError] = useState("");
   const [reviewing, setReviewing] = useState(false);
   const [approvalTarget,setApprovalTarget]=useState<AdminPaymentRow|null>(null);
+  const [rejectionTarget,setRejectionTarget]=useState<AdminPaymentRow|null>(null);
 
   const reviewPayment = async (row: AdminPaymentRow, decision: AdminPaymentDecision) => {
     const reason = decision === "reject" ? (rejectionReasons[row.id] || "").trim() : null;
@@ -74,12 +75,13 @@ export default function AdminPaymentsWorkspace() {
             <button className="admin-payment-approve" type="button" disabled={reviewing||!r.receipt_url} onClick={()=>setApprovalTarget(r)}>قبول الدفع وإصدار التذاكر</button>
             <div className="admin-payment-reject-box">
               <label>سبب الرفض (سيصل للعميل)<textarea rows={2} value={rejectionReasons[r.id]||""} onChange={event=>setRejectionReasons(current=>({...current,[r.id]:event.target.value}))} placeholder="مثلاً: صورة الإيصال غير واضحة أو المبلغ غير مطابق..."/></label>
-              <button className="admin-payment-reject" type="button" disabled={reviewing||!(rejectionReasons[r.id]||"").trim()} onClick={()=>void reviewPayment(r,"reject")}>رفض وإرسال السبب</button>
+              <button className="admin-payment-reject" type="button" disabled={reviewing||!(rejectionReasons[r.id]||"").trim()} onClick={()=>setRejectionTarget(r)}>رفض وإرسال السبب</button>
             </div>
           </div>}
         </article>;
       })}
     </div>}
+    {rejectionTarget&&<HaddirDialog open title="تأكيد رفض إثبات الدفع؟" description={"سيتم رفض الإيصال وإرسال سبب الرفض للعميل: "+(rejectionReasons[rejectionTarget.id]||"")} confirmLabel="تأكيد الرفض" tone="danger" busy={reviewing} onCancel={()=>setRejectionTarget(null)} onConfirm={async()=>{const row=rejectionTarget;setRejectionTarget(null);await reviewPayment(row,"reject");}}/>}
     {approvalTarget&&<HaddirDialog open title="اعتماد الدفع وإصدار التذاكر؟" description="سيتم اعتماد إثبات التحويل وإصدار تذاكر برموز دخول من 10 أرقام وإرسال إشعار للعميل." confirmLabel="اعتماد الدفع" tone="success" busy={reviewing} onCancel={()=>setApprovalTarget(null)} onConfirm={async()=>{const row=approvalTarget;setApprovalTarget(null);await reviewPayment(row,"approve");}}/>}
   </section>;
 }
