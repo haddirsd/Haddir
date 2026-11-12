@@ -1,6 +1,7 @@
 "use client";
 
-import { Copy, CreditCard } from "lucide-react";
+import { Copy } from "lucide-react";
+import { HaddirSelect } from "../../../components/ui/HaddirSelect";
 import type { EventPaymentAccount } from "../booking.types";
 
 type PaymentMethodSelectorProps = {
@@ -25,17 +26,14 @@ export function PaymentMethodSelector({
       <h2>طريقة الدفع</h2>
       <label className="checkout-label">
         <span>اختر حساب التحويل</span>
-        <select
-          required
+        <HaddirSelect
           value={paymentMethod}
-          onChange={(change) => onPaymentMethodChange(change.target.value)}
+          onChange={onPaymentMethodChange}
           disabled={accounts.length === 0}
-        >
-          <option value="" disabled>اضغط هنا لاختيار طريقة الدفع</option>
-          {accounts.map((account) => (
-            <option key={account.id} value={account.id}>{account.account_name}</option>
-          ))}
-        </select>
+          ariaLabel="اختيار حساب التحويل"
+          placeholder="اضغط هنا لاختيار طريقة الدفع"
+          options={accounts.map(account=>({value:account.id,label:account.account_name}))}
+        />
       </label>
 
       <div className="account-details">
