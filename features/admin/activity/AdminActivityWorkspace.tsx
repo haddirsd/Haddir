@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { HaddirSelect } from "../../../components/ui/HaddirSelect";
 import { Activity, CalendarDays, RefreshCw, Search, SlidersHorizontal, UserRound, X } from "lucide-react";
 import { useAdminActivity } from "./useAdminActivity";
 import type { AdminActivityRow } from "./admin-activity.types";
@@ -55,9 +56,9 @@ export default function AdminActivityWorkspace() {
       <div className="admin-activity-filter-title"><div><SlidersHorizontal size={16}/><b>البحث والتصفية</b></div>{hasFilters&&<button type="button" onClick={reset}><X size={14}/> مسح الفلاتر</button>}</div>
       <div className="admin-activity-filters">
         <label className="admin-activity-search"><Search size={17}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="ابحث باسم المنفّذ أو الإجراء أو الفعالية..."/></label>
-        <label><span>نوع الإجراء</span><select value={groupFilter} onChange={e=>setGroupFilter(e.target.value)}><option value="all">كل العمليات</option><option value="events">الفعاليات</option><option value="event">إجراءات الفعالية</option><option value="bookings">الحجوزات</option><option value="booking">إجراءات الحجز</option><option value="payment">المدفوعات</option><option value="ticket">التذاكر</option><option value="tickets">إدارة التذاكر</option><option value="ticket_types">فئات التذاكر</option><option value="event_payment_accounts">حسابات الدفع</option><option value="user">المستخدمون</option><option value="profiles">الحسابات</option></select></label>
-        <label><span>دور المنفّذ</span><select value={roleFilter} onChange={e=>setRoleFilter(e.target.value)}><option value="all">كل الأدوار</option>{Object.entries(roleNames).filter(([key])=>key!=="unknown").map(([key,value])=><option value={key} key={key}>{value}</option>)}</select></label>
-        <label><span>الفترة الزمنية</span><select value={period} onChange={e=>setPeriod(e.target.value)}><option value="all">كل الفترات</option><option value="today">اليوم</option><option value="7d">آخر 7 أيام</option><option value="30d">آخر 30 يوماً</option></select></label>
+        <label><span>نوع الإجراء</span><HaddirSelect value={groupFilter} onChange={setGroupFilter} options={[{value:"all",label:"كل العمليات"},{value:"events",label:"الفعاليات"},{value:"event",label:"إجراءات الفعالية"},{value:"bookings",label:"الحجوزات"},{value:"booking",label:"إجراءات الحجز"},{value:"payment",label:"المدفوعات"},{value:"ticket",label:"التذاكر"},{value:"tickets",label:"إدارة التذاكر"},{value:"ticket_types",label:"فئات التذاكر"},{value:"event_payment_accounts",label:"حسابات الدفع"},{value:"user",label:"المستخدمون"},{value:"profiles",label:"الحسابات"}]}/></label>
+        <label><span>دور المنفّذ</span><HaddirSelect value={roleFilter} onChange={setRoleFilter} options={[{value:"all",label:"كل الأدوار"},...Object.entries(roleNames).filter(([key])=>key!=="unknown").map(([key,value])=>({value:key,label:value}))]}/></label>
+        <label><span>الفترة الزمنية</span><HaddirSelect value={period} onChange={setPeriod} options={[{value:"all",label:"كل الفترات"},{value:"today",label:"اليوم"},{value:"7d",label:"آخر 7 أيام"},{value:"30d",label:"آخر 30 يوماً"}]}/></label>
       </div>
     </div>
     <div className="admin-activity-results-head"><div><h4>تفاصيل الإجراءات</h4><p>{loading?"يتم تحميل السجل...":`عرض ${filtered.length.toLocaleString("ar-SD-u-nu-latn")} من أصل ${rows.length.toLocaleString("ar-SD-u-nu-latn")} إجراء محمّل`}</p></div></div>
