@@ -1,4 +1,4 @@
-const CACHE_NAME = "haddir-static-v10";
+const CACHE_NAME = "haddir-static-v11";
 const PRECACHE_URLS = [
   "/icons/icon-192-brand.svg",
   "/icons/icon-512-brand.svg",
@@ -70,4 +70,44 @@ self.addEventListener("fetch", (event) => {
       return response;
     })
   );
+});
+
+
+self.addEventListener("push", (event) => {
+  let payload = {};
+  try {
+    payload = event.data ? event.data.json() : {};
+  } catch {
+    payload = { body: event.data ? event.data.text() : "" };
+  }
+  const title = payload.title || "حاضر";
+  const options = {
+    body: payload.body || "عندك تحديث جديد في حاضر.",
+    icon: payload.icon || "/icons/icon-192-brand.svg",
+    badge: payload.badge || "/icons/icon-192-brand.svg",
+    tag: payload.tag || "haddir-notification",
+    data: { url: payload.url || "/?tab=notifications" },
+    vibrate: [180, 80, 180],
+    renotify: false,
+    silent: false,
+    dir: "rtl",
+    lang: "ar",
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = new URL(event.notification.data?.url || "/?tab=notifications", self.location.origin).href;
+  event.waitUntil((async () => {
+    const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    for (const client of windows) {
+      if (new URL(client.url).origin === self.location.origin) {
+        await client.focus();
+        if ("navigate" in client) await client.navigate(target);
+        return;
+      }
+    }
+    await self.clients.openWindow(target);
+  })());
 });
