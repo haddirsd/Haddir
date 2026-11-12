@@ -22,7 +22,6 @@ export default function AdminPaymentsWorkspace() {
   const reviewPayment = async (row: AdminPaymentRow, decision: AdminPaymentDecision) => {
     const reason = decision === "reject" ? (rejectionReasons[row.id] || "").trim() : null;
     if (decision === "reject" && !reason) { setActionError("اكتب سبب الرفض أولاً حتى نرسله للعميل."); return; }
-    if (decision === "approve") { setApprovalTarget(row); return; }
     setReviewing(true); setActionError(""); setActionMessage("");
     try {
       const result = await reviewAdminPayment(row.id, decision, reason);
@@ -72,7 +71,7 @@ export default function AdminPaymentsWorkspace() {
             {r.review_note&&<div className="admin-payment-note"><small>ملاحظة المراجعة</small><strong>{r.review_note}</strong></div>}
           </div>
           {pending&&<div className="admin-payment-actions">
-            <button className="admin-payment-approve" type="button" disabled={reviewing||!r.receipt_url} onClick={()=>void reviewPayment(r,"approve")}>قبول الدفع وإصدار التذاكر</button>
+            <button className="admin-payment-approve" type="button" disabled={reviewing||!r.receipt_url} onClick={()=>setApprovalTarget(r)}>قبول الدفع وإصدار التذاكر</button>
             <div className="admin-payment-reject-box">
               <label>سبب الرفض (سيصل للعميل)<textarea rows={2} value={rejectionReasons[r.id]||""} onChange={event=>setRejectionReasons(current=>({...current,[r.id]:event.target.value}))} placeholder="مثلاً: صورة الإيصال غير واضحة أو المبلغ غير مطابق..."/></label>
               <button className="admin-payment-reject" type="button" disabled={reviewing||!(rejectionReasons[r.id]||"").trim()} onClick={()=>void reviewPayment(r,"reject")}>رفض وإرسال السبب</button>
