@@ -8,11 +8,13 @@ import { TicketWorkspace } from "../features/customer-account/components/TicketW
 import { NotificationsWorkspace } from "../features/customer-account/components/NotificationsWorkspace";
 import { useGatekeeper } from "../features/gatekeeper/useGatekeeper";
 import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
+import { HaddirDialog } from "../components/ui/HaddirDialog";
 import { Bell, CheckCircle2, House, Sparkles, Ticket, UserRound, ChevronLeft, ScanLine, ShieldCheck, ClipboardList, Pencil, Sun, Moon, Share2, CloudUpload, LockKeyhole, Trash2 } from "lucide-react";
 
 type Tab="home"|"tickets"|"notifications"|"profile";
 export default function Home(){
  const [activeTab,setActiveTab]=useState<Tab>("home"),[darkMode,setDarkMode]=useState(false),[showPrivacySecurity,setShowPrivacySecurity]=useState(false),[deletingAccount,setDeletingAccount]=useState(false);
+ const [accountDialog,setAccountDialog]=useState<"logout"|"delete-email"|"delete-final"|null>(null),[deleteEmailInput,setDeleteEmailInput]=useState("");
  const [bookingGate,setBookingGate]=useState<"login"|"phone"|null>(null);
  const [eventResetKey,setEventResetKey]=useState(0),[isEventDetailOpen,setIsEventDetailOpen]=useState(false);
  const [fullName,setFullName]=useState(""),[email,setEmail]=useState(""),[phone,setPhone]=useState(""),[avatarUrl,setAvatarUrl]=useState(""),[profileEditing,setProfileEditing]=useState(false),[saved,setSaved]=useState(false),[profileSaving,setProfileSaving]=useState(false);
@@ -66,21 +68,29 @@ export default function Home(){
  } = gatekeeper;
  const signInWithGoogle=async()=>{const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("إعدادات تسجيل الدخول غير مكتملة على الموقع.");return;}const {error}=await supabase.auth.signInWithOAuth({provider:"google",options:{redirectTo:window.location.origin}});if(error)setAuthMessage(error.message);};
  const saveProfile=async()=>{if(!authUser){setAuthMessage("سجّل الدخول أولاً لحفظ بياناتك.");return;}const normalizedPhone=phone.replace(/[٠-٩]/g,d=>String("٠١٢٣٤٥٦٧٨٩".indexOf(d))).replace(/\s+/g,"");if(!/^0\d{9}$/.test(normalizedPhone)){setAuthMessage("رقم الهاتف لازم يكون 10 خانات بالضبط ويبدأ بصفر، مثال: 09XXXXXXXX.");return;}const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("تعذر الاتصال بقاعدة البيانات حالياً.");return;}setProfileSaving(true);setSaved(false);setAuthMessage("");const {data,error}=await supabase.from("profiles").update({phone:normalizedPhone}).eq("id",authUser.id).select("phone").single();setProfileSaving(false);if(error){setAuthMessage("ما قدرنا نحفظ رقمك. تأكد من الاتصال وحاول مرة تانية.");return;}setPhone(data.phone||normalizedPhone);setProfileEditing(false);setSaved(true);};
- const deleteAccount=async()=>{
+ const deleteAccount=()=>{
   if(!authUser?.email){setAuthMessage("سجّل الدخول أولاً عشان تقدر تحذف حسابك.");return;}
-  const confirmedEmail=window.prompt("لتأكيد الحذف النهائي، اكتب البريد الإلكتروني المرتبط بحسابك:");
-  if(confirmedEmail===null)return;
-  if(confirmedEmail.trim().toLowerCase()!==authUser.email.toLowerCase()){setAuthMessage("البريد الإلكتروني غير مطابق. لم يتم حذف أي بيانات.");return;}
-  if(!window.confirm("تنبيه أخير: سيتم حذف حسابك وإيصالات التحويل والبيانات الشخصية. ستبقى سجلات المعاملات اللازمة محفوظة بعد إزالة بيانات تعريفك. هل تريد المتابعة؟ لن يسمح النظام بالحذف إذا كانت لديك تذكرة مؤكدة لفعالية قادمة."))return;
-  const supabase=getSupabaseBrowserClient();if(!supabase){setAuthMessage("تعذر الاتصال بالخدمة حالياً.");return;}
-  setDeletingAccount(true);setAuthMessage("");
-  const {data,error}=await supabase.functions.invoke("delete-customer-account",{body:{confirm_email:confirmedEmail.trim()}});
+  setDeleteEmailInput("");
+  setAccountDialog("delete-email");
+ };
+ const executeDeleteAccount=async()=>{
+  const confirmedEmail=deleteEmailInput.trim();
+  if(!authUser?.email)return;
+  if(confirmedEmail.toLowerCase()!==authUser.email.toLowerCase()){setAccountDialog(null);setAuthMessage("البريد الإلكتروني غير مطابق. لم يتم حذف أي بيانات.");return;}
+  const supabase=getSupabaseBrowserClient();if(!supabase){setAccountDialog(null);setAuthMessage("تعذر الاتصال بالخدمة حالياً.");return;}
+  setAccountDialog(null);setDeletingAccount(true);setAuthMessage("");
+  const {data,error}=await supabase.functions.invoke("delete-customer-account",{body:{confirm_email:confirmedEmail}});
   setDeletingAccount(false);
   if(error||!data?.success){let failureMessage=data?.error;try{if(!failureMessage&&error)failureMessage=(await (error as any).context?.json?.())?.error;}catch{}setAuthMessage(failureMessage||"تعذر حذف الحساب حالياً. لم نتمكن من تأكيد اكتمال العملية.");return;}
   await supabase.auth.signOut();
   window.location.assign("/?tab=profile");
  };
- const signOut=async()=>{if(!window.confirm("هل تريد تسجيل الخروج من حسابك؟ ستعود إلى شاشة تسجيل الدخول."))return;const supabase=getSupabaseBrowserClient();if(supabase){const {error}=await supabase.auth.signOut();if(error){setAuthMessage("تعذر تسجيل الخروج حالياً. حاول مرة أخرى.");return;}}setAuthMessage("تم تسجيل الخروج بنجاح. يمكنك تسجيل الدخول مرة أخرى في أي وقت.");};
+ const signOut=()=>setAccountDialog("logout");
+ const confirmSignOut=async()=>{
+  setAccountDialog(null);
+  const supabase=getSupabaseBrowserClient();if(supabase){const {error}=await supabase.auth.signOut();if(error){setAuthMessage("تعذر تسجيل الخروج حالياً. حاول مرة أخرى.");return;}}
+  setAuthMessage("تم تسجيل الخروج بنجاح. يمكنك تسجيل الدخول مرة أخرى في أي وقت.");
+ };
 
  const markNotificationRead=async(notification:any)=>{
   if(!authUser)return;
@@ -252,6 +262,9 @@ export default function Home(){
    onClose={()=>{const url=new URL(window.location.href);url.searchParams.delete("workspace");url.searchParams.set("tab","profile");window.location.assign(url.pathname+url.search+url.hash);}}
   />}
  </div>
+ {accountDialog==="logout"&&<HaddirDialog open title="تسجيل الخروج؟" description="هل تريد تسجيل الخروج من حسابك؟ ستعود إلى شاشة تسجيل الدخول." confirmLabel="تسجيل الخروج" tone="primary" onConfirm={confirmSignOut} onCancel={()=>setAccountDialog(null)}/>}
+ {accountDialog==="delete-email"&&<HaddirDialog open title="تأكيد هوية الحساب" description="اكتب البريد الإلكتروني المرتبط بحسابك للمتابعة في طلب حذف الحساب." confirmLabel="متابعة" onConfirm={()=>{if(!deleteEmailInput.trim()){setAuthMessage("اكتب البريد الإلكتروني أولاً.");return;}if(deleteEmailInput.trim().toLowerCase()!==authUser?.email?.toLowerCase()){setAccountDialog(null);setAuthMessage("البريد الإلكتروني غير مطابق. لم يتم حذف أي بيانات.");return;}setAccountDialog("delete-final");}} onCancel={()=>setAccountDialog(null)}><input className="haddir-dialog-input" type="email" value={deleteEmailInput} onChange={event=>setDeleteEmailInput(event.target.value)} placeholder="البريد الإلكتروني" autoComplete="email"/></HaddirDialog>}
+ {accountDialog==="delete-final"&&<HaddirDialog open title="حذف الحساب نهائياً؟" description="سيتم حذف الحساب وإيصالات التحويل والبيانات الشخصية. ستبقى سجلات المعاملات اللازمة محفوظة بعد إزالة بيانات تعريفك. لن يسمح النظام بالحذف إذا كانت لديك تذكرة مؤكدة لفعالية قادمة." confirmLabel="حذف الحساب نهائياً" tone="danger" busy={deletingAccount} onConfirm={executeDeleteAccount} onCancel={()=>setAccountDialog(null)}/>}
  {bookingGate&&<div className="booking-gate-backdrop" role="presentation"><section className="booking-gate-dialog" role="dialog" aria-modal="true" aria-labelledby="booking-gate-title"><span className="booking-gate-icon"><UserRound size={28}/></span><h2 id="booking-gate-title">{bookingGate==="phone"?"أضف رقم جوالك لإكمال الحجز":"سجّل الدخول لإكمال الحجز"}</h2><p>{bookingGate==="phone"?"باقي خطوة واحدة! أضف رقم جوالك عشان نقدر نكمل حجزك ونتواصل معاك عند الحاجة.":"تحتاج تسجّل الدخول أولاً عشان نربط الحجز بحسابك ونقدر نتابع تذكرتك."}</p><button type="button" className="booking-gate-primary" onClick={()=>{const gate=bookingGate;if(gate==="login")window.sessionStorage.setItem("haddir_booking_phone_required","1");setBookingGate(null);setEventResetKey(value=>value+1);setActiveTab("profile");setAuthMessage(gate==="login"?"سجّل الدخول لمواصلة الحجز.":"أضف رقم جوالك لمواصلة الحجز.");if(gate==="phone")setProfileEditing(true);window.scrollTo({top:0,behavior:"smooth"});}}>{bookingGate==="phone"?"إضافة رقم الجوال":"الانتقال لتسجيل الدخول"}</button><button type="button" className="booking-gate-secondary" onClick={()=>setBookingGate(null)}>لاحقاً</button></section></div>}
  {!isGatekeeperPage&&!isEventDetailOpen&&<nav className="bottom-nav" aria-label="التنقل الرئيسي"><button type="button" aria-current={activeTab==="home"?"page":undefined} aria-label="الرئيسية" className={activeTab==="home"?"selected":""} onClick={()=>go("home")}><House size={21}/><span className="nav-label">الرئيسية</span></button><button type="button" aria-current={activeTab==="tickets"?"page":undefined} aria-label="تذاكري" className={activeTab==="tickets"?"selected":""} onClick={()=>go("tickets")}><Ticket size={21}/><span className="nav-label">تذاكري</span></button><button type="button" aria-current={activeTab==="notifications"?"page":undefined} aria-label="الإشعارات" className={activeTab==="notifications"?"selected":""} onClick={()=>go("notifications")}><span className="nav-icon-wrap"><Bell size={21}/>{unreadNotificationCount>0&&<i className="nav-notification-dot" aria-label={`${unreadNotificationCount} إشعارات غير مقروءة`}/>}</span><span className="nav-label">الإشعارات</span></button><button type="button" aria-current={activeTab==="profile"?"page":undefined} aria-label="الملف الشخصي" className={activeTab==="profile"?"selected":""} onClick={()=>go("profile")}><UserRound size={21}/><span className="nav-label">الملف الشخصي</span></button></nav>}
  </>
