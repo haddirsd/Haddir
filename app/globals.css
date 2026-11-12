@@ -10486,5 +10486,5 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 .app-shell .haddir-select-option:hover,.app-shell .haddir-select-option.is-selected{background:rgba(91,46,255,.09);color:#5B2EFF}
 .app-shell.theme-dark .haddir-select-option:hover,.app-shell.theme-dark .haddir-select-option.is-selected{background:rgba(185,168,255,.13);color:#B9A8FF}
 .app-shell .haddir-select-option:disabled{opacity:.45;cursor:not-allowed}
-@keyframeshadd ir-dialog-in{from{opacity:0;transform:translateY(9px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes haddir-dialog-in{from{opacity:0;transform:translateY(9px) scale(.985)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.app-shell .haddir-dialog{animation:none}}
