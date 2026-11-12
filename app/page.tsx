@@ -92,7 +92,7 @@ export default function Home(){
  const unreadNotificationCount=myNotifications.filter(n=>!n.is_read).length;
  const filteredNotifications=myNotifications.filter(n=>notificationFilter==="unread"?!n.is_read:n.is_read);
  const go=(tab:Tab)=>{
-  setEventResetKey(value=>value+1);setActiveTab(tab);
+  setShowPrivacySecurity(false);setEventResetKey(value=>value+1);setActiveTab(tab);
   const url=new URL(window.location.href);
   if(tab==="home")url.searchParams.delete("tab");else url.searchParams.set("tab",tab);
   url.searchParams.delete("workspace");setIsGatekeeperPage(false);setActiveWorkspace(null);
