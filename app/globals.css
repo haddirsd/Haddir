@@ -10351,3 +10351,37 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
   color:#34D399!important;
   border-color:rgba(20,211,180,.25)!important;
 }
+
+
+/* Privacy & security page */
+.app-shell .privacy-screen{max-width:820px;margin-inline:auto;padding:22px 18px 40px;display:grid;gap:18px}
+.app-shell .privacy-intro{padding:12px 2px 22px;border-bottom:1px solid var(--line)}
+.app-shell .privacy-eyebrow{display:inline-block;color:#5B2EFF;font-size:12px;font-weight:800;margin-bottom:10px}
+.app-shell.theme-dark .privacy-eyebrow{color:#B9A8FF}
+.app-shell .privacy-intro h1{margin:0 0 14px;font-size:clamp(25px,5vw,32px);font-weight:900;color:var(--fg)}
+.app-shell .privacy-intro p,.app-shell .privacy-section-card>p{margin:0;color:var(--muted);font-size:14px;line-height:2}
+.app-shell .privacy-section-card{position:relative;padding:22px;border:1px solid var(--line);border-radius:20px;background:var(--surface);color:var(--fg);box-shadow:var(--haddir-glass-shadow)}
+.app-shell .privacy-icon{width:54px;height:54px;display:grid;place-items:center;border-radius:50%;margin-bottom:16px;background:rgba(91,46,255,.11);color:#5B2EFF}
+.app-shell.theme-dark .privacy-icon{background:rgba(185,168,255,.13);color:#B9A8FF}
+.app-shell .privacy-section-card h2{margin:0 0 14px;font-size:21px;font-weight:900;color:var(--fg)}
+.app-shell .privacy-section-card h3{margin:0 0 10px;font-size:16px;font-weight:800;color:var(--fg)}
+.app-shell .privacy-section-card>p+p{margin-top:12px}
+.app-shell .privacy-note{margin-top:14px!important;padding:12px 14px;border-radius:12px;background:rgba(91,46,255,.06);color:var(--muted)!important;font-size:12px!important}
+.app-shell.theme-dark .privacy-note{background:rgba(185,168,255,.08)}
+.app-shell .privacy-data-group{padding:15px 0;border-bottom:1px solid var(--line)}
+.app-shell .privacy-data-group:last-child{border-bottom:0;padding-bottom:0}
+.app-shell .privacy-data-group>strong{display:flex;align-items:center;gap:9px;color:var(--fg);font-size:14px}
+.app-shell .privacy-data-group>strong svg{color:#5B2EFF}
+.app-shell.theme-dark .privacy-data-group>strong svg{color:#B9A8FF}
+.app-shell .privacy-data-group p,.app-shell .privacy-security-row p,.app-shell .privacy-delete-option p{margin:7px 0 0;color:var(--muted);font-size:13px;line-height:1.9}
+.app-shell .privacy-security-row{display:flex;align-items:flex-start;gap:12px;padding:16px 0;border-bottom:1px solid var(--line)}
+.app-shell .privacy-security-row>svg{flex:0 0 auto;color:#5B2EFF}
+.app-shell.theme-dark .privacy-security-row>svg{color:#B9A8FF}
+.app-shell .privacy-security-row strong{font-size:15px;color:var(--fg)}
+.app-shell .privacy-delete-option{margin-top:14px;padding:17px;border:1px solid var(--line);border-radius:15px;background:var(--bg)}
+.app-shell .privacy-pending-label{display:inline-flex;margin-top:13px;padding:7px 10px;border-radius:9px;background:rgba(255,176,32,.12);color:#8A5A00;font-size:11px;font-weight:800}
+.app-shell.theme-dark .privacy-pending-label{color:#FFCB70;background:rgba(255,176,32,.12)}
+.app-shell .privacy-entry-button{margin:16px 0}
+.app-shell .privacy-back-button{display:inline-flex;align-items:center;gap:5px;justify-self:start;min-height:42px;padding:7px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);font-size:12px;font-weight:800}
+.app-shell .privacy-screen-topbar{grid-template-columns:1fr auto 1fr}
+@media(max-width:520px){.app-shell .privacy-screen{padding:16px 14px 30px;gap:14px}.app-shell .privacy-section-card{padding:18px;border-radius:17px}.app-shell .privacy-screen-topbar{gap:7px;padding-inline:12px!important}.app-shell .privacy-back-button{font-size:11px;padding-inline:7px}.app-shell .privacy-section-card h2{font-size:19px}}
