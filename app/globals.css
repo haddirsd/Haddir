@@ -10683,3 +10683,45 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
     min-height:48px;
   }
 }
+
+
+/* Dialogs are portaled to body so transformed mobile workspaces cannot clip them. */
+.haddir-dialog-root{position:relative;z-index:2147482000}
+.haddir-dialog-root .haddir-dialog-backdrop{
+  position:fixed!important;inset:0!important;z-index:2147482000!important;
+  display:grid!important;place-items:center!important;
+  box-sizing:border-box;padding:20px!important;
+  background:rgba(14,11,31,.68)!important;
+  -webkit-backdrop-filter:blur(12px)!important;backdrop-filter:blur(12px)!important;
+}
+.haddir-dialog-root .haddir-dialog{
+  position:relative!important;box-sizing:border-box!important;
+  width:min(100%,440px)!important;max-height:min(88dvh,720px)!important;
+  overflow:auto!important;padding:28px 22px 20px!important;
+  border:1px solid rgba(91,46,255,.18)!important;border-radius:24px!important;
+  background:#fff!important;color:#1A1533!important;
+  box-shadow:0 28px 90px rgba(14,11,31,.38)!important;
+  text-align:center!important;animation:haddir-dialog-in .2s ease-out both;
+}
+.haddir-dialog-root .haddir-dialog h2{color:#1A1533!important}
+.haddir-dialog-root .haddir-dialog>p{color:#6B6590!important}
+.haddir-dialog-root.theme-dark .haddir-dialog-backdrop{background:rgba(7,5,24,.8)!important}
+.haddir-dialog-root.theme-dark .haddir-dialog{background:#1A1633!important;color:#F4F2FF!important;border-color:rgba(185,168,255,.24)!important}
+.haddir-dialog-root.theme-dark .haddir-dialog h2{color:#F4F2FF!important}
+.haddir-dialog-root.theme-dark .haddir-dialog>p{color:#A9A3C9!important}
+.haddir-dialog-root.theme-dark .haddir-dialog-close{background:rgba(185,168,255,.12)!important;color:#B9A8FF!important}
+.haddir-dialog-root.theme-dark .haddir-dialog-cancel{background:#0E0B1F!important;border-color:rgba(185,168,255,.2)!important;color:#C9C3E8!important}
+@media(max-width:600px){
+  .haddir-dialog-root .haddir-dialog-backdrop{
+    align-items:end!important;justify-items:center!important;
+    padding:12px 12px calc(12px + env(safe-area-inset-bottom))!important;
+  }
+  .haddir-dialog-root .haddir-dialog{
+    width:100%!important;max-width:100%!important;
+    max-height:calc(100dvh - 24px - env(safe-area-inset-bottom))!important;
+    overflow-y:auto!important;border-radius:22px!important;
+    padding:22px 17px 17px!important;
+  }
+  .haddir-dialog-root .haddir-dialog-actions{grid-template-columns:minmax(0,1fr)!important;gap:9px!important}
+  .haddir-dialog-root .haddir-dialog-actions button{width:100%!important;min-height:48px!important}
+}
