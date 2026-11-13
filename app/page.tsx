@@ -29,7 +29,7 @@ export default function Home(){
  const [activeWorkspace,setActiveWorkspace]=useState<"customer"|"organizer"|"gatekeeper"|"advertiser"|"admin"|"owner"|null>(null);
  const [isGatekeeperPage,setIsGatekeeperPage]=useState(false);
  const [showWelcome,setShowWelcome]=useState(true),[welcomeFading,setWelcomeFading]=useState(false),[welcomeGreeting,setWelcomeGreeting]=useState("أهلاً بيك في حاضر");
- const { authUser, userRole, assignedEvent, fullName, setFullName, email, phone, setPhone, avatarUrl, profileEditing, setProfileEditing, saved, setSaved, authMessage, setAuthMessage } = useAuth();
+ const { authUser, userRole, assignedEvent, fullName, email, phone, setPhone, avatarUrl, profileEditing, setProfileEditing, saved, setSaved, authMessage, setAuthMessage } = useAuth();
  const { myTickets, myNotifications, setMyNotifications, accountDataLoading, accountDataError, setAccountDataError } = useCustomerAccount(authUser?.id ?? null);
  const [notificationFilter,setNotificationFilter]=useState<"unread"|"read">("unread");
  const [ticketFilter,setTicketFilter]=useState<"new"|"used">("new");
