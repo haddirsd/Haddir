@@ -1,7 +1,7 @@
 import { getSupabaseBrowserClient } from "../../lib/supabase";
 import type { EventItem, PublicEventsResult } from "./types";
 
-import { formatEventDate, formatMoney } from "./events.formatters";
+import { formatEventDate, formatMoney } from "./utils/events.formatters";
 
 export async function getPublishedEvents(): Promise<PublicEventsResult> {
   const supabase = getSupabaseBrowserClient();
