@@ -13,6 +13,7 @@ import { EventsWorkspace } from "../features/events/components/EventsWorkspace";
 import { TicketWorkspace } from "../features/customer-account/components/TicketWorkspace";
 import { NotificationsWorkspace } from "../features/customer-account/components/NotificationsWorkspace";
 import { useCustomerAccount } from "../features/customer-account/hooks/useCustomerAccount";
+import { useCustomerNotificationView } from "../features/customer-account/hooks/useCustomerNotificationView";
 import { requestCustomerAccountDeletion } from "../features/customer-account/services/customer-account.service";
 import { useAuth } from "../features/auth/hooks/useAuth";
 import { signInWithGoogle as startGoogleSignIn, updateCustomerPhone } from "../features/auth/services/auth.service";
@@ -34,7 +35,6 @@ export default function Home(){
  const [showWelcome,setShowWelcome]=useState(true),[welcomeFading,setWelcomeFading]=useState(false),[welcomeGreeting,setWelcomeGreeting]=useState("أهلاً بيك في حاضر");
  const { authUser, userRole, assignedEvent, fullName, email, phone, setPhone, avatarUrl, profileEditing, setProfileEditing, saved, setSaved, authMessage, setAuthMessage } = useAuth();
  const { myTickets, myNotifications, accountDataLoading, accountDataError, markNotificationRead: markCustomerNotificationReadAction, markAllNotificationsRead: markAllCustomerNotificationsReadAction } = useCustomerAccount(authUser?.id ?? null);
- const [notificationFilter,setNotificationFilter]=useState<"unread"|"read">("unread");
  const [ticketFilter,setTicketFilter]=useState<"new"|"used">("new");
  const [expandedTicketId,setExpandedTicketId]=useState<string|null>(null);
   useEffect(()=>{
@@ -80,20 +80,6 @@ export default function Home(){
   setAuthMessage("تم تسجيل الخروج بنجاح. يمكنك تسجيل الدخول مرة أخرى في أي وقت.");
  };
 
- const markNotificationRead=async(notification:any)=>{
-  const result=await markCustomerNotificationReadAction(notification.id);
-  if(!result.error)setNotificationFilter("read");
- };
- const markAllNotificationsRead=async()=>{
-  const result=await markAllCustomerNotificationsReadAction();
-  if(!result.error)setNotificationFilter("read");
- };
- const openNotification=async(notification:any)=>{
-  if(!notification.is_read)await markNotificationRead(notification);
-  if(notification.type==="ticket_approved"||String(notification.type||"").startsWith("event_reminder_"))go("tickets");
- };
- const unreadNotificationCount=myNotifications.filter(n=>!n.is_read).length;
- const filteredNotifications=myNotifications.filter(n=>notificationFilter==="unread"?!n.is_read:n.is_read);
  const go=(tab:Tab)=>{
   setShowPrivacySecurity(false);setEventResetKey(value=>value+1);setActiveTab(tab);
   const url=new URL(window.location.href);
@@ -101,7 +87,14 @@ export default function Home(){
   url.searchParams.delete("workspace");setIsGatekeeperPage(false);setActiveWorkspace(null);
   window.history.replaceState({}, "", url.pathname+url.search+url.hash);
   window.scrollTo({top:0,behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});
- }; const downloadTicket=async(ticket:any)=>{
+ };
+ const notificationView = useCustomerNotificationView({
+  notifications: myNotifications,
+  markNotificationRead: markCustomerNotificationReadAction,
+  markAllNotificationsRead: markAllCustomerNotificationsReadAction,
+  onNavigateToTickets: () => go("tickets"),
+ });
+ const downloadTicket=async(ticket:any)=>{
   try{
    await downloadTicketAsImage(ticket,formatEventDate);
   }catch(error){
@@ -173,13 +166,13 @@ export default function Home(){
   loading={accountDataLoading}
   error={accountDataError}
   notifications={myNotifications}
-  filteredNotifications={filteredNotifications}
-  filter={notificationFilter}
-  unreadCount={unreadNotificationCount}
-  onFilterChange={setNotificationFilter}
-  onMarkAllRead={()=>void markAllNotificationsRead()}
-  onOpenNotification={(notification)=>void openNotification(notification)}
-  onToggleRead={(notification)=>void markNotificationRead(notification)}
+  filteredNotifications={notificationView.filteredNotifications}
+  filter={notificationView.filter}
+  unreadCount={notificationView.unreadCount}
+  onFilterChange={notificationView.setFilter}
+  onMarkAllRead={()=>void notificationView.markAllRead()}
+  onOpenNotification={(notification)=>void notificationView.openNotification(notification)}
+  onToggleRead={(notification)=>void notificationView.markOneRead(notification)}
  />}
  {!isGatekeeperPage&&activeTab==="profile"&&<ProfileWorkspace
   authUser={authUser} userRole={userRole} fullName={fullName} email={email}
