@@ -52,7 +52,7 @@ export function HaddirSelect({ value, options, onChange, placeholder = "اختر
   const menu = open && typeof document !== "undefined" ? createPortal(
     <>
       <button type="button" className="haddir-select-dismiss" aria-label="إغلاق القائمة" onClick={() => setOpen(false)} />
-      {position && <div className="haddir-select-menu haddir-select-menu-portal" role="listbox" aria-label={ariaLabel} style={{ position: "fixed", top: position.top, left: position.left, width: position.width, maxHeight: position.maxHeight }}>
+      {position && <div className={"haddir-select-menu haddir-select-menu-portal" + (document.querySelector(".app-shell.theme-dark, .admin-shell.theme-dark") ? " theme-dark" : "")} role="listbox" aria-label={ariaLabel} style={{ position: "fixed", top: position.top, left: position.left, width: position.width, maxHeight: position.maxHeight }}>
         {options.map(option => <button type="button" role="option" aria-selected={option.value === value} key={option.value} disabled={option.disabled} className={"haddir-select-option" + (option.value === value ? " is-selected" : "")} onClick={() => { onChange(option.value); setOpen(false); }}>
           <span>{option.label}</span>{option.value === value && <Check size={16}/>}
         </button>)}
