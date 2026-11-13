@@ -61,7 +61,16 @@ export function useAuth({ onSignedOut }: UseAuthOptions = {}) {
         .limit(1);
       if (!alive) return;
 
-      setAssignedEvent((assignmentRows?.[0] as AssignedEvent | undefined) ?? null);
+      const assignment = assignmentRows?.[0];
+      setAssignedEvent(assignment ? {
+        event_id: String(assignment.event_id),
+        events: assignment.events ? {
+          title: assignment.events.title || undefined,
+          venue: assignment.events.venue || undefined,
+          city: assignment.events.city || undefined,
+          starts_at: assignment.events.starts_at || undefined,
+        } : undefined,
+      } as AssignedEvent : null);
       const metadataName = String(user.user_metadata?.full_name || user.user_metadata?.name || "");
       const metadataAvatar = String(user.user_metadata?.avatar_url || user.user_metadata?.picture || "");
       setFullName(String(data?.full_name || metadataName || ""));
