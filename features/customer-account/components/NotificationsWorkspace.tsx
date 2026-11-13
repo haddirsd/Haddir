@@ -2,16 +2,9 @@
 
 import { Bell, CalendarDays, CheckCircle2, Sparkles } from "lucide-react";
 import { PushNotificationSettings } from "./PushNotificationSettings";
+import type { CustomerNotification } from "../types";
 
-export type CustomerNotification = {
-  id: string;
-  title: string;
-  message: string;
-  type: string;
-  is_read: boolean;
-  created_at: string;
-  booking_id?: string | null;
-};
+export type { CustomerNotification } from "../types";
 
 type NotificationsWorkspaceProps = {
   userId: string | null;
