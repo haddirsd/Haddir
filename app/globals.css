@@ -10819,3 +10819,7 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 .haddir-empty-state p{margin:0;max-width:440px;font-size:12px;line-height:1.9}
 
 .btn-danger{border-color:#dc3545;background:#dc3545;color:#fff}.btn-danger:hover{background:#c82333;border-color:#c82333}
+
+
+/* Loading indicator inside shared buttons */
+.haddir-button-spinner{flex:0 0 auto;animation:haddir-spin .9s linear infinite}
