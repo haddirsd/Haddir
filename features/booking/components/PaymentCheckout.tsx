@@ -2,9 +2,9 @@
 
 import type { FormEvent } from "react";
 import { ArrowLeft } from "lucide-react";
-import type { EventPaymentAccount } from "../booking.types";
-import { CheckoutSummary } from "./CheckoutSummary";
-import { PaymentMethodSelector } from "./PaymentMethodSelector";
+import type { EventPaymentAccount } from "../types";
+import { BookingSummary } from "./BookingSummary";
+import { PaymentInstructions } from "./PaymentInstructions";
 import { ReceiptUpload } from "./ReceiptUpload";
 
 type CheckoutEvent = {
@@ -53,13 +53,13 @@ export function PaymentCheckout({
       <h1>إتمام الحجز</h1>
       <p>راجع تفاصيل حجزك وأكمل بيانات الدفع.</p>
 
-      <CheckoutSummary
+      <BookingSummary
         event={event}
         selectedTier={selectedTier}
         totalLabel={totalLabel}
       />
 
-      <PaymentMethodSelector
+      <PaymentInstructions
         accounts={accounts}
         paymentMethod={paymentMethod}
         onPaymentMethodChange={onPaymentMethodChange}
