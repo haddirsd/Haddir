@@ -19,12 +19,13 @@ import { signInWithGoogle as startGoogleSignIn, updateCustomerPhone } from "../f
 import { useGatekeeper } from "../features/gatekeeper/hooks/useGatekeeper";
 import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
 import { HaddirDialog } from "../components/ui/HaddirDialog";
+import { AccountDialogs, type AccountDialog } from "../features/customer-account/components/AccountDialogs";
 import { Bell, Ticket, UserRound, ChevronLeft, ScanLine, ShieldCheck, Sun, Moon } from "lucide-react";
 
 type Tab="home"|"tickets"|"notifications"|"profile";
 export default function Home(){
  const [activeTab,setActiveTab]=useState<Tab>("home"),[darkMode,setDarkMode]=useState(false),[showPrivacySecurity,setShowPrivacySecurity]=useState(false),[deletingAccount,setDeletingAccount]=useState(false);
- const [accountDialog,setAccountDialog]=useState<"logout"|"delete-email"|"delete-final"|null>(null),[deleteEmailInput,setDeleteEmailInput]=useState(""),[uiNotice,setUiNotice]=useState("");
+ const [accountDialog,setAccountDialog]=useState<AccountDialog>(null),[deleteEmailInput,setDeleteEmailInput]=useState(""),[uiNotice,setUiNotice]=useState("");
  const [bookingGate,setBookingGate]=useState<"login"|"phone"|null>(null);
  const [eventResetKey,setEventResetKey]=useState(0),[isEventDetailOpen,setIsEventDetailOpen]=useState(false);
  const [profileSaving,setProfileSaving]=useState(false);
@@ -212,9 +213,20 @@ export default function Home(){
   />}
  </div>
  {uiNotice&&<HaddirDialog open title="تنبيه من حاضر" description={uiNotice} confirmLabel="حسناً" onConfirm={()=>setUiNotice("")} onCancel={()=>setUiNotice("")}/>}
- {accountDialog==="logout"&&<HaddirDialog open title="تسجيل الخروج؟" description="هل تريد تسجيل الخروج من حسابك؟ ستعود إلى شاشة تسجيل الدخول." confirmLabel="تسجيل الخروج" tone="primary" onConfirm={confirmSignOut} onCancel={()=>setAccountDialog(null)}/>}
- {accountDialog==="delete-email"&&<HaddirDialog open title="تأكيد هوية الحساب" description="اكتب البريد الإلكتروني المرتبط بحسابك للمتابعة في طلب حذف الحساب." confirmLabel="متابعة" onConfirm={()=>{if(!deleteEmailInput.trim()){setAuthMessage("اكتب البريد الإلكتروني أولاً.");return;}if(deleteEmailInput.trim().toLowerCase()!==authUser?.email?.toLowerCase()){setAccountDialog(null);setAuthMessage("البريد الإلكتروني غير مطابق. لم يتم حذف أي بيانات.");return;}setAccountDialog("delete-final");}} onCancel={()=>setAccountDialog(null)}><input className="haddir-dialog-input" type="email" value={deleteEmailInput} onChange={event=>setDeleteEmailInput(event.target.value)} placeholder="البريد الإلكتروني" autoComplete="email"/></HaddirDialog>}
- {accountDialog==="delete-final"&&<HaddirDialog open title="حذف الحساب نهائياً؟" description="سيتم حذف الحساب وإيصالات التحويل والبيانات الشخصية. ستبقى سجلات المعاملات اللازمة محفوظة بعد إزالة بيانات تعريفك. لن يسمح النظام بالحذف إذا كانت لديك تذكرة مؤكدة لفعالية قادمة." confirmLabel="حذف الحساب نهائياً" tone="danger" busy={deletingAccount} onConfirm={executeDeleteAccount} onCancel={()=>setAccountDialog(null)}/>}
+ <AccountDialogs
+  accountDialog={accountDialog}
+  deleteEmailInput={deleteEmailInput}
+  setDeleteEmailInput={setDeleteEmailInput}
+  deletingAccount={deletingAccount}
+  onConfirmSignOut={confirmSignOut}
+  onContinueDelete={()=>{
+   if(!deleteEmailInput.trim()){setAuthMessage("اكتب البريد الإلكتروني أولاً.");return;}
+   if(deleteEmailInput.trim().toLowerCase()!==authUser?.email?.toLowerCase()){setAccountDialog(null);setAuthMessage("البريد الإلكتروني غير مطابق. لم يتم حذف أي بيانات.");return;}
+   setAccountDialog("delete-final");
+  }}
+  onExecuteDelete={executeDeleteAccount}
+  onClose={()=>setAccountDialog(null)}
+ />
  {bookingGate&&<div className="booking-gate-backdrop" role="presentation"><section className="booking-gate-dialog" role="dialog" aria-modal="true" aria-labelledby="booking-gate-title"><span className="booking-gate-icon"><UserRound size={28}/></span><h2 id="booking-gate-title">{bookingGate==="phone"?"أضف رقم جوالك لإكمال الحجز":"سجّل الدخول لإكمال الحجز"}</h2><p>{bookingGate==="phone"?"باقي خطوة واحدة! أضف رقم جوالك عشان نقدر نكمل حجزك ونتواصل معاك عند الحاجة.":"تحتاج تسجّل الدخول أولاً عشان نربط الحجز بحسابك ونقدر نتابع تذكرتك."}</p><button type="button" className="booking-gate-primary" onClick={()=>{const gate=bookingGate;if(gate==="login")window.sessionStorage.setItem("haddir_booking_phone_required","1");setBookingGate(null);setEventResetKey(value=>value+1);setActiveTab("profile");setAuthMessage(gate==="login"?"سجّل الدخول لمواصلة الحجز.":"أضف رقم جوالك لمواصلة الحجز.");if(gate==="phone")setProfileEditing(true);window.scrollTo({top:0,behavior:"smooth"});}}>{bookingGate==="phone"?"إضافة رقم الجوال":"الانتقال لتسجيل الدخول"}</button><button type="button" className="booking-gate-secondary" onClick={()=>setBookingGate(null)}>لاحقاً</button></section></div>}
  {!isGatekeeperPage&&!isEventDetailOpen&&<BottomNav activeTab={activeTab} unreadCount={unreadNotificationCount} onNavigate={go}/>}
  </>
