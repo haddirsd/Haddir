@@ -8,11 +8,19 @@ type PageHeaderProps = {
   leading?: ReactNode;
   trailing?: ReactNode;
   className?: string;
+  "aria-label"?: string;
 };
 
-export function PageHeader({ title, icon, leading, trailing, className = "" }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  icon,
+  leading,
+  trailing,
+  className = "",
+  "aria-label": ariaLabel,
+}: PageHeaderProps) {
   return (
-    <header className={["screen-topbar", className].filter(Boolean).join(" ")}>
+    <header aria-label={ariaLabel} className={["screen-topbar", className].filter(Boolean).join(" ")}>
       {leading ?? <span className="screen-topbar-spacer" aria-hidden="true" />}
       <strong>{title}</strong>
       {icon && <span className="screen-icon">{icon}</span>}
