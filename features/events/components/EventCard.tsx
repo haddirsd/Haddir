@@ -1,6 +1,7 @@
 "use client";
 
 import { CalendarDays, MapPin } from "lucide-react";
+import type { KeyboardEvent } from "react";
 import type { EventItem } from "../types";
 
 type EventCardProps = {
@@ -12,7 +13,7 @@ type EventCardProps = {
 
 export function EventCard({ event, variant, onOpen, clone = false }: EventCardProps) {
   const open = () => onOpen(event.id);
-  const handleKeyDown = (eventKey: React.KeyboardEvent<HTMLElement>) => {
+  const handleKeyDown = (eventKey: KeyboardEvent<HTMLElement>) => {
     if (eventKey.key === "Enter" || eventKey.key === " ") {
       eventKey.preventDefault();
       open();
