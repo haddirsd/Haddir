@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { useEvents } from "../hooks/useEvents";
 import { useEventWorkspace } from "../useEventWorkspace";
 import { HomeEventsWorkspace } from "./HomeEventsWorkspace";
-import { EventDetailWorkspace } from "./EventDetailWorkspace";
+import { EventDetailWorkspace } from "./EventDetails";
 
 type EventsWorkspaceProps = {
   showHome: boolean;
