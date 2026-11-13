@@ -41,7 +41,7 @@ export function ProfileWorkspace({
 }: ProfileWorkspaceProps) {
   return (
     <>
-{!isGatekeeperPage&&activeTab==="profile"&&!showPrivacySecurity&&<section className="screen container profile-screen">
+{!showPrivacySecurity&&<section className="screen container profile-screen">
    <div className="profile-card profile-account-card">
     <div className="profile-account-head">
      <div className="profile-avatar-wrap"><div className="profile-avatar profile-avatar-large">{avatarUrl?<img src={avatarUrl} alt="صورة المستخدم"/>:<UserRound size={34}/>}</div>{authUser&&!profileEditing&&<button className="profile-avatar-edit" type="button" aria-label="تعديل البيانات" title="تعديل البيانات" onClick={()=>{setProfileEditing(true);setAuthMessage("");setSaved(false);}}><Pencil size={15}/></button>}</div>
@@ -66,7 +66,7 @@ export function ProfileWorkspace({
  </section>}
 
  
-{!isGatekeeperPage&&activeTab==="profile"&&showPrivacySecurity&&<section className="screen container privacy-screen">
+{showPrivacySecurity&&<section className="screen container privacy-screen">
   <div className="privacy-intro"><span className="privacy-eyebrow">حاضر • الخصوصية والأمان</span><h1>أمان البيانات</h1><p>نوضح ليك هنا أنواع المعلومات التي قد يجمعها تطبيق حاضر، وكيفية استخدامها وحمايتها. قد تختلف بعض الممارسات حسب طريقة استخدامك للتطبيق والميزات التي تستعملها.</p></div>
   <article className="privacy-section-card">
    <span className="privacy-icon"><Share2 size={25}/></span><h2>مشاركة البيانات</h2><h3>لا نبيع بياناتك ولا نستخدمها للإعلانات</h3><p>لا يبيع حاضر بيانات المستخدمين ولا يشاركها مع جهات خارجية لأغراض إعلانية. نستعين بمزوّدي خدمات تقنية لتشغيل التطبيق، وقد تتم معالجة البيانات الضرورية لديهم، مثل الاستضافة وقاعدة البيانات وتسجيل الدخول.</p><p className="privacy-note">قد يشمل ذلك خدمات Supabase وVercel، وخدمة Google عند اختيار تسجيل الدخول باستخدام Google.</p>
