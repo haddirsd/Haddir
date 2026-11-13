@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getSupabaseBrowserClient } from "../../lib/supabase";
 import { getPublishedEvents } from "./events.service";
-import type { EventItem } from "./events.types";
+import type { EventItem } from "./types";
 
 export function useEvents() {
   const [events, setEvents] = useState<EventItem[]>([]);
