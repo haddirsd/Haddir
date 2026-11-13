@@ -1,5 +1,5 @@
 import { getSupabaseBrowserClient } from "../../lib/supabase";
-import type { EventItem, PublicEventsResult } from "./events.types";
+import type { EventItem, PublicEventsResult } from "./types";
 
 import { formatEventDate, formatMoney } from "./events.formatters";
 
