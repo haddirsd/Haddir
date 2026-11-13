@@ -2,7 +2,7 @@
 
 import { Copy } from "lucide-react";
 import { HaddirSelect } from "../../../components/ui/HaddirSelect";
-import type { EventPaymentAccount } from "../booking.types";
+import type { EventPaymentAccount } from "../types";
 
 type PaymentMethodSelectorProps = {
   accounts: EventPaymentAccount[];
