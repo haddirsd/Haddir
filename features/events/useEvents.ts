@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getSupabaseBrowserClient } from "../../lib/supabase";
-import { getPublishedEvents } from "./events.service";
+import { getPublishedEvents } from "./services/events.service";
 import type { EventItem } from "./types";
 
 export function useEvents() {
