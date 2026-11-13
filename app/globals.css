@@ -10496,3 +10496,7 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 /* Keep custom select menus above checkout/admin content and outside clipped containers. */
 .haddir-select-dismiss{position:fixed!important;inset:0!important;z-index:2147483000!important;width:100vw;height:100dvh;opacity:0;cursor:default}
 .haddir-select-menu-portal{position:fixed!important;z-index:2147483001!important;overflow-y:auto;overscroll-behavior:contain;isolation:isolate}
+
+.haddir-select-menu-portal.theme-dark{background:#1A1633!important;border-color:rgba(185,168,255,.24)!important;color:#F4F2FF!important}
+.haddir-select-menu-portal.theme-dark .haddir-select-option{color:#F4F2FF!important}
+.haddir-select-menu-portal.theme-dark .haddir-select-option:hover,.haddir-select-menu-portal.theme-dark .haddir-select-option.is-selected{background:rgba(185,168,255,.13)!important;color:#B9A8FF!important}
