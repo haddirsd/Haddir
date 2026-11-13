@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CalendarDays, MapPin, Search, Ticket } from "lucide-react";
-import type { EventItem } from "../events.types";
+import type { EventItem } from "../types";
 
 type HomeEventsWorkspaceProps = {
   events: EventItem[];
