@@ -1,6 +1,7 @@
 "use client";
 
 import { Bell, House, Ticket, UserRound } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 type Tab = "home" | "tickets" | "notifications" | "profile";
 type BottomNavProps = {
@@ -9,7 +10,7 @@ type BottomNavProps = {
   onNavigate: (tab: Tab) => void;
 };
 
-const items: { id: Tab; label: string; icon: typeof House }[] = [
+const items: { id: Tab; label: string; icon: LucideIcon }[] = [
   { id: "home", label: "الرئيسية", icon: House },
   { id: "tickets", label: "تذاكري", icon: Ticket },
   { id: "notifications", label: "الإشعارات", icon: Bell },
