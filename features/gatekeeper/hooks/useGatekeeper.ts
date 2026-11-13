@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BrowserQRCodeReader } from "@zxing/browser";
 import { getSupabaseBrowserClient } from "../../../lib/supabase";
-import { getGatekeeperScanHistory, getGatekeeperScanStats, submitGatekeeperTicketAction } from "../gatekeeper.service";
-import type { GatekeeperScanHistoryItem, GatekeeperScanStats, GatekeeperTicketActionResult, GatekeeperEntryMethod } from "../gatekeeper.types";
+import { getGatekeeperScanHistory, getGatekeeperScanStats, submitGatekeeperTicketAction } from "../services/gatekeeper.service";
+import type { GatekeeperScanHistoryItem, GatekeeperScanStats, GatekeeperTicketActionResult, GatekeeperEntryMethod } from "../types";
 
 type GatekeeperUser = { id: string } | null;
 type GatekeeperAssignment = { event_id: string; events?: { title?: string; venue?: string; city?: string; starts_at?: string } } | null;
