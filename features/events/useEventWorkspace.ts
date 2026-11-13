@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import { useBooking } from "../booking/useBooking";
-import type { EventItem } from "./events.types";
+import { useBooking } from "../booking/hooks/useBooking";
+import type { EventItem } from "./types";
 import { useEventNavigation } from "./useEventNavigation";
 
 type AuthUser = { id: string; email?: string; user_metadata?: Record<string, unknown> } | null;
