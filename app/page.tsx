@@ -50,6 +50,7 @@ export default function Home(){
   gatekeeperCounts, gatekeeperHistory: gatekeeperManualHistory, gatekeeperHistoryLoading,
   scannerOpen, setScannerOpen, videoRef, runGatekeeperAction, openScanner, openManualEntry, acknowledgeGatekeeperResult,
  } = gatekeeper;
+ useEffect(()=>{if(!authUser){setGatekeeperResult(null);setGatekeeperCode("");}},[authUser]);
  const signInWithGoogle=async()=>{const error=await startGoogleSignIn();if(error)setAuthMessage(error);};
  const saveProfile=async()=>{if(!authUser){setAuthMessage("سجّل الدخول أولاً لحفظ بياناتك.");return;}const normalizedPhone=normalizeSudanesePhone(phone);if(!isValidSudanesePhone(normalizedPhone)){setAuthMessage("رقم الهاتف لازم يكون 10 خانات بالضبط ويبدأ بصفر، مثال: 09XXXXXXXX.");return;}setProfileSaving(true);setSaved(false);setAuthMessage("");const result=await updateCustomerPhone(authUser.id,normalizedPhone);setProfileSaving(false);if(result.error){setAuthMessage(result.error);return;}setPhone(result.phone||normalizedPhone);setProfileEditing(false);setSaved(true);};
  const deleteAccount=()=>{
