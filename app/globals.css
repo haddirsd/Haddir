@@ -10800,3 +10800,20 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
   .haddir-dialog-root .haddir-dialog-actions{grid-template-columns:minmax(0,1fr)!important;gap:10px!important;margin-top:18px!important}
   .haddir-dialog-root .haddir-dialog-actions button{min-height:50px!important;font-size:15px!important}
 }
+
+
+/* Shared Haddir foundation components */
+.haddir-field{display:flex;flex-direction:column;gap:7px;width:100%;text-align:right}
+.haddir-field-label{font-size:12px;font-weight:700;color:var(--fg)}
+.haddir-input{width:100%;min-height:46px;padding:10px 13px;border:1px solid var(--line);border-radius:12px;background:var(--surface,#fff);color:var(--fg);font:inherit;outline:none;transition:border-color .18s,box-shadow .18s}
+.haddir-input:focus{border-color:#5B2EFF;box-shadow:0 0 0 3px rgba(91,46,255,.12)}
+.haddir-input[aria-invalid=true]{border-color:#dc3545}
+.haddir-field-error{font-size:11px;color:#dc3545}
+.haddir-loading-state{min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--muted);font-size:13px;text-align:center}
+.haddir-loading-state.is-compact{min-height:0;flex-direction:row;justify-content:flex-start;font-size:12px}
+.haddir-loading-spinner{color:#5B2EFF;animation:haddir-spin .9s linear infinite}
+@keyframes haddir-spin{to{transform:rotate(360deg)}}
+.haddir-empty-state{min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:28px 18px;border:1px dashed var(--line);border-radius:16px;text-align:center;color:var(--muted)}
+.haddir-empty-icon{width:48px;height:48px;display:grid;place-items:center;border-radius:15px;background:rgba(91,46,255,.09);color:#5B2EFF}
+.haddir-empty-state h2{margin:0;color:var(--fg);font-size:15px}
+.haddir-empty-state p{margin:0;max-width:440px;font-size:12px;line-height:1.9}
