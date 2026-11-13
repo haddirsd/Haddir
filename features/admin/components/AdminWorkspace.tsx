@@ -12,17 +12,15 @@ import AdminReportsWorkspace from "../reports/AdminReportsWorkspace";
 import AdminOverviewWorkspace from "../overview/AdminOverviewWorkspace";
 import { Activity, BadgeCheck, Banknote, CalendarDays, ClipboardCheck, LayoutDashboard, LogOut, Shield, Ticket, Users } from "lucide-react";
 import { HaddirDialog } from "../../../components/ui/HaddirDialog";
+import { ADMIN_ROLE_LABELS, ADMIN_SECTION_LABELS, getAdminNavigationAdminSections, type AdminRole, type AdminAdminSection } from "../types";
 
-type AdminRole = "owner" | "admin" | "supervisor";
-type Section = "overview" | "events" | "bookings" | "payments" | "users" | "reports" | "activity";
-const labels: Record<Section, string> = { overview: "نظرة عامة", events: "الفعاليات", bookings: "الحجوزات", payments: "مراجعة المدفوعات", users: "المستخدمون", reports: "الإحصائيات", activity: "سجل الإجراءات" };
 
 export default function AdminPage() {
   const router = useRouter();
   const [role, setRole] = useState<AdminRole | null>(null);
   const [name, setName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
-  const [section, setSection] = useState<Section>("overview");
+  const [section, setAdminSection] = useState<AdminSection>("overview");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [userSearchTerm,setUserSearchTerm]=useState("");
@@ -64,7 +62,7 @@ export default function AdminPage() {
     return () => { alive = false; };
   }, [router]);
 
-  const nav = useMemo(() => role === "supervisor" ? (["overview","bookings","payments"] as Section[]) : (["overview","events","bookings","payments","users","reports","activity"] as Section[]), [role]);
+  const nav = useMemo(() => role ? getAdminNavigationSections(role) : [], [role]);
 
   const signOut = () => setShowLogoutConfirm(true);
   const confirmSignOut = async () => { setShowLogoutConfirm(false); const supabase = getSupabaseBrowserClient(); if (supabase) await supabase.auth.signOut(); router.replace("/"); };
@@ -73,21 +71,21 @@ export default function AdminPage() {
   if (!role) return <main className={"admin-denied"+(darkMode?" theme-dark":"")} dir="rtl"><Shield size={34}/><h1>الوصول غير متاح</h1><p>{error || "هذه الصفحة مخصصة لفريق إدارة حاضر."}</p><button onClick={() => router.replace("/")}>العودة للرئيسية</button></main>;
 
   const supervisor = role === "supervisor";
-  const roleLabel = role === "owner" ? "مالك المنصة" : role === "admin" ? "المشرف الإداري" : "موظف حاضر";
+  const roleLabel = ADMIN_ROLE_LABELS[role];
   return <main className={"admin-shell"+(darkMode?" theme-dark":"")} dir="rtl">
     <aside className="admin-sidebar">
       <button className="admin-brand" onClick={() => router.push("/")}><img src={darkMode?"/dark.svg":"/light.svg"} alt="حاضر"/><small>الإدارة</small></button>
       <div className="admin-side-caption">مساحة العمل</div>
-      <nav aria-label="تبويبات لوحة الإدارة">{nav.map(item=><button key={item} className={section===item?"active":""} onClick={()=>setSection(item)}><span>{item==="overview"?<LayoutDashboard/>:item==="events"?<CalendarDays/>:item==="bookings"?<Ticket/>:item==="payments"?<Banknote/>:item==="users"?<Users/>:<Activity/>}</span>{labels[item]}</button>)}</nav>
+      <nav aria-label="تبويبات لوحة الإدارة">{nav.map(item=><button key={item} className={section===item?"active":""} onClick={()=>setAdminSection(item)}><span>{item==="overview"?<LayoutDashboard/>:item==="events"?<CalendarDays/>:item==="bookings"?<Ticket/>:item==="payments"?<Banknote/>:item==="users"?<Users/>:<Activity/>}</span>{ADMIN_SECTION_LABELS[item]}</button>)}</nav>
       <div className="admin-side-bottom"><div className="admin-mini-profile"><span className="admin-mini-avatar">{avatarUrl?<img src={avatarUrl} alt="صورة الحساب"/>:role==="owner"?<Shield/>:role==="admin"?<BadgeCheck/>:<ClipboardCheck/>}</span><div><b>{name}</b><small>{roleLabel}</small></div></div><button className="admin-logout" onClick={signOut}><LogOut size={17}/> تسجيل الخروج</button></div>
     </aside>
     <section className="admin-main">
-      <header className="admin-topbar"><div><span>حاضر / لوحة الإدارة</span><h1>{labels[section]}</h1></div><div className="admin-top-user"><span>{roleLabel}</span><span className="admin-avatar">{avatarUrl?<img src={avatarUrl} alt="صورة حساب Google"/>:name.slice(0,1)}</span></div></header>
+      <header className="admin-topbar"><div><span>حاضر / لوحة الإدارة</span><h1>{ADMIN_SECTION_LABELS[section]}</h1></div><div className="admin-top-user"><span>{roleLabel}</span><span className="admin-avatar">{avatarUrl?<img src={avatarUrl} alt="صورة حساب Google"/>:name.slice(0,1)}</span></div></header>
       <div className="admin-content">
         <div className="admin-welcome"><div><span className="admin-eyebrow">لوحة التحكم</span><h2>مرحباً، {name}</h2><p>{supervisor?"راجع الحجوزات وإثباتات التحويل.":"تابع أداء منصة حاضر وأدر عملياتها من مكان واحد."}</p></div><div className="admin-welcome-mark"><LayoutDashboard size={30}/></div></div>
         {error&&<div className="admin-notice" role="status">{error}</div>}
         <div key={section} className="admin-section-transition">
-          {section==="overview"&&<AdminOverviewWorkspace role={role} onNavigate={setSection}/>}
+          {section==="overview"&&<AdminOverviewWorkspace role={role} onNavigate={setAdminSection}/>}
           {section==="events"?<AdminEventsWorkspace role={role}/>:section==="bookings"?<AdminBookingsWorkspace/>:section==="payments"?<AdminPaymentsWorkspace/>:section==="users"?<AdminUsersWorkspace role={role} searchTerm={userSearchTerm} onSearchTermChange={setUserSearchTerm}/>:section==="activity"?<AdminActivityWorkspace/>:section==="reports"?<AdminReportsWorkspace/>:null}
         </div>
         <footer className="admin-footer">حاضر · نظام إدارة الفعاليات والتذاكر <span>{roleLabel}</span></footer>
