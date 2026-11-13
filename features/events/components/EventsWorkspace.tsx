@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import { useEvents } from "../useEvents";
+import { useEvents } from "../hooks/useEvents";
 import { useEventWorkspace } from "../useEventWorkspace";
 import { HomeEventsWorkspace } from "./HomeEventsWorkspace";
 import { EventDetailWorkspace } from "./EventDetailWorkspace";
