@@ -14,7 +14,7 @@ import { NotificationsWorkspace } from "../features/customer-account/components/
 import { useGatekeeper } from "../features/gatekeeper/useGatekeeper";
 import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
 import { HaddirDialog } from "../components/ui/HaddirDialog";
-import { Bell, CheckCircle2, House, Sparkles, Ticket, UserRound, ChevronLeft, ScanLine, ShieldCheck, ClipboardList, Pencil, Sun, Moon, Share2, CloudUpload, LockKeyhole, Trash2 } from "lucide-react";
+import { Bell, CheckCircle2, Sparkles, Ticket, UserRound, ChevronLeft, ScanLine, ShieldCheck, ClipboardList, Pencil, Sun, Moon, Share2, CloudUpload, LockKeyhole, Trash2 } from "lucide-react";
 
 type Tab="home"|"tickets"|"notifications"|"profile";
 export default function Home(){
