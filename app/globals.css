@@ -10725,3 +10725,78 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
   .haddir-dialog-root .haddir-dialog-actions{grid-template-columns:minmax(0,1fr)!important;gap:9px!important}
   .haddir-dialog-root .haddir-dialog-actions button{width:100%!important;min-height:48px!important}
 }
+
+
+/* Complete visual styles for the body-level dialog portal (not inside .admin-shell). */
+.haddir-dialog-root .haddir-dialog-close{
+  position:absolute!important;top:14px!important;inset-inline-start:14px!important;
+  width:38px!important;height:38px!important;display:grid!important;place-items:center!important;
+  padding:0!important;border:0!important;border-radius:12px!important;
+  background:rgba(91,46,255,.08)!important;color:#5B2EFF!important;
+}
+.haddir-dialog-root .haddir-dialog-icon{
+  display:grid!important;place-items:center!important;
+  width:58px!important;height:58px!important;margin:0 auto 14px!important;
+  border-radius:18px!important;background:rgba(91,46,255,.1)!important;color:#5B2EFF!important;
+}
+.haddir-dialog-root .haddir-dialog-icon.tone-danger{background:rgba(255,84,112,.13)!important;color:#D92D50!important}
+.haddir-dialog-root .haddir-dialog-icon.tone-success{background:rgba(20,211,180,.14)!important;color:#087A68!important}
+.haddir-dialog-root .haddir-dialog h2{
+  display:block!important;margin:0 0 9px!important;
+  font-family:inherit!important;font-size:20px!important;font-weight:900!important;
+  line-height:1.65!important;text-align:center!important;
+}
+.haddir-dialog-root .haddir-dialog>p{
+  display:block!important;margin:0 0 18px!important;
+  font-family:inherit!important;font-size:15px!important;font-weight:400!important;
+  line-height:1.9!important;text-align:center!important;
+}
+.haddir-dialog-root .haddir-dialog-actions{
+  display:grid!important;grid-template-columns:1fr 1fr!important;
+  gap:10px!important;margin-top:20px!important;width:100%!important;
+}
+.haddir-dialog-root .haddir-dialog-actions button{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  box-sizing:border-box!important;width:100%!important;min-width:0!important;
+  min-height:50px!important;padding:12px 14px!important;
+  border-radius:13px!important;font-family:inherit!important;
+  font-size:15px!important;font-weight:800!important;line-height:1.5!important;
+  white-space:normal!important;cursor:pointer!important;
+}
+.haddir-dialog-root .haddir-dialog-confirm{
+  border:1px solid #5B2EFF!important;background:#5B2EFF!important;color:#FFFFFF!important;
+}
+.haddir-dialog-root .haddir-dialog-confirm.tone-danger{
+  border-color:#FF5470!important;background:#FF5470!important;color:#1A1533!important;
+}
+.haddir-dialog-root .haddir-dialog-confirm.tone-success{
+  border-color:#0B7F6C!important;background:#0B7F6C!important;color:#FFFFFF!important;
+}
+.haddir-dialog-root .haddir-dialog-cancel{
+  border:1px solid rgba(107,101,144,.24)!important;background:#F6F4FF!important;color:#514A70!important;
+}
+.haddir-dialog-root .haddir-dialog-actions button:disabled,
+.haddir-dialog-root .haddir-dialog-close:disabled{opacity:.55!important;cursor:wait!important}
+.haddir-dialog-root .haddir-dialog-input{
+  display:block!important;box-sizing:border-box!important;width:100%!important;min-height:50px!important;
+  margin:8px 0!important;padding:12px 14px!important;border:1px solid rgba(91,46,255,.24)!important;
+  border-radius:12px!important;background:#F6F4FF!important;color:#1A1533!important;
+  font-family:inherit!important;font-size:16px!important;
+}
+.haddir-dialog-root.theme-dark .haddir-dialog-icon{background:rgba(185,168,255,.14)!important;color:#B9A8FF!important}
+.haddir-dialog-root.theme-dark .haddir-dialog-icon.tone-danger{background:rgba(255,84,112,.14)!important;color:#FF7B91!important}
+.haddir-dialog-root.theme-dark .haddir-dialog-icon.tone-success{background:rgba(20,211,180,.14)!important;color:#48DCC3!important}
+.haddir-dialog-root.theme-dark .haddir-dialog-confirm{background:#5B2EFF!important;color:#fff!important}
+.haddir-dialog-root.theme-dark .haddir-dialog-cancel{background:#0E0B1F!important;border-color:rgba(185,168,255,.24)!important;color:#F4F2FF!important}
+.haddir-dialog-root.theme-dark .haddir-dialog-input{background:#0E0B1F!important;border-color:rgba(185,168,255,.28)!important;color:#F4F2FF!important}
+@media(max-width:600px){
+  .haddir-dialog-root .haddir-dialog{
+    width:100%!important;max-width:440px!important;min-width:0!important;
+    padding:26px 20px 20px!important;
+  }
+  .haddir-dialog-root .haddir-dialog-icon{width:54px!important;height:54px!important;margin-bottom:12px!important}
+  .haddir-dialog-root .haddir-dialog h2{font-size:19px!important}
+  .haddir-dialog-root .haddir-dialog>p{font-size:15px!important;line-height:1.9!important}
+  .haddir-dialog-root .haddir-dialog-actions{grid-template-columns:minmax(0,1fr)!important;gap:10px!important;margin-top:18px!important}
+  .haddir-dialog-root .haddir-dialog-actions button{min-height:50px!important;font-size:15px!important}
+}
