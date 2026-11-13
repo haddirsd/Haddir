@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
-import { loadCustomerAccountData } from "../services/customer-account.service";
+import { loadCustomerAccountData, markCustomerNotificationRead, markAllCustomerNotificationsRead } from "../services/customer-account.service";
 import type { CustomerNotification, CustomerTicket } from "../types";
 
 export function useCustomerAccount(userId: string | null) {
@@ -58,6 +58,29 @@ export function useCustomerAccount(userId: string | null) {
     };
   }, [userId]);
 
+  const markNotificationRead = useCallback(async (notificationId: string) => {
+    if (!userId) return { error: "سجّل الدخول أولاً." };
+    const result = await markCustomerNotificationRead(userId, notificationId);
+    if (result.error) {
+      setAccountDataError("تعذر تحديث حالة الإشعار. " + result.error);
+      return result;
+    }
+    setMyNotifications((rows) => rows.map((row) => row.id === notificationId ? { ...row, is_read: true } : row));
+    return result;
+  }, [userId]);
+
+  const markAllNotificationsRead = useCallback(async () => {
+    if (!userId) return { error: "سجّل الدخول أولاً." };
+    const unreadIds = myNotifications.filter((notification) => !notification.is_read).map((notification) => notification.id);
+    const result = await markAllCustomerNotificationsRead(userId, unreadIds);
+    if (result.error) {
+      setAccountDataError("تعذر تعليم الإشعارات كمقروءة. " + result.error);
+      return result;
+    }
+    setMyNotifications((rows) => rows.map((row) => ({ ...row, is_read: true })));
+    return result;
+  }, [userId, myNotifications]);
+
   return {
     myTickets,
     myNotifications,
@@ -65,5 +88,7 @@ export function useCustomerAccount(userId: string | null) {
     accountDataLoading,
     accountDataError,
     setAccountDataError,
+    markNotificationRead,
+    markAllNotificationsRead,
   };
 }
