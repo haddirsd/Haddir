@@ -12,12 +12,13 @@ import { EventsWorkspace } from "../features/events/components/EventsWorkspace";
 import { TicketWorkspace } from "../features/customer-account/components/TicketWorkspace";
 import { NotificationsWorkspace } from "../features/customer-account/components/NotificationsWorkspace";
 import { useCustomerAccount } from "../features/customer-account/hooks/useCustomerAccount";
+import { requestCustomerAccountDeletion } from "../features/customer-account/services/customer-account.service";
 import { useAuth } from "../features/auth/hooks/useAuth";
 import { signInWithGoogle as startGoogleSignIn, updateCustomerPhone } from "../features/auth/services/auth.service";
 import { useGatekeeper } from "../features/gatekeeper/hooks/useGatekeeper";
 import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
 import { HaddirDialog } from "../components/ui/HaddirDialog";
-import { Bell, CheckCircle2, Sparkles, Ticket, UserRound, ChevronLeft, ScanLine, ShieldCheck, ClipboardList, Sun, Moon } from "lucide-react";
+import { Bell, Ticket, UserRound, ChevronLeft, ScanLine, ShieldCheck, Sun, Moon } from "lucide-react";
 
 type Tab="home"|"tickets"|"notifications"|"profile";
 export default function Home(){
@@ -30,7 +31,7 @@ export default function Home(){
  const [isGatekeeperPage,setIsGatekeeperPage]=useState(false);
  const [showWelcome,setShowWelcome]=useState(true),[welcomeFading,setWelcomeFading]=useState(false),[welcomeGreeting,setWelcomeGreeting]=useState("أهلاً بيك في حاضر");
  const { authUser, userRole, assignedEvent, fullName, email, phone, setPhone, avatarUrl, profileEditing, setProfileEditing, saved, setSaved, authMessage, setAuthMessage } = useAuth();
- const { myTickets, myNotifications, setMyNotifications, accountDataLoading, accountDataError, setAccountDataError } = useCustomerAccount(authUser?.id ?? null);
+ const { myTickets, myNotifications, accountDataLoading, accountDataError, markNotificationRead: markCustomerNotificationReadAction, markAllNotificationsRead: markAllCustomerNotificationsReadAction } = useCustomerAccount(authUser?.id ?? null);
  const [notificationFilter,setNotificationFilter]=useState<"unread"|"read">("unread");
  const [ticketFilter,setTicketFilter]=useState<"new"|"used">("new");
  const [expandedTicketId,setExpandedTicketId]=useState<string|null>(null);
@@ -62,12 +63,12 @@ export default function Home(){
   const confirmedEmail=deleteEmailInput.trim();
   if(!authUser?.email)return;
   if(confirmedEmail.toLowerCase()!==authUser.email.toLowerCase()){setAccountDialog(null);setAuthMessage("البريد الإلكتروني غير مطابق. لم يتم حذف أي بيانات.");return;}
-  const supabase=getSupabaseBrowserClient();if(!supabase){setAccountDialog(null);setAuthMessage("تعذر الاتصال بالخدمة حالياً.");return;}
   setAccountDialog(null);setDeletingAccount(true);setAuthMessage("");
-  const {data,error}=await supabase.functions.invoke("delete-customer-account",{body:{confirm_email:confirmedEmail}});
+  const deletion=await requestCustomerAccountDeletion(confirmedEmail);
   setDeletingAccount(false);
-  if(error||!data?.success){let failureMessage=data?.error;try{if(!failureMessage&&error)failureMessage=(await (error as any).context?.json?.())?.error;}catch{}setAuthMessage(failureMessage||"تعذر حذف الحساب حالياً. لم نتمكن من تأكيد اكتمال العملية.");return;}
-  await supabase.auth.signOut();
+  if(deletion.error){setAuthMessage(deletion.error);return;}
+  const supabase=getSupabaseBrowserClient();
+  if(supabase)await supabase.auth.signOut();
   window.location.assign("/?tab=profile");
  };
  const signOut=()=>setAccountDialog("logout");
@@ -78,22 +79,12 @@ export default function Home(){
  };
 
  const markNotificationRead=async(notification:any)=>{
-  if(!authUser)return;
-  const supabase=getSupabaseBrowserClient();if(!supabase)return;
-  const {error}=await supabase.from("notifications").update({is_read:true}).eq("id",notification.id).eq("user_id",authUser.id);
-  if(error){setAccountDataError("تعذر تحديث حالة الإشعار. "+error.message);return;}
-  setMyNotifications(rows=>rows.map(row=>row.id===notification.id?{...row,is_read:true}:row));
-  setNotificationFilter("read");
+  const result=await markCustomerNotificationReadAction(notification.id);
+  if(!result.error)setNotificationFilter("read");
  };
  const markAllNotificationsRead=async()=>{
-  if(!authUser)return;
-  const supabase=getSupabaseBrowserClient();if(!supabase)return;
-  const unreadIds=myNotifications.filter(n=>!n.is_read).map(n=>n.id);
-  if(!unreadIds.length)return;
-  const {error}=await supabase.from("notifications").update({is_read:true}).in("id",unreadIds).eq("user_id",authUser.id);
-  if(error){setAccountDataError("تعذر تعليم الإشعارات كمقروءة. "+error.message);return;}
-  setMyNotifications(rows=>rows.map(row=>({...row,is_read:true})));
-  setNotificationFilter("read");
+  const result=await markAllCustomerNotificationsReadAction();
+  if(!result.error)setNotificationFilter("read");
  };
  const openNotification=async(notification:any)=>{
   if(!notification.is_read)await markNotificationRead(notification);
