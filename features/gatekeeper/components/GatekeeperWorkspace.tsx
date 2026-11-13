@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type RefObject } from "react";
 import { ClipboardList, ScanLine } from "lucide-react";
-import type { GatekeeperScanHistoryItem, GatekeeperScanStats, GatekeeperTicketActionResult } from "../gatekeeper.types";
+import type { GatekeeperScanHistoryItem, GatekeeperScanStats, GatekeeperTicketActionResult } from "../types";
 import { ManualTicketEntry } from "./ManualTicketEntry";
 import { QrScanner } from "./QrScanner";
 import { ScanHistory } from "./ScanHistory";
