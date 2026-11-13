@@ -3,12 +3,12 @@
 import { useState, type FormEvent } from "react";
 import { HaddirDialog } from "../../../components/ui/HaddirDialog";
 import { ArrowLeft, CalendarDays, ExternalLink, MapPin, Share2, Wallet } from "lucide-react";
-import type { EventItem } from "../events.types";
-import type { EventPaymentAccount } from "../../booking/booking.types";
+import type { EventItem } from "../types";
+import type { EventPaymentAccount } from "../../booking/types";
 import { PaymentCheckout } from "../../booking/components/PaymentCheckout";
 import { BookingSuccess } from "../../booking/components/BookingSuccess";
 import { TicketSelection } from "../../booking/components/TicketSelection";
-import { formatMoney } from "../events.formatters";
+import { formatMoney } from "../utils/events.formatters";
 
 type EventDetailWorkspaceProps = {
   event: EventItem;
