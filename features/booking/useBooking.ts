@@ -3,8 +3,8 @@
 import { useCallback, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { getSupabaseBrowserClient } from "../../lib/supabase";
-import { getEventPaymentAccounts, createBooking, uploadPaymentReceipt, getBookingPaymentSubmission, submitPayment } from "./booking.service";
-import type { EventPaymentAccount } from "./booking.types";
+import { getEventPaymentAccounts, createBooking, uploadPaymentReceipt, getBookingPaymentSubmission, submitPayment } from "./services/booking.service";
+import type { EventPaymentAccount } from "./types";
 
 type BookingUser = { id: string } | null;
 type BookingEvent = { id: string; tiers: Array<{ id: string }> } | null;
