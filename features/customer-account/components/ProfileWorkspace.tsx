@@ -2,7 +2,7 @@
 
 import { type Dispatch, type SetStateAction } from "react";
 import { CheckCircle2, UserRound, ChevronLeft, ShieldCheck, ClipboardList, ScanLine, Pencil, Share2, CloudUpload, LockKeyhole, Trash2, Ticket } from "lucide-react";
-import AdvertiserWorkspace from "../../advertiser/AdvertiserWorkspace";
+import AdvertiserWorkspace from "../../advertiser/components/AdvertiserWorkspace";
 
 type AuthUser = { id: string; email?: string } | null;
 
