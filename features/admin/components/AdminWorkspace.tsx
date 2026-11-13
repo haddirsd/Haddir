@@ -2,16 +2,16 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getSupabaseBrowserClient } from "../../lib/supabase";
-import AdminEventsWorkspace from "../events/admin/AdminEventsWorkspace";
-import AdminBookingsWorkspace from "../booking/admin/AdminBookingsWorkspace";
-import AdminPaymentsWorkspace from "../booking/admin/AdminPaymentsWorkspace";
-import AdminUsersWorkspace from "../users/admin/AdminUsersWorkspace";
-import AdminActivityWorkspace from "../admin/activity/AdminActivityWorkspace";
-import AdminReportsWorkspace from "../admin/reports/AdminReportsWorkspace";
-import AdminOverviewWorkspace from "../admin/overview/AdminOverviewWorkspace";
+import { getSupabaseBrowserClient } from "../../../lib/supabase";
+import AdminEventsWorkspace from "../../events/admin/AdminEventsWorkspace";
+import AdminBookingsWorkspace from "../../booking/admin/AdminBookingsWorkspace";
+import AdminPaymentsWorkspace from "../../booking/admin/AdminPaymentsWorkspace";
+import AdminUsersWorkspace from "../../users/admin/AdminUsersWorkspace";
+import AdminActivityWorkspace from "../activity/AdminActivityWorkspace";
+import AdminReportsWorkspace from "../reports/AdminReportsWorkspace";
+import AdminOverviewWorkspace from "../overview/AdminOverviewWorkspace";
 import { Activity, BadgeCheck, Banknote, CalendarDays, ClipboardCheck, LayoutDashboard, LogOut, Shield, Ticket, Users } from "lucide-react";
-import { HaddirDialog } from "../../components/ui/HaddirDialog";
+import { HaddirDialog } from "../../../components/ui/HaddirDialog";
 
 type AdminRole = "owner" | "admin" | "supervisor";
 type Section = "overview" | "events" | "bookings" | "payments" | "users" | "reports" | "activity";
