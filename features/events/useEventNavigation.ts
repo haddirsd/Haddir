@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { EventItem } from "./events.types";
+import type { EventItem } from "./types";
 
 type AuthUser = { id: string; email?: string; user_metadata?: Record<string, unknown> } | null;
 
