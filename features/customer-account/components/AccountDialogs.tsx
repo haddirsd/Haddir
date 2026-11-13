@@ -1,13 +1,11 @@
 "use client";
 
-import type { AuthUser } from "../../auth/types";
 import { HaddirDialog } from "../../../components/ui/HaddirDialog";
 
 export type AccountDialog = "logout" | "delete-email" | "delete-final" | null;
 
 type AccountDialogsProps = {
   accountDialog: AccountDialog;
-  authUser: AuthUser | null;
   deleteEmailInput: string;
   setDeleteEmailInput: (value: string) => void;
   deletingAccount: boolean;
@@ -19,7 +17,6 @@ type AccountDialogsProps = {
 
 export function AccountDialogs({
   accountDialog,
-  authUser,
   deleteEmailInput,
   setDeleteEmailInput,
   deletingAccount,
