@@ -11,6 +11,7 @@ import AdvertiserWorkspace from "../features/advertiser/AdvertiserWorkspace";
 import { EventsWorkspace } from "../features/events/components/EventsWorkspace";
 import { TicketWorkspace } from "../features/customer-account/components/TicketWorkspace";
 import { NotificationsWorkspace } from "../features/customer-account/components/NotificationsWorkspace";
+import { useCustomerAccount } from "../features/customer-account/hooks/useCustomerAccount";
 import { useAuth } from "../features/auth/hooks/useAuth";
 import { signInWithGoogle as startGoogleSignIn, updateCustomerPhone } from "../features/auth/services/auth.service";
 import { useGatekeeper } from "../features/gatekeeper/useGatekeeper";
@@ -29,7 +30,7 @@ export default function Home(){
  const [isGatekeeperPage,setIsGatekeeperPage]=useState(false);
  const [showWelcome,setShowWelcome]=useState(true),[welcomeFading,setWelcomeFading]=useState(false),[welcomeGreeting,setWelcomeGreeting]=useState("أهلاً بيك في حاضر");
  const { authUser, userRole, assignedEvent, fullName, setFullName, email, phone, setPhone, avatarUrl, profileEditing, setProfileEditing, saved, setSaved, authMessage, setAuthMessage } = useAuth();
- const [myTickets,setMyTickets]=useState<any[]>([]),[myNotifications,setMyNotifications]=useState<any[]>([]),[accountDataLoading,setAccountDataLoading]=useState(false),[accountDataError,setAccountDataError]=useState("");
+ const { myTickets, myNotifications, setMyNotifications, accountDataLoading, accountDataError, setAccountDataError } = useCustomerAccount(authUser?.id ?? null);
  const [notificationFilter,setNotificationFilter]=useState<"unread"|"read">("unread");
  const [ticketFilter,setTicketFilter]=useState<"new"|"used">("new");
  const [expandedTicketId,setExpandedTicketId]=useState<string|null>(null);
@@ -39,29 +40,6 @@ export default function Home(){
   if(tab==="tickets"||tab==="notifications"||tab==="profile")setActiveTab(tab);
   if(params.get("workspace")==="gatekeeper"){setActiveWorkspace("gatekeeper");setIsGatekeeperPage(true);}
  },[]);
- useEffect(()=>{
-  const supabase=getSupabaseBrowserClient();if(!supabase||!authUser)return;
-  let alive=true;let firstLoad=true;let requestSequence=0;setAccountDataLoading(true);setAccountDataError("");
-  const loadAccountData=async()=>{
-   const requestId=++requestSequence;
-   const [ticketsResult,notificationsResult]=await Promise.all([
-    supabase.from("tickets").select("id,booking_item_id,ticket_code,status,issued_at,events(title,starts_at,is_continuous,venue,cover_image_url),ticket_types(name),bookings!inner(booking_number,user_id),booking_items(quantity)").eq("bookings.user_id",authUser.id).order("issued_at",{ascending:false}),
-    supabase.from("notifications").select("id,title,message,type,is_read,created_at,booking_id").eq("user_id",authUser.id).order("created_at",{ascending:false}).limit(100)
-   ]);
-   if(!alive||requestId!==requestSequence)return;
-   const failure=ticketsResult.error||notificationsResult.error;
-   if(failure)setAccountDataError(failure.message||"تعذر تحميل بيانات الحساب.");
-   else{setMyTickets(ticketsResult.data||[]);setMyNotifications(notificationsResult.data||[]);setAccountDataError("");}
-   if(firstLoad){setAccountDataLoading(false);firstLoad=false;}
-  };
-  void loadAccountData();
-  const channel=supabase.channel("customer-live-"+authUser.id)
-   .on("postgres_changes",{event:"*",schema:"public",table:"tickets"},()=>{void loadAccountData();})
-   .on("postgres_changes",{event:"*",schema:"public",table:"notifications",filter:"user_id=eq."+authUser.id},()=>{void loadAccountData();})
-   .on("postgres_changes",{event:"UPDATE",schema:"public",table:"bookings",filter:"user_id=eq."+authUser.id},()=>{void loadAccountData();})
-   .subscribe((status)=>{if(status==="SUBSCRIBED")void loadAccountData();});
-  return()=>{alive=false;requestSequence++;void supabase.removeChannel(channel);};
- },[authUser]);
  useEffect(()=>{const saved=window.localStorage.getItem(THEME_STORAGE_KEY);const prefersDark=window.matchMedia?.("(prefers-color-scheme: dark)").matches;setDarkMode(saved?saved==="dark":!!prefersDark);},[]);
  useEffect(()=>{document.documentElement.dataset.theme=darkMode?"dark":"light";document.documentElement.style.colorScheme=darkMode?"dark":"light";window.localStorage.setItem(THEME_STORAGE_KEY,darkMode?"dark":"light");const themeMeta=document.querySelector('meta[name="theme-color"]');themeMeta?.setAttribute("content",darkMode?"#1D135D":"#F6F4FF");},[darkMode]);
  useEffect(()=>{const hour=Number(new Intl.DateTimeFormat("en-GB",{timeZone:"Africa/Khartoum",hour:"2-digit",hourCycle:"h23"}).format(new Date()));setWelcomeGreeting(hour>=5&&hour<11?"صباح الخير":hour>=11&&hour<17?"نهارك سعيد":hour>=17&&hour<23?"مساء الخير":"ليلة سعيدة");let seen=false;try{seen=sessionStorage.getItem("haddir_splash")==="1";}catch(e){}if(seen){setShowWelcome(false);return;}try{sessionStorage.setItem("haddir_splash","1");}catch(e){}let removeTimer: number|undefined;const fadeTimer=window.setTimeout(()=>{setWelcomeFading(true);removeTimer=window.setTimeout(()=>setShowWelcome(false),450);},2600);return()=>{window.clearTimeout(fadeTimer);if(removeTimer!==undefined)window.clearTimeout(removeTimer);};},[]);
