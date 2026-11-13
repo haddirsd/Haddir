@@ -10559,3 +10559,127 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
   background:rgba(185,168,255,.14)!important;
   color:#B9A8FF!important;
 }
+
+
+/* Mobile layout: admin payment approval and ticket issuance */
+@media (max-width: 600px) {
+  .admin-shell .admin-panel,
+  .admin-shell .admin-panel-head,
+  .admin-shell .admin-payment-cards,
+  .admin-shell .admin-payment-card {
+    width:100%;
+    max-width:100%;
+    min-width:0;
+  }
+  .admin-shell .admin-panel-head {
+    align-items:stretch;
+    flex-direction:column;
+    gap:12px;
+  }
+  .admin-shell .admin-panel-head > div {
+    min-width:0;
+  }
+  .admin-shell .admin-panel-head h3 {
+    overflow-wrap:anywhere;
+  }
+  .admin-shell .admin-panel-head p {
+    line-height:1.7;
+    overflow-wrap:anywhere;
+  }
+  .admin-shell .admin-payment-cards {
+    grid-template-columns:minmax(0,1fr);
+    gap:12px;
+  }
+  .admin-shell .admin-payment-card {
+    box-sizing:border-box;
+    padding:14px!important;
+    border-radius:17px!important;
+  }
+  .admin-shell .admin-payment-card-head {
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
+  }
+  .admin-shell .admin-payment-card-head > div {
+    flex:1 1 130px;
+    min-width:0;
+  }
+  .admin-shell .admin-payment-card-head .admin-event-status {
+    max-width:100%;
+    white-space:normal;
+    text-align:center;
+  }
+  .admin-shell .admin-payment-card-event {
+    min-width:0;
+    align-items:flex-start;
+  }
+  .admin-shell .admin-payment-card-event strong {
+    min-width:0;
+    overflow-wrap:anywhere;
+    line-height:1.65;
+  }
+  .admin-shell .admin-payment-card-grid {
+    grid-template-columns:minmax(0,1fr);
+    gap:11px;
+    padding:13px 0;
+  }
+  .admin-shell .admin-payment-card-grid > div {
+    min-width:0;
+    padding-bottom:9px;
+    border-bottom:1px solid var(--line);
+  }
+  .admin-shell .admin-payment-card-grid > div:last-child {
+    border-bottom:0;
+  }
+  .admin-shell .admin-payment-card-grid strong,
+  .admin-shell .admin-payment-card-grid a {
+    max-width:100%;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+  }
+  .admin-shell .admin-payment-actions {
+    grid-template-columns:minmax(0,1fr);
+    gap:11px;
+  }
+  .admin-shell .admin-payment-approve,
+  .admin-shell .admin-payment-reject {
+    width:100%;
+    min-height:48px;
+    padding:12px;
+    white-space:normal;
+    line-height:1.55;
+  }
+  .admin-shell .admin-payment-reject-box {
+    min-width:0;
+  }
+  .admin-shell .admin-payment-reject-box textarea {
+    box-sizing:border-box;
+    width:100%;
+    min-width:0;
+    min-height:92px;
+    font-size:14px;
+    line-height:1.6;
+  }
+  .admin-shell .haddir-dialog-backdrop {
+    box-sizing:border-box;
+    align-items:flex-end;
+    padding:12px 12px calc(12px + env(safe-area-inset-bottom));
+  }
+  .admin-shell .haddir-dialog {
+    box-sizing:border-box;
+    width:100%;
+    max-width:100%;
+    max-height:calc(100dvh - 24px - env(safe-area-inset-bottom));
+    overflow-y:auto;
+    border-radius:22px;
+    padding:22px 17px 17px;
+  }
+  .admin-shell .haddir-dialog-actions {
+    grid-template-columns:minmax(0,1fr);
+    gap:9px;
+  }
+  .admin-shell .haddir-dialog-actions button {
+    width:100%;
+    min-height:48px;
+  }
+}
