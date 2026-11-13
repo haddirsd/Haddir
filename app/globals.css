@@ -10500,3 +10500,62 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 .haddir-select-menu-portal.theme-dark{background:#1A1633!important;border-color:rgba(185,168,255,.24)!important;color:#F4F2FF!important}
 .haddir-select-menu-portal.theme-dark .haddir-select-option{color:#F4F2FF!important}
 .haddir-select-menu-portal.theme-dark .haddir-select-option:hover,.haddir-select-menu-portal.theme-dark .haddir-select-option.is-selected{background:rgba(185,168,255,.13)!important;color:#B9A8FF!important}
+
+
+/* Portal dropdowns render under document.body, outside app-shell scoping. */
+.haddir-select-menu-portal{
+  box-sizing:border-box!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:3px!important;
+  padding:6px!important;
+  border:1px solid rgba(91,46,255,.22)!important;
+  border-radius:14px!important;
+  background:#FFFFFF!important;
+  color:#1A1533!important;
+  box-shadow:0 16px 42px rgba(14,11,31,.22)!important;
+  font-family:inherit!important;
+}
+.haddir-select-menu-portal .haddir-select-option{
+  box-sizing:border-box!important;
+  display:flex!important;
+  flex:0 0 auto!important;
+  width:100%!important;
+  min-height:46px!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:10px!important;
+  padding:10px 12px!important;
+  border:0!important;
+  border-radius:9px!important;
+  background:transparent!important;
+  color:#1A1533!important;
+  font:inherit!important;
+  font-size:14px!important;
+  line-height:1.5!important;
+  text-align:start!important;
+  white-space:normal!important;
+  cursor:pointer!important;
+}
+.haddir-select-menu-portal .haddir-select-option:hover,
+.haddir-select-menu-portal .haddir-select-option.is-selected{
+  background:rgba(91,46,255,.09)!important;
+  color:#5B2EFF!important;
+}
+.haddir-select-menu-portal .haddir-select-option:disabled{
+  opacity:.45!important;
+  cursor:not-allowed!important;
+}
+.haddir-select-menu-portal.theme-dark{
+  background:#1A1633!important;
+  border-color:rgba(185,168,255,.28)!important;
+  color:#F4F2FF!important;
+}
+.haddir-select-menu-portal.theme-dark .haddir-select-option{
+  color:#F4F2FF!important;
+}
+.haddir-select-menu-portal.theme-dark .haddir-select-option:hover,
+.haddir-select-menu-portal.theme-dark .haddir-select-option.is-selected{
+  background:rgba(185,168,255,.14)!important;
+  color:#B9A8FF!important;
+}
