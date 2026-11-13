@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CalendarDays, MapPin, Search, Ticket } from "lucide-react";
+import { EventCard } from "./EventCard";
+import { EventFilters } from "./EventFilters";
 import type { EventItem } from "../types";
 
 type HomeEventsWorkspaceProps = {
@@ -87,12 +88,7 @@ export function HomeEventsWorkspace({ events, loading, error, onOpenEvent, onRet
   return (
     <section className="home-discovery redesigned-home" id="events">
       <div className="container">
-        <div className="home-search" role="search">
-          <Search size={18} aria-hidden="true" />
-          <input type="search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="ابحث عن فعالية أو مكان..." aria-label="ابحث عن فعالية أو مكان" />
-          {searchQuery && <button type="button" onClick={() => setSearchQuery("")} aria-label="مسح البحث">×</button>}
-        </div>
+        <EventFilters value={searchQuery} onChange={setSearchQuery} />
 
         {loading ? (
           <div className="empty-state" role="status"><span className="home-loading-mark" aria-hidden="true" /><strong>جاري تحميل الفعاليات...</strong></div>
@@ -108,23 +104,11 @@ export function HomeEventsWorkspace({ events, loading, error, onOpenEvent, onRet
                 <div ref={trendingCarouselRef} className="trending-carousel hide-scrollbar" dir="ltr"
                   onMouseEnter={pauseTrending} onMouseLeave={resumeTrending} onTouchStart={pauseTrending}
                   onTouchEnd={resumeTrending} onTouchCancel={resumeTrending} onScroll={syncTrendingIndex}>
-                  {trendingLoopEvents.map((event, index) => {
-                    const isClone = index < trendingEvents.length || index >= trendingEvents.length * 2;
-                    return <article className="trending-card snap-item" key={event.id + "-loop-" + index}
-                      role="button" tabIndex={isClone ? -1 : 0} aria-hidden={isClone}
-                      aria-label={"عرض تفاصيل " + event.title} onClick={() => onOpenEvent(event.id)}
-                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpenEvent(event.id); } }}>
-                      <div className={"trending-card-media " + event.cover}>
-                        {event.coverImageUrl ? <img src={event.coverImageUrl} alt={isClone ? "" : event.title} loading="lazy" decoding="async" /> : <span className="trending-placeholder">✦</span>}
-                        <div className="trending-overlay" />
-                        <span className="trending-category">{event.category}</span><span className="trending-price">{event.price}</span>
-                        <div className="trending-card-copy"><h3>{event.title}</h3>
-                          <div><CalendarDays size={14} /><span>{event.date} · {event.time}</span></div>
-                          <div><MapPin size={14} /><span>{event.venue || event.place}</span></div>
-                        </div>
-                      </div>
-                    </article>;
-                  })}
+                  {trendingLoopEvents.map((event, index) => (
+                    <EventCard key={event.id + "-loop-" + index} event={event} variant="trending"
+                      clone={index < trendingEvents.length || index >= trendingEvents.length * 2}
+                      onOpen={onOpenEvent} />
+                  ))}
                 </div>
               ) : <div className="empty-state">ما في فعاليات رائجة حالياً.</div>}
             </section>}
@@ -133,28 +117,7 @@ export function HomeEventsWorkspace({ events, loading, error, onOpenEvent, onRet
               <div className="redesign-section-head"><h2>{normalizedQuery ? "نتائج البحث" : "بقية الفعاليات"}</h2><span>{displayedEvents.length} فعالية</span></div>
               {displayedEvents.length ? <div className="event-list">
                 {displayedEvents.map((event) => (
-                  <article className="event-list-card event-card-clickable ticket-style-card" key={event.id}
-                    role="button" tabIndex={0} aria-label={"عرض تفاصيل " + event.title}
-                    onClick={() => onOpenEvent(event.id)}
-                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpenEvent(event.id); } }}>
-                    <div className="event-list-main">
-                      <div className="event-list-thumb">
-                        {event.coverImageUrl ? <img src={event.coverImageUrl} alt={event.title} loading="lazy" decoding="async" /> : <span>✦</span>}
-                      </div>
-                      <div className="event-list-info">
-                        <h3>{event.title}</h3>
-                        <span className="event-category-chip">{event.category}</span>
-                        <div className="event-list-meta">
-                          <p><MapPin size={13} /><span>{event.venue || event.place}</span></p>
-                          <p><CalendarDays size={13} /><span>{event.date} · {event.time}</span></p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="ticket-card-perforation" aria-hidden="true"><span /></div>
-                    <div className="ticket-card-footer">
-                      <strong className="event-list-price">{event.price}</strong>
-                    </div>
-                  </article>
+                  <EventCard key={event.id} event={event} variant="list" onOpen={onOpenEvent} />
                 ))}
               </div> : <div className="empty-state">ما في فعاليات أخرى حالياً.</div>}
             </section>
