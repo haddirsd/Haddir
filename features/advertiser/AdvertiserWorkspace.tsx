@@ -2,7 +2,7 @@
 
 import { ChevronLeft, Ticket } from "lucide-react";
 import { formatEventDate, formatMoney } from "../events/events.formatters";
-import { useAdvertiserStatistics } from "./useAdvertiserStatistics";
+import { useAdvertiserStatistics } from "./hooks/useAdvertiserStatistics";
 
 type AuthUser = { id: string; email?: string } | null;
 
