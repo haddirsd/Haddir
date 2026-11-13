@@ -10491,3 +10491,8 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 
 :is(.app-shell.theme-dark,.admin-shell.theme-dark) .haddir-select-trigger{background:#1A1633;border-color:rgba(185,168,255,.24);color:#F4F2FF}
 :is(.app-shell.theme-dark,.admin-shell.theme-dark) .haddir-select-menu{background:#1A1633;border-color:rgba(185,168,255,.24)}
+
+
+/* Keep custom select menus above checkout/admin content and outside clipped containers. */
+.haddir-select-dismiss{position:fixed!important;inset:0!important;z-index:2147483000!important;width:100vw;height:100dvh;opacity:0;cursor:default}
+.haddir-select-menu-portal{position:fixed!important;z-index:2147483001!important;overflow-y:auto;overscroll-behavior:contain;isolation:isolate}
