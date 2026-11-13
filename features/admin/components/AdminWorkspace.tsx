@@ -12,7 +12,7 @@ import AdminReportsWorkspace from "../reports/AdminReportsWorkspace";
 import AdminOverviewWorkspace from "../overview/AdminOverviewWorkspace";
 import { Activity, BadgeCheck, Banknote, CalendarDays, ClipboardCheck, LayoutDashboard, LogOut, Shield, Ticket, Users } from "lucide-react";
 import { HaddirDialog } from "../../../components/ui/HaddirDialog";
-import { ADMIN_ROLE_LABELS, ADMIN_SECTION_LABELS, getAdminNavigationAdminSections, type AdminRole, type AdminAdminSection } from "../types";
+import { ADMIN_ROLE_LABELS, ADMIN_SECTION_LABELS, getAdminNavigationSections, type AdminRole, type AdminSection } from "../types";
 
 
 export default function AdminPage() {
