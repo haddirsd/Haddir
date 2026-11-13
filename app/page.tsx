@@ -14,7 +14,7 @@ import { NotificationsWorkspace } from "../features/customer-account/components/
 import { useCustomerAccount } from "../features/customer-account/hooks/useCustomerAccount";
 import { useAuth } from "../features/auth/hooks/useAuth";
 import { signInWithGoogle as startGoogleSignIn, updateCustomerPhone } from "../features/auth/services/auth.service";
-import { useGatekeeper } from "../features/gatekeeper/useGatekeeper";
+import { useGatekeeper } from "../features/gatekeeper/hooks/useGatekeeper";
 import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
 import { HaddirDialog } from "../components/ui/HaddirDialog";
 import { Bell, CheckCircle2, Sparkles, Ticket, UserRound, ChevronLeft, ScanLine, ShieldCheck, ClipboardList, Pencil, Sun, Moon, Share2, CloudUpload, LockKeyhole, Trash2 } from "lucide-react";
