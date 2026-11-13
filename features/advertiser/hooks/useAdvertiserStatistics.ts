@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getAdvertiserEventStatistics } from "../advertiser.service";
-import type { AdvertiserStatistics } from "../advertiser.types";
+import { getAdvertiserEventStatistics } from "../services/advertiser.service";
+import type { AdvertiserStatistics } from "../types";
 
 type AuthUser = { id: string } | null;
 
