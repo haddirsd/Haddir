@@ -9,7 +9,7 @@ Source: `supabase/recovery/baseline/10-routines-draft.sql.md`, compared with the
 - 32 definitions found; 32 unique schema-qualified routine names.
 - 18 PL/pgSQL routines and 14 SQL routines.
 - All 32 were previously confirmed owned by `postgres` and configured with an explicitly empty `search_path`.
-- All 16 private routines are SECURITY DEFINER.
+- All 17 private routines are SECURITY DEFINER.
 - Public SECURITY DEFINER routines: `create_booking`, `get_gatekeeper_manual_history`, `get_haddir_push_config`, `review_payment_submission`, `submit_payment`, and `sync_haddir_push_subscription`.
 - No direct self-recursive routine calls or cycles were found in the captured application-routine call graph.
 
@@ -81,7 +81,23 @@ The notification email enqueue routine is not currently listed among the 12 acti
 - `public.set_updated_at()` currently has PUBLIC EXECUTE. Preserve or change only through an explicit ACL decision; do not let default function privileges decide accidentally.
 - Every function's empty `search_path`, owner, SECURITY DEFINER/INVOKER mode, and grants must be set and verified explicitly.
 
-## 7. Validation still required
+
+
+## 7. Fresh live-production metadata and ACL reconciliation — 2026-11-14
+
+A fresh read-only catalog extraction was compared with all 32 routine definitions and the privilege draft:
+
+- 32/32 routine identities and pg_get_functiondef definitions match the preserved production definitions.
+- All 32 are owned by postgres; languages match the draft.
+- All 32 have search_path="".
+- 23/32 are SECURITY DEFINER: 17 private and six public; nine public routines are invoker-security.
+- The privilege draft contains 32 per-signature REVOKE statements covering all 32 functions and 41 explicit EXECUTE grant entries. All 41 grants match the live ACL exactly; no unexpected non-owner EXECUTE ACL entries were found.
+- The actual ACL includes the expected owner EXECUTE entry for each of the 32 functions.
+- The private gatekeeper core authenticated EXECUTE grant and public.set_updated_at() PUBLIC EXECUTE exception are both present in production and retained as explicit review findings.
+
+The public.get_haddir_push_config() ACL is restricted to service_role plus owner postgres. It is not executable by PUBLIC, anon, or authenticated.
+
+## 8. Validation still required
 
 - Run the staged definitions on a real PostgreSQL/Supabase-compatible instance; static scanning cannot prove PL/pgSQL body compilation or runtime behavior.
 - Verify actual SQL-language wrapper creation order and PL/pgSQL lazy statement resolution on the selected PostgreSQL version.
