@@ -35,7 +35,8 @@ Keep all generated artifacts quarantined under `supabase/recovery/baseline/`:
 - `40-rls-policies-draft.sql.md` — RLS enabled on 16 public tables and 29 policy definitions.
 - `50-triggers-draft.sql.md` — 12 distinct trigger definitions.
 - `SECURITY_REVIEW.md` — routine ownership, security mode, search_path and EXECUTE ACL review.
-- Storage and scheduled jobs remain separate deployment steps.
+- `ACCESS_CONTROL_STORAGE_CRON.md` — exact Storage bucket/policy inventory, cron job definitions, schema/object grants, and default-privilege findings.
+- Storage and scheduled jobs remain separate deployment steps and must not be silently omitted from a future full bootstrap.
 
 All SQL is embedded in Markdown with a `.sql.md` suffix deliberately; these are evidence-backed drafts, not deployable SQL files.
 
@@ -57,7 +58,9 @@ All SQL is embedded in Markdown with a `.sql.md` suffix deliberately; these are 
 - Routine definitions are now drafted. The read-only review found all 32 owned by `postgres`, all with empty `search_path`, and mixed SECURITY DEFINER / INVOKER execution; per-routine EXECUTE ACLs must be reconstructed exactly and reviewed before executable SQL is produced.
 - Reconcile the complete grant/default-privilege model with Supabase-managed roles; do not copy managed role memberships into a generic bootstrap.
 - Verify table dependency order and confirm all foreign-key targets exist before constraints are added.
-- Review Storage bucket configuration, object policies, and cron definitions separately. The current catalog evidence identifies 2 Haddir buckets, 6 object policies, and 2 active cron jobs.
+- Storage review is now documented in `baseline/ACCESS_CONTROL_STORAGE_CRON.md`: 2 buckets, 6 object policies, and 2 active cron jobs. Preserve the private receipt bucket, public cover reads, user/booking path checks, and the exact cron schedules/functions.
+- Grant review is documented alongside Storage: public/private schema ACLs, per-object table/routine grants, three column-level UPDATE grant groups, and default privileges for postgres/supabase_admin. Do not copy the broad hosted-project default ACLs as generic defaults. Reconstruct only verified object-specific grants.
+- Security follow-up: some existing application tables have broad anon/authenticated table-level SQL grants while RLS is enabled. Review each table's effective policy/grant combination before executable DDL; do not assume the grants alone prove exposure or that RLS makes every grant harmless.
 - Obtain a real PostgreSQL/Supabase-compatible validation runtime before calling the result tested. The current execution environment has no `psql`, `postgres`, Docker, or Supabase CLI; no database execution test has been performed.
 
 ## Current safety status
