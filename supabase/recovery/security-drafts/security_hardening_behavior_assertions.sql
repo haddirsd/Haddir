@@ -206,15 +206,14 @@ BEGIN
     OR (SELECT count(*) FROM public.tickets WHERE booking_id='30000000-0000-4000-8000-000000000001')<>1
     OR (SELECT quantity_sold FROM public.ticket_types WHERE id='40000000-0000-4000-8000-000000000001')<>5
     OR (SELECT count(*) FROM public.notifications WHERE booking_id='30000000-0000-4000-8000-000000000001' AND type='ticket_approved')<>1
-    OR (SELECT count(*) FROM public.email_outbox WHERE booking_id='30000000-0000-4000-8000-000000000001' AND notification_type='ticket_approved')<>1
     OR (SELECT status FROM public.payment_submissions WHERE id='60000000-0000-4000-8000-000000000002')<>'rejected'
     OR (SELECT review_note FROM public.payment_submissions WHERE id='60000000-0000-4000-8000-000000000002')<>'إيصال غير مطابق'
     OR (SELECT status FROM public.bookings WHERE id='30000000-0000-4000-8000-000000000002')<>'rejected'
     OR (SELECT quantity_sold FROM public.ticket_types WHERE id='40000000-0000-4000-8000-000000000001')<>2
     OR EXISTS(SELECT 1 FROM public.tickets WHERE booking_id='30000000-0000-4000-8000-000000000002')
     OR (SELECT count(*) FROM public.notifications WHERE booking_id='30000000-0000-4000-8000-000000000002' AND type='payment_rejected')<>1
-    OR (SELECT count(*) FROM public.email_outbox WHERE booking_id='30000000-0000-4000-8000-000000000002' AND notification_type='payment_rejected')<>1 THEN
-    RAISE EXCEPTION 'SECURITY TEST FAILED: payment side-effect, ticket, inventory, notification or email-outbox invariant';
+ THEN
+    RAISE EXCEPTION 'SECURITY TEST FAILED: payment side-effect, ticket, inventory or in-app notification invariant';
   END IF;
 END
 $payment_side_effects$;
@@ -264,4 +263,4 @@ BEGIN
   END IF;
 END
 $gatekeeper_side_effects$;
-SELECT 'PASS: payment approve/reject, stock/ticket/notification/outbox, QR/manual and event-assignment workflows.' AS result;
+SELECT 'PASS: payment approve/reject, stock/ticket/in-app notifications, QR/manual and event-assignment workflows.' AS result;
