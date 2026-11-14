@@ -252,3 +252,18 @@ The SQL blocks in the policy, trigger, and table drafts were cross-checked direc
 - No missing policy helper, trigger target table, or trigger function was found in this source-level cross-check.
 
 This corrects the earlier seven-table wording: the live 12-trigger inventory spans **eight** target tables. The audit/activity log table is written by the audit trigger function but is not itself a trigger target.
+
+
+## 12. Object privilege reconstruction stage
+
+The exact observed application-object grants are now represented in `60-privileges-draft.sql.md`:
+
+- 38 grouped table-grant statements for `anon`, `authenticated`, and `service_role`; owner postgres privileges are represented by ownership rather than redundant GRANT statements.
+- Two column-grant statements representing the three explicit column-only UPDATE grants: `profiles.full_name`, `profiles.phone`, and `notifications.is_read`. Column privilege rows expanded from table-level grants were excluded.
+- Per-signature EXECUTE ACL reconstruction for all 32 routines, including explicit revocation of PostgreSQL's default PUBLIC EXECUTE before restoring the observed grantees. The `public.set_updated_at()` PUBLIC EXECUTE exception is retained.
+- The app-owned `private` schema ACL is recorded; the platform-managed `public` schema ACL is not blindly rewritten.
+- No default privileges or Supabase-managed role memberships are recreated.
+
+This is a faithful catalog reconstruction draft, not a least-privilege recommendation. It intentionally records broad anon/authenticated table grants that are constrained by RLS in production. The private gatekeeper core authenticated EXECUTE grant is also recorded as observed but remains a high-priority hardening finding; do not confuse a recovery snapshot with approval of that grant.
+
+The draft ACL statements have not been applied or tested. Before execution, verify every role and object on the target and compare effective privileges, including PUBLIC inheritance, against the intended recovery policy.
