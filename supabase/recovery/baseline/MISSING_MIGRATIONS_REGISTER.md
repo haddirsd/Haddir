@@ -1,6 +1,6 @@
 # Missing historical migration register
 
-**Purpose:** preserve the exact boundary between recovered original SQL, candidate historical files, and catalog-derived reconstruction. This is an evidence register, not migration SQL.
+**Purpose:** preserve the exact boundary between production-ledger-recovered SQL payloads, candidate historical files, and catalog-derived reconstruction. This is an evidence register, not active migration SQL.
 
 ## Production ledger and repository inventory
 
@@ -9,12 +9,13 @@
 - Exact production version + name matches: 21.
 - Production entries whose name exists in GitHub but timestamp differs: 21.
 - Production entries with no same-name file in the active repository migration directory: 22.
-- Seven of those 22 have candidate historical SQL archived separately; the remaining **15** have no source SQL found in the inspected GitHub migration-path history.
+- Seven of those 22 have candidate historical SQL archived separately.
+- The remaining **15** have no corresponding original file in the inspected GitHub migration-path history, but their SQL payloads have now been recovered verbatim from the production ledger and archived under `supabase/recovery/production-ledger-sql/`.
 - Repository SQL files without an exact version + name match: 29. These are not necessarily all missing originals; the category includes timestamp drift and later files not represented in the current production ledger.
 
 These comparison dimensions overlap and must not be summed.
 
-## Fifteen production migrations whose original SQL was not recovered
+## Fifteen production migrations recovered from the production ledger
 
 The following entries are present in the production migration ledger but have no corresponding original SQL file in the inspected GitHub migration-path history:
 
@@ -34,7 +35,9 @@ The following entries are present in the production migration ledger but have no
 14. 20261103185928_enable_live_admin_booking_updates
 15. 20261103201140_add_event_payment_account_beneficiary
 
-The absence is established only relative to the GitHub history/path sources inspected. It does **not** prove that no external backup, local developer copy, archived deployment artifact, or other source exists.
+For all 15 production rows, `statements` contained exactly one non-null SQL string. Each archived file contains the text of `statements[1]` verbatim. All 15 committed files were fetched back from GitHub and compared character-for-character with a fresh read of the production ledger: **15/15 exact matches**.
+
+This recovers the SQL payloads from the production ledger, but it does not recreate the original Git blobs, commit chronology, or independently prove byte-for-byte equivalence to any separate lost workstation copy. The absence of the original Git files is established relative to the GitHub history/path sources inspected.
 
 ## Seven archived candidate files — not original-history replacements
 
@@ -60,12 +63,13 @@ A concrete example: production records 20261105131539 / event_reminder_notificat
 
 **Known:**
 - The production ledger contains the 64 recorded entries in the evidence snapshot.
+- The SQL payloads for all 15 early missing entries are preserved in `supabase/recovery/production-ledger-sql/` and verified 15/15 against the live ledger text.
 - The active repository migration directory contains 50 SQL files on this branch.
 - Seven archived SQL files were retrieved from identified GitHub commits.
 - The production catalog snapshot and ordered baseline drafts reproduce the currently observed database structure sufficiently to pass the documented isolated PostgreSQL 17 DDL smoke test.
 
 **Not established:**
-- The original SQL text for the 15 listed entries.
+- The original Git file objects and commit history for the 15 listed entries; the production ledger preserves their SQL payloads but not the original Git history.
 - Byte-for-byte equivalence of the seven candidate archives to the exact SQL originally applied in production.
 - A complete historical sequence of every DDL/data transformation between the 64 ledger entries.
 - Whether external backups or developer artifacts contain the missing originals.
