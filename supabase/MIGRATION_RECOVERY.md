@@ -19,7 +19,7 @@ Status: forensic recovery completed for the accessible sources. Fifteen early mi
 
 The counts above describe different comparison dimensions and should not be added together.
 
-The 21 same-name timestamp mismatches were checked against the SQL payloads stored in the production migration ledger: 13/21 are byte-for-byte identical; the remaining 8/21 become identical after removing SQL comments and insignificant whitespace. No executable SQL difference was observed in this set. The review does not cover the eight repository SQL files whose names have no same-name production ledger entry.
+The 21 same-name timestamp mismatches were checked against the SQL payloads stored in the production migration ledger: 13/21 are byte-for-byte identical; the remaining 8/21 become identical after removing SQL comments and insignificant whitespace. No executable SQL difference was observed in this set. The eight repository SQL files whose names have no same-name production ledger entry have now been reviewed in `supabase/recovery/baseline/UNMATCHED_REPOSITORY_MIGRATIONS_REVIEW.md`.
 
 ## Production entries missing by name from the repository
 
@@ -122,3 +122,16 @@ The review found a concrete legacy ticket display issue: the customer UI and gat
 ## PostgreSQL 17 DDL smoke test — 2026-11-14
 
 The staged baseline draft passed a disposable PostgreSQL 17.12 DDL smoke test in GitHub Actions. All stages created successfully and catalog assertions matched: 16 tables, 158 columns, 81 constraints, 57 indexes, 29 public policies, 12 triggers, 32 routines, six Storage policies, and two cron jobs. Two test-discovered issues (32 missing function terminators and foreign-key ordering) were corrected before the passing run. Minimal Supabase platform stubs were used; this is not a full Supabase integration test. Full scope is documented in `supabase/recovery/baseline/POSTGRESQL_17_SMOKE_TEST.md`.
+
+
+## Review of eight unmatched repository migrations — 2026-11-15
+
+The eight files with no same-name production ledger entry were compared with the complete production ledger, their GitHub path history, and relevant live catalog objects. Results are recorded in `supabase/recovery/baseline/UNMATCHED_REPOSITORY_MIGRATIONS_REVIEW.md`:
+
+- Two files are byte-for-byte matches under alternate production ledger names/versions.
+- Two files match after SQL comment/formatting normalization.
+- One role-assignment file combines changes that production records as several separate migrations; its function is not the final live implementation.
+- Two files have effects present in production but no corresponding DDL in the inspected ledger: the legacy global `payment_methods` table/policies and `events.platform_fee_percent` column/constraint. Exact file provenance remains unresolved.
+- One advertiser-statistics file is superseded by a later recorded private-function implementation; the live public wrapper's creation is not represented in the inspected ledger.
+
+No production writes, migration replay, file rename/deletion, main-branch change, or Vercel deployment occurred. Keep all eight files unchanged until any future forward-only cleanup is separately reviewed and approved.
