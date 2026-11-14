@@ -33,11 +33,13 @@ Keep all generated artifacts quarantined under `supabase/recovery/baseline/`:
 - `20-tables-draft.sql.md` — all 16 public tables / 158 columns.
 - `30-constraints-indexes-draft.sql.md` — 81 constraints and 33 standalone index definitions.
 - `40-rls-policies-draft.sql.md` — RLS enabled on 16 public tables and 29 policy definitions.
-- `50-triggers-draft.sql.md` — 12 distinct trigger definitions.
+- `50-triggers-draft.sql.md` — 12 distinct trigger definitions across eight target tables.
+- `60-privileges-draft.sql.md` — grouped app-table grants, three explicit column-only UPDATE grants, and exact routine EXECUTE ACL reconstruction; no hosted default privileges or managed role memberships.
 - `SECURITY_REVIEW.md` — routine ownership, security mode, search_path and EXECUTE ACL review.
 - `ACCESS_CONTROL_STORAGE_CRON.md` — exact Storage bucket/policy inventory, cron job definitions, schema/object grants, and default-privilege findings.
 - `RLS_EFFECTIVE_ACCESS_REVIEW.md` — effective row-level access matrix, public payment-account data boundary, broad SQL grant/RLS interaction, and static review of key SECURITY DEFINER routines.
 - `DEPENDENCY_ORDER_REVIEW.md` — table/FK/function/policy/trigger ordering, observed extension prerequisites, and exact per-signature routine EXECUTE ACL inventory.
+- `ROUTINE_DEPENDENCY_AUDIT.md` — source-level dependency graph and managed-service references for all 32 routines.
 - `CONSTRAINTS_INDEXES_REVIEW.md` — reconciled constraint/index counts, FK index coverage, duplicate unique index, and event-role uniqueness semantics.
 - Storage and scheduled jobs remain separate deployment steps and must not be silently omitted from a future full bootstrap.
 
@@ -61,11 +63,11 @@ All SQL is embedded in Markdown with a `.sql.md` suffix deliberately; these are 
 
 - Review every column's exact type, default, collation, identity/generated status, and nullability against `columns.json`.
 - Routine definitions are now drafted. The read-only review found all 32 owned by `postgres`, all with empty `search_path`, and mixed SECURITY DEFINER / INVOKER execution; per-routine EXECUTE ACLs must be reconstructed exactly and reviewed before executable SQL is produced.
-- Reconcile the complete grant/default-privilege model with Supabase-managed roles; do not copy managed role memberships into a generic bootstrap.
+- Object-level ACL reconstruction is drafted in `baseline/60-privileges-draft.sql.md`: 38 table-grant statements, two column-only UPDATE statements (three columns), and per-signature routine EXECUTE statements. Schema/default ACL and hosted-managed role prerequisites still require target-environment reconciliation; do not copy managed role memberships or hosted default privileges.
 - Dependency review is documented in `baseline/DEPENDENCY_ORDER_REVIEW.md`: all 16 tables are staged before the 32 foreign keys; observed column defaults do not call application routines; routine ACLs are inventoried by exact signature; policies and triggers are sequenced after their dependencies.
 - The same dependency report records installed extension evidence (`pg_cron`, `pg_net`, `pgcrypto`, `pg_stat_statements`, `plpgsql`, `supabase_vault`, `uuid-ossp`). This is not permission or instruction to recreate/install every extension in a generic environment.
 - Storage review is now documented in `baseline/ACCESS_CONTROL_STORAGE_CRON.md`: 2 buckets, 6 object policies, and 2 active cron jobs. Preserve the private receipt bucket, public cover reads, user/booking path checks, and the exact cron schedules/functions.
-- Grant review is documented alongside Storage: public/private schema ACLs, per-object table/routine grants, three column-level UPDATE grant groups, and default privileges for postgres/supabase_admin. Do not copy the broad hosted-project default ACLs as generic defaults. Reconstruct only verified object-specific grants.
+- Grant review is documented alongside Storage: public/private schema ACLs, per-object table/routine grants, three explicit column-only UPDATE grants, and default privileges for postgres/supabase_admin. Do not copy the broad hosted-project default ACLs as generic defaults. Reconstruct only verified object-specific grants.
 - Security follow-up: the effective policy map is now documented in `baseline/RLS_EFFECTIVE_ACCESS_REVIEW.md`. All 16 public tables have RLS enabled; anon policies are limited to published event/ticket/payment-account reads. Sensitive application tables have no anon row policy. Broad anon/authenticated SQL grants remain a least-privilege hardening backlog item, but no exploit was demonstrated. Do not assume grants alone prove exposure or that RLS makes every grant harmless.
 - The public `event_payment_accounts` SELECT policy exposes account name, account number, and beneficiary for active accounts on published events. Confirm these are all intended customer-facing payment details before any future schema expansion.
 - The SECURITY DEFINER static review confirmed key booking, payment, role-management, event-save, gatekeeper, and push-subscription RPCs contain explicit identity/role/ownership checks. `get_haddir_push_config()` returns Vault secrets but EXECUTE is restricted to postgres/service_role; keep it server-side. This was source review, not runtime penetration testing.
