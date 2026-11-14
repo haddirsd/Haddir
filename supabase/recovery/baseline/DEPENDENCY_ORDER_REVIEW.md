@@ -93,6 +93,27 @@ Proposed stages after table creation:
 9. Create triggers only after both their target tables and trigger functions exist.
 10. Treat Storage policies/buckets and cron jobs as separate platform configuration stages after their referenced routines and schemas are available.
 
+Static body scan of the 32 captured definitions identified these direct application-routine calls (the PL/pgSQL bodies still require manual review; dynamic SQL and indirect dependencies may not be captured):
+
+| Calling routine | Called routine |
+|---|---|
+| `private.admin_search_profiles` | `private.current_profile_role` |
+| `private.admin_update_profile_role` | `private.current_profile_role` |
+| `private.gatekeeper_manual_ticket_action` | `private.gatekeeper_ticket_action_core` |
+| `private.gatekeeper_ticket_action` | `private.gatekeeper_ticket_action_core` |
+| `private.save_admin_event` | `private.current_profile_role` |
+| `public.admin_search_profiles` | `private.admin_search_profiles` |
+| `public.admin_update_profile_role` | `private.admin_update_profile_role` |
+| `public.gatekeeper_manual_ticket_action` | `private.gatekeeper_manual_ticket_action` |
+| `public.gatekeeper_ticket_action` | `private.gatekeeper_ticket_action` |
+| `public.get_advertiser_event_statistics` | `private.get_advertiser_event_statistics` |
+| `public.get_gatekeeper_scan_history` | `private.get_gatekeeper_scan_history` |
+| `public.get_gatekeeper_scan_stats` | `private.get_gatekeeper_scan_stats` |
+| `public.review_payment_submission` | `private.current_profile_role` |
+| `public.save_admin_event` | `private.save_admin_event` |
+
+`private.current_profile_role()` and `private.current_user_is_owner()` are separate SQL helpers that query `public.profiles`; the captured body of `current_profile_role()` does not call `current_user_is_owner()`. Do not invent a helper-to-helper dependency between them.
+
 Important known routine dependencies from source review:
 - `private.admin_search_profiles` and `private.admin_update_profile_role` call `private.current_profile_role()`.
 - `private.current_profile_role()` and `private.current_user_is_owner()` depend on the application profile/role data model.
