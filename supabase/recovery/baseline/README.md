@@ -42,3 +42,4 @@ No production changes were made during this recovery work.
 
 - `POSTGRESQL_17_SMOKE_TEST.md` — passing disposable PostgreSQL 17 DDL smoke test report, including exact scope and limitations.
 - `../production-ledger-sql/README.md` — provenance and inventory for the 15 SQL payloads recovered from the production migration ledger; archive only, not active migrations.
+- `MIGRATION_VERSION_MISMATCH_REVIEW.md` — complete 21-pair review of production/GitHub migration timestamp differences and SQL-content comparison.
