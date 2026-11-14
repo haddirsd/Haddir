@@ -4,9 +4,9 @@ Contains **32 public/private routine definitions** from the production catalog s
 
 - Definitions are included verbatim from the read-only catalog export.
 - This is not yet ordered by dependency; review SQL-language function dependencies before execution.
-- Function owners, security-definer settings, search paths and exact EXECUTE ACLs still require a dedicated reconciliation pass.
+- Fresh live-production reconciliation on 2026-11-14 confirmed all 32 definitions, owners, SECURITY DEFINER/INVOKER modes, languages, and empty search_path settings. Per-signature EXECUTE ACLs are documented and reconciled in `60-privileges-draft.sql.md` and `DDL_RECONCILIATION_AUDIT.md`.
 - Any Supabase-managed service schemas, roles, Vault secrets, or external credentials remain prerequisites and are not recreated here.
-- Not tested on PostgreSQL; do not apply to production.
+- The definitions passed the isolated PostgreSQL 17 smoke test with platform stubs; this is not a full Supabase integration test. This remains a quarantined draft; do not apply to production.
 
 ```sql
 -- DRAFT ONLY: public/private routine definitions captured from the production catalog.
