@@ -62,7 +62,7 @@ The preserved catalog and drafts were reconciled against live production through
 
 An isolated PostgreSQL 17.12 GitHub Actions service-container test passed the staged baseline DDL and catalog assertions. It uses minimal stubs for Supabase-managed interfaces. It is a genuine PostgreSQL DDL smoke test, but not a full Supabase integration test.
 
-**Final rerun result: PASS.** GitHub Actions run 43641771671 completed successfully on commit ce2efd4d85c026ad9bef11e6c625996a1e1124ae. The postgres-ddl-smoke-test job and all steps completed successfully. [Open final validation run](https://github.com/haddirsd/Haddir/actions/runs/43641771671). The closure-report update itself is documentation-only; the SQL drafts and test harness were unchanged after this passing run.
+**Final rerun result: PASS.** GitHub Actions run 43641848388 completed successfully on commit 6b12489299134fe20bb49ee933bd7044eabb1ac9. The postgres-ddl-smoke-test job and all steps completed successfully. [Open final validation run](https://github.com/haddirsd/Haddir/actions/runs/43641848388). This test was run against the closure-report commit; the only later change to the report is this final result record, with no SQL draft or test-harness changes.
 
 ## 4. Known findings and remaining uncertainty
 
@@ -89,9 +89,9 @@ An isolated PostgreSQL 17.12 GitHub Actions service-container test passed the st
 ## 6. Final validation record
 
 - Branch: chore/restore-supabase-migration-history
-- Tested branch commit: ce2efd4d85c026ad9bef11e6c625996a1e1124ae
-- Final PostgreSQL 17 Actions run: 43641771671 (success)
-- Closure report update: documentation-only commit after the passing run
+- Tested branch commit: 6b12489299134fe20bb49ee933bd7044eabb1ac9
+- Final PostgreSQL 17 Actions run: 43641848388 (success)
+- Final result-record update: documentation-only; SQL drafts and test harness unchanged
 - Production writes: none
 - Main branch changes: none
 - Vercel deployment: none
