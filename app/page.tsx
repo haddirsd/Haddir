@@ -30,7 +30,6 @@ export default function Home(){
  const [profileSaving,setProfileSaving]=useState(false);
  const [activeWorkspace,setActiveWorkspace]=useState<"customer"|"organizer"|"gatekeeper"|"advertiser"|"admin"|"owner"|null>(null);
  const [isGatekeeperPage,setIsGatekeeperPage]=useState(false);
- const [showWelcome,setShowWelcome]=useState(true),[welcomeFading,setWelcomeFading]=useState(false),[welcomeGreeting,setWelcomeGreeting]=useState("أهلاً بيك في حاضر");
  const { authUser, userRole, assignedEvent, fullName, setFullName, email, phone, setPhone, avatarUrl, profileEditing, setProfileEditing, saved, setSaved, authMessage, setAuthMessage } = useAuth();
  const { myTickets, myNotifications, accountDataLoading, accountDataError, markNotificationRead: markCustomerNotificationReadAction, markAllNotificationsRead: markAllCustomerNotificationsReadAction } = useCustomerAccount(authUser?.id ?? null);
  const [ticketFilter,setTicketFilter]=useState<"new"|"used">("new");
