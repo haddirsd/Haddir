@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { PwaRegistration } from "./PwaRegistration";
 import "./globals.css";
+import "../components/layout/responsive-nav.css";
 
 export const viewport: Viewport = {
   width: "device-width",
