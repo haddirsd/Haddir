@@ -31,7 +31,7 @@ The 15 entries are listed individually in MISSING_MIGRATIONS_REGISTER.md. They a
 
 The seven archived files are source-provenanced GitHub artifacts, but only candidate correspondences to production ledger entries. They are not asserted to be byte-for-byte copies of the exact production-applied SQL. Do not rename, replay, or promote them as original migration history.
 
-The 21 same-name timestamp mismatches were individually reviewed and mapped in `MIGRATION_VERSION_MISMATCH_REVIEW.md`: all 21 SQL payloads are equivalent after ignoring comments and insignificant whitespace; 13 are byte-for-byte identical and eight differ only in comments/formatting. No executable SQL difference was observed in this 21-pair set. No filenames were renamed and no migrations were replayed.
+The 21 same-name timestamp mismatches were individually reviewed and mapped in `MIGRATION_VERSION_MISMATCH_REVIEW.md`: all 21 SQL payloads are equivalent after ignoring comments and insignificant whitespace; 13 are byte-for-byte identical and eight differ only in comments/formatting. No executable SQL difference was observed in this 21-pair set. The separate review of the eight repository files with no same-name production ledger entry is in `UNMATCHED_REPOSITORY_MIGRATIONS_REVIEW.md`: two are exact SQL matches under another ledger name/version, two are normalized matches, one is represented by several separate production entries, and three have mixed or unresolved provenance. No filenames were renamed and no migrations were replayed.
 
 ## 2. What was restored
 
@@ -77,6 +77,7 @@ An isolated PostgreSQL 17.12 GitHub Actions service-container test passed the st
 7. **Legacy ticket display:** the known attendee-count rendering mismatch for older individual-ticket rows and omission from downloaded PNG remain application issues, not migration-recovery fixes.
 8. **Repository config gap:** no active supabase/config.toml was found on the recovery branch; bucket settings are preserved in the recovery draft/evidence.
 9. **Migration identity mismatch:** reminder migration ledger timestamp differs from the GitHub SQL filename timestamp despite the live routine/job being reconciled.
+10. **Eight unmatched repository files:** the separate review distinguishes confirmed alternate-name matches from split/superseded migrations and unledgered effects. In particular, `payment_methods` and `events.platform_fee_percent` exist in production without their DDL being represented in the inspected ledger; the advertiser-statistics candidate is not the current recorded implementation. See `UNMATCHED_REPOSITORY_MIGRATIONS_REVIEW.md`.
 
 ## 5. Closure decision
 
