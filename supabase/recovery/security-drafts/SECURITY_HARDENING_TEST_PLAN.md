@@ -1,6 +1,6 @@
 # Security hardening test plan
 
-Status: test cases specified; **not yet executed**. These require a disposable Supabase/PostgreSQL environment with the Haddir schema and representative fixtures. No production writes or live role simulations were performed.
+Status: catalog assertions are wired into the PostgreSQL 17 GitHub Actions smoke harness; runtime result for the latest commit has not yet been retrieved. Payment-state and gatekeeper workflow cases below require a disposable Supabase environment with representative fixtures and have not been executed. No production writes or live role simulations were performed.
 
 ## A. Payment review — negative cases
 
@@ -24,9 +24,9 @@ Also run NULL/invalid decision against a nonexistent submission ID and verify th
 Using an assigned gatekeeper and a valid ticket fixture:
 
 1. Direct invocation of `private.gatekeeper_ticket_action_core(text,boolean)` as `authenticated` must fail with permission denied.
-2. QR preview through the public QR wrapper succeeds and creates the expected scan-log outcome.
-3. QR confirmation through the public QR wrapper marks a valid ticket used exactly once and writes the scan log.
-4. Manual preview/confirmation through the public manual wrapper preserves its entry_method and audit outcome.
+2. QR preview through the public QR wrapper returns `status=valid`; the current wrapper intentionally does not write a scan-log row for a valid preview (`v_outcome` is NULL for `valid`).
+3. QR confirmation through the public QR wrapper marks a valid ticket used exactly once and writes one `accepted` scan-log row with `entry_method=qr`.
+4. Manual confirmation through the public manual wrapper preserves `entry_method=manual` and writes one `accepted` scan-log row. Manual preview with `p_confirm=false` should return valid without a scan-log row.
 5. A gatekeeper assigned to Event A cannot inspect or confirm Event B's ticket.
 6. A customer, supervisor without gate assignment, and anon cannot use gatekeeper wrappers.
 7. Concurrent confirmation attempts result in exactly one valid-to-used transition and no duplicate check-in notification.
