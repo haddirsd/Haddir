@@ -54,3 +54,14 @@ No user-defined enum/domain/view/sequence/identity/generated-column objects were
 ## Next implementation step
 
 Complete the missing privilege/ownership evidence, then generate a clearly labelled **draft** bootstrap for Haddir-owned `public`/`private` objects with explicit Supabase prerequisites. Keep it separate from the migration ledger and do not execute it until reviewed and tested.
+
+## Privilege and ownership review (read-only)
+
+- All 16 Haddir public tables are owned by `postgres`; RLS is enabled and FORCE RLS is not enabled on these tables.
+- The `private` schema is owned by `postgres`; its ACL grants USAGE to `authenticated` and USAGE/CREATE to `postgres`.
+- The `public` schema is owned by `pg_database_owner`; the current ACL includes USAGE for `anon`, `authenticated`, and `service_role`.
+- Function ACLs were inspected for all 32 application routines. Several private worker/trigger functions are postgres-only, while selected RPC/helper functions grant EXECUTE to `authenticated`; selected public RPCs also grant EXECUTE to `service_role`. `set_updated_at()` currently grants EXECUTE to PUBLIC, so preserve that deliberately rather than applying a blanket function grant.
+- Default privileges exist for both `postgres` and `supabase_admin` in `public` for tables, sequences, and functions. This is deployment-managed privilege state and must be reconciled, not blindly copied into a generic PostgreSQL instance.
+- Role memberships include Supabase-managed roles and service principals. Do not create or alter these memberships in an app bootstrap; the target Supabase environment owns them.
+
+These results close the earlier ACL discovery gap at the evidence level. A structured, exact ACL export and the baseline DDL ordering review are still required before calling the SQL baseline runnable.
