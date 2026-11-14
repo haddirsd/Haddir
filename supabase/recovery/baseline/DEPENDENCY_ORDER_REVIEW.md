@@ -147,7 +147,7 @@ The trigger stage therefore requires the seven target tables and three trigger f
 
 The four `*_set_updated_at` triggers are BEFORE UPDATE and must remain distinct per table. Audit triggers are AFTER row triggers. Preserve the captured trigger definitions rather than regenerating them from the 26 event-expanded information-schema rows.
 
-## 5. Exact routine ACL inventory
+## 6. Exact routine ACL inventory
 
 The following EXECUTE ACLs were read from `pg_proc.proacl` by schema, routine name, and identity arguments. `X` means EXECUTE. `PUBLIC` is represented by the empty grantee before `=X`.
 
@@ -190,7 +190,7 @@ These are observed ACL entries, not an endorsement that every current grant is i
 
 All 32 routines are owned by `postgres` and have an explicitly empty `search_path`. The inventory distinguishes routine signatures to avoid accidentally merging overloaded names.
 
-## 6. Proposed baseline phase order
+## 7. Proposed baseline phase order
 
 | Phase | Objects |
 |---|---|
@@ -208,7 +208,7 @@ All 32 routines are owned by `postgres` and have an explicitly empty `search_pat
 
 The ordering of grants is deliberately late in the proposed sequence, but function EXECUTE ACLs must be applied as part of the routine security stage and checked before policies or application tests rely on them. Do not copy broad project default privileges.
 
-## 7. Open validation gates
+## 8. Open validation gates
 
 - Inspect all 32 routine definitions for cross-routine calls and managed extension references, including SQL wrappers, trigger functions, cron workers, Vault, and `net`.
 - Verify whether every required extension is already provisioned by the target Supabase project; do not assume extension installation rights in generic PostgreSQL.
