@@ -83,4 +83,4 @@ The draft set has since been expanded and structurally reconciled against the pr
 
 The current artifact inventory is indexed in baseline/README.md. All SQL remains quarantined in Markdown drafts; no file has been moved into supabase/migrations.
 
-**Still untested:** the full staged baseline has not been executed in a real PostgreSQL/Supabase-compatible runtime. No production changes, paid branches, Vercel deployments, or changes to main occurred.
+**Validation status:** the full staged DDL has now passed an isolated PostgreSQL 17.12 smoke test with minimal Supabase-platform stubs. This is not a full Supabase integration test; Auth, Storage API, Vault, pg_cron/pg_net extensions, Edge Functions, and application workflows remain untested. See `baseline/POSTGRESQL_17_SMOKE_TEST.md`. No production changes, paid branches, Vercel deployments, or changes to main occurred.
