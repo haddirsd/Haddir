@@ -133,5 +133,54 @@ SELECT 'PASS: all baseline DDL stages created and catalog assertions matched.' A
     run_file("95-security-catalog-assertions", (SECURITY / "security_hardening_catalog_assertions.sql").read_text(encoding="utf-8"), temp)
     run_file("96-security-behavior-assertions", (SECURITY / "security_hardening_behavior_assertions.sql").read_text(encoding="utf-8"), temp)
 
-print("\nPASS: PostgreSQL 17 DDL smoke test completed using disposable platform stubs.")
+    # Two independent PostgreSQL sessions contend on the same valid ticket.
+    import time
+    concurrent_a = """BEGIN;
+SELECT id FROM public.tickets WHERE ticket_code='3333333333' FOR UPDATE;
+\\echo LOCK_HELD
+SET LOCAL ROLE authenticated;
+SELECT set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000003',true);
+SELECT public.gatekeeper_ticket_action('3333333333',true);
+SELECT pg_sleep(2);
+COMMIT;
+"""
+    concurrent_b = """SET ROLE authenticated;
+SELECT set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000003',false);
+SELECT public.gatekeeper_ticket_action('3333333333',true);
+"""
+    print("\n=== PostgreSQL concurrency stage: two independent gatekeeper sessions ===", flush=True)
+    first = subprocess.Popen(["psql", "-X", "-v", "ON_ERROR_STOP=1", "-Atq"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    first.stdin.write(concurrent_a)
+    first.stdin.close()
+    first.stdin = None
+    ready = False
+    deadline = time.monotonic() + 15
+    while time.monotonic() < deadline:
+        line = first.stdout.readline()
+        if not line:
+            break
+        if "LOCK_HELD" in line:
+            ready = True
+            break
+    if not ready:
+        first.kill()
+        raise RuntimeError("Concurrency session A did not acquire its ticket row lock")
+    second = subprocess.run(["psql", "-X", "-v", "ON_ERROR_STOP=1", "-Atq"], input=concurrent_b, text=True, capture_output=True, check=True)
+    first_stdout, first_stderr = first.communicate(timeout=20)
+    if first.returncode != 0:
+        raise RuntimeError(f"Concurrency session A failed: {first_stderr} {first_stdout}")
+    concurrency_assertions = r"""
+DO $assert$
+BEGIN
+  IF (SELECT status FROM public.tickets WHERE ticket_code='3333333333') <> 'used'
+    OR (SELECT count(*) FROM public.gatekeeper_scan_logs WHERE entered_code='3333333333' AND outcome='accepted' AND entry_method='qr') <> 1
+    OR (SELECT count(*) FROM public.gatekeeper_scan_logs WHERE entered_code='3333333333' AND outcome='used' AND entry_method='qr') <> 1
+    OR (SELECT count(*) FROM public.notifications WHERE booking_id='30000000-0000-4000-8000-000000000004' AND type='ticket_checked_in') <> 1
+  THEN RAISE EXCEPTION 'CONCURRENCY TEST FAILED: check-in was not exactly once'; END IF;
+END $;
+SELECT 'PASS: two-session concurrent check-in is exactly once.' AS result;
+"""
+    run_file("97-security-concurrency-assertions", concurrency_assertions, temp)
+
+print("\nPASS: PostgreSQL 17 DDL, payment/gatekeeper workflows and two-session concurrency tests completed using disposable platform stubs.")
 print("This is not a Supabase platform integration test and does not execute application workflows.")
