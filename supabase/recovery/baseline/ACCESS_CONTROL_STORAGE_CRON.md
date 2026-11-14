@@ -46,7 +46,7 @@ A read-only ACL inventory was taken for public/private application objects, sche
 - `private` schema grants USAGE to authenticated and USAGE/CREATE to postgres. Authenticated has no CREATE grant.
 - Private routine EXECUTE ACLs are selective: internal worker/trigger routines are postgres-only; selected application RPC/helper routines also grant authenticated.
 - Public routine EXECUTE ACLs vary by routine. `set_updated_at()` is the notable exception with EXECUTE granted to PUBLIC (and consequently available to anon/authenticated); do not generalize this to other routines.
-- Column-level UPDATE grants exist on two `profiles` columns and one `notifications` column; retain exact column names/ACLs from the catalog evidence when producing executable DDL.
+- Column-level UPDATE grants are limited to `profiles.full_name`, `profiles.phone`, and `notifications.is_read`, each granted to `authenticated` without grant option.
 - Default privileges are configured for both `postgres` and `supabase_admin` in `public`. They grant broad table privileges to anon/authenticated/service_role, sequence SELECT/UPDATE/USAGE, and function EXECUTE. These are Supabase/project-specific defaults, not safe generic bootstrap defaults.
 
 Important review gate:
