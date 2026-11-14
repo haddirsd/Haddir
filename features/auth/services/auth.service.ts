@@ -18,17 +18,17 @@ export async function signOutUser(): Promise<string | null> {
   return error ? "تعذر تسجيل الخروج حالياً. حاول مرة أخرى." : null;
 }
 
-export async function updateCustomerPhone(userId: string, phone: string): Promise<{ phone: string | null; error: string | null }> {
+export async function updateCustomerProfile(userId: string, fullName: string, phone: string): Promise<{ fullName: string | null; phone: string | null; error: string | null }> {
   const supabase = getSupabaseBrowserClient();
-  if (!supabase) return { phone: null, error: "تعذر الاتصال بقاعدة البيانات حالياً." };
+  if (!supabase) return { fullName: null, phone: null, error: "تعذر الاتصال بقاعدة البيانات حالياً." };
 
   const { data, error } = await supabase
     .from("profiles")
-    .update({ phone })
+    .update({ full_name: fullName.trim(), phone })
     .eq("id", userId)
-    .select("phone")
+    .select("full_name,phone")
     .single();
 
-  if (error) return { phone: null, error: "ما قدرنا نحفظ رقمك. تأكد من الاتصال وحاول مرة تانية." };
-  return { phone: data?.phone ?? phone, error: null };
+  if (error) return { fullName: null, phone: null, error: "ما قدرنا نحفظ بياناتك. تأكد من الاتصال وحاول مرة تانية." };
+  return { fullName: data?.full_name ?? fullName.trim(), phone: data?.phone ?? phone, error: null };
 }
