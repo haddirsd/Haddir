@@ -1,0 +1,258 @@
+[
+  {
+    "name": "initial_haddir_ticketing_schema",
+    "version": "20261102190001"
+  },
+  {
+    "name": "harden_functions_and_foreign_key_indexes",
+    "version": "20261102190017"
+  },
+  {
+    "name": "owner_roles_and_google_auth_profile",
+    "version": "20261102191712"
+  },
+  {
+    "name": "fix_owner_profile_policy",
+    "version": "20261102191722"
+  },
+  {
+    "name": "secure_owner_profile_policy",
+    "version": "20261102191743"
+  },
+  {
+    "name": "allow_users_to_update_basic_profile_fields",
+    "version": "20261102230757"
+  },
+  {
+    "name": "revoke_anonymous_profile_updates",
+    "version": "20261102230828"
+  },
+  {
+    "name": "enable_platform_admin_supervisor_rls",
+    "version": "20261103095158"
+  },
+  {
+    "name": "add_event_trending_flag",
+    "version": "20261103105550"
+  },
+  {
+    "name": "event_cover_storage",
+    "version": "20261103110219"
+  },
+  {
+    "name": "add_event_location_url",
+    "version": "20261103112135"
+  },
+  {
+    "name": "add_atomic_booking_creation",
+    "version": "20261103182323"
+  },
+  {
+    "name": "event_payment_accounts",
+    "version": "20261103185150"
+  },
+  {
+    "name": "enable_live_admin_booking_updates",
+    "version": "20261103185928"
+  },
+  {
+    "name": "add_event_payment_account_beneficiary",
+    "version": "20261103201140"
+  },
+  {
+    "name": "event_scoped_payment_accounts_only",
+    "version": "20261103204518"
+  },
+  {
+    "name": "admin_manage_profile_roles",
+    "version": "20261103210704"
+  },
+  {
+    "name": "event_role_assignments_and_scoped_roles",
+    "version": "20261105070931"
+  },
+  {
+    "name": "normalize_legacy_organizer_roles",
+    "version": "20261105071031"
+  },
+  {
+    "name": "allow_admin_role_assignment",
+    "version": "20261105071047"
+  },
+  {
+    "name": "limit_role_assignment_to_active_event_states",
+    "version": "20261105071103"
+  },
+  {
+    "name": "drop_legacy_admin_update_profile_role_overload",
+    "version": "20261105073706"
+  },
+  {
+    "name": "admin_activity_audit_log",
+    "version": "20261105092343"
+  },
+  {
+    "name": "audit_only_staff_actions",
+    "version": "20261105092430"
+  },
+  {
+    "name": "audit_event_state_actions",
+    "version": "20261105092635"
+  },
+  {
+    "name": "audit_deleted_entity_references",
+    "version": "20261105092729"
+  },
+  {
+    "name": "activity_log_realtime_and_booking_index",
+    "version": "20261105092823"
+  },
+  {
+    "name": "gatekeeper_ticket_scanner",
+    "version": "20261105111105"
+  },
+  {
+    "name": "gatekeeper_checkin_details_and_status",
+    "version": "20261105113301"
+  },
+  {
+    "name": "admin_user_search_by_email_or_phone",
+    "version": "20261105121640"
+  },
+  {
+    "name": "fix_admin_search_profiles_return_types",
+    "version": "20261105122245"
+  },
+  {
+    "name": "booking_email_outbox",
+    "version": "20261105130414"
+  },
+  {
+    "name": "event_reminder_notifications",
+    "version": "20261105131539"
+  },
+  {
+    "name": "one_ticket_per_booking_item",
+    "version": "20261105133225"
+  },
+  {
+    "name": "deduplicate_booking_item_tickets",
+    "version": "20261105134355"
+  },
+  {
+    "name": "persist_gatekeeper_scan_history_and_page_state",
+    "version": "20261105142405"
+  },
+  {
+    "name": "gatekeeper_manual_numeric_entry_history",
+    "version": "20261105161023"
+  },
+  {
+    "name": "enable_scoped_realtime_for_events_and_gatekeepers",
+    "version": "20261105183650"
+  },
+  {
+    "name": "gatekeeper_event_wide_scan_history",
+    "version": "20261105211436"
+  },
+  {
+    "name": "grant_gatekeeper_scan_log_realtime_select",
+    "version": "20261105211503"
+  },
+  {
+    "name": "harden_gatekeeper_scan_history_and_indexes",
+    "version": "20261105211629"
+  },
+  {
+    "name": "expire_pending_bookings_and_serialize_inventory",
+    "version": "20261107100841"
+  },
+  {
+    "name": "route_booking_expiry_through_notification_cleanup",
+    "version": "20261107101047"
+  },
+  {
+    "name": "index_booking_expiry_and_customer_notifications",
+    "version": "20261107101130"
+  },
+  {
+    "name": "allow_booking_expiry_and_event_reminder_notification_types",
+    "version": "20261107101310"
+  },
+  {
+    "name": "harden_event_role_assignments_and_admin_promotion",
+    "version": "20261108113036"
+  },
+  {
+    "name": "correct_advertiser_inventory_metrics",
+    "version": "20261108121617"
+  },
+  {
+    "name": "restrict_direct_payment_submission_mutations",
+    "version": "20261108122947"
+  },
+  {
+    "name": "issue_one_ticket_per_attendee_on_payment_approval",
+    "version": "20261108124015"
+  },
+  {
+    "name": "restore_booking_item_ticket_issue_semantics",
+    "version": "20261108124142"
+  },
+  {
+    "name": "harden_customer_notifications_and_deduplicate_terminal_events",
+    "version": "20261108143655"
+  },
+  {
+    "name": "limit_supervisor_workspace_and_pause_email_queue",
+    "version": "20261108144509"
+  },
+  {
+    "name": "restrict_direct_ticket_table_access",
+    "version": "20261108145718"
+  },
+  {
+    "name": "restrict_profile_table_mutations",
+    "version": "20261108152610"
+  },
+  {
+    "name": "notify_customer_on_ticket_checkin",
+    "version": "20261109110623"
+  },
+  {
+    "name": "allow_ticket_checked_in_notifications",
+    "version": "20261109132608"
+  },
+  {
+    "name": "support_continuous_events_and_unlimited_ticket_inventory",
+    "version": "20261109145434"
+  },
+  {
+    "name": "atomic_admin_event_save",
+    "version": "20261109152150"
+  },
+  {
+    "name": "fix_atomic_admin_event_save_order",
+    "version": "20261109152243"
+  },
+  {
+    "name": "restrict_atomic_event_save_function_access",
+    "version": "20261109152338"
+  },
+  {
+    "name": "haddir_admin_user_role_filter",
+    "version": "20261110123134"
+  },
+  {
+    "name": "web_push_notifications",
+    "version": "20261112005412"
+  },
+  {
+    "name": "install_pg_net_in_extensions_schema",
+    "version": "20261112010224"
+  },
+  {
+    "name": "sync_haddir_push_subscription",
+    "version": "20261114101634"
+  }
+]
