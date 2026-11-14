@@ -6,7 +6,6 @@ import AdminEventCards from "./AdminEventCards";
 import AdminEventAccountsEditor from "./AdminEventAccountsEditor";
 import AdminEventTicketsEditor from "./AdminEventTicketsEditor";
 import { HaddirDialog } from "../../../components/ui/HaddirDialog";
-import { HaddirSelect } from "../../../components/ui/HaddirSelect";
 import { deleteOrCancelAdminEvent, getAdminEventEditorData, publishDraftAdminEvent, saveAdminEvent } from "./admin-events.service";
 import { useAdminEvents } from "./useAdminEvents";
 import type { AdminEventAccountForm, AdminEventFormValues, AdminEventRole, AdminEventRow, AdminTicketForm } from "./admin-events.types";
