@@ -31,7 +31,7 @@ END
 $fixtures$;
 
 -- Invalid decisions must fail before payment lookup, even when the submission ID is absent.
-SELECT set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000001',true);
+SELECT set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000001',false);
 SET ROLE authenticated;
 DO $payment_validation$
 DECLARE
