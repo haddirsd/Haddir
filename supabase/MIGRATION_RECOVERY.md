@@ -70,7 +70,7 @@ The initial schema and the earlier 2026-11-02 migrations are therefore not recov
 
 Read-only catalog inspection confirmed the live project currently has the core ticketing tables, role-assignment and audit tables, payment-account/submission tables, notification/outbox tables, gatekeeper scan history, and push subscriptions. The project also has functions in `public` and `private` schemas supporting booking, payment review, event save, role management, gatekeeper validation, reminders, expiry, email enqueueing, and web push.
 
-This inventory is not a complete schema dump. Before writing a bootstrap baseline, capture exact table DDL, indexes, constraints, policies, triggers, functions, grants, storage bucket/policies, extensions, and scheduled jobs.
+This inventory was the starting point for recovery. A structured read-only catalog snapshot has since been captured for columns, constraints, indexes, RLS policies, triggers, routines, grants, extensions, Storage, and scheduled jobs. The snapshot is evidence, not executable SQL.
 
 ## Production catalog snapshot captured
 
@@ -82,15 +82,15 @@ A read-only, structured catalog snapshot is now preserved under `supabase/recove
 - `functions-and-grants.json`: public/private function definitions, extensions, table grants, and column grants.
 - `storage-rls-cron.json`: RLS enablement flags, Storage buckets and policies, and scheduled cron jobs.
 
-This is a read-only catalog evidence snapshot, **not yet a runnable bootstrap SQL baseline**. Managed Supabase internals are not being recreated. The snapshot must still be reviewed for completeness and converted into ordered DDL only after object dependencies and ownership/privileges are reconciled.
+This is a read-only catalog evidence snapshot, **not yet a runnable bootstrap SQL baseline**. Managed Supabase internals are not being recreated. The snapshot has been count-checked against production: 16 tables, 158 columns, 81 constraints, 57 indexes, 29 policies, 32 routines, and 12 distinct trigger objects (26 event-expanded trigger rows). Ownership and privilege review has also been performed. The remaining work is detailed definition/dependency review and conversion into ordered DDL.
 
 ## Safety and next steps
 
 1. Keep production untouched. Never replay reconstructed migrations against production.
 2. Compare the seven archived candidate scripts with the live production object definitions and confirm their ledger mappings; do not replay them.
 3. Preserve the 21 timestamp mismatches as an explicit reconciliation list; do not rename files blindly.
-4. Review the captured catalog snapshot for completeness and convert it into a separately labelled bootstrap baseline; the JSON evidence files themselves are not migrations.
+4. Follow `supabase/recovery/BASELINE_BUILD_PLAN.md` to review the snapshot and build a separately labelled baseline; the JSON evidence files themselves are not migrations.
 5. Recover the remaining 15 early SQL migrations only from an external backup/artifact or a verified reconstruction clearly labelled as a baseline, never as original historical SQL.
-6. Validate the baseline on a free local PostgreSQL environment before proposing any changes to `main`.
+6. Obtain a real free PostgreSQL-compatible validation runtime and test the generated baseline before proposing any changes to `main`. The current environment has no local PostgreSQL runtime, so no SQL execution test has been claimed.
 
 Local tooling check in the current work environment found Git and Node.js, but no `psql`, `postgres`, Docker, or Supabase CLI. No local database test has been claimed or run.
