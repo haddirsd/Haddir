@@ -8,6 +8,7 @@ import tomllib
 ROOT = Path(__file__).resolve().parents[3]
 BASE = ROOT / "supabase/recovery/baseline"
 HARNESS = ROOT / "supabase/recovery/test-harness"
+SECURITY = ROOT / "supabase/recovery/security-drafts"
 
 def blocks(path: Path, language: str):
     text = path.read_text(encoding="utf-8")
@@ -46,6 +47,7 @@ assert len(storage_sql) == 2, f"Expected two SQL blocks in Storage/Cron draft, f
 stages.extend([
     ("70-storage-policies", storage_sql[0]),
     ("80-cron-jobs", storage_sql[1]),
+    ("85-security-hardening", blocks(SECURITY / "SECURITY_HARDENING_DRAFT.sql.md", "sql")[0]),
 ])
 
 for label, content in stages:
@@ -113,13 +115,22 @@ BEGIN
     THEN RAISE EXCEPTION 'authenticated must not execute get_haddir_push_config'; END IF;
   IF NOT has_function_privilege('service_role', 'public.get_haddir_push_config()', 'EXECUTE')
     THEN RAISE EXCEPTION 'service_role must execute get_haddir_push_config'; END IF;
-  IF NOT has_function_privilege('authenticated', 'private.gatekeeper_ticket_action_core(text,boolean)', 'EXECUTE')
-    THEN RAISE EXCEPTION 'faithful draft no longer reflects the observed gatekeeper-core grant'; END IF;
+  IF has_function_privilege('authenticated', 'private.gatekeeper_ticket_action_core(text,boolean)', 'EXECUTE')
+    THEN RAISE EXCEPTION 'authenticated must not execute the private gatekeeper core'; END IF;
+  IF NOT has_function_privilege('authenticated', 'public.gatekeeper_ticket_action(text,boolean)', 'EXECUTE')
+    THEN RAISE EXCEPTION 'authenticated must retain the public QR wrapper'; END IF;
+  IF NOT has_function_privilege('authenticated', 'public.gatekeeper_manual_ticket_action(text,boolean)', 'EXECUTE')
+    THEN RAISE EXCEPTION 'authenticated must retain the public manual wrapper'; END IF;
+  IF has_function_privilege('authenticated', 'public.set_updated_at()', 'EXECUTE')
+     OR has_function_privilege('anon', 'public.set_updated_at()', 'EXECUTE')
+     OR has_function_privilege('service_role', 'public.set_updated_at()', 'EXECUTE')
+    THEN RAISE EXCEPTION 'set_updated_at must not be executable by API roles'; END IF;
 END $$;
 
 SELECT 'PASS: all baseline DDL stages created and catalog assertions matched.' AS result;
 """
     run_file("90-assertions", assertions, temp)
+    run_file("95-security-catalog-assertions", (SECURITY / "security_hardening_catalog_assertions.sql").read_text(encoding="utf-8"), temp)
 
 print("\nPASS: PostgreSQL 17 DDL smoke test completed using disposable platform stubs.")
 print("This is not a Supabase platform integration test and does not execute application workflows.")
