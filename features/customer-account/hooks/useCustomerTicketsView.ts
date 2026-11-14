@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { formatEventDate } from "../../events/events.formatters";
 import { downloadTicketAsImage } from "../utils/ticket-image";
+import type { CustomerTicket } from "../types";
 
 type TicketFilter = "new" | "used";
 
@@ -23,7 +24,7 @@ export function useCustomerTicketsView(
     );
   };
 
-  const downloadTicket = async (ticket: unknown) => {
+  const downloadTicket = async (ticket: CustomerTicket) => {
     try {
       await downloadTicketAsImage(ticket, formatEventDate);
     } catch (error) {
