@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+
 import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "../../../lib/supabase";
 import AdminEventsWorkspace from "../../events/admin/AdminEventsWorkspace";
@@ -12,23 +12,27 @@ import AdminReportsWorkspace from "../reports/AdminReportsWorkspace";
 import AdminOverviewWorkspace from "../overview/AdminOverviewWorkspace";
 import { Activity, BadgeCheck, Banknote, CalendarDays, ClipboardCheck, LayoutDashboard, LogOut, Shield, Ticket, Users } from "lucide-react";
 import { HaddirDialog } from "../../../components/ui/HaddirDialog";
-import { ADMIN_ROLE_LABELS, ADMIN_SECTION_LABELS, getAdminNavigationSections, type AdminSection } from "../types";
+import { ADMIN_ROLE_LABELS, ADMIN_SECTION_LABELS } from "../types";
 import { useAdminAccess } from "../hooks/useAdminAccess";
 import { useAdminTheme } from "../hooks/useAdminTheme";
+import { useAdminWorkspaceNavigation } from "../hooks/useAdminWorkspaceNavigation";
 
 
 export default function AdminPage() {
   const router = useRouter();
   const { role, name, avatarUrl, loading, error } = useAdminAccess();
-  const [section, setAdminSection] = useState<AdminSection>("overview");
-  const [userSearchTerm,setUserSearchTerm]=useState("");
   const darkMode = useAdminTheme();
-  const [showLogoutConfirm,setShowLogoutConfirm]=useState(false);
-
-  const nav = useMemo(() => role ? getAdminNavigationSections(role) : [], [role]);
-
-  const signOut = () => setShowLogoutConfirm(true);
-  const confirmSignOut = async () => { setShowLogoutConfirm(false); const supabase = getSupabaseBrowserClient(); if (supabase) await supabase.auth.signOut(); router.replace("/"); };
+  const {
+    section,
+    setAdminSection,
+    userSearchTerm,
+    setUserSearchTerm,
+    nav,
+    showLogoutConfirm,
+    requestSignOut,
+    cancelSignOut,
+    confirmSignOut,
+  } = useAdminWorkspaceNavigation(role);
 
   if (loading) return <main className={"admin-loading"+(darkMode?" theme-dark":"")} dir="rtl"><div className="admin-spinner"/><p>جاري التحقق من صلاحياتك...</p></main>;
   if (!role) return <main className={"admin-denied"+(darkMode?" theme-dark":"")} dir="rtl"><Shield size={34}/><h1>الوصول غير متاح</h1><p>{error || "هذه الصفحة مخصصة لفريق إدارة حاضر."}</p><button onClick={() => router.replace("/")}>العودة للرئيسية</button></main>;
@@ -40,7 +44,7 @@ export default function AdminPage() {
       <button className="admin-brand" onClick={() => router.push("/")}><img src={darkMode?"/dark.svg":"/light.svg"} alt="حاضر"/><small>الإدارة</small></button>
       <div className="admin-side-caption">مساحة العمل</div>
       <nav aria-label="تبويبات لوحة الإدارة">{nav.map(item=><button key={item} className={section===item?"active":""} onClick={()=>setAdminSection(item)}><span>{item==="overview"?<LayoutDashboard/>:item==="events"?<CalendarDays/>:item==="bookings"?<Ticket/>:item==="payments"?<Banknote/>:item==="users"?<Users/>:<Activity/>}</span>{ADMIN_SECTION_LABELS[item]}</button>)}</nav>
-      <div className="admin-side-bottom"><div className="admin-mini-profile"><span className="admin-mini-avatar">{avatarUrl?<img src={avatarUrl} alt="صورة الحساب"/>:role==="owner"?<Shield/>:role==="admin"?<BadgeCheck/>:<ClipboardCheck/>}</span><div><b>{name}</b><small>{roleLabel}</small></div></div><button className="admin-logout" onClick={signOut}><LogOut size={17}/> تسجيل الخروج</button></div>
+      <div className="admin-side-bottom"><div className="admin-mini-profile"><span className="admin-mini-avatar">{avatarUrl?<img src={avatarUrl} alt="صورة الحساب"/>:role==="owner"?<Shield/>:role==="admin"?<BadgeCheck/>:<ClipboardCheck/>}</span><div><b>{name}</b><small>{roleLabel}</small></div></div><button className="admin-logout" onClick={requestSignOut}><LogOut size={17}/> تسجيل الخروج</button></div>
     </aside>
     <section className="admin-main">
       <header className="admin-topbar"><div><span>حاضر / لوحة الإدارة</span><h1>{ADMIN_SECTION_LABELS[section]}</h1></div><div className="admin-top-user"><span>{roleLabel}</span><span className="admin-avatar">{avatarUrl?<img src={avatarUrl} alt="صورة حساب Google"/>:name.slice(0,1)}</span></div></header>
@@ -54,6 +58,6 @@ export default function AdminPage() {
         <footer className="admin-footer">حاضر · نظام إدارة الفعاليات والتذاكر <span>{roleLabel}</span></footer>
       </div>
     </section>
-    {showLogoutConfirm&&<HaddirDialog open title="تسجيل الخروج من لوحة التحكم؟" description="هل تريد إنهاء جلسة فريق الإدارة والعودة إلى واجهة حاضر؟" confirmLabel="تسجيل الخروج" onConfirm={confirmSignOut} onCancel={()=>setShowLogoutConfirm(false)}/>}
+    {showLogoutConfirm&&<HaddirDialog open title="تسجيل الخروج من لوحة التحكم؟" description="هل تريد إنهاء جلسة فريق الإدارة والعودة إلى واجهة حاضر؟" confirmLabel="تسجيل الخروج" onConfirm={confirmSignOut} onCancel={cancelSignOut}/>}
   </main>;
 }
