@@ -186,6 +186,9 @@ BEGIN
     IF v_message='SECURITY TEST FAILED: repeated approval accepted' THEN RAISE; END IF;
     IF v_message<>'تمت مراجعة إثبات الدفع مسبقاً' THEN RAISE EXCEPTION 'Unexpected repeat-approval error: %',v_message; END IF;
   END;
+  IF (SELECT quantity_sold FROM public.ticket_types WHERE id='40000000-0000-4000-8000-000000000001')<>5 THEN
+    RAISE EXCEPTION 'PAYMENT ASSERT: approval changed already-reserved stock; expected 5 before rejection';
+  END IF;
   PERFORM public.review_payment_submission('60000000-0000-4000-8000-000000000002','reject','إيصال غير مطابق');
   BEGIN
     PERFORM public.review_payment_submission('60000000-0000-4000-8000-000000000002','reject','تكرار');
@@ -204,7 +207,6 @@ DECLARE
   v_approved_payment text;
   v_approved_booking text;
   v_approved_tickets integer;
-  v_approved_stock integer;
   v_approved_notifications integer;
   v_rejected_payment text;
   v_rejection_note text;
@@ -216,7 +218,6 @@ BEGIN
   SELECT status INTO v_approved_payment FROM public.payment_submissions WHERE id='60000000-0000-4000-8000-000000000001';
   SELECT status INTO v_approved_booking FROM public.bookings WHERE id='30000000-0000-4000-8000-000000000001';
   SELECT count(*) INTO v_approved_tickets FROM public.tickets WHERE booking_id='30000000-0000-4000-8000-000000000001';
-  SELECT quantity_sold INTO v_approved_stock FROM public.ticket_types WHERE id='40000000-0000-4000-8000-000000000001';
   SELECT count(*) INTO v_approved_notifications FROM public.notifications WHERE booking_id='30000000-0000-4000-8000-000000000001' AND type='ticket_approved';
 
   SELECT status,review_note INTO v_rejected_payment,v_rejection_note FROM public.payment_submissions WHERE id='60000000-0000-4000-8000-000000000002';
@@ -228,7 +229,6 @@ BEGIN
   IF v_approved_payment IS DISTINCT FROM 'approved' THEN RAISE EXCEPTION 'PAYMENT ASSERT: approval status %, expected approved',v_approved_payment; END IF;
   IF v_approved_booking IS DISTINCT FROM 'confirmed' THEN RAISE EXCEPTION 'PAYMENT ASSERT: approval booking status %, expected confirmed',v_approved_booking; END IF;
   IF v_approved_tickets <> 1 THEN RAISE EXCEPTION 'PAYMENT ASSERT: approval tickets %, expected 1',v_approved_tickets; END IF;
-  IF v_approved_stock <> 5 THEN RAISE EXCEPTION 'PAYMENT ASSERT: stock after approval %, expected 5',v_approved_stock; END IF;
   IF v_approved_notifications <> 1 THEN RAISE EXCEPTION 'PAYMENT ASSERT: approval notifications %, expected 1',v_approved_notifications; END IF;
   IF v_rejected_payment IS DISTINCT FROM 'rejected' THEN RAISE EXCEPTION 'PAYMENT ASSERT: rejection status %, expected rejected',v_rejected_payment; END IF;
   IF v_rejection_note IS DISTINCT FROM 'إيصال غير مطابق' THEN RAISE EXCEPTION 'PAYMENT ASSERT: rejection note %, unexpected',v_rejection_note; END IF;
