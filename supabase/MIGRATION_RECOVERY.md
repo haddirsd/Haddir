@@ -54,6 +54,8 @@ GitHub commit history was traced for the migrations path. Seven historical SQL f
 
 The archive includes provenance links and a candidate mapping table. These are **candidate correspondences only**: timestamp/name drift exists, and the SQL has not yet been proven byte-for-byte identical to what production applied. The archive is intentionally outside `supabase/migrations` so Supabase tooling will not treat it as runnable migration history.
 
+Read-only comparison against production confirms the archived admin role-filter and push-subscription function bodies match the live definitions, and the live payment-review function matches the later restored group-ticket semantics. The earlier per-attendee script is intermediate. The role-assignment scripts are not a complete final-state representation: production has an additional unique constraint, a different current policy set, and a more hardened private role-update function. The legacy two-argument public role-update overload is absent; the current public three-argument function delegates to the private implementation.
+
 The remaining **15** missing-by-name entries are from 2026-11-02 and early 2026-11-03; no source SQL for them was found in the inspected GitHub migration-path history.
 
 ## Historical recovery finding
