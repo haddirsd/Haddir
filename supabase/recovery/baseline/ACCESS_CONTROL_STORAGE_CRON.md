@@ -42,12 +42,12 @@ Only command text without credentials was retained. No cron job was changed or e
 A read-only ACL inventory was taken for public/private application objects, schemas, and default privileges.
 
 - All observed application tables and routines are owned by `postgres`.
-- `public` schema grants USAGE to PUBLIC, anon, authenticated, postgres, and service_role; CREATE is held by `pg_database_owner` and postgres.
+- The direct `public` schema ACL grants USAGE to `PUBLIC`, `pg_database_owner`, and `postgres`; CREATE is held by `pg_database_owner` only. `anon`, `authenticated`, and `service_role` inherit USAGE through PUBLIC rather than receiving separate direct schema ACL entries.
 - `private` schema grants USAGE to authenticated and USAGE/CREATE to postgres. Authenticated has no CREATE grant.
 - Private routine EXECUTE ACLs are selective: internal worker/trigger routines are postgres-only; selected application RPC/helper routines also grant authenticated.
 - Public routine EXECUTE ACLs vary by routine. `set_updated_at()` is the notable exception with EXECUTE granted to PUBLIC (and consequently available to anon/authenticated); do not generalize this to other routines.
 - Column-level UPDATE grants are limited to `profiles.full_name`, `profiles.phone`, and `notifications.is_read`, each granted to `authenticated` without grant option.
-- Default privileges are configured for both `postgres` and `supabase_admin` in `public`. They grant broad table privileges to anon/authenticated/service_role, sequence SELECT/UPDATE/USAGE, and function EXECUTE. These are Supabase/project-specific defaults, not safe generic bootstrap defaults.
+- Default privileges are configured for both `postgres` and `supabase_admin` in `public`. They grant broad table privileges (including PostgreSQL 17's `MAINTAIN` privilege) to anon/authenticated/service_role, sequence SELECT/UPDATE/USAGE, and function EXECUTE. These are Supabase/project-specific defaults, not safe generic bootstrap defaults.
 
 Important review gate:
 - The current catalog includes broad table-level SQL privileges for anon/authenticated on some application tables. RLS is enabled on all 16 public application tables, so grants and row policies must be considered together. This observation is not, by itself, proof of an exploitable data leak; each policy and table's effective access path needs a deliberate security review.
