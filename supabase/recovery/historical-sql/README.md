@@ -33,3 +33,15 @@ The other 15 entries from 2026-11-02 and early 2026-11-03 have no SQL source in 
 5. Validate in a free local PostgreSQL environment before considering a merge.
 
 Production has not been modified. These archived files are for forensic recovery only.
+
+## Read-only comparison with production (2026-11-14)
+
+The following final-state checks were made against the live catalog; no DDL was run:
+
+- `private.admin_search_profiles(text, integer, integer, text)` has a body matching the archived role-filter migration.
+- `public.sync_haddir_push_subscription(text, jsonb, text)` has a body matching the archived push-subscription migration.
+- The live `public.review_payment_submission(uuid, text, text)` body matches the later restored group-ticket semantics, not the earlier per-attendee version. The earlier script is therefore historical/intermediate and must not be treated as the final implementation.
+- The legacy two-argument public `admin_update_profile_role(uuid,text)` overload is absent. The public three-argument function is a wrapper around a hardened private implementation.
+- The live `event_role_assignments` table has an additional `UNIQUE(user_id)` constraint, and its current policy set differs from the archived initial migration. The live private role-update function also contains later hardening (owner-only admin promotion and active-event-state checks).
+
+These comparisons confirm useful provenance and final-state relationships, but they also prove that at least the role-assignment archive is not a complete representation of the final production DDL. Keep all archived files non-runnable until a full object-by-object reconciliation is complete.
