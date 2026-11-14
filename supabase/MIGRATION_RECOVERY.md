@@ -46,6 +46,16 @@ The counts above describe different comparison dimensions and should not be adde
 20261114101634_sync_haddir_push_subscription
 ```
 
+## Historical recovery progress
+
+GitHub commit history was traced for the migrations path. Seven historical SQL files corresponding by intent to seven production entries missing by name were recovered verbatim into:
+
+`supabase/recovery/historical-sql/`
+
+The archive includes provenance links and a candidate mapping table. These are **candidate correspondences only**: timestamp/name drift exists, and the SQL has not yet been proven byte-for-byte identical to what production applied. The archive is intentionally outside `supabase/migrations` so Supabase tooling will not treat it as runnable migration history.
+
+The remaining **15** missing-by-name entries are from 2026-11-02 and early 2026-11-03; no source SQL for them was found in the inspected GitHub migration-path history.
+
 ## Historical recovery finding
 
 The earliest commit returned by GitHub's history for `supabase/migrations` is the payment-methods/receipts migration commit on 2026-11-03. At that commit, the directory contains only:
@@ -63,9 +73,9 @@ This inventory is not a complete schema dump. Before writing a bootstrap baselin
 ## Safety and next steps
 
 1. Keep production untouched. Never replay reconstructed migrations against production.
-2. Recover each migration with a reliable source: historical commit diff, archived SQL, or exact catalog definition.
+2. Compare the seven archived candidate scripts with the live production object definitions and confirm their ledger mappings; do not replay them.
 3. Preserve the 21 timestamp mismatches as an explicit reconciliation list; do not rename files blindly.
-4. Create a clearly labelled **bootstrap baseline** from a verified schema snapshot only if historical SQL cannot be recovered. Keep it distinct from the historical migration ledger.
-5. Validate on a free local PostgreSQL environment before proposing any changes to `main`.
+4. Recover the remaining 15 early SQL migrations only from an external backup/artifact or a verified reconstruction clearly labelled as a baseline, never as original historical SQL.
+5. Create a separate bootstrap baseline from a complete verified schema snapshot, then validate it on a free local PostgreSQL environment before proposing any changes to `main`.
 
 Local tooling check in the current work environment found Git and Node.js, but no `psql`, `postgres`, Docker, or Supabase CLI. No local database test has been claimed or run.
