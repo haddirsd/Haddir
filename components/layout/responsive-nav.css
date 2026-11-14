@@ -1,0 +1,20 @@
+/* Responsive navigation for tablet and desktop */
+.desktop-nav{display:none}
+@media (min-width:768px){
+  .desktop-nav{position:sticky;top:0;z-index:49;display:block;width:100%;border-bottom:1px solid var(--line,rgba(91,46,255,.12));background:var(--surface,#fff);box-shadow:0 5px 18px rgba(25,15,75,.035)}
+  .desktop-nav-inner{width:min(1160px,calc(100% - 56px));min-height:66px;margin-inline:auto;display:flex;align-items:center;justify-content:center;gap:clamp(22px,4vw,58px)}
+  .desktop-nav button{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:66px;padding:0 3px;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:var(--muted,#77718f);font-family:inherit;font-size:13px;font-weight:600;white-space:nowrap;transition:color .18s,border-color .18s}
+  .desktop-nav button:hover{color:#5B2EFF}
+  .desktop-nav button.selected{border-bottom-color:#5B2EFF;color:#5B2EFF;font-weight:800}
+  .desktop-nav button svg{width:18px;height:18px;stroke-width:1.8}
+  .desktop-nav button.selected svg{stroke-width:2.3}
+  .desktop-nav .desktop-nav-icon{position:relative;display:inline-flex;align-items:center}
+  .desktop-nav .desktop-nav-badge{position:absolute;top:-7px;right:-9px;min-width:15px;height:15px;padding:0 4px;display:grid;place-items:center;border:1.5px solid var(--surface,#fff);border-radius:99px;background:#F04462;color:#fff;font-size:9px;font-weight:800;line-height:1}
+  .bottom-nav{display:none!important}
+  body{padding-bottom:0!important}
+  .app-shell{padding-bottom:24px!important}
+}
+@media (min-width:768px) and (max-width:950px){
+  .desktop-nav-inner{gap:clamp(17px,3vw,30px)}
+  .desktop-nav button{gap:7px;font-size:12px}
+}
