@@ -22,6 +22,8 @@ For each entry below, the production row had the matching version and name, a re
 | 20261103185928 | enable_live_admin_booking_updates | 112 |
 | 20261103201140 | add_event_payment_account_beneficiary | 84 |
 
+All 15 archived files were fetched back from GitHub and compared character-for-character with a fresh read of the corresponding production ledger value: **15/15 exact matches**.
+
 ## Safety and scope
 
 - Archived under `supabase/recovery/production-ledger-sql/`, not `supabase/migrations/`.
