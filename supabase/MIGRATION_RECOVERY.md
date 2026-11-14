@@ -72,12 +72,25 @@ Read-only catalog inspection confirmed the live project currently has the core t
 
 This inventory is not a complete schema dump. Before writing a bootstrap baseline, capture exact table DDL, indexes, constraints, policies, triggers, functions, grants, storage bucket/policies, extensions, and scheduled jobs.
 
+## Production catalog snapshot captured
+
+A read-only, structured catalog snapshot is now preserved under `supabase/recovery/production-catalog/`:
+
+- `applied-migrations.json`: all 64 production ledger entries.
+- `columns.json`: public/private table columns, types, nullability, and defaults.
+- `structure.json`: constraints, indexes, RLS policies, and non-internal triggers.
+- `functions-and-grants.json`: public/private function definitions, extensions, table grants, and column grants.
+- `storage-rls-cron.json`: RLS enablement flags, Storage buckets and policies, and scheduled cron jobs.
+
+This is a read-only catalog evidence snapshot, **not yet a runnable bootstrap SQL baseline**. Managed Supabase internals are not being recreated. The snapshot must still be reviewed for completeness and converted into ordered DDL only after object dependencies and ownership/privileges are reconciled.
+
 ## Safety and next steps
 
 1. Keep production untouched. Never replay reconstructed migrations against production.
 2. Compare the seven archived candidate scripts with the live production object definitions and confirm their ledger mappings; do not replay them.
 3. Preserve the 21 timestamp mismatches as an explicit reconciliation list; do not rename files blindly.
-4. Recover the remaining 15 early SQL migrations only from an external backup/artifact or a verified reconstruction clearly labelled as a baseline, never as original historical SQL.
-5. Create a separate bootstrap baseline from a complete verified schema snapshot, then validate it on a free local PostgreSQL environment before proposing any changes to `main`.
+4. Review the captured catalog snapshot for completeness and convert it into a separately labelled bootstrap baseline; the JSON evidence files themselves are not migrations.
+5. Recover the remaining 15 early SQL migrations only from an external backup/artifact or a verified reconstruction clearly labelled as a baseline, never as original historical SQL.
+6. Validate the baseline on a free local PostgreSQL environment before proposing any changes to `main`.
 
 Local tooling check in the current work environment found Git and Node.js, but no `psql`, `postgres`, Docker, or Supabase CLI. No local database test has been claimed or run.
