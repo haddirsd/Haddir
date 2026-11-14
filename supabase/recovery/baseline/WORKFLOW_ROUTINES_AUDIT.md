@@ -118,17 +118,19 @@ The routine verifies payment status `submitted` but does not explicitly require 
 Observed rule: one ticket row per booking-item row, while attendee count is the sum of `booking_items.quantity`.
 
 Current production data:
-- 64 tickets issued for 64 confirmed booking-item rows.
-- 175 attendee units represented by those rows.
-- 27 confirmed booking items represent multiple attendees.
+- 55 confirmed booking-item rows represent 137 attendee units.
+- 64 tickets are linked to those 55 confirmed booking-item rows.
+- 52 booking items have exactly one ticket row each (the current group-ticket pattern).
+- 3 older booking items have 3, 4, and 5 ticket rows respectively (12 attendee-level ticket rows across those items).
+- This is a mixed historical issuance population: do not assume every legacy booking item follows the current one-ticket-per-item pattern.
 - No duplicate ticket codes or QR tokens.
 - All ticket codes match the ten-digit numeric format.
 - No `used` ticket lacks `used_at`; no `valid` ticket has `used_at`.
 
 Assessment:
-- This is group-ticket issuance, not one ticket per attendee.
-- Ticket display and gatekeeper UI must clearly show that one ticket covers the booking item's attendee quantity.
-- Do not change issuance to one QR per attendee as part of baseline recovery; that is a separate product/schema migration requiring reconciliation and UX design.
+- The current routine implements group-ticket issuance (one ticket per booking-item row), but the live dataset preserves older attendee-level issuance for three booking items. The observed dataset is therefore mixed, not a uniform group-ticket population.
+- Ticket display and gatekeeper UI must support both legacy per-attendee tickets and current group tickets. For group tickets, show the attendee quantity covered; for legacy rows, preserve the separate ticket codes.
+- Do not regenerate, merge, or delete legacy tickets during baseline recovery. Any future switch to one QR per attendee is a separate product/schema migration requiring reconciliation and UX design.
 
 ### 6. QR and manual gate validation
 
