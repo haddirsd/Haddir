@@ -14,6 +14,7 @@ import { Activity, BadgeCheck, Banknote, CalendarDays, ClipboardCheck, LayoutDas
 import { HaddirDialog } from "../../../components/ui/HaddirDialog";
 import { ADMIN_ROLE_LABELS, ADMIN_SECTION_LABELS, getAdminNavigationSections, type AdminSection } from "../types";
 import { useAdminAccess } from "../hooks/useAdminAccess";
+import { useAdminTheme } from "../hooks/useAdminTheme";
 
 
 export default function AdminPage() {
@@ -21,21 +22,8 @@ export default function AdminPage() {
   const { role, name, avatarUrl, loading, error } = useAdminAccess();
   const [section, setAdminSection] = useState<AdminSection>("overview");
   const [userSearchTerm,setUserSearchTerm]=useState("");
-  const [darkMode,setDarkMode]=useState(false);
+  const darkMode = useAdminTheme();
   const [showLogoutConfirm,setShowLogoutConfirm]=useState(false);
-
-  useEffect(() => {
-    const syncTheme = () => {
-      const saved = window.localStorage.getItem("haddir-theme");
-      const dark = saved ? saved === "dark" : !!window.matchMedia?.("(prefers-color-scheme: dark)").matches;
-      setDarkMode(dark);
-      document.documentElement.dataset.theme = dark ? "dark" : "light";
-      document.documentElement.style.colorScheme = dark ? "dark" : "light";
-    };
-    syncTheme();
-    window.addEventListener("storage", syncTheme);
-    return () => window.removeEventListener("storage", syncTheme);
-  }, []);
 
   const nav = useMemo(() => role ? getAdminNavigationSections(role) : [], [role]);
 
