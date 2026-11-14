@@ -31,7 +31,7 @@ The 15 entries are listed individually in MISSING_MIGRATIONS_REGISTER.md. They a
 
 The seven archived files are source-provenanced GitHub artifacts, but only candidate correspondences to production ledger entries. They are not asserted to be byte-for-byte copies of the exact production-applied SQL. Do not rename, replay, or promote them as original migration history.
 
-The 21 timestamp mismatches remain explicit. For example, production records 20261105131539 / event_reminder_notifications, whereas the GitHub filename uses 20261105190000.
+The 21 same-name timestamp mismatches were individually reviewed and mapped in `MIGRATION_VERSION_MISMATCH_REVIEW.md`: all 21 SQL payloads are equivalent after ignoring comments and insignificant whitespace; 13 are byte-for-byte identical and eight differ only in comments/formatting. No executable SQL difference was observed in this 21-pair set. No filenames were renamed and no migrations were replayed.
 
 ## 2. What was restored
 
@@ -70,7 +70,7 @@ An isolated PostgreSQL 17.12 GitHub Actions service-container test passed the st
 
 1. **Original Git history gap:** the original Git file objects/commit history for the 15 early migrations remain absent from inspected repository history. Their SQL payloads are now recovered from the production ledger; this does not recreate Git history or prove equivalence to a separate lost workstation copy.
 2. **Candidate provenance:** seven archived scripts are not proven byte-for-byte identical to production-applied migration SQL.
-3. **Timestamp drift:** 21 same-name production/repository migration pairs have version mismatch; no mass renaming was performed.
+3. **Timestamp drift:** all 21 same-name production/repository pairs are now individually mapped. SQL comparison found 13 exact text matches and eight comment/formatting-only differences; all eight match after removing comments and insignificant whitespace. No mass renaming or replay was performed. See `MIGRATION_VERSION_MISMATCH_REVIEW.md`.
 4. **Full Supabase integration:** Auth JWT/RLS runtime, Storage provisioning/API, Vault secret delivery, pg_cron worker behavior, pg_net delivery, Realtime, and Edge Functions were not exercised by the PostgreSQL stubs test.
 5. **Application runtime:** the integration review was static; it was not a complete browser/device/end-to-end acceptance test.
 6. **Security findings retained:** the payment-review NULL-decision edge case and authenticated EXECUTE on private.gatekeeper_ticket_action_core(text, boolean) remain documented findings. They were not changed during forensic recovery.
