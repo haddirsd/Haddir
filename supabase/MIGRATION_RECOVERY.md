@@ -13,11 +13,13 @@ Status: forensic recovery completed for the accessible sources. Fifteen early mi
 - Production migration history: **64** applied entries.
 - Repository migration directory: **50** SQL files.
 - Exact version + name matches: **21**.
-- Production entries whose migration name exists in GitHub but whose timestamp differs: **21**.
+- Production entries whose migration name exists in GitHub but whose timestamp differs: **21**; all 21 pairs are mapped in `supabase/recovery/baseline/MIGRATION_VERSION_MISMATCH_REVIEW.md`.
 - Production entries with no same-name SQL file in the repository: **22**.
 - Repository SQL files with no exact version + name match in production: **29** (21 timestamp/name matches plus 8 files whose names are not in the production ledger).
 
 The counts above describe different comparison dimensions and should not be added together.
+
+The 21 same-name timestamp mismatches were checked against the SQL payloads stored in the production migration ledger: 13/21 are byte-for-byte identical; the remaining 8/21 become identical after removing SQL comments and insignificant whitespace. No executable SQL difference was observed in this set. The review does not cover the eight repository SQL files whose names have no same-name production ledger entry.
 
 ## Production entries missing by name from the repository
 
