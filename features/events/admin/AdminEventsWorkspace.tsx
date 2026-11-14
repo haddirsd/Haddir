@@ -16,6 +16,7 @@ import type { AdminEventRole, AdminEventRow } from "./admin-events.types";
 
 export default function AdminEventsWorkspace({ role }: { role: AdminEventRole }) {
   const { rows, loading, loadError, refreshEvents: loadEvents } = useAdminEvents();
+  const [pendingAction, setPendingAction] = useState<{ title: string; description: string; label: string; tone: "primary" | "danger"; run: () => Promise<void> } | null>(null);
   const editor = useAdminEventEditor(role, loadEvents);
   const {
     showEventForm, savingEvent, eventMessage, setEventMessage, editingEventId,
