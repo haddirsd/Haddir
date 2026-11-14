@@ -22,7 +22,7 @@ Each archived file was fetched from the named historical commit, then committed 
 
 ## Remaining gap
 
-The other 15 entries from 2026-11-02 and early 2026-11-03 have no SQL source in the GitHub `supabase/migrations` path history inspected so far. Do not fabricate their contents. Recover them only from an external backup, archived deployment artifact, or a verified schema/DDL reconstruction clearly labelled as a baseline rather than historical migration SQL.
+The 15 entries from 2026-11-02 and early 2026-11-03 remain absent as original Git files in the inspected `supabase/migrations` path history. Their SQL payloads were recovered from the production ledger's `statements[1]` values and archived separately under `supabase/recovery/production-ledger-sql/`. All 15 archived files were verified character-for-character against a fresh production-ledger read. This preserves the SQL text held by production, but does not recreate the original Git blobs or commit history. Do not move the archive into the active migration directory or replay it.
 
 ## Next verification required
 
