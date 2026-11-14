@@ -221,3 +221,20 @@ The ordering of grants is deliberately late in the proposed sequence, but functi
 ## Safety statement
 
 This review used read-only production catalog queries and source/document inspection. No production DDL/data was changed, no migrations were run, no paid branch/resource was created, no Vercel deployment was triggered, and `main` was not modified. All baseline SQL remains quarantined in Markdown drafts and is not approved for execution.
+
+
+## 10. Source-level routine dependency scan (completed)
+
+A separate source scan of all 32 definitions is recorded in `ROUTINE_DEPENDENCY_AUDIT.md`. It confirms 32 unique schema-qualified names, 18 PL/pgSQL and 14 SQL routines, and the 14 direct caller/callee edges listed below. No direct application-routine call cycle was found.
+
+- Role helper prerequisites: `private.current_profile_role()` and `private.current_user_is_owner()` follow table creation; the captured definitions do not call one another.
+- Private implementation prerequisites: `private.gatekeeper_ticket_action_core()` precedes both private gatekeeper wrappers.
+- Private callers follow their helper: admin search/update and event-save routines follow `private.current_profile_role()`.
+- Public SQL wrappers follow their private targets: admin search/update, gatekeeper QR/manual, advertiser statistics, gatekeeper history/stats, and event-save wrappers.
+- Remaining public PL/pgSQL routines follow table and platform prerequisites.
+
+The scan also recorded direct Auth, Storage, Vault, pg_net, and advisory-lock dependencies. It is lexical/static source review; it cannot establish full PostgreSQL dependency resolution or prove PL/pgSQL runtime compilation. SQL wrappers have an especially strict creation-order dependency because their referenced private functions are resolved as SQL function bodies are created.
+
+The email enqueue function has no corresponding active trigger in the preserved 12-trigger inventory; do not invent one. The push trigger depends on Vault and pg_net configuration as well as the trigger function. Keep all secret values outside the repository.
+
+See `ROUTINE_DEPENDENCY_AUDIT.md` for the full call graph, managed-platform dependency matrix, creation groups, ACL-sensitive notes, and outstanding validation gates.
