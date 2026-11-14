@@ -86,3 +86,7 @@ All SQL is embedded in Markdown with a `.sql.md` suffix deliberately; these are 
 - No Vercel deployment was triggered.
 - No changes were made to `main`.
 - The baseline has **not** been generated, tested, or approved for execution.
+
+## PostgreSQL draft validation
+
+The staged DDL drafts now pass the disposable PostgreSQL 17 smoke test recorded in `baseline/POSTGRESQL_17_SMOKE_TEST.md`. The harness uses minimal stubs for Supabase-managed schemas, so it is not a full Supabase integration test and does not authorize production replay.
