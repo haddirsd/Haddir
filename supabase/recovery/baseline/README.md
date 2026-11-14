@@ -14,12 +14,13 @@ This directory contains first-pass SQL reconstruction artifacts based on read-on
 - `SECURITY_REVIEW.md` — ownership, SECURITY DEFINER, search_path and EXECUTE ACL findings.
 - `ACCESS_CONTROL_STORAGE_CRON.md` — bucket configuration, six Storage policies, two active cron jobs, schema/object grants, and default-privilege review.
 - `RLS_EFFECTIVE_ACCESS_REVIEW.md` — effective row-access map for all 16 tables, public payment-account disclosure, broad-grant/RLS interaction, and static review of key SECURITY DEFINER routines.
+- `DEPENDENCY_ORDER_REVIEW.md` — staged build order, FK graph, extension prerequisites, routine call ordering notes, and exact per-signature EXECUTE ACL inventory.
 
 The `.sql.md` suffix is deliberate: the SQL is embedded in Markdown so these files cannot be mistaken for deployable migration scripts by Supabase tooling.
 
 ## Important exclusions
 
-The drafts do not yet reconstruct a complete executable bootstrap. The catalog evidence now includes routines, RLS policies, triggers, Storage buckets/policies, cron jobs, and grant/default-privilege findings. These still require dependency-aware conversion and exact ACL review. Supabase-managed schemas and roles are prerequisites and must not be recreated.
+The drafts do not yet reconstruct a complete executable bootstrap. The dependency review proposes creating tables first without FKs, then routines, constraints/indexes, RLS policies, triggers, and finally separately reviewed Storage/cron configuration. Routine ACLs are inventoried by exact signature. Supabase-managed schemas and roles are prerequisites and must not be recreated. PL/pgSQL body dependencies still require source review and a real PostgreSQL-compatible creation test.
 
 ## Safe-use rules
 
