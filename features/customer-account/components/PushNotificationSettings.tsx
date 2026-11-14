@@ -33,13 +33,11 @@ export function PushNotificationSettings({userId}:{userId:string|null}){
    if(!sub){setEnabled(false);return;}
    const db=getSupabaseBrowserClient();
    if(!db){setEnabled(true);setMessage("الاشتراك موجود على الجهاز، لكن تعذرت مزامنته مع حاضر حالياً.");return;}
-   const {error}=await db.from("push_subscriptions").upsert({
-    user_id:userId,
-    endpoint:sub.endpoint,
-    subscription:sub.toJSON(),
-    device_label:navigator.userAgent.slice(0,160),
-    updated_at:new Date().toISOString()
-   },{onConflict:"endpoint"});
+   const {error}=await db.rpc("sync_haddir_push_subscription",{
+    p_endpoint:sub.endpoint,
+    p_subscription:sub.toJSON(),
+    p_device_label:navigator.userAgent.slice(0,160)
+   });
    setEnabled(true);
    setMessage(error?"الإشعارات مفعّلة على الجهاز، لكن تعذرت مزامنة الاشتراك مع الخادم.":"");
   }catch(error){
@@ -85,13 +83,11 @@ export function PushNotificationSettings({userId}:{userId:string|null}){
    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:decodeKey(VAPID_PUBLIC_KEY) as BufferSource});
    const db=getSupabaseBrowserClient();
    if(!db)throw new Error("تعذر الاتصال بحاضر حالياً.");
-   const {error}=await db.from("push_subscriptions").upsert({
-    user_id:userId,
-    endpoint:sub.endpoint,
-    subscription:sub.toJSON(),
-    device_label:navigator.userAgent.slice(0,160),
-    updated_at:new Date().toISOString()
-   },{onConflict:"endpoint"});
+   const {error}=await db.rpc("sync_haddir_push_subscription",{
+    p_endpoint:sub.endpoint,
+    p_subscription:sub.toJSON(),
+    p_device_label:navigator.userAgent.slice(0,160)
+   });
    if(error)throw error;
    setEnabled(true);setMessage("تم تفعيل الإشعارات الخارجية على هذا الجهاز.");
   }catch(error){
