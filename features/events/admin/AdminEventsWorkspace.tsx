@@ -19,7 +19,7 @@ export default function AdminEventsWorkspace({ role }: { role: AdminEventRole })
   const [pendingAction, setPendingAction] = useState<{ title: string; description: string; label: string; tone: "primary" | "danger"; run: () => Promise<void> } | null>(null);
   const editor = useAdminEventEditor(role, loadEvents);
   const {
-    showEventForm, savingEvent, eventMessage, setEventMessage, editingEventId,
+    showEventForm, setShowEventForm, savingEvent, eventMessage, setEventMessage, editingEventId,
     ticketForms, setTicketForms, eventAccountForms, setEventAccountForms,
     eventForm, setEventForm, coverFile, setCoverFile, coverPreview, setCoverPreview,
     emptyTicket, toggleEventForm, closeEventForm, editEvent, createEvent,
