@@ -81,8 +81,9 @@ A read-only, structured catalog snapshot is now preserved under `supabase/recove
 - `structure.json`: constraints, indexes, RLS policies, and non-internal triggers.
 - `functions-and-grants.json`: public/private function definitions, extensions, table grants, and column grants.
 - `storage-rls-cron.json`: RLS enablement flags, Storage buckets and policies, and scheduled cron jobs.
+- `baseline/ACCESS_CONTROL_STORAGE_CRON.md`: expanded human-readable review of bucket limits/MIME types, all six Storage policies, two active cron jobs, schema/object ACLs, column-level grants, and default-privilege caveats.
 
-This is a read-only catalog evidence snapshot, **not yet a runnable bootstrap SQL baseline**. Managed Supabase internals are not being recreated. The snapshot has been count-checked against production: 16 tables, 158 columns, 81 constraints, 57 indexes, 29 policies, 32 routines, and 12 distinct trigger objects (26 event-expanded trigger rows). Ownership and privilege review has also been performed. The remaining work is detailed definition/dependency review and conversion into ordered DDL.
+This is a read-only catalog evidence snapshot, **not yet a runnable bootstrap SQL baseline**. Managed Supabase internals are not being recreated. The snapshot has been count-checked against production: 16 tables, 158 columns, 81 constraints, 57 indexes, 29 policies, 32 routines, and 12 distinct trigger objects (26 event-expanded trigger rows). Ownership and privilege review has also been performed. The remaining work is detailed definition/dependency review, exact grant reconciliation, Storage/cron dependency ordering, and conversion into ordered DDL. The current expanded access-control findings are documented in `supabase/recovery/baseline/ACCESS_CONTROL_STORAGE_CRON.md`.
 
 ## Safety and next steps
 
