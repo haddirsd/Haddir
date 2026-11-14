@@ -35,6 +35,7 @@ Keep all generated artifacts quarantined under `supabase/recovery/baseline/`:
 - `40-rls-policies-draft.sql.md` — RLS enabled on 16 public tables and 29 policy definitions.
 - `50-triggers-draft.sql.md` — 12 distinct trigger definitions across eight target tables.
 - `60-privileges-draft.sql.md` — grouped app-table grants, three explicit column-only UPDATE grants, and exact routine EXECUTE ACL reconstruction; no hosted default privileges or managed role memberships.
+- `DDL_RECONCILIATION_AUDIT.md` — source-level structural comparison of table/column, constraint/index, policy, trigger, and privilege drafts against the production catalog.
 - `SECURITY_REVIEW.md` — routine ownership, security mode, search_path and EXECUTE ACL review.
 - `ACCESS_CONTROL_STORAGE_CRON.md` — exact Storage bucket/policy inventory, cron job definitions, schema/object grants, and default-privilege findings.
 - `RLS_EFFECTIVE_ACCESS_REVIEW.md` — effective row-level access matrix, public payment-account data boundary, broad SQL grant/RLS interaction, and static review of key SECURITY DEFINER routines.
@@ -72,6 +73,7 @@ All SQL is embedded in Markdown with a `.sql.md` suffix deliberately; these are 
 - The public `event_payment_accounts` SELECT policy exposes account name, account number, and beneficiary for active accounts on published events. Confirm these are all intended customer-facing payment details before any future schema expansion.
 - The SECURITY DEFINER static review confirmed key booking, payment, role-management, event-save, gatekeeper, and push-subscription RPCs contain explicit identity/role/ownership checks. `get_haddir_push_config()` returns Vault secrets but EXECUTE is restricted to postgres/service_role; keep it server-side. This was source review, not runtime penetration testing.
 - Constraint/index audit is documented in `baseline/CONSTRAINTS_INDEXES_REVIEW.md`: the 81 draft constraints reconcile to production (16 PK, 8 UNIQUE, 32 FK, 25 CHECK); all are validated and non-deferrable. All 57 indexes are valid/ready. The audit flags two FK columns without leading child-side indexes, a duplicate unique index on `tickets.ticket_code`, and a global one-assignment-per-user uniqueness rule for product confirmation.
+- Structural reconciliation is recorded in `baseline/DDL_RECONCILIATION_AUDIT.md`: 16 tables/158 columns, 81 constraints, 33 standalone indexes, 29 policies, and 12 triggers match the preserved catalog evidence; all 81 constraint definitions and 33 standalone index definitions matched exactly. This is not a database execution test.
 - Obtain a real PostgreSQL/Supabase-compatible validation runtime before calling the result tested. The current execution environment has no `psql`, `postgres`, Docker, or Supabase CLI; no database execution test has been performed.
 
 ## Current safety status
