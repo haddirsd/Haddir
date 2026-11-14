@@ -10,9 +10,6 @@ import { useAdminEvents } from "./useAdminEvents";
 import type { AdminEventAccountForm, AdminEventFormValues, AdminEventRole, AdminEventRow, AdminTicketForm } from "./admin-events.types";
 
 
-const statusLabels: Record<string, string> = { draft:"مسودة", published:"منشورة", cancelled:"ملغاة", completed:"مكتملة" };
-const fmt = (v: unknown) => v == null || v === "" ? "—" : String(v);
-
 export default function AdminEventsWorkspace({ role }: { role: AdminEventRole }) {
   const { rows, loading, loadError, refreshEvents: loadEvents } = useAdminEvents();
   const [showEventForm, setShowEventForm] = useState(false);
