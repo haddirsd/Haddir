@@ -47,6 +47,8 @@ export function useAdminEventEditor(role: AdminEventRole, loadEvents: () => Prom
 
   const toggleEventForm = () => {
     if (showEventForm) {
+      resetEditor();
+      setEventMessage("");
       setShowEventForm(false);
       return;
     }
