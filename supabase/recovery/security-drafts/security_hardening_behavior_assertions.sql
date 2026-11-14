@@ -116,3 +116,152 @@ END
 $trigger_behavior$;
 
 SELECT 'PASS: NULL/invalid payment decisions rejected; gatekeeper core direct call denied; all four updated_at triggers still fire.' AS result;
+
+
+-- Full payment lifecycle fixtures and assertions (still disposable PostgreSQL only).
+DO $workflow_fixtures$
+DECLARE
+  v_customer uuid := '10000000-0000-4000-8000-000000000002';
+  v_gate uuid := '10000000-0000-4000-8000-000000000003';
+  v_event uuid := '20000000-0000-4000-8000-000000000001';
+  v_other uuid := '20000000-0000-4000-8000-000000000002';
+  v_reject_booking uuid := '30000000-0000-4000-8000-000000000002';
+  v_manual_booking uuid := '30000000-0000-4000-8000-000000000003';
+  v_concurrent_booking uuid := '30000000-0000-4000-8000-000000000004';
+  v_other_booking uuid := '30000000-0000-4000-8000-000000000005';
+  v_type uuid := '40000000-0000-4000-8000-000000000001';
+BEGIN
+  INSERT INTO auth.users(id,email) VALUES
+    (v_customer,'workflow-customer@example.invalid'),
+    (v_gate,'workflow-gatekeeper@example.invalid');
+  INSERT INTO public.profiles(id,full_name,role) VALUES
+    (v_customer,'Workflow Customer','customer'),
+    (v_gate,'Workflow Gatekeeper','gatekeeper');
+  INSERT INTO public.events(id,title,slug,status,created_by)
+  VALUES(v_other,'Other Test Event','other-test-event','draft','10000000-0000-4000-8000-000000000001');
+  UPDATE public.ticket_types SET quantity_sold=5 WHERE id=v_type;
+  UPDATE public.bookings SET user_id=v_customer,status='under_review' WHERE id='30000000-0000-4000-8000-000000000001';
+  INSERT INTO public.bookings(id,booking_number,user_id,customer_name,customer_phone,event_id,subtotal,status)
+  VALUES
+    (v_reject_booking,'SECURITY-REJECT',v_customer,'Workflow Customer','0000000000',v_event,300,'under_review'),
+    (v_manual_booking,'SECURITY-MANUAL',v_customer,'Workflow Customer','0000000000',v_event,100,'confirmed'),
+    (v_concurrent_booking,'SECURITY-CONCURRENT',v_customer,'Workflow Customer','0000000000',v_event,100,'confirmed'),
+    (v_other_booking,'SECURITY-OTHER',v_customer,'Workflow Customer','0000000000',v_other,100,'confirmed');
+  INSERT INTO public.booking_items(id,booking_id,ticket_type_id,quantity,unit_price,line_total)
+  VALUES
+    ('50000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001',v_type,2,100,200),
+    ('50000000-0000-4000-8000-000000000002',v_reject_booking,v_type,3,100,300),
+    ('50000000-0000-4000-8000-000000000003',v_manual_booking,v_type,1,100,100),
+    ('50000000-0000-4000-8000-000000000004',v_concurrent_booking,v_type,1,100,100),
+    ('50000000-0000-4000-8000-000000000005',v_other_booking,v_type,1,100,100);
+  INSERT INTO public.payment_submissions(id,booking_id,submitted_by,amount,status)
+  VALUES
+    ('60000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001',v_customer,200,'submitted'),
+    ('60000000-0000-4000-8000-000000000002',v_reject_booking,v_customer,300,'submitted');
+  INSERT INTO public.event_role_assignments(user_id,event_id,assignment_role)
+  VALUES(v_gate,v_event,'gatekeeper');
+  INSERT INTO public.tickets(booking_item_id,booking_id,event_id,ticket_type_id,ticket_code,attendee_name,status)
+  VALUES
+    ('50000000-0000-4000-8000-000000000003',v_manual_booking,v_event,v_type,'2222222222','Manual Guest','valid'),
+    ('50000000-0000-4000-8000-000000000004',v_concurrent_booking,v_event,v_type,'3333333333','Concurrent Guest','valid'),
+    ('50000000-0000-4000-8000-000000000005',v_other_booking,v_other,v_type,'4444444444','Wrong Event Guest','valid');
+END
+$workflow_fixtures$;
+
+SET ROLE authenticated;
+DO $payment_workflows$
+DECLARE
+  v_result jsonb;
+  v_message text;
+BEGIN
+  v_result:=public.review_payment_submission('60000000-0000-4000-8000-000000000001','approve',NULL);
+  IF v_result->>'success'<>'true' OR v_result->>'tickets_created'<>'1' OR v_result->>'attendee_count'<>'2' THEN
+    RAISE EXCEPTION 'SECURITY TEST FAILED: approval result unexpected: %',v_result;
+  END IF;
+  BEGIN
+    PERFORM public.review_payment_submission('60000000-0000-4000-8000-000000000001','approve',NULL);
+    RAISE EXCEPTION 'SECURITY TEST FAILED: repeated approval accepted';
+  EXCEPTION WHEN OTHERS THEN
+    GET STACKED DIAGNOSTICS v_message=MESSAGE_TEXT;
+    IF v_message='SECURITY TEST FAILED: repeated approval accepted' THEN RAISE; END IF;
+    IF v_message<>'تمت مراجعة إثبات الدفع مسبقاً' THEN RAISE EXCEPTION 'Unexpected repeat-approval error: %',v_message; END IF;
+  END;
+  PERFORM public.review_payment_submission('60000000-0000-4000-8000-000000000002','reject','إيصال غير مطابق');
+  BEGIN
+    PERFORM public.review_payment_submission('60000000-0000-4000-8000-000000000002','reject','تكرار');
+    RAISE EXCEPTION 'SECURITY TEST FAILED: repeated rejection accepted';
+  EXCEPTION WHEN OTHERS THEN
+    GET STACKED DIAGNOSTICS v_message=MESSAGE_TEXT;
+    IF v_message='SECURITY TEST FAILED: repeated rejection accepted' THEN RAISE; END IF;
+    IF v_message<>'تمت مراجعة إثبات الدفع مسبقاً' THEN RAISE EXCEPTION 'Unexpected repeat-rejection error: %',v_message; END IF;
+  END;
+END
+$payment_workflows$;
+RESET ROLE;
+
+DO $payment_side_effects$
+BEGIN
+  IF (SELECT status FROM public.payment_submissions WHERE id='60000000-0000-4000-8000-000000000001')<>'approved'
+    OR (SELECT status FROM public.bookings WHERE id='30000000-0000-4000-8000-000000000001')<>'confirmed'
+    OR (SELECT count(*) FROM public.tickets WHERE booking_id='30000000-0000-4000-8000-000000000001')<>1
+    OR (SELECT quantity_sold FROM public.ticket_types WHERE id='40000000-0000-4000-8000-000000000001')<>5
+    OR (SELECT count(*) FROM public.notifications WHERE booking_id='30000000-0000-4000-8000-000000000001' AND type='ticket_approved')<>1
+    OR (SELECT count(*) FROM public.email_outbox WHERE booking_id='30000000-0000-4000-8000-000000000001' AND notification_type='ticket_approved')<>1
+    OR (SELECT status FROM public.payment_submissions WHERE id='60000000-0000-4000-8000-000000000002')<>'rejected'
+    OR (SELECT review_note FROM public.payment_submissions WHERE id='60000000-0000-4000-8000-000000000002')<>'إيصال غير مطابق'
+    OR (SELECT status FROM public.bookings WHERE id='30000000-0000-4000-8000-000000000002')<>'rejected'
+    OR (SELECT quantity_sold FROM public.ticket_types WHERE id='40000000-0000-4000-8000-000000000001')<>2
+    OR EXISTS(SELECT 1 FROM public.tickets WHERE booking_id='30000000-0000-4000-8000-000000000002')
+    OR (SELECT count(*) FROM public.notifications WHERE booking_id='30000000-0000-4000-8000-000000000002' AND type='payment_rejected')<>1
+    OR (SELECT count(*) FROM public.email_outbox WHERE booking_id='30000000-0000-4000-8000-000000000002' AND notification_type='payment_rejected')<>1 THEN
+    RAISE EXCEPTION 'SECURITY TEST FAILED: payment side-effect, ticket, inventory, notification or email-outbox invariant';
+  END IF;
+END
+$payment_side_effects$;
+
+SELECT set_config('haddir_test.qr_code',
+  (SELECT ticket_code FROM public.tickets WHERE booking_id='30000000-0000-4000-8000-000000000001' LIMIT 1),false);
+SET ROLE authenticated;
+DO $gatekeeper_workflows$
+DECLARE v_result jsonb; v_code text:=current_setting('haddir_test.qr_code'); v_message text;
+BEGIN
+  PERFORM set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000003',false);
+  v_result:=public.gatekeeper_ticket_action(v_code,false);
+  IF v_result->>'status'<>'valid' THEN RAISE EXCEPTION 'QR preview failed: %',v_result; END IF;
+  v_result:=public.gatekeeper_ticket_action(v_code,true);
+  IF v_result->>'status'<>'checked_in' THEN RAISE EXCEPTION 'QR confirmation failed: %',v_result; END IF;
+  v_result:=public.gatekeeper_ticket_action(v_code,true);
+  IF v_result->>'status'<>'used' THEN RAISE EXCEPTION 'QR repeat failed: %',v_result; END IF;
+  v_result:=public.gatekeeper_manual_ticket_action('2222222222',false);
+  IF v_result->>'status'<>'valid' THEN RAISE EXCEPTION 'Manual preview failed: %',v_result; END IF;
+  v_result:=public.gatekeeper_manual_ticket_action('2222222222',true);
+  IF v_result->>'status'<>'checked_in' THEN RAISE EXCEPTION 'Manual confirmation failed: %',v_result; END IF;
+  v_result:=public.gatekeeper_manual_ticket_action('2222222222',true);
+  IF v_result->>'status'<>'used' THEN RAISE EXCEPTION 'Manual repeat failed: %',v_result; END IF;
+  BEGIN
+    PERFORM public.gatekeeper_ticket_action('4444444444',false);
+    RAISE EXCEPTION 'SECURITY TEST FAILED: cross-event ticket inspection succeeded';
+  EXCEPTION WHEN OTHERS THEN
+    GET STACKED DIAGNOSTICS v_message=MESSAGE_TEXT;
+    IF v_message='SECURITY TEST FAILED: cross-event ticket inspection succeeded' THEN RAISE; END IF;
+    IF v_message<>'هذه التذكرة لا تخص الفعالية المصرح لك بها' THEN RAISE EXCEPTION 'Unexpected cross-event error: %',v_message; END IF;
+  END;
+END
+$gatekeeper_workflows$;
+RESET ROLE;
+
+DO $gatekeeper_side_effects$
+DECLARE v_code text:=current_setting('haddir_test.qr_code');
+BEGIN
+  IF (SELECT count(*) FROM public.gatekeeper_scan_logs WHERE entered_code=v_code AND outcome='accepted' AND entry_method='qr')<>1
+    OR (SELECT count(*) FROM public.gatekeeper_scan_logs WHERE entered_code=v_code AND outcome='used' AND entry_method='qr')<>1
+    OR (SELECT count(*) FROM public.notifications WHERE booking_id='30000000-0000-4000-8000-000000000001' AND type='ticket_checked_in')<>1
+    OR (SELECT count(*) FROM public.gatekeeper_scan_logs WHERE entered_code='2222222222' AND outcome='accepted' AND entry_method='manual')<>1
+    OR (SELECT count(*) FROM public.gatekeeper_scan_logs WHERE entered_code='2222222222' AND outcome='used' AND entry_method='manual')<>1
+    OR (SELECT count(*) FROM public.notifications WHERE booking_id='30000000-0000-4000-8000-000000000003' AND type='ticket_checked_in')<>1
+    OR EXISTS(SELECT 1 FROM public.gatekeeper_scan_logs WHERE entered_code='4444444444') THEN
+    RAISE EXCEPTION 'SECURITY TEST FAILED: QR/manual audit or exactly-once notification invariant';
+  END IF;
+END
+$gatekeeper_side_effects$;
+SELECT 'PASS: payment approve/reject, stock/ticket/notification/outbox, QR/manual and event-assignment workflows.' AS result;
