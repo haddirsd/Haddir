@@ -36,7 +36,7 @@ The drafts do not yet reconstruct a complete executable bootstrap. The dependenc
 2. Do not run them against production.
 3. Do not treat this reconstruction as the original migration history.
 4. Do not use them until exact dependency, privilege, and Supabase prerequisite reviews are complete.
-5. A real PostgreSQL/Supabase-compatible execution test is mandatory before any future proposal to adopt the baseline.
+5. The isolated PostgreSQL 17.12 DDL smoke test has passed with minimal platform stubs; a full Supabase integration test is still mandatory before any future proposal to adopt the baseline.
 
 No production changes were made during this recovery work.
 
