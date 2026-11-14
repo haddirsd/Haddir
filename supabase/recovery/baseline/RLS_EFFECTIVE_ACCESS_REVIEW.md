@@ -85,3 +85,17 @@ These are static source inspections, not runtime authorization tests. All 32 rou
 3. Plan a separate, reviewed least-privilege migration to reduce broad table grants and tighten default privileges, only after checking every frontend/RPC/storage call path.
 4. Confirm the public payment-account disclosure is intentional and contains only customer-facing destination details.
 5. Run a real PostgreSQL/Supabase-compatible restore test in a free local environment before calling the baseline executable or tested.
+
+
+## Fresh live-production reconciliation — 2026-11-14
+
+A direct read-only comparison against the active production catalog confirmed:
+
+- All 16 public application tables remain owned by postgres, with RLS enabled and FORCE RLS disabled.
+- All 29 policy identities, target tables, roles, commands, USING expressions, and WITH CHECK expressions match the preserved policy snapshot and policy draft. All are PERMISSIVE.
+- email_outbox has RLS enabled and no policy, matching production; no policy was invented.
+- All 32 routine definitions match production; all are owned by postgres and use an explicit empty search_path. The corrected inventory is 17 private SECURITY DEFINER routines and six public SECURITY DEFINER routines.
+- Table and column grant inventories match the live production catalog exactly (333 table-grant rows; 1,961 expanded column-privilege rows). The three explicit column-only UPDATE grants are unchanged.
+- The 41 per-signature routine EXECUTE grants in the draft match live production. The authenticated grant on private.gatekeeper_ticket_action_core(text, boolean) remains a high-priority bypass-of-wrapper-logging finding; no production permissions were changed.
+
+This is a metadata/source comparison, not a live role-based API penetration test. No production policy, grant, routine, or schema was changed.
