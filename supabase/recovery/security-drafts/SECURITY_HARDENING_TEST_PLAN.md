@@ -22,3 +22,7 @@ Two separate psql processes run concurrently against one ticket. Session A holds
 - Real Supabase Auth JWT validation, PostgREST, RLS request context, Storage and Edge Functions.
 - Full browser/device payment and receipt flow, QR camera flow and network retry behavior.
 - A production change remains blocked until a real disposable Supabase integration run, fresh live-definition reconciliation and explicit user approval.
+
+
+## Additional pre-existing integration finding
+The production catalog contains \`private.enqueue_booking_notification_email()\`, but the captured live trigger inventory has no trigger bound to it. The payment routine inserts in-app notification rows; the currently attached notification trigger dispatches web push only. Therefore this isolated suite asserts the in-app notification rows and does not incorrectly require an email_outbox row. Email-outbox enqueue wiring is a separate pre-existing behavior gap and is not changed by this security draft.
