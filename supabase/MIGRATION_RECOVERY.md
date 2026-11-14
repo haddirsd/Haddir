@@ -1,6 +1,6 @@
 # Supabase migration history recovery
 
-Status: forensic inventory only. No production DDL or data was changed.
+Status: forensic recovery completed for the accessible sources. Fifteen early migration SQL payloads have been recovered from the production ledger; the original Git file history remains unavailable. No production DDL or data was changed.
 
 ## Sources checked
 
@@ -56,7 +56,7 @@ The archive includes provenance links and a candidate mapping table. These are *
 
 Read-only comparison against production confirms the archived admin role-filter and push-subscription function bodies match the live definitions, and the live payment-review function matches the later restored group-ticket semantics. The earlier per-attendee script is intermediate. The role-assignment scripts are not a complete final-state representation: production has an additional unique constraint, a different current policy set, and a more hardened private role-update function. The legacy two-argument public role-update overload is absent; the current public three-argument function delegates to the private implementation.
 
-The remaining **15** missing-by-name entries are from 2026-11-02 and early 2026-11-03; no source SQL for them was found in the inspected GitHub migration-path history.
+The remaining **15** missing-by-name entries are from 2026-11-02 and early 2026-11-03. Their original Git files were not found in the inspected GitHub migration-path history, but the production ledger contains exactly one SQL text value for each. Those texts were extracted from `supabase_migrations.schema_migrations.statements[1]`, archived under `supabase/recovery/production-ledger-sql/`, and verified 15/15 character-for-character against a fresh read of the live ledger. This does not recreate original Git blobs or commit history.
 
 ## Historical recovery finding
 
@@ -64,7 +64,7 @@ The earliest commit returned by GitHub's history for `supabase/migrations` is th
 
 `20261103170000_payment_methods_and_receipts.sql`
 
-The initial schema and the earlier 2026-11-02 migrations are therefore not recoverable as committed migration files from the repository's path history. They appear to have been applied outside the tracked migration directory. Do not fabricate historical SQL or assign old timestamps to reconstructed snapshots.
+The initial schema and the earlier 2026-11-02 migrations are not recoverable as committed Git files from the repository's path history; they appear to have been applied outside the tracked migration directory. Their SQL payloads are now recovered from the production ledger and preserved separately under `supabase/recovery/production-ledger-sql/`. Do not fabricate Git history or assign old timestamps to catalog-derived snapshots.
 
 ## Current live-schema evidence
 
@@ -92,7 +92,7 @@ This is a read-only catalog evidence snapshot, **not yet a runnable bootstrap SQ
 2. Compare the seven archived candidate scripts with the live production object definitions and confirm their ledger mappings; do not replay them.
 3. Preserve the 21 timestamp mismatches as an explicit reconciliation list; do not rename files blindly.
 4. Follow `supabase/recovery/BASELINE_BUILD_PLAN.md` to review the snapshot and build a separately labelled baseline; the JSON evidence files themselves are not migrations.
-5. Recover the remaining 15 early SQL migrations only from an external backup/artifact or a verified reconstruction clearly labelled as a baseline, never as original historical SQL.
+5. Keep the 15 ledger-extracted SQL payloads quarantined under `supabase/recovery/production-ledger-sql/`. Continue looking for original Git blobs/commits or external backups only if original Git-history provenance is required; never replay the archive.
 6. Obtain a real free PostgreSQL-compatible validation runtime and test the generated baseline before proposing any changes to `main`. The current environment has no local PostgreSQL runtime, so no SQL execution test has been claimed.
 
 Local tooling check in the current work environment found Git and Node.js, but no `psql`, `postgres`, Docker, or Supabase CLI. No local database test has been claimed or run.
@@ -102,7 +102,7 @@ Local tooling check in the current work environment found Git and Node.js, but n
 The recovery workspace has advanced beyond the initial inventory described above:
 
 - Seven candidate historical SQL files remain archived under supabase/recovery/historical-sql/; they are not runnable migrations and their production mapping is not claimed as byte-for-byte provenance.
-- Fifteen production migrations missing by name from GitHub remain unrecovered from repository path history. Their original SQL has not been fabricated.
+- Fifteen early migrations remain missing as original Git path files, but their SQL payloads are recovered from the production ledger and archived; all 15 were verified character-for-character against a fresh ledger read.
 - A complete catalog-derived baseline draft set is now indexed in supabase/recovery/baseline/README.md: tables, routines, constraints/indexes, RLS policies, triggers, privileges, Storage/cron configuration, and reconciliation/dependency/security audits.
 - Structural reconciliation found 16 tables/158 columns, 81 constraints, 33 standalone indexes, 29 policies, and 12 trigger objects matching the preserved catalog. Constraint and standalone-index definitions matched exactly.
 - Routine dependency, ACL, workflow, Storage, and cron findings are documented. Known payment-review NULL-decision and gatekeeper-core EXECUTE findings remain unpatched in production.
