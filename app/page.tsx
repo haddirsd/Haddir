@@ -16,7 +16,7 @@ import { useCustomerAccount } from "../features/customer-account/hooks/useCustom
 import { useCustomerNotificationView } from "../features/customer-account/hooks/useCustomerNotificationView";
 import { requestCustomerAccountDeletion } from "../features/customer-account/services/customer-account.service";
 import { useAuth } from "../features/auth/hooks/useAuth";
-import { signInWithGoogle as startGoogleSignIn, updateCustomerPhone } from "../features/auth/services/auth.service";
+import { signInWithGoogle as startGoogleSignIn, updateCustomerProfile } from "../features/auth/services/auth.service";
 import { useGatekeeper } from "../features/gatekeeper/hooks/useGatekeeper";
 import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
 import { HaddirDialog } from "../components/ui/HaddirDialog";
@@ -33,7 +33,7 @@ export default function Home(){
  const [activeWorkspace,setActiveWorkspace]=useState<"customer"|"organizer"|"gatekeeper"|"advertiser"|"admin"|"owner"|null>(null);
  const [isGatekeeperPage,setIsGatekeeperPage]=useState(false);
  const [showWelcome,setShowWelcome]=useState(true),[welcomeFading,setWelcomeFading]=useState(false),[welcomeGreeting,setWelcomeGreeting]=useState("أهلاً بيك في حاضر");
- const { authUser, userRole, assignedEvent, fullName, email, phone, setPhone, avatarUrl, profileEditing, setProfileEditing, saved, setSaved, authMessage, setAuthMessage } = useAuth();
+ const { authUser, userRole, assignedEvent, fullName, setFullName, email, phone, setPhone, avatarUrl, profileEditing, setProfileEditing, saved, setSaved, authMessage, setAuthMessage } = useAuth();
  const { myTickets, myNotifications, accountDataLoading, accountDataError, markNotificationRead: markCustomerNotificationReadAction, markAllNotificationsRead: markAllCustomerNotificationsReadAction } = useCustomerAccount(authUser?.id ?? null);
  const [ticketFilter,setTicketFilter]=useState<"new"|"used">("new");
  const [expandedTicketId,setExpandedTicketId]=useState<string|null>(null);
@@ -55,7 +55,7 @@ export default function Home(){
  } = gatekeeper;
  useEffect(()=>{if(!authUser){setGatekeeperResult(null);setGatekeeperCode("");}},[authUser]);
  const signInWithGoogle=async()=>{const error=await startGoogleSignIn();if(error)setAuthMessage(error);};
- const saveProfile=async()=>{if(!authUser){setAuthMessage("سجّل الدخول أولاً لحفظ بياناتك.");return;}const normalizedPhone=normalizeSudanesePhone(phone);if(!isValidSudanesePhone(normalizedPhone)){setAuthMessage("رقم الهاتف لازم يكون 10 خانات بالضبط ويبدأ بصفر، مثال: 09XXXXXXXX.");return;}setProfileSaving(true);setSaved(false);setAuthMessage("");const result=await updateCustomerPhone(authUser.id,normalizedPhone);setProfileSaving(false);if(result.error){setAuthMessage(result.error);return;}setPhone(result.phone||normalizedPhone);setProfileEditing(false);setSaved(true);};
+ const saveProfile=async()=>{if(!authUser){setAuthMessage("سجّل الدخول أولاً لحفظ بياناتك.");return;}const cleanName=fullName.trim();const normalizedPhone=normalizeSudanesePhone(phone);if(cleanName.length<2){setAuthMessage("اكتب اسمك بصورة صحيحة.");return;}if(!isValidSudanesePhone(normalizedPhone)){setAuthMessage("رقم الهاتف لازم يكون 10 خانات بالضبط ويبدأ بصفر، مثال: 09XXXXXXXX.");return;}setProfileSaving(true);setSaved(false);setAuthMessage("");const result=await updateCustomerProfile(authUser.id,cleanName,normalizedPhone);setProfileSaving(false);if(result.error){setAuthMessage(result.error);return;}setFullName(result.fullName||cleanName);setPhone(result.phone||normalizedPhone);setProfileEditing(false);setSaved(true);};
  const deleteAccount=()=>{
   if(!authUser?.email){setAuthMessage("سجّل الدخول أولاً عشان تقدر تحذف حسابك.");return;}
   setDeleteEmailInput("");
@@ -175,7 +175,7 @@ export default function Home(){
   onToggleRead={(notification)=>void notificationView.markOneRead(notification)}
  />}
  {!isGatekeeperPage&&activeTab==="profile"&&<ProfileWorkspace
-  authUser={authUser} userRole={userRole} fullName={fullName} email={email}
+  authUser={authUser} userRole={userRole} fullName={fullName} setFullName={setFullName} email={email}
   phone={phone} setPhone={setPhone} avatarUrl={avatarUrl}
   profileEditing={profileEditing} setProfileEditing={setProfileEditing}
   saved={saved} setSaved={setSaved} authMessage={authMessage} setAuthMessage={setAuthMessage}
