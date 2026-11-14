@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { WelcomeSplash } from "../components/layout/WelcomeSplash";
 import { AppShell } from "../components/layout/AppShell";
 import { AppHeader } from "../components/layout/AppHeader";
@@ -15,11 +15,10 @@ import { useCustomerAccountActions } from "../features/customer-account/hooks/us
 import { useCustomerTicketsView } from "../features/customer-account/hooks/useCustomerTicketsView";
 import { useCustomerNotificationView } from "../features/customer-account/hooks/useCustomerNotificationView";
 import { useAuth } from "../features/auth/hooks/useAuth";
-import { useGatekeeper } from "../features/gatekeeper/hooks/useGatekeeper";
-import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
 import type { AccountDialog } from "../features/customer-account/components/AccountDialogs";
 import { useAppNavigation } from "../components/layout/hooks/useAppNavigation";
 import { useAppTheme } from "../components/layout/hooks/useAppTheme";
+import { GatekeeperPage } from "../features/gatekeeper/GatekeeperPage";
 export default function Home(){
  const [deletingAccount,setDeletingAccount]=useState(false);
  const { darkMode, setDarkMode } = useAppTheme();
@@ -31,14 +30,6 @@ export default function Home(){
  const { authUser, userRole, assignedEvent, fullName, setFullName, email, phone, setPhone, avatarUrl, profileEditing, setProfileEditing, saved, setSaved, authMessage, setAuthMessage } = useAuth();
  const { myTickets, myNotifications, accountDataLoading, accountDataError, markNotificationRead: markCustomerNotificationReadAction, markAllNotificationsRead: markAllCustomerNotificationsReadAction } = useCustomerAccount(authUser?.id ?? null);
  const ticketsView = useCustomerTicketsView(setUiNotice);
- const gatekeeper = useGatekeeper({ authUser, assignedEvent, userRole, isGatekeeperPage, activeWorkspace });
- const {
-  gatekeeperCode, setGatekeeperCode, gatekeeperResult, setGatekeeperResult,
-  gatekeeperLoading, gatekeeperOnline, manualEntryOpen, setManualEntryOpen,
-  gatekeeperCounts, gatekeeperHistory: gatekeeperManualHistory, gatekeeperHistoryLoading,
-  scannerOpen, setScannerOpen, videoRef, runGatekeeperAction, openScanner, openManualEntry, acknowledgeGatekeeperResult,
- } = gatekeeper;
- useEffect(()=>{if(!authUser){setGatekeeperResult(null);setGatekeeperCode("");}},[authUser]);
  const accountActions = useCustomerAccountActions({
   authUser,
   fullName,
@@ -122,24 +113,12 @@ export default function Home(){
   setShowPrivacySecurity={setShowPrivacySecurity} saveProfile={()=>void accountActions.saveProfile()}
   signInWithGoogle={()=>void accountActions.signInWithGoogle()} deleteAccount={accountActions.deleteAccount} signOut={accountActions.signOut}
 />}
-{isGatekeeperPage&&<GatekeeperWorkspace
+{isGatekeeperPage&&<GatekeeperPage
+   authUser={authUser}
    userRole={userRole}
    assignedEvent={assignedEvent}
-   online={gatekeeperOnline}
-   counts={gatekeeperCounts}
-   loading={gatekeeperLoading}
-   code={gatekeeperCode}
-   result={gatekeeperResult}
-   manualEntryOpen={manualEntryOpen}
-   scannerOpen={scannerOpen}
-   history={gatekeeperManualHistory}
-   historyLoading={gatekeeperHistoryLoading}
-   videoRef={videoRef}
-   onOpenScanner={openScanner}
-   onOpenManual={openManualEntry}
-   onCodeChange={setGatekeeperCode}
-   onManualSubmit={()=>{setScannerOpen(false);setManualEntryOpen(false);void runGatekeeperAction(true,gatekeeperCode,"manual");}}
-   onAcknowledgeResult={acknowledgeGatekeeperResult}
+   isGatekeeperPage={isGatekeeperPage}
+   activeWorkspace={activeWorkspace}
    onClose={closeGatekeeper}
   />}
  </div>
