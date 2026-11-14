@@ -1,0 +1,202 @@
+{
+  "cron_jobs": [
+    {
+      "jobid": 1,
+      "active": true,
+      "command": "select private.generate_event_reminders();",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "jobid": 2,
+      "active": true,
+      "command": "select private.expire_pending_bookings();",
+      "schedule": "* * * * *"
+    }
+  ],
+  "rls_tables": [
+    {
+      "table": "admin_activity_log",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true
+    },
+    {
+      "table": "booking_items",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true
+    },
+    {
+      "table": "bookings",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true
+    },
+    {
+      "table": "checkins",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true
+    },
+    {
+      "table": "email_outbox",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true
+    },
+    {
+      "table": "event_payment_accounts",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true
+    },
+    {
+      "table": "event_role_assignments",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true
+    },
+    {
+      "table": "events",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true
+    },
+    {
+      "table": "gatekeeper_scan_logs",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true
+    },
+    {
+      "table": "notifications",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true
+    },
+    {
+      "table": "payment_methods",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true
+    },
+    {
+      "table": "payment_submissions",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true
+    },
+    {
+      "table": "profiles",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true
+    },
+    {
+      "table": "push_subscriptions",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true
+    },
+    {
+      "table": "ticket_types",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true
+    },
+    {
+      "table": "tickets",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true
+    }
+  ],
+  "storage_buckets": [
+    {
+      "id": "event-covers",
+      "name": "event-covers",
+      "public": true,
+      "file_size_limit": 10485760,
+      "allowed_mime_types": [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/gif",
+        "image/avif"
+      ]
+    },
+    {
+      "id": "payment-receipts",
+      "name": "payment-receipts",
+      "public": false,
+      "file_size_limit": 5242880,
+      "allowed_mime_types": [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+      ]
+    }
+  ],
+  "storage_policies": [
+    {
+      "name": "Customers upload own payment receipts",
+      "check": "((bucket_id = 'payment-receipts'::text) AND ((storage.foldername(name))[1] = (( SELECT auth.uid() AS uid))::text) AND (EXISTS ( SELECT 1\n   FROM bookings b\n  WHERE (((b.id)::text = (storage.foldername(objects.name))[2]) AND (b.user_id = ( SELECT auth.uid() AS uid)) AND (b.status = 'pending_payment'::text) AND (b.expires_at > now())))))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "objects",
+      "using": null,
+      "command": "INSERT"
+    },
+    {
+      "name": "Event cover images are public",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "objects",
+      "using": "(bucket_id = 'event-covers'::text)",
+      "command": "SELECT"
+    },
+    {
+      "name": "Owners and admins delete event covers",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "objects",
+      "using": "((bucket_id = 'event-covers'::text) AND (( SELECT private.current_profile_role() AS current_profile_role) = ANY (ARRAY['owner'::text, 'admin'::text])) AND ((storage.foldername(name))[1] = (( SELECT auth.uid() AS uid))::text))",
+      "command": "DELETE"
+    },
+    {
+      "name": "Owners and admins read payment receipts",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "objects",
+      "using": "((bucket_id = 'payment-receipts'::text) AND (((storage.foldername(name))[1] = (( SELECT auth.uid() AS uid))::text) OR (private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'supervisor'::text]))))",
+      "command": "SELECT"
+    },
+    {
+      "name": "Owners and admins update event covers",
+      "check": "((bucket_id = 'event-covers'::text) AND (( SELECT private.current_profile_role() AS current_profile_role) = ANY (ARRAY['owner'::text, 'admin'::text])) AND ((storage.foldername(name))[1] = (( SELECT auth.uid() AS uid))::text))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "objects",
+      "using": "((bucket_id = 'event-covers'::text) AND (( SELECT private.current_profile_role() AS current_profile_role) = ANY (ARRAY['owner'::text, 'admin'::text])) AND ((storage.foldername(name))[1] = (( SELECT auth.uid() AS uid))::text))",
+      "command": "UPDATE"
+    },
+    {
+      "name": "Owners and admins upload event covers",
+      "check": "((bucket_id = 'event-covers'::text) AND (( SELECT private.current_profile_role() AS current_profile_role) = ANY (ARRAY['owner'::text, 'admin'::text])) AND ((storage.foldername(name))[1] = (( SELECT auth.uid() AS uid))::text))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "objects",
+      "using": null,
+      "command": "INSERT"
+    }
+  ]
+}
