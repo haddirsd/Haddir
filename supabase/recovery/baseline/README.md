@@ -10,7 +10,8 @@ This directory contains first-pass SQL reconstruction artifacts based on read-on
 - `20-tables-draft.sql.md` — 16 public application tables and 158 columns.
 - `30-constraints-indexes-draft.sql.md` — 81 constraints and 33 standalone indexes (constraint-backed indexes are not duplicated).
 - `40-rls-policies-draft.sql.md` — RLS enablement for 16 tables and all 29 policies.
-- `50-triggers-draft.sql.md` — 12 distinct trigger definitions.
+- `50-triggers-draft.sql.md` — 12 distinct trigger definitions across eight target tables.
+- `60-privileges-draft.sql.md` — catalog-derived table, column-only, schema, and per-signature routine ACL reconstruction; hosted default privileges and managed roles are excluded.
 - `SECURITY_REVIEW.md` — ownership, SECURITY DEFINER, search_path and EXECUTE ACL findings.
 - `ACCESS_CONTROL_STORAGE_CRON.md` — bucket configuration, six Storage policies, two active cron jobs, schema/object grants, and default-privilege review.
 - `RLS_EFFECTIVE_ACCESS_REVIEW.md` — effective row-access map for all 16 tables, public payment-account disclosure, broad-grant/RLS interaction, and static review of key SECURITY DEFINER routines.
