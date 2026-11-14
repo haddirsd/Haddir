@@ -1,0 +1,1313 @@
+{
+  "indexes": [
+    {
+      "name": "admin_activity_log_actor_idx",
+      "table": "admin_activity_log",
+      "schema": "public",
+      "definition": "CREATE INDEX admin_activity_log_actor_idx ON public.admin_activity_log USING btree (actor_id, created_at DESC)"
+    },
+    {
+      "name": "admin_activity_log_booking_idx",
+      "table": "admin_activity_log",
+      "schema": "public",
+      "definition": "CREATE INDEX admin_activity_log_booking_idx ON public.admin_activity_log USING btree (booking_id, created_at DESC)"
+    },
+    {
+      "name": "admin_activity_log_created_at_idx",
+      "table": "admin_activity_log",
+      "schema": "public",
+      "definition": "CREATE INDEX admin_activity_log_created_at_idx ON public.admin_activity_log USING btree (created_at DESC)"
+    },
+    {
+      "name": "admin_activity_log_event_idx",
+      "table": "admin_activity_log",
+      "schema": "public",
+      "definition": "CREATE INDEX admin_activity_log_event_idx ON public.admin_activity_log USING btree (event_id, created_at DESC)"
+    },
+    {
+      "name": "admin_activity_log_pkey",
+      "table": "admin_activity_log",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX admin_activity_log_pkey ON public.admin_activity_log USING btree (id)"
+    },
+    {
+      "name": "booking_items_booking_id_idx",
+      "table": "booking_items",
+      "schema": "public",
+      "definition": "CREATE INDEX booking_items_booking_id_idx ON public.booking_items USING btree (booking_id)"
+    },
+    {
+      "name": "booking_items_pkey",
+      "table": "booking_items",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX booking_items_pkey ON public.booking_items USING btree (id)"
+    },
+    {
+      "name": "booking_items_ticket_type_id_idx",
+      "table": "booking_items",
+      "schema": "public",
+      "definition": "CREATE INDEX booking_items_ticket_type_id_idx ON public.booking_items USING btree (ticket_type_id)"
+    },
+    {
+      "name": "bookings_booking_number_key",
+      "table": "bookings",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX bookings_booking_number_key ON public.bookings USING btree (booking_number)"
+    },
+    {
+      "name": "bookings_event_idx",
+      "table": "bookings",
+      "schema": "public",
+      "definition": "CREATE INDEX bookings_event_idx ON public.bookings USING btree (event_id, status)"
+    },
+    {
+      "name": "bookings_pending_expiry_idx",
+      "table": "bookings",
+      "schema": "public",
+      "definition": "CREATE INDEX bookings_pending_expiry_idx ON public.bookings USING btree (expires_at, id) WHERE ((status = 'pending_payment'::text) AND (expires_at IS NOT NULL))"
+    },
+    {
+      "name": "bookings_pkey",
+      "table": "bookings",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX bookings_pkey ON public.bookings USING btree (id)"
+    },
+    {
+      "name": "bookings_user_idx",
+      "table": "bookings",
+      "schema": "public",
+      "definition": "CREATE INDEX bookings_user_idx ON public.bookings USING btree (user_id, created_at DESC)"
+    },
+    {
+      "name": "checkins_checked_in_by_idx",
+      "table": "checkins",
+      "schema": "public",
+      "definition": "CREATE INDEX checkins_checked_in_by_idx ON public.checkins USING btree (checked_in_by)"
+    },
+    {
+      "name": "checkins_event_id_idx",
+      "table": "checkins",
+      "schema": "public",
+      "definition": "CREATE INDEX checkins_event_id_idx ON public.checkins USING btree (event_id)"
+    },
+    {
+      "name": "checkins_pkey",
+      "table": "checkins",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX checkins_pkey ON public.checkins USING btree (id)"
+    },
+    {
+      "name": "checkins_ticket_id_key",
+      "table": "checkins",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX checkins_ticket_id_key ON public.checkins USING btree (ticket_id)"
+    },
+    {
+      "name": "email_outbox_notification_id_key",
+      "table": "email_outbox",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX email_outbox_notification_id_key ON public.email_outbox USING btree (notification_id)"
+    },
+    {
+      "name": "email_outbox_pending_idx",
+      "table": "email_outbox",
+      "schema": "public",
+      "definition": "CREATE INDEX email_outbox_pending_idx ON public.email_outbox USING btree (status, created_at) WHERE (status = ANY (ARRAY['pending'::text, 'failed'::text]))"
+    },
+    {
+      "name": "email_outbox_pkey",
+      "table": "email_outbox",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX email_outbox_pkey ON public.email_outbox USING btree (id)"
+    },
+    {
+      "name": "event_payment_accounts_event_idx",
+      "table": "event_payment_accounts",
+      "schema": "public",
+      "definition": "CREATE INDEX event_payment_accounts_event_idx ON public.event_payment_accounts USING btree (event_id, sort_order)"
+    },
+    {
+      "name": "event_payment_accounts_pkey",
+      "table": "event_payment_accounts",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX event_payment_accounts_pkey ON public.event_payment_accounts USING btree (id)"
+    },
+    {
+      "name": "event_role_assignments_event_role_idx",
+      "table": "event_role_assignments",
+      "schema": "public",
+      "definition": "CREATE INDEX event_role_assignments_event_role_idx ON public.event_role_assignments USING btree (event_id, assignment_role)"
+    },
+    {
+      "name": "event_role_assignments_one_event_per_user",
+      "table": "event_role_assignments",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX event_role_assignments_one_event_per_user ON public.event_role_assignments USING btree (user_id)"
+    },
+    {
+      "name": "event_role_assignments_pkey",
+      "table": "event_role_assignments",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX event_role_assignments_pkey ON public.event_role_assignments USING btree (user_id, event_id, assignment_role)"
+    },
+    {
+      "name": "events_created_by_idx",
+      "table": "events",
+      "schema": "public",
+      "definition": "CREATE INDEX events_created_by_idx ON public.events USING btree (created_by)"
+    },
+    {
+      "name": "events_pkey",
+      "table": "events",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX events_pkey ON public.events USING btree (id)"
+    },
+    {
+      "name": "events_public_listing_idx",
+      "table": "events",
+      "schema": "public",
+      "definition": "CREATE INDEX events_public_listing_idx ON public.events USING btree (starts_at) WHERE (status = 'published'::text)"
+    },
+    {
+      "name": "events_slug_key",
+      "table": "events",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX events_slug_key ON public.events USING btree (slug)"
+    },
+    {
+      "name": "gatekeeper_scan_logs_event_time_idx",
+      "table": "gatekeeper_scan_logs",
+      "schema": "public",
+      "definition": "CREATE INDEX gatekeeper_scan_logs_event_time_idx ON public.gatekeeper_scan_logs USING btree (event_id, scanned_at DESC)"
+    },
+    {
+      "name": "gatekeeper_scan_logs_pkey",
+      "table": "gatekeeper_scan_logs",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX gatekeeper_scan_logs_pkey ON public.gatekeeper_scan_logs USING btree (id)"
+    },
+    {
+      "name": "gatekeeper_scan_logs_ticket_id_idx",
+      "table": "gatekeeper_scan_logs",
+      "schema": "public",
+      "definition": "CREATE INDEX gatekeeper_scan_logs_ticket_id_idx ON public.gatekeeper_scan_logs USING btree (ticket_id)"
+    },
+    {
+      "name": "gatekeeper_scan_logs_user_event_time_idx",
+      "table": "gatekeeper_scan_logs",
+      "schema": "public",
+      "definition": "CREATE INDEX gatekeeper_scan_logs_user_event_time_idx ON public.gatekeeper_scan_logs USING btree (gatekeeper_user_id, event_id, scanned_at DESC)"
+    },
+    {
+      "name": "notifications_booking_reminder_unique",
+      "table": "notifications",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX notifications_booking_reminder_unique ON public.notifications USING btree (booking_id, type) WHERE ((booking_id IS NOT NULL) AND (type = ANY (ARRAY['event_reminder_3d'::text, 'event_reminder_24h'::text, 'event_reminder_6h'::text])))"
+    },
+    {
+      "name": "notifications_booking_terminal_once_idx",
+      "table": "notifications",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX notifications_booking_terminal_once_idx ON public.notifications USING btree (booking_id, type) WHERE ((booking_id IS NOT NULL) AND (type = ANY (ARRAY['ticket_approved'::text, 'payment_rejected'::text, 'booking_expired'::text])))"
+    },
+    {
+      "name": "notifications_pkey",
+      "table": "notifications",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX notifications_pkey ON public.notifications USING btree (id)"
+    },
+    {
+      "name": "notifications_user_created_idx",
+      "table": "notifications",
+      "schema": "public",
+      "definition": "CREATE INDEX notifications_user_created_idx ON public.notifications USING btree (user_id, created_at DESC)"
+    },
+    {
+      "name": "payment_methods_pkey",
+      "table": "payment_methods",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX payment_methods_pkey ON public.payment_methods USING btree (id)"
+    },
+    {
+      "name": "payment_submissions_booking_idx",
+      "table": "payment_submissions",
+      "schema": "public",
+      "definition": "CREATE INDEX payment_submissions_booking_idx ON public.payment_submissions USING btree (booking_id, created_at DESC)"
+    },
+    {
+      "name": "payment_submissions_pkey",
+      "table": "payment_submissions",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX payment_submissions_pkey ON public.payment_submissions USING btree (id)"
+    },
+    {
+      "name": "payment_submissions_reviewed_by_idx",
+      "table": "payment_submissions",
+      "schema": "public",
+      "definition": "CREATE INDEX payment_submissions_reviewed_by_idx ON public.payment_submissions USING btree (reviewed_by)"
+    },
+    {
+      "name": "payment_submissions_submitted_by_idx",
+      "table": "payment_submissions",
+      "schema": "public",
+      "definition": "CREATE INDEX payment_submissions_submitted_by_idx ON public.payment_submissions USING btree (submitted_by)"
+    },
+    {
+      "name": "profiles_pkey",
+      "table": "profiles",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX profiles_pkey ON public.profiles USING btree (id)"
+    },
+    {
+      "name": "push_subscriptions_endpoint_key",
+      "table": "push_subscriptions",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX push_subscriptions_endpoint_key ON public.push_subscriptions USING btree (endpoint)"
+    },
+    {
+      "name": "push_subscriptions_pkey",
+      "table": "push_subscriptions",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX push_subscriptions_pkey ON public.push_subscriptions USING btree (id)"
+    },
+    {
+      "name": "push_subscriptions_user_id_idx",
+      "table": "push_subscriptions",
+      "schema": "public",
+      "definition": "CREATE INDEX push_subscriptions_user_id_idx ON public.push_subscriptions USING btree (user_id)"
+    },
+    {
+      "name": "ticket_types_event_idx",
+      "table": "ticket_types",
+      "schema": "public",
+      "definition": "CREATE INDEX ticket_types_event_idx ON public.ticket_types USING btree (event_id, is_active)"
+    },
+    {
+      "name": "ticket_types_pkey",
+      "table": "ticket_types",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX ticket_types_pkey ON public.ticket_types USING btree (id)"
+    },
+    {
+      "name": "tickets_booking_id_idx",
+      "table": "tickets",
+      "schema": "public",
+      "definition": "CREATE INDEX tickets_booking_id_idx ON public.tickets USING btree (booking_id)"
+    },
+    {
+      "name": "tickets_booking_item_id_idx",
+      "table": "tickets",
+      "schema": "public",
+      "definition": "CREATE INDEX tickets_booking_item_id_idx ON public.tickets USING btree (booking_item_id)"
+    },
+    {
+      "name": "tickets_event_status_idx",
+      "table": "tickets",
+      "schema": "public",
+      "definition": "CREATE INDEX tickets_event_status_idx ON public.tickets USING btree (event_id, status)"
+    },
+    {
+      "name": "tickets_one_active_per_booking_item_uidx",
+      "table": "tickets",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX tickets_one_active_per_booking_item_uidx ON public.tickets USING btree (booking_item_id) WHERE ((booking_item_id IS NOT NULL) AND (status = ANY (ARRAY['valid'::text, 'used'::text])))"
+    },
+    {
+      "name": "tickets_pkey",
+      "table": "tickets",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX tickets_pkey ON public.tickets USING btree (id)"
+    },
+    {
+      "name": "tickets_qr_token_key",
+      "table": "tickets",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX tickets_qr_token_key ON public.tickets USING btree (qr_token)"
+    },
+    {
+      "name": "tickets_ticket_code_key",
+      "table": "tickets",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX tickets_ticket_code_key ON public.tickets USING btree (ticket_code)"
+    },
+    {
+      "name": "tickets_ticket_code_unique",
+      "table": "tickets",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX tickets_ticket_code_unique ON public.tickets USING btree (ticket_code)"
+    },
+    {
+      "name": "tickets_ticket_type_id_idx",
+      "table": "tickets",
+      "schema": "public",
+      "definition": "CREATE INDEX tickets_ticket_type_id_idx ON public.tickets USING btree (ticket_type_id)"
+    }
+  ],
+  "policies": [
+    {
+      "name": "Platform managers read activity log",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "admin_activity_log",
+      "using": "(private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text]))",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "Platform managers manage booking items",
+      "check": "(private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text]))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "booking_items",
+      "using": "(private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text]))",
+      "schema": "public",
+      "command": "ALL"
+    },
+    {
+      "name": "Platform staff read booking items",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "booking_items",
+      "using": "(EXISTS ( SELECT 1\n   FROM bookings b\n  WHERE ((b.id = booking_items.booking_id) AND (private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'supervisor'::text])))))",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "Users can read items from their own bookings",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "booking_items",
+      "using": "(EXISTS ( SELECT 1\n   FROM bookings b\n  WHERE ((b.id = booking_items.booking_id) AND (b.user_id = ( SELECT auth.uid() AS uid)))))",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "Platform managers manage bookings",
+      "check": "(private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text]))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "bookings",
+      "using": "(private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text]))",
+      "schema": "public",
+      "command": "ALL"
+    },
+    {
+      "name": "Platform staff read all bookings",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "bookings",
+      "using": "(private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'supervisor'::text]))",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "Users can read their own bookings",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "bookings",
+      "using": "(( SELECT auth.uid() AS uid) = user_id)",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "Platform managers read checkins",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "checkins",
+      "using": "(private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text]))",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "Active event accounts are visible for published events",
+      "check": null,
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "event_payment_accounts",
+      "using": "(is_active AND (EXISTS ( SELECT 1\n   FROM events e\n  WHERE ((e.id = event_payment_accounts.event_id) AND (e.status = 'published'::text)))))",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "Platform admins manage event payment accounts",
+      "check": "(private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text]))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "event_payment_accounts",
+      "using": "(private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text]))",
+      "schema": "public",
+      "command": "ALL"
+    },
+    {
+      "name": "Users read own event role assignments",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "event_role_assignments",
+      "using": "((user_id = ( SELECT auth.uid() AS uid)) OR (private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text])))",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "Assigned staff can read assigned events",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "events",
+      "using": "(EXISTS ( SELECT 1\n   FROM event_role_assignments a\n  WHERE ((a.user_id = ( SELECT auth.uid() AS uid)) AND (a.event_id = events.id) AND (a.assignment_role = ANY (ARRAY['gatekeeper'::text, 'advertiser'::text])))))",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "Platform managers manage events",
+      "check": "(private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text]))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "events",
+      "using": "(private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text]))",
+      "schema": "public",
+      "command": "ALL"
+    },
+    {
+      "name": "Published events are visible to everyone",
+      "check": null,
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "events",
+      "using": "(status = 'published'::text)",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "Assigned gatekeepers read event scan updates",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "gatekeeper_scan_logs",
+      "using": "(EXISTS ( SELECT 1\n   FROM event_role_assignments a\n  WHERE ((a.user_id = ( SELECT auth.uid() AS uid)) AND (a.event_id = gatekeeper_scan_logs.event_id) AND (a.assignment_role = ANY (ARRAY['gatekeeper'::text, 'organizer'::text])))))",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "Users read own notifications",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "notifications",
+      "using": "(user_id = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "Users update own notifications",
+      "check": "(user_id = ( SELECT auth.uid() AS uid))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "notifications",
+      "using": "(user_id = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "UPDATE"
+    },
+    {
+      "name": "Active payment methods are visible to customers",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "payment_methods",
+      "using": "(is_active OR (private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'supervisor'::text])))",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "Platform admins manage payment methods",
+      "check": "(private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text]))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "payment_methods",
+      "using": "(private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text]))",
+      "schema": "public",
+      "command": "ALL"
+    },
+    {
+      "name": "Platform staff read payment submissions",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "payment_submissions",
+      "using": "(private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'supervisor'::text]))",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "Users can read payment submissions for their own bookings",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "payment_submissions",
+      "using": "(EXISTS ( SELECT 1\n   FROM bookings b\n  WHERE ((b.id = payment_submissions.booking_id) AND (b.user_id = ( SELECT auth.uid() AS uid)))))",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "Platform staff can read profiles",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "profiles",
+      "using": "(private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text]))",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "Users can read own profile and owner can read all",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "profiles",
+      "using": "((id = ( SELECT auth.uid() AS uid)) OR ( SELECT private.current_user_is_owner() AS current_user_is_owner))",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "Users can update their own basic profile",
+      "check": "(( SELECT auth.uid() AS uid) = id)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "profiles",
+      "using": "(( SELECT auth.uid() AS uid) = id)",
+      "schema": "public",
+      "command": "UPDATE"
+    },
+    {
+      "name": "Users manage own push subscriptions",
+      "check": "(( SELECT auth.uid() AS uid) = user_id)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "push_subscriptions",
+      "using": "(( SELECT auth.uid() AS uid) = user_id)",
+      "schema": "public",
+      "command": "ALL"
+    },
+    {
+      "name": "Active ticket types for published events are visible",
+      "check": null,
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "ticket_types",
+      "using": "((is_active = true) AND (EXISTS ( SELECT 1\n   FROM events e\n  WHERE ((e.id = ticket_types.event_id) AND (e.status = 'published'::text)))))",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "Platform managers manage ticket types",
+      "check": "(private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text]))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "ticket_types",
+      "using": "(private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text]))",
+      "schema": "public",
+      "command": "ALL"
+    },
+    {
+      "name": "Platform managers read tickets",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "tickets",
+      "using": "(private.current_profile_role() = ANY (ARRAY['owner'::text, 'admin'::text]))",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "Users can read their own tickets",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "tickets",
+      "using": "(EXISTS ( SELECT 1\n   FROM bookings b\n  WHERE ((b.id = tickets.booking_id) AND (b.user_id = ( SELECT auth.uid() AS uid)))))",
+      "schema": "public",
+      "command": "SELECT"
+    }
+  ],
+  "triggers": [
+    {
+      "name": "audit_bookings",
+      "table": "bookings",
+      "schema": "public",
+      "definition": "CREATE TRIGGER audit_bookings AFTER INSERT OR DELETE OR UPDATE ON public.bookings FOR EACH ROW EXECUTE FUNCTION private.capture_admin_activity()"
+    },
+    {
+      "name": "bookings_set_updated_at",
+      "table": "bookings",
+      "schema": "public",
+      "definition": "CREATE TRIGGER bookings_set_updated_at BEFORE UPDATE ON public.bookings FOR EACH ROW EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "name": "audit_event_payment_accounts",
+      "table": "event_payment_accounts",
+      "schema": "public",
+      "definition": "CREATE TRIGGER audit_event_payment_accounts AFTER INSERT OR DELETE OR UPDATE ON public.event_payment_accounts FOR EACH ROW EXECUTE FUNCTION private.capture_admin_activity()"
+    },
+    {
+      "name": "audit_events",
+      "table": "events",
+      "schema": "public",
+      "definition": "CREATE TRIGGER audit_events AFTER INSERT OR DELETE OR UPDATE ON public.events FOR EACH ROW EXECUTE FUNCTION private.capture_admin_activity()"
+    },
+    {
+      "name": "events_set_updated_at",
+      "table": "events",
+      "schema": "public",
+      "definition": "CREATE TRIGGER events_set_updated_at BEFORE UPDATE ON public.events FOR EACH ROW EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "name": "dispatch_haddir_web_push_after_insert",
+      "table": "notifications",
+      "schema": "public",
+      "definition": "CREATE TRIGGER dispatch_haddir_web_push_after_insert AFTER INSERT ON public.notifications FOR EACH ROW EXECUTE FUNCTION private.dispatch_haddir_web_push()"
+    },
+    {
+      "name": "audit_payment_submissions",
+      "table": "payment_submissions",
+      "schema": "public",
+      "definition": "CREATE TRIGGER audit_payment_submissions AFTER INSERT OR DELETE OR UPDATE ON public.payment_submissions FOR EACH ROW EXECUTE FUNCTION private.capture_admin_activity()"
+    },
+    {
+      "name": "audit_profiles",
+      "table": "profiles",
+      "schema": "public",
+      "definition": "CREATE TRIGGER audit_profiles AFTER INSERT OR DELETE OR UPDATE ON public.profiles FOR EACH ROW EXECUTE FUNCTION private.capture_admin_activity()"
+    },
+    {
+      "name": "profiles_set_updated_at",
+      "table": "profiles",
+      "schema": "public",
+      "definition": "CREATE TRIGGER profiles_set_updated_at BEFORE UPDATE ON public.profiles FOR EACH ROW EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "name": "audit_ticket_types",
+      "table": "ticket_types",
+      "schema": "public",
+      "definition": "CREATE TRIGGER audit_ticket_types AFTER INSERT OR DELETE OR UPDATE ON public.ticket_types FOR EACH ROW EXECUTE FUNCTION private.capture_admin_activity()"
+    },
+    {
+      "name": "ticket_types_set_updated_at",
+      "table": "ticket_types",
+      "schema": "public",
+      "definition": "CREATE TRIGGER ticket_types_set_updated_at BEFORE UPDATE ON public.ticket_types FOR EACH ROW EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "name": "audit_tickets",
+      "table": "tickets",
+      "schema": "public",
+      "definition": "CREATE TRIGGER audit_tickets AFTER INSERT OR DELETE OR UPDATE ON public.tickets FOR EACH ROW EXECUTE FUNCTION private.capture_admin_activity()"
+    }
+  ],
+  "constraints": [
+    {
+      "name": "admin_activity_log_actor_id_fkey",
+      "type": "f",
+      "table": "admin_activity_log",
+      "schema": "public",
+      "definition": "FOREIGN KEY (actor_id) REFERENCES profiles(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "admin_activity_log_booking_id_fkey",
+      "type": "f",
+      "table": "admin_activity_log",
+      "schema": "public",
+      "definition": "FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "admin_activity_log_event_id_fkey",
+      "type": "f",
+      "table": "admin_activity_log",
+      "schema": "public",
+      "definition": "FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "admin_activity_log_pkey",
+      "type": "p",
+      "table": "admin_activity_log",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "booking_items_booking_id_fkey",
+      "type": "f",
+      "table": "booking_items",
+      "schema": "public",
+      "definition": "FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "booking_items_line_total_check",
+      "type": "c",
+      "table": "booking_items",
+      "schema": "public",
+      "definition": "CHECK ((line_total >= (0)::numeric))"
+    },
+    {
+      "name": "booking_items_pkey",
+      "type": "p",
+      "table": "booking_items",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "booking_items_quantity_check",
+      "type": "c",
+      "table": "booking_items",
+      "schema": "public",
+      "definition": "CHECK ((quantity > 0))"
+    },
+    {
+      "name": "booking_items_ticket_type_id_fkey",
+      "type": "f",
+      "table": "booking_items",
+      "schema": "public",
+      "definition": "FOREIGN KEY (ticket_type_id) REFERENCES ticket_types(id) ON DELETE RESTRICT"
+    },
+    {
+      "name": "booking_items_unit_price_check",
+      "type": "c",
+      "table": "booking_items",
+      "schema": "public",
+      "definition": "CHECK ((unit_price >= (0)::numeric))"
+    },
+    {
+      "name": "bookings_booking_number_key",
+      "type": "u",
+      "table": "bookings",
+      "schema": "public",
+      "definition": "UNIQUE (booking_number)"
+    },
+    {
+      "name": "bookings_event_id_fkey",
+      "type": "f",
+      "table": "bookings",
+      "schema": "public",
+      "definition": "FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE RESTRICT"
+    },
+    {
+      "name": "bookings_pkey",
+      "type": "p",
+      "table": "bookings",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "bookings_status_check",
+      "type": "c",
+      "table": "bookings",
+      "schema": "public",
+      "definition": "CHECK ((status = ANY (ARRAY['pending_payment'::text, 'under_review'::text, 'confirmed'::text, 'rejected'::text, 'cancelled'::text, 'expired'::text])))"
+    },
+    {
+      "name": "bookings_subtotal_check",
+      "type": "c",
+      "table": "bookings",
+      "schema": "public",
+      "definition": "CHECK ((subtotal >= (0)::numeric))"
+    },
+    {
+      "name": "bookings_user_id_fkey",
+      "type": "f",
+      "table": "bookings",
+      "schema": "public",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "checkins_checked_in_by_fkey",
+      "type": "f",
+      "table": "checkins",
+      "schema": "public",
+      "definition": "FOREIGN KEY (checked_in_by) REFERENCES auth.users(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "checkins_event_id_fkey",
+      "type": "f",
+      "table": "checkins",
+      "schema": "public",
+      "definition": "FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE RESTRICT"
+    },
+    {
+      "name": "checkins_pkey",
+      "type": "p",
+      "table": "checkins",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "checkins_ticket_id_fkey",
+      "type": "f",
+      "table": "checkins",
+      "schema": "public",
+      "definition": "FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE RESTRICT"
+    },
+    {
+      "name": "checkins_ticket_id_key",
+      "type": "u",
+      "table": "checkins",
+      "schema": "public",
+      "definition": "UNIQUE (ticket_id)"
+    },
+    {
+      "name": "email_outbox_booking_id_fkey",
+      "type": "f",
+      "table": "email_outbox",
+      "schema": "public",
+      "definition": "FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "email_outbox_notification_id_fkey",
+      "type": "f",
+      "table": "email_outbox",
+      "schema": "public",
+      "definition": "FOREIGN KEY (notification_id) REFERENCES notifications(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "email_outbox_notification_id_key",
+      "type": "u",
+      "table": "email_outbox",
+      "schema": "public",
+      "definition": "UNIQUE (notification_id)"
+    },
+    {
+      "name": "email_outbox_notification_type_check",
+      "type": "c",
+      "table": "email_outbox",
+      "schema": "public",
+      "definition": "CHECK ((notification_type = ANY (ARRAY['ticket_approved'::text, 'payment_rejected'::text])))"
+    },
+    {
+      "name": "email_outbox_pkey",
+      "type": "p",
+      "table": "email_outbox",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "email_outbox_recipient_user_id_fkey",
+      "type": "f",
+      "table": "email_outbox",
+      "schema": "public",
+      "definition": "FOREIGN KEY (recipient_user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "email_outbox_status_check",
+      "type": "c",
+      "table": "email_outbox",
+      "schema": "public",
+      "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'sending'::text, 'sent'::text, 'failed'::text])))"
+    },
+    {
+      "name": "event_payment_accounts_account_name_check",
+      "type": "c",
+      "table": "event_payment_accounts",
+      "schema": "public",
+      "definition": "CHECK ((length(TRIM(BOTH FROM account_name)) > 0))"
+    },
+    {
+      "name": "event_payment_accounts_account_number_check",
+      "type": "c",
+      "table": "event_payment_accounts",
+      "schema": "public",
+      "definition": "CHECK ((length(TRIM(BOTH FROM account_number)) > 0))"
+    },
+    {
+      "name": "event_payment_accounts_event_id_fkey",
+      "type": "f",
+      "table": "event_payment_accounts",
+      "schema": "public",
+      "definition": "FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "event_payment_accounts_pkey",
+      "type": "p",
+      "table": "event_payment_accounts",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "event_role_assignments_assignment_role_check",
+      "type": "c",
+      "table": "event_role_assignments",
+      "schema": "public",
+      "definition": "CHECK ((assignment_role = ANY (ARRAY['gatekeeper'::text, 'advertiser'::text])))"
+    },
+    {
+      "name": "event_role_assignments_event_id_fkey",
+      "type": "f",
+      "table": "event_role_assignments",
+      "schema": "public",
+      "definition": "FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "event_role_assignments_one_event_per_user",
+      "type": "u",
+      "table": "event_role_assignments",
+      "schema": "public",
+      "definition": "UNIQUE (user_id)"
+    },
+    {
+      "name": "event_role_assignments_pkey",
+      "type": "p",
+      "table": "event_role_assignments",
+      "schema": "public",
+      "definition": "PRIMARY KEY (user_id, event_id, assignment_role)"
+    },
+    {
+      "name": "event_role_assignments_user_id_fkey",
+      "type": "f",
+      "table": "event_role_assignments",
+      "schema": "public",
+      "definition": "FOREIGN KEY (user_id) REFERENCES profiles(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "events_created_by_fkey",
+      "type": "f",
+      "table": "events",
+      "schema": "public",
+      "definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "events_pkey",
+      "type": "p",
+      "table": "events",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "events_platform_fee_percent_check",
+      "type": "c",
+      "table": "events",
+      "schema": "public",
+      "definition": "CHECK (((platform_fee_percent >= (0)::numeric) AND (platform_fee_percent <= (100)::numeric)))"
+    },
+    {
+      "name": "events_slug_key",
+      "type": "u",
+      "table": "events",
+      "schema": "public",
+      "definition": "UNIQUE (slug)"
+    },
+    {
+      "name": "events_status_check",
+      "type": "c",
+      "table": "events",
+      "schema": "public",
+      "definition": "CHECK ((status = ANY (ARRAY['draft'::text, 'published'::text, 'cancelled'::text, 'completed'::text])))"
+    },
+    {
+      "name": "events_valid_dates",
+      "type": "c",
+      "table": "events",
+      "schema": "public",
+      "definition": "CHECK (((ends_at IS NULL) OR (ends_at > starts_at)))"
+    },
+    {
+      "name": "gatekeeper_scan_logs_entry_method_check",
+      "type": "c",
+      "table": "gatekeeper_scan_logs",
+      "schema": "public",
+      "definition": "CHECK ((entry_method = ANY (ARRAY['qr'::text, 'manual'::text])))"
+    },
+    {
+      "name": "gatekeeper_scan_logs_event_id_fkey",
+      "type": "f",
+      "table": "gatekeeper_scan_logs",
+      "schema": "public",
+      "definition": "FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "gatekeeper_scan_logs_gatekeeper_user_id_fkey",
+      "type": "f",
+      "table": "gatekeeper_scan_logs",
+      "schema": "public",
+      "definition": "FOREIGN KEY (gatekeeper_user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "gatekeeper_scan_logs_outcome_check",
+      "type": "c",
+      "table": "gatekeeper_scan_logs",
+      "schema": "public",
+      "definition": "CHECK ((outcome = ANY (ARRAY['accepted'::text, 'used'::text, 'forged'::text, 'invalid'::text])))"
+    },
+    {
+      "name": "gatekeeper_scan_logs_pkey",
+      "type": "p",
+      "table": "gatekeeper_scan_logs",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "gatekeeper_scan_logs_ticket_id_fkey",
+      "type": "f",
+      "table": "gatekeeper_scan_logs",
+      "schema": "public",
+      "definition": "FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "notifications_booking_id_fkey",
+      "type": "f",
+      "table": "notifications",
+      "schema": "public",
+      "definition": "FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "notifications_pkey",
+      "type": "p",
+      "table": "notifications",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "notifications_type_check",
+      "type": "c",
+      "table": "notifications",
+      "schema": "public",
+      "definition": "CHECK ((type = ANY (ARRAY['ticket_approved'::text, 'payment_rejected'::text, 'general'::text, 'booking_expired'::text, 'event_reminder_3d'::text, 'event_reminder_24h'::text, 'event_reminder_6h'::text, 'ticket_checked_in'::text])))"
+    },
+    {
+      "name": "notifications_user_id_fkey",
+      "type": "f",
+      "table": "notifications",
+      "schema": "public",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "payment_methods_pkey",
+      "type": "p",
+      "table": "payment_methods",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "payment_submissions_amount_check",
+      "type": "c",
+      "table": "payment_submissions",
+      "schema": "public",
+      "definition": "CHECK ((amount >= (0)::numeric))"
+    },
+    {
+      "name": "payment_submissions_booking_id_fkey",
+      "type": "f",
+      "table": "payment_submissions",
+      "schema": "public",
+      "definition": "FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "payment_submissions_pkey",
+      "type": "p",
+      "table": "payment_submissions",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "payment_submissions_reviewed_by_fkey",
+      "type": "f",
+      "table": "payment_submissions",
+      "schema": "public",
+      "definition": "FOREIGN KEY (reviewed_by) REFERENCES auth.users(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "payment_submissions_status_check",
+      "type": "c",
+      "table": "payment_submissions",
+      "schema": "public",
+      "definition": "CHECK ((status = ANY (ARRAY['submitted'::text, 'approved'::text, 'rejected'::text])))"
+    },
+    {
+      "name": "payment_submissions_submitted_by_fkey",
+      "type": "f",
+      "table": "payment_submissions",
+      "schema": "public",
+      "definition": "FOREIGN KEY (submitted_by) REFERENCES auth.users(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "profiles_id_fkey",
+      "type": "f",
+      "table": "profiles",
+      "schema": "public",
+      "definition": "FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "profiles_pkey",
+      "type": "p",
+      "table": "profiles",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "profiles_role_check",
+      "type": "c",
+      "table": "profiles",
+      "schema": "public",
+      "definition": "CHECK ((role = ANY (ARRAY['customer'::text, 'organizer'::text, 'gatekeeper'::text, 'advertiser'::text, 'supervisor'::text, 'admin'::text, 'owner'::text])))"
+    },
+    {
+      "name": "push_subscriptions_endpoint_key",
+      "type": "u",
+      "table": "push_subscriptions",
+      "schema": "public",
+      "definition": "UNIQUE (endpoint)"
+    },
+    {
+      "name": "push_subscriptions_https_endpoint",
+      "type": "c",
+      "table": "push_subscriptions",
+      "schema": "public",
+      "definition": "CHECK ((endpoint ~ '^https://'::text))"
+    },
+    {
+      "name": "push_subscriptions_pkey",
+      "type": "p",
+      "table": "push_subscriptions",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "push_subscriptions_subscription_object",
+      "type": "c",
+      "table": "push_subscriptions",
+      "schema": "public",
+      "definition": "CHECK (((jsonb_typeof(subscription) = 'object'::text) AND (subscription ? 'keys'::text) AND (subscription ? 'endpoint'::text)))"
+    },
+    {
+      "name": "push_subscriptions_user_id_fkey",
+      "type": "f",
+      "table": "push_subscriptions",
+      "schema": "public",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "ticket_types_check",
+      "type": "c",
+      "table": "ticket_types",
+      "schema": "public",
+      "definition": "CHECK (((quantity_sold >= 0) AND (quantity_sold <= quantity_total)))"
+    },
+    {
+      "name": "ticket_types_event_id_fkey",
+      "type": "f",
+      "table": "ticket_types",
+      "schema": "public",
+      "definition": "FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "ticket_types_pkey",
+      "type": "p",
+      "table": "ticket_types",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "ticket_types_price_check",
+      "type": "c",
+      "table": "ticket_types",
+      "schema": "public",
+      "definition": "CHECK ((price >= (0)::numeric))"
+    },
+    {
+      "name": "ticket_types_quantity_total_check",
+      "type": "c",
+      "table": "ticket_types",
+      "schema": "public",
+      "definition": "CHECK ((quantity_total >= 0))"
+    },
+    {
+      "name": "tickets_booking_id_fkey",
+      "type": "f",
+      "table": "tickets",
+      "schema": "public",
+      "definition": "FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "tickets_booking_item_id_fkey",
+      "type": "f",
+      "table": "tickets",
+      "schema": "public",
+      "definition": "FOREIGN KEY (booking_item_id) REFERENCES booking_items(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "tickets_event_id_fkey",
+      "type": "f",
+      "table": "tickets",
+      "schema": "public",
+      "definition": "FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE RESTRICT"
+    },
+    {
+      "name": "tickets_pkey",
+      "type": "p",
+      "table": "tickets",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "tickets_qr_token_key",
+      "type": "u",
+      "table": "tickets",
+      "schema": "public",
+      "definition": "UNIQUE (qr_token)"
+    },
+    {
+      "name": "tickets_status_check",
+      "type": "c",
+      "table": "tickets",
+      "schema": "public",
+      "definition": "CHECK ((status = ANY (ARRAY['valid'::text, 'used'::text, 'cancelled'::text])))"
+    },
+    {
+      "name": "tickets_ticket_code_key",
+      "type": "u",
+      "table": "tickets",
+      "schema": "public",
+      "definition": "UNIQUE (ticket_code)"
+    },
+    {
+      "name": "tickets_ticket_type_id_fkey",
+      "type": "f",
+      "table": "tickets",
+      "schema": "public",
+      "definition": "FOREIGN KEY (ticket_type_id) REFERENCES ticket_types(id) ON DELETE RESTRICT"
+    }
+  ]
+}
