@@ -19,26 +19,18 @@ import { useAuth } from "../features/auth/hooks/useAuth";
 import { useGatekeeper } from "../features/gatekeeper/hooks/useGatekeeper";
 import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
 import type { AccountDialog } from "../features/customer-account/components/AccountDialogs";
-
-type Tab="home"|"tickets"|"notifications"|"profile";
+import { useAppNavigation } from "../components/layout/hooks/useAppNavigation";
 export default function Home(){
- const [activeTab,setActiveTab]=useState<Tab>("home"),[darkMode,setDarkMode]=useState(false),[showPrivacySecurity,setShowPrivacySecurity]=useState(false),[deletingAccount,setDeletingAccount]=useState(false);
+ const [darkMode,setDarkMode]=useState(false),[deletingAccount,setDeletingAccount]=useState(false);
  const [accountDialog,setAccountDialog]=useState<AccountDialog>(null),[deleteEmailInput,setDeleteEmailInput]=useState(""),[uiNotice,setUiNotice]=useState("");
  const [bookingGate,setBookingGate]=useState<"login"|"phone"|null>(null);
- const [eventResetKey,setEventResetKey]=useState(0),[isEventDetailOpen,setIsEventDetailOpen]=useState(false);
+ const [isEventDetailOpen,setIsEventDetailOpen]=useState(false);
  const [profileSaving,setProfileSaving]=useState(false);
- const [activeWorkspace,setActiveWorkspace]=useState<"customer"|"organizer"|"gatekeeper"|"advertiser"|"admin"|"owner"|null>(null);
- const [isGatekeeperPage,setIsGatekeeperPage]=useState(false);
+ const { activeTab, setActiveTab, showPrivacySecurity, setShowPrivacySecurity, eventResetKey, setEventResetKey, activeWorkspace, isGatekeeperPage, go, backFromGatekeeper, closeGatekeeper } = useAppNavigation();
  const { authUser, userRole, assignedEvent, fullName, setFullName, email, phone, setPhone, avatarUrl, profileEditing, setProfileEditing, saved, setSaved, authMessage, setAuthMessage } = useAuth();
  const { myTickets, myNotifications, accountDataLoading, accountDataError, markNotificationRead: markCustomerNotificationReadAction, markAllNotificationsRead: markAllCustomerNotificationsReadAction } = useCustomerAccount(authUser?.id ?? null);
  const [ticketFilter,setTicketFilter]=useState<"new"|"used">("new");
  const [expandedTicketId,setExpandedTicketId]=useState<string|null>(null);
-  useEffect(()=>{
-  const params=new URLSearchParams(window.location.search);
-  const tab=params.get("tab");
-  if(tab==="tickets"||tab==="notifications"||tab==="profile")setActiveTab(tab);
-  if(params.get("workspace")==="gatekeeper"){setActiveWorkspace("gatekeeper");setIsGatekeeperPage(true);}
- },[]);
  useEffect(()=>{const saved=window.localStorage.getItem(THEME_STORAGE_KEY);const prefersDark=window.matchMedia?.("(prefers-color-scheme: dark)").matches;setDarkMode(saved?saved==="dark":!!prefersDark);},[]);
  useEffect(()=>{document.documentElement.dataset.theme=darkMode?"dark":"light";document.documentElement.style.colorScheme=darkMode?"dark":"light";window.localStorage.setItem(THEME_STORAGE_KEY,darkMode?"dark":"light");const themeMeta=document.querySelector('meta[name="theme-color"]');themeMeta?.setAttribute("content",darkMode?"#1D135D":"#F6F4FF");},[darkMode]);
  const gatekeeper = useGatekeeper({ authUser, assignedEvent, userRole, isGatekeeperPage, activeWorkspace });
@@ -64,14 +56,6 @@ export default function Home(){
   setAccountDialog,
   setDeleteEmailInput,
  });
- const go=(tab:Tab)=>{
-  setShowPrivacySecurity(false);setEventResetKey(value=>value+1);setActiveTab(tab);
-  const url=new URL(window.location.href);
-  if(tab==="home")url.searchParams.delete("tab");else url.searchParams.set("tab",tab);
-  url.searchParams.delete("workspace");setIsGatekeeperPage(false);setActiveWorkspace(null);
-  window.history.replaceState({}, "", url.pathname+url.search+url.hash);
-  window.scrollTo({top:0,behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});
- };
  const notificationView = useCustomerNotificationView({
   notifications: myNotifications,
   markNotificationRead: markCustomerNotificationReadAction,
@@ -98,13 +82,7 @@ export default function Home(){
   onGoHome={()=>go("home")}
   onToggleTheme={()=>setDarkMode(value=>!value)}
   onBackFromPrivacy={()=>setShowPrivacySecurity(false)}
-  onBackFromGatekeeper={()=>{
-   setIsGatekeeperPage(false);
-   setActiveWorkspace(null);
-   const url=new URL(window.location.href);
-   url.searchParams.delete("workspace");
-   window.location.assign(url.pathname+url.search+url.hash);
-  }}
+  onBackFromGatekeeper={backFromGatekeeper}
  />
  {!isGatekeeperPage&&!showPrivacySecurity&&<DesktopNav activeTab={activeTab} unreadCount={notificationView.unreadCount} onNavigate={go}/>}
  <div className="app-content">
@@ -172,7 +150,7 @@ export default function Home(){
    onCodeChange={setGatekeeperCode}
    onManualSubmit={()=>{setScannerOpen(false);setManualEntryOpen(false);void runGatekeeperAction(true,gatekeeperCode,"manual");}}
    onAcknowledgeResult={acknowledgeGatekeeperResult}
-   onClose={()=>{const url=new URL(window.location.href);url.searchParams.delete("workspace");url.searchParams.set("tab","profile");window.location.assign(url.pathname+url.search+url.hash);}}
+   onClose={closeGatekeeper}
   />}
  </div>
  <AppOverlays
