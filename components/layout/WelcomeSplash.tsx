@@ -23,7 +23,7 @@ export function WelcomeSplash() {
   }, []);
 
   if (!showWelcome) return null;
-  return {showWelcome&&<div id="haddir-splash" className={welcomeFading?"out":""} role="img" aria-label="حاضر" onClick={()=>{if(!welcomeFading){setWelcomeFading(true);window.setTimeout(()=>setShowWelcome(false),450);}}}>
+  return <div id="haddir-splash" className={welcomeFading?"out":""} role="img" aria-label="حاضر" onClick={()=>{if(!welcomeFading){setWelcomeFading(true);window.setTimeout(()=>setShowWelcome(false),450);}}}>
   <svg viewBox="30 370 905 230" aria-hidden="true">
     <g className="logo p">
       <path className="line" d="M60 484H905" stroke="#fff" strokeWidth="4" strokeDasharray="12 9" strokeLinecap="round" fill="none"/>
@@ -54,5 +54,5 @@ export function WelcomeSplash() {
       </g>
     </g>
   </svg>
-</div>};
+</div>;
 }
