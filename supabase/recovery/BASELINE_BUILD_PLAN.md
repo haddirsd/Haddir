@@ -37,6 +37,7 @@ Keep all generated artifacts quarantined under `supabase/recovery/baseline/`:
 - `60-privileges-draft.sql.md` — grouped app-table grants, three explicit column-only UPDATE grants, and exact routine EXECUTE ACL reconstruction; no hosted default privileges or managed role memberships.
 - `DDL_RECONCILIATION_AUDIT.md` — source-level structural comparison of table/column, constraint/index, policy, trigger, and privilege drafts against the production catalog.
 - `70-storage-cron-draft.md` — Storage bucket config excerpt, six Storage policies, and two cron definitions; no Storage schema recreation or secret values.
+- `APPLICATION_INTEGRATION_AUDIT.md` — static verification of application RPC parameters/return contracts and documented legacy/group ticket UI mismatch.
 - `SECURITY_REVIEW.md` — routine ownership, security mode, search_path and EXECUTE ACL review.
 - `ACCESS_CONTROL_STORAGE_CRON.md` — exact Storage bucket/policy inventory, cron job definitions, schema/object grants, and default-privilege findings.
 - `RLS_EFFECTIVE_ACCESS_REVIEW.md` — effective row-level access matrix, public payment-account data boundary, broad SQL grant/RLS interaction, and static review of key SECURITY DEFINER routines.
