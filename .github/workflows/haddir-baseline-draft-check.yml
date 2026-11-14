@@ -7,6 +7,7 @@ on:
     paths:
       - "supabase/recovery/baseline/**"
       - "supabase/recovery/test-harness/**"
+      - "supabase/recovery/security-drafts/**"
       - ".github/workflows/haddir-baseline-draft-check.yml"
 
 permissions:
