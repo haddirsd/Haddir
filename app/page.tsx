@@ -1,8 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getSupabaseBrowserClient } from "../lib/supabase/browser";
 import { THEME_STORAGE_KEY } from "../lib/constants";
-import { normalizeSudanesePhone, isValidSudanesePhone } from "../lib/utils/phone";
 import { AppShell } from "../components/layout/AppShell";
 import { BottomNav, DesktopNav } from "../components/layout/BottomNav";
 import { PageHeader } from "../components/layout/PageHeader";
@@ -13,10 +11,9 @@ import { EventsWorkspace } from "../features/events/components/EventsWorkspace";
 import { TicketWorkspace } from "../features/customer-account/components/TicketWorkspace";
 import { NotificationsWorkspace } from "../features/customer-account/components/NotificationsWorkspace";
 import { useCustomerAccount } from "../features/customer-account/hooks/useCustomerAccount";
+import { useCustomerAccountActions } from "../features/customer-account/hooks/useCustomerAccountActions";
 import { useCustomerNotificationView } from "../features/customer-account/hooks/useCustomerNotificationView";
-import { requestCustomerAccountDeletion } from "../features/customer-account/services/customer-account.service";
 import { useAuth } from "../features/auth/hooks/useAuth";
-import { signInWithGoogle as startGoogleSignIn, updateCustomerProfile } from "../features/auth/services/auth.service";
 import { useGatekeeper } from "../features/gatekeeper/hooks/useGatekeeper";
 import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
 import { HaddirDialog } from "../components/ui/HaddirDialog";
@@ -54,32 +51,21 @@ export default function Home(){
   scannerOpen, setScannerOpen, videoRef, runGatekeeperAction, openScanner, openManualEntry, acknowledgeGatekeeperResult,
  } = gatekeeper;
  useEffect(()=>{if(!authUser){setGatekeeperResult(null);setGatekeeperCode("");}},[authUser]);
- const signInWithGoogle=async()=>{const error=await startGoogleSignIn();if(error)setAuthMessage(error);};
- const saveProfile=async()=>{if(!authUser){setAuthMessage("سجّل الدخول أولاً لحفظ بياناتك.");return;}const cleanName=fullName.trim();const normalizedPhone=normalizeSudanesePhone(phone);if(cleanName.length<2){setAuthMessage("اكتب اسمك بصورة صحيحة.");return;}if(!isValidSudanesePhone(normalizedPhone)){setAuthMessage("رقم الهاتف لازم يكون 10 خانات بالضبط ويبدأ بصفر، مثال: 09XXXXXXXX.");return;}setProfileSaving(true);setSaved(false);setAuthMessage("");const result=await updateCustomerProfile(authUser.id,cleanName,normalizedPhone);setProfileSaving(false);if(result.error){setAuthMessage(result.error);return;}setFullName(result.fullName||cleanName);setPhone(result.phone||normalizedPhone);setProfileEditing(false);setSaved(true);};
- const deleteAccount=()=>{
-  if(!authUser?.email){setAuthMessage("سجّل الدخول أولاً عشان تقدر تحذف حسابك.");return;}
-  setDeleteEmailInput("");
-  setAccountDialog("delete-email");
- };
- const executeDeleteAccount=async()=>{
-  const confirmedEmail=deleteEmailInput.trim();
-  if(!authUser?.email)return;
-  if(confirmedEmail.toLowerCase()!==authUser.email.toLowerCase()){setAccountDialog(null);setAuthMessage("البريد الإلكتروني غير مطابق. لم يتم حذف أي بيانات.");return;}
-  setAccountDialog(null);setDeletingAccount(true);setAuthMessage("");
-  const deletion=await requestCustomerAccountDeletion(confirmedEmail);
-  setDeletingAccount(false);
-  if(deletion.error){setAuthMessage(deletion.error);return;}
-  const supabase=getSupabaseBrowserClient();
-  if(supabase)await supabase.auth.signOut();
-  window.location.assign("/?tab=profile");
- };
- const signOut=()=>setAccountDialog("logout");
- const confirmSignOut=async()=>{
-  setAccountDialog(null);
-  const supabase=getSupabaseBrowserClient();if(supabase){const {error}=await supabase.auth.signOut();if(error){setAuthMessage("تعذر تسجيل الخروج حالياً. حاول مرة أخرى.");return;}}
-  setAuthMessage("تم تسجيل الخروج بنجاح. يمكنك تسجيل الدخول مرة أخرى في أي وقت.");
- };
-
+ const accountActions = useCustomerAccountActions({
+  authUser,
+  fullName,
+  phone,
+  deleteEmailInput,
+  setFullName,
+  setPhone,
+  setProfileEditing,
+  setSaved,
+  setAuthMessage,
+  setProfileSaving,
+  setDeletingAccount,
+  setAccountDialog,
+  setDeleteEmailInput,
+ });
  const go=(tab:Tab)=>{
   setShowPrivacySecurity(false);setEventResetKey(value=>value+1);setActiveTab(tab);
   const url=new URL(window.location.href);
@@ -182,8 +168,8 @@ export default function Home(){
   saved={saved} setSaved={setSaved} authMessage={authMessage} setAuthMessage={setAuthMessage}
   profileSaving={profileSaving} deletingAccount={deletingAccount} darkMode={darkMode}
   setDarkMode={setDarkMode} showPrivacySecurity={showPrivacySecurity}
-  setShowPrivacySecurity={setShowPrivacySecurity} saveProfile={()=>void saveProfile()}
-  signInWithGoogle={()=>void signInWithGoogle()} deleteAccount={deleteAccount} signOut={signOut}
+  setShowPrivacySecurity={setShowPrivacySecurity} saveProfile={()=>void accountActions.saveProfile()}
+  signInWithGoogle={()=>void accountActions.signInWithGoogle()} deleteAccount={accountActions.deleteAccount} signOut={accountActions.signOut}
 />}
 {isGatekeeperPage&&<GatekeeperWorkspace
    userRole={userRole}
@@ -212,13 +198,13 @@ export default function Home(){
   deleteEmailInput={deleteEmailInput}
   setDeleteEmailInput={setDeleteEmailInput}
   deletingAccount={deletingAccount}
-  onConfirmSignOut={confirmSignOut}
+  onConfirmSignOut={accountActions.confirmSignOut}
   onContinueDelete={()=>{
    if(!deleteEmailInput.trim()){setAuthMessage("اكتب البريد الإلكتروني أولاً.");return;}
    if(deleteEmailInput.trim().toLowerCase()!==authUser?.email?.toLowerCase()){setAccountDialog(null);setAuthMessage("البريد الإلكتروني غير مطابق. لم يتم حذف أي بيانات.");return;}
    setAccountDialog("delete-final");
   }}
-  onExecuteDelete={executeDeleteAccount}
+  onExecuteDelete={accountActions.executeDeleteAccount}
   onClose={()=>setAccountDialog(null)}
  />
  {bookingGate&&<div className="booking-gate-backdrop" role="presentation"><section className="booking-gate-dialog" role="dialog" aria-modal="true" aria-labelledby="booking-gate-title"><span className="booking-gate-icon"><UserRound size={28}/></span><h2 id="booking-gate-title">{bookingGate==="phone"?"أضف رقم جوالك لإكمال الحجز":"سجّل الدخول لإكمال الحجز"}</h2><p>{bookingGate==="phone"?"باقي خطوة واحدة! أضف رقم جوالك عشان نقدر نكمل حجزك ونتواصل معاك عند الحاجة.":"تحتاج تسجّل الدخول أولاً عشان نربط الحجز بحسابك ونقدر نتابع تذكرتك."}</p><button type="button" className="booking-gate-primary" onClick={()=>{const gate=bookingGate;if(gate==="login")window.sessionStorage.setItem("haddir_booking_phone_required","1");setBookingGate(null);setEventResetKey(value=>value+1);setActiveTab("profile");setAuthMessage(gate==="login"?"سجّل الدخول لمواصلة الحجز.":"أضف رقم جوالك لمواصلة الحجز.");if(gate==="phone")setProfileEditing(true);window.scrollTo({top:0,behavior:"smooth"});}}>{bookingGate==="phone"?"إضافة رقم الجوال":"الانتقال لتسجيل الدخول"}</button><button type="button" className="booking-gate-secondary" onClick={()=>setBookingGate(null)}>لاحقاً</button></section></div>}
