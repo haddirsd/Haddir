@@ -116,3 +116,62 @@ All 33 standalone index statements match the live pg_indexes.indexdef output exa
 This conclusion is limited to the public application table/column/constraint/index scope above. It does not certify routine bodies, grants, policies, triggers, Supabase-managed schemas, Storage, cron execution, application behavior, or historical migration completeness; those have separate audits and/or remain separate validation work.
 
 The production queries used for this reconciliation were catalog-only SELECTs. No production DDL/DML, migration, grant, policy, or index change was made. The report update is documentation-only on chore/restore-supabase-migration-history; main remains untouched and no Vercel deployment was triggered.
+
+
+## 8. Fresh live-production routine, privilege, and RLS reconciliation — 2026-11-14
+
+A fresh read-only catalog extraction was compared with the preserved production catalog, routine draft, policy draft, and privilege draft.
+
+### Routine definitions and execution properties
+
+| Check | Live production | Draft | Result |
+|---|---:|---:|---|
+| Routine identities / definitions | 32 | 32 | Exact definition match |
+| Owner = postgres | 32 | 32 | Exact |
+| Explicit empty search_path | 32 | 32 | Exact |
+| SECURITY DEFINER | 23 | 23 | Exact |
+| SECURITY INVOKER | 9 | 9 | Exact |
+| Private routines | 17 | 17 | Exact |
+| Private SECURITY DEFINER | 17 | 17 | Exact |
+| Public SECURITY DEFINER | 6 | 6 | Exact |
+
+All 32 routine signatures and pg_get_functiondef bodies match exactly. The corrected schema inventory is 17 private routines (all SECURITY DEFINER) and 15 public routines (six SECURITY DEFINER, nine invoker-security). All routine languages match the captured definitions.
+
+### Routine EXECUTE ACLs
+
+- 32 per-signature REVOKE statements cover all 32 routines.
+- 41 explicit EXECUTE grant entries match the live ACL exactly.
+- The live ACL contains 32 owner EXECUTE entries plus those 41 explicit grantee entries.
+- No unexpected non-owner EXECUTE ACL entries were found outside the draft.
+- public.get_haddir_push_config() is executable by service_role and owner postgres only.
+- public.set_updated_at() has the observed PUBLIC EXECUTE grant, plus explicit anon/authenticated/service_role grants.
+- private.gatekeeper_ticket_action_core(text, boolean) has authenticated EXECUTE in production. This remains a high-priority security finding because direct execution can bypass wrapper scan logging. The recovery draft records the current grant faithfully; it does not remediate it.
+
+### RLS policies and table/column grants
+
+| Check | Live production | Draft / snapshot | Result |
+|---|---:|---:|---|
+| Public application tables with RLS | 16 | 16 | Exact |
+| FORCE RLS | 0 | 0 | Exact |
+| Policies | 29 | 29 | Exact |
+| PERMISSIVE policies | 29 | 29 | Exact |
+| Table-grant rows | 333 | 333 | Exact |
+| Expanded column-privilege rows | 1,961 | 1,961 | Exact |
+
+All 29 policies match by identity, target table, roles, command, USING expression, and WITH CHECK expression. email_outbox intentionally has RLS enabled and no policy. No missing or extra policy was found.
+
+The 333 table-grant rows and 1,961 expanded column-privilege rows match the live catalog. The only explicit column-only UPDATE grants are profiles.full_name, profiles.phone, and notifications.is_read for authenticated.
+
+### Schema ACL and hosted defaults clarification
+
+The direct live schema ACL is:
+- private: USAGE to authenticated; USAGE and CREATE to postgres.
+- public: USAGE to PUBLIC, pg_database_owner, and postgres; CREATE to pg_database_owner only. anon, authenticated, and service_role inherit USAGE through PUBLIC rather than being separate direct schema ACL grantees.
+
+The hosted default ACL inventory remains intentionally excluded from generic bootstrap SQL. Production has default privileges for both postgres and supabase_admin in public, including broad table privileges (PostgreSQL 17 reports MAINTAIN as well), sequence SELECT/UPDATE/USAGE, and function EXECUTE. These are platform/project defaults, not generic application grants.
+
+### Reconciliation conclusion and security boundary
+
+**PASS — routine definitions and security attributes, per-signature EXECUTE ACLs, RLS policy definitions, RLS table flags, and application table/column grants match the live production catalog.**
+
+This does not constitute a runtime role-based penetration test or full Supabase integration test. The authenticated EXECUTE grant on the private gatekeeper core and the broad hosted default privileges remain explicit security review findings. No production routines, grants, policies, schema ACLs, or data were changed. All production queries were catalog-only SELECTs.
