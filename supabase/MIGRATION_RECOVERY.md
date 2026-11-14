@@ -109,3 +109,10 @@ The recovery workspace has advanced beyond the initial inventory described above
 - The baseline remains **not executable, not tested, and not approved**. The current environment still has no PostgreSQL server, psql, Docker, or Supabase CLI. A real compatible PostgreSQL/Supabase validation run is still required.
 
 Safety boundaries remain unchanged: production was read-only, main was not modified, no paid Supabase branch/resource was created, and no Vercel deployment was triggered.
+
+
+## Application integration review — 2026-11-14
+
+The application source was statically compared with the production-derived routine contracts. Booking creation, receipt upload, event-specific payment submission, admin payment review, admin event save, gatekeeper wrappers, and push-subscription RPC parameters align. The frontend VAPID public key was confirmed to match Vault through a boolean-only read-only query; no secret value was retrieved.
+
+The review found a concrete legacy ticket display issue: the customer UI and gatekeeper result display booking_item.quantity on every ticket row, but three historical booking items have multiple individual ticket rows. Those rows therefore repeat the full group count instead of showing one attendee per legacy ticket. The downloaded ticket PNG also omits the attendee count. Details and a compatibility rule are in baseline/APPLICATION_INTEGRATION_AUDIT.md. No app or production change was made.
