@@ -68,3 +68,19 @@ Complete the missing privilege/ownership evidence, then generate a clearly label
 Trigger-count clarification: the production catalog has **12 distinct trigger objects**. The `information_schema.triggers` view returns **26 rows** because multi-event triggers (INSERT/UPDATE/DELETE) appear once per event. The snapshot's trigger-object count of 12 is therefore correct.
 
 These results close the earlier ACL discovery gap at the evidence level. A structured, exact ACL export and the baseline DDL ordering review are still required before calling the SQL baseline runnable.
+
+## Follow-up reconciliation status (2026-11-14)
+
+The draft set has since been expanded and structurally reconciled against the preserved production catalog:
+
+- Table/column draft: 16 tables and 158 columns; all table/column identities match, and base type, nullability, and defaults compare with zero differences. Numeric precision and character widths were checked by a fresh read-only production query.
+- Constraints/indexes: all 81 constraint names and definitions match; all 33 standalone index names and definitions match. The 24 constraint-backed indexes are not duplicated.
+- RLS/policies: all 16 tables have RLS enablement statements; all 29 policy names and target-table pairs match. email_outbox intentionally has RLS enabled with no policy in production.
+- Triggers: all 12 trigger names and target-table pairs match; they span eight target tables.
+- Routines: all 32 definitions were source-scanned (18 PL/pgSQL, 14 SQL); the direct application-routine call graph has 14 edges and no direct cycle. This is not PostgreSQL compilation/runtime validation.
+- Privileges: a separate non-executable draft records 38 grouped table grants, three explicit column-only UPDATE grants, and per-signature routine EXECUTE ACLs. Hosted default privileges and Supabase role memberships are excluded.
+- Storage/cron: separate drafts preserve two bucket configurations, six Storage policies, and two cron jobs without copying secret values or recreating managed schemas.
+
+The current artifact inventory is indexed in baseline/README.md. All SQL remains quarantined in Markdown drafts; no file has been moved into supabase/migrations.
+
+**Still untested:** the full staged baseline has not been executed in a real PostgreSQL/Supabase-compatible runtime. No production changes, paid branches, Vercel deployments, or changes to main occurred.
