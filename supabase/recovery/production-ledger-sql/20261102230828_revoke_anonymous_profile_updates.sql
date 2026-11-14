@@ -1,0 +1,1 @@
+revoke update on table public.profiles from anon;

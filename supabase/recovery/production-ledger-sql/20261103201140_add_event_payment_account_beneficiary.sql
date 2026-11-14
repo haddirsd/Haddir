@@ -1,0 +1,1 @@
+alter table public.event_payment_accounts add column if not exists beneficiary text;

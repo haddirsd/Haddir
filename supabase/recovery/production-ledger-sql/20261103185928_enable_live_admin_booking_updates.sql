@@ -1,0 +1,1 @@
+alter publication supabase_realtime add table public.bookings, public.booking_items, public.payment_submissions;
