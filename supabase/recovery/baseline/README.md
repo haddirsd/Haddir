@@ -1,6 +1,6 @@
 # Haddir baseline recovery workspace
 
-**Status: draft / not executable / not tested.**
+**Status: draft / not deployable / isolated PostgreSQL 17 DDL smoke-tested; not full Supabase integration-tested.**
 
 This directory contains first-pass SQL reconstruction artifacts based on read-only catalog evidence from the live Supabase project.
 
@@ -41,3 +41,4 @@ The drafts do not yet reconstruct a complete executable bootstrap. The dependenc
 No production changes were made during this recovery work.
 
 - `POSTGRESQL_17_SMOKE_TEST.md` — passing disposable PostgreSQL 17 DDL smoke test report, including exact scope and limitations.
+- `../production-ledger-sql/README.md` — provenance and inventory for the 15 SQL payloads recovered from the production migration ledger; archive only, not active migrations.
