@@ -6,13 +6,13 @@ import { AppHeader } from "../components/layout/AppHeader";
 import { AppOverlays } from "../components/layout/AppOverlays";
 import { BottomNav, DesktopNav } from "../components/layout/BottomNav";
 import { formatEventDate } from "../features/events/events.formatters";
-import { downloadTicketAsImage } from "../features/customer-account/utils/ticket-image";
 import { ProfileWorkspace } from "../features/customer-account/components/ProfileWorkspace";
 import { EventsWorkspace } from "../features/events/components/EventsWorkspace";
 import { TicketWorkspace } from "../features/customer-account/components/TicketWorkspace";
 import { NotificationsWorkspace } from "../features/customer-account/components/NotificationsWorkspace";
 import { useCustomerAccount } from "../features/customer-account/hooks/useCustomerAccount";
 import { useCustomerAccountActions } from "../features/customer-account/hooks/useCustomerAccountActions";
+import { useCustomerTicketsView } from "../features/customer-account/hooks/useCustomerTicketsView";
 import { useCustomerNotificationView } from "../features/customer-account/hooks/useCustomerNotificationView";
 import { useAuth } from "../features/auth/hooks/useAuth";
 import { useGatekeeper } from "../features/gatekeeper/hooks/useGatekeeper";
@@ -30,8 +30,7 @@ export default function Home(){
  const { activeTab, setActiveTab, showPrivacySecurity, setShowPrivacySecurity, eventResetKey, setEventResetKey, activeWorkspace, isGatekeeperPage, go, backFromGatekeeper, closeGatekeeper } = useAppNavigation();
  const { authUser, userRole, assignedEvent, fullName, setFullName, email, phone, setPhone, avatarUrl, profileEditing, setProfileEditing, saved, setSaved, authMessage, setAuthMessage } = useAuth();
  const { myTickets, myNotifications, accountDataLoading, accountDataError, markNotificationRead: markCustomerNotificationReadAction, markAllNotificationsRead: markAllCustomerNotificationsReadAction } = useCustomerAccount(authUser?.id ?? null);
- const [ticketFilter,setTicketFilter]=useState<"new"|"used">("new");
- const [expandedTicketId,setExpandedTicketId]=useState<string|null>(null);
+ const ticketsView = useCustomerTicketsView(setUiNotice);
  const gatekeeper = useGatekeeper({ authUser, assignedEvent, userRole, isGatekeeperPage, activeWorkspace });
  const {
   gatekeeperCode, setGatekeeperCode, gatekeeperResult, setGatekeeperResult,
@@ -61,14 +60,6 @@ export default function Home(){
   markAllNotificationsRead: markAllCustomerNotificationsReadAction,
   onNavigateToTickets: () => go("tickets"),
  });
- const downloadTicket=async(ticket:any)=>{
-  try{
-   await downloadTicketAsImage(ticket,formatEventDate);
-  }catch(error){
-   console.error("Ticket image export failed",error);
-   setUiNotice("تعذر حفظ التذكرة كصورة. حاول مرة أخرى.");
-  }
- };
 
  return <AppShell darkMode={darkMode}>
  <>
@@ -101,11 +92,11 @@ export default function Home(){
   loading={accountDataLoading}
   error={accountDataError}
   tickets={myTickets}
-  filter={ticketFilter}
-  expandedTicketId={expandedTicketId}
-  onFilterChange={(filter)=>{setTicketFilter(filter);setExpandedTicketId(null);}}
-  onToggleTicket={(ticketId)=>setExpandedTicketId(current=>current===ticketId?null:ticketId)}
-  onDownloadTicket={(ticket)=>void downloadTicket(ticket)}
+  filter={ticketsView.filter}
+  expandedTicketId={ticketsView.expandedTicketId}
+  onFilterChange={ticketsView.changeFilter}
+  onToggleTicket={ticketsView.toggleTicket}
+  onDownloadTicket={(ticket)=>void ticketsView.downloadTicket(ticket)}
   formatEventDate={formatEventDate}
  />}
  {!isGatekeeperPage&&activeTab==="notifications"&&<NotificationsWorkspace
