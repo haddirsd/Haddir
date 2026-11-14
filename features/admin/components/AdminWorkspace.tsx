@@ -1,8 +1,6 @@
 "use client";
 
-
 import { useRouter } from "next/navigation";
-import { getSupabaseBrowserClient } from "../../../lib/supabase";
 import AdminEventsWorkspace from "../../events/admin/AdminEventsWorkspace";
 import AdminBookingsWorkspace from "../../booking/admin/AdminBookingsWorkspace";
 import AdminPaymentsWorkspace from "../../booking/admin/AdminPaymentsWorkspace";
@@ -16,7 +14,6 @@ import { ADMIN_ROLE_LABELS, ADMIN_SECTION_LABELS } from "../types";
 import { useAdminAccess } from "../hooks/useAdminAccess";
 import { useAdminTheme } from "../hooks/useAdminTheme";
 import { useAdminWorkspaceNavigation } from "../hooks/useAdminWorkspaceNavigation";
-
 
 export default function AdminPage() {
   const router = useRouter();
