@@ -39,3 +39,5 @@ The drafts do not yet reconstruct a complete executable bootstrap. The dependenc
 5. A real PostgreSQL/Supabase-compatible execution test is mandatory before any future proposal to adopt the baseline.
 
 No production changes were made during this recovery work.
+
+- `POSTGRESQL_17_SMOKE_TEST.md` — passing disposable PostgreSQL 17 DDL smoke test report, including exact scope and limitations.
