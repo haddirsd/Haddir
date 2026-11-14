@@ -65,7 +65,7 @@ No Vault secret values, hook secrets, VAPID private keys, or credentials are inc
 
 ## 5. Trigger routine prerequisites
 
-Production has 12 distinct trigger objects on seven tables. The trigger stage requires these three trigger functions to exist first:
+Production has 12 distinct trigger objects on eight tables. The trigger stage requires these three trigger functions to exist first:
 
 - `private.capture_admin_activity()` — audit triggers on bookings, event payment accounts, events, payment submissions, profiles, ticket types, and tickets.
 - `private.dispatch_haddir_web_push()` — notification push dispatch trigger; also requires Vault/pg_net configuration.
