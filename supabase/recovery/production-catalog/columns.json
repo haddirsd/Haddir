@@ -1,0 +1,1582 @@
+[
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "admin_activity_log",
+    "column": "id",
+    "schema": "public",
+    "default": "gen_random_uuid()",
+    "nullable": "NO",
+    "position": 1
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "admin_activity_log",
+    "column": "actor_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 2
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "admin_activity_log",
+    "column": "actor_name",
+    "schema": "public",
+    "default": "'مستخدم غير معروف'::text",
+    "nullable": "NO",
+    "position": 3
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "admin_activity_log",
+    "column": "actor_role",
+    "schema": "public",
+    "default": "'unknown'::text",
+    "nullable": "NO",
+    "position": 4
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "admin_activity_log",
+    "column": "action",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 5
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "admin_activity_log",
+    "column": "entity_type",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 6
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "admin_activity_log",
+    "column": "entity_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 7
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "admin_activity_log",
+    "column": "entity_label",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 8
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "admin_activity_log",
+    "column": "event_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 9
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "admin_activity_log",
+    "column": "booking_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 10
+  },
+  {
+    "udt": "jsonb",
+    "type": "jsonb",
+    "table": "admin_activity_log",
+    "column": "details",
+    "schema": "public",
+    "default": "'{}'::jsonb",
+    "nullable": "NO",
+    "position": 11
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "admin_activity_log",
+    "column": "created_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 12
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "booking_items",
+    "column": "id",
+    "schema": "public",
+    "default": "gen_random_uuid()",
+    "nullable": "NO",
+    "position": 1
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "booking_items",
+    "column": "booking_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 2
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "booking_items",
+    "column": "ticket_type_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 3
+  },
+  {
+    "udt": "int4",
+    "type": "integer",
+    "table": "booking_items",
+    "column": "quantity",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 4
+  },
+  {
+    "udt": "numeric",
+    "type": "numeric",
+    "table": "booking_items",
+    "column": "unit_price",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 5
+  },
+  {
+    "udt": "numeric",
+    "type": "numeric",
+    "table": "booking_items",
+    "column": "line_total",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 6
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "booking_items",
+    "column": "created_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 7
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "bookings",
+    "column": "id",
+    "schema": "public",
+    "default": "gen_random_uuid()",
+    "nullable": "NO",
+    "position": 1
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "bookings",
+    "column": "booking_number",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 2
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "bookings",
+    "column": "user_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 3
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "bookings",
+    "column": "customer_name",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 4
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "bookings",
+    "column": "customer_email",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 5
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "bookings",
+    "column": "customer_phone",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 6
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "bookings",
+    "column": "event_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 7
+  },
+  {
+    "udt": "numeric",
+    "type": "numeric",
+    "table": "bookings",
+    "column": "subtotal",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 8
+  },
+  {
+    "udt": "bpchar",
+    "type": "character",
+    "table": "bookings",
+    "column": "currency",
+    "schema": "public",
+    "default": "'SDG'::bpchar",
+    "nullable": "NO",
+    "position": 9
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "bookings",
+    "column": "status",
+    "schema": "public",
+    "default": "'pending_payment'::text",
+    "nullable": "NO",
+    "position": 10
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "bookings",
+    "column": "expires_at",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 11
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "bookings",
+    "column": "created_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 12
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "bookings",
+    "column": "updated_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 13
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "checkins",
+    "column": "id",
+    "schema": "public",
+    "default": "gen_random_uuid()",
+    "nullable": "NO",
+    "position": 1
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "checkins",
+    "column": "ticket_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 2
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "checkins",
+    "column": "event_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 3
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "checkins",
+    "column": "checked_in_by",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 4
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "checkins",
+    "column": "checked_in_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 5
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "checkins",
+    "column": "gate_name",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 6
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "email_outbox",
+    "column": "id",
+    "schema": "public",
+    "default": "gen_random_uuid()",
+    "nullable": "NO",
+    "position": 1
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "email_outbox",
+    "column": "notification_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 2
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "email_outbox",
+    "column": "booking_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 3
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "email_outbox",
+    "column": "recipient_user_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 4
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "email_outbox",
+    "column": "notification_type",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 5
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "email_outbox",
+    "column": "status",
+    "schema": "public",
+    "default": "'pending'::text",
+    "nullable": "NO",
+    "position": 6
+  },
+  {
+    "udt": "int4",
+    "type": "integer",
+    "table": "email_outbox",
+    "column": "attempts",
+    "schema": "public",
+    "default": "0",
+    "nullable": "NO",
+    "position": 7
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "email_outbox",
+    "column": "last_error",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 8
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "email_outbox",
+    "column": "created_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 9
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "email_outbox",
+    "column": "sent_at",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 10
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "event_payment_accounts",
+    "column": "id",
+    "schema": "public",
+    "default": "(gen_random_uuid())::text",
+    "nullable": "NO",
+    "position": 1
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "event_payment_accounts",
+    "column": "event_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 2
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "event_payment_accounts",
+    "column": "account_name",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 3
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "event_payment_accounts",
+    "column": "account_number",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 4
+  },
+  {
+    "udt": "int4",
+    "type": "integer",
+    "table": "event_payment_accounts",
+    "column": "sort_order",
+    "schema": "public",
+    "default": "10",
+    "nullable": "NO",
+    "position": 5
+  },
+  {
+    "udt": "bool",
+    "type": "boolean",
+    "table": "event_payment_accounts",
+    "column": "is_active",
+    "schema": "public",
+    "default": "true",
+    "nullable": "NO",
+    "position": 6
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "event_payment_accounts",
+    "column": "created_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 7
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "event_payment_accounts",
+    "column": "updated_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 8
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "event_payment_accounts",
+    "column": "beneficiary",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 9
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "event_role_assignments",
+    "column": "user_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 1
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "event_role_assignments",
+    "column": "event_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 2
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "event_role_assignments",
+    "column": "assignment_role",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 3
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "event_role_assignments",
+    "column": "created_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 4
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "events",
+    "column": "id",
+    "schema": "public",
+    "default": "gen_random_uuid()",
+    "nullable": "NO",
+    "position": 1
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "events",
+    "column": "title",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 2
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "events",
+    "column": "slug",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 3
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "events",
+    "column": "description",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 4
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "events",
+    "column": "category",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 5
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "events",
+    "column": "venue",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 6
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "events",
+    "column": "city",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 7
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "events",
+    "column": "address",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 8
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "events",
+    "column": "starts_at",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 9
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "events",
+    "column": "ends_at",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 10
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "events",
+    "column": "cover_image_url",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 11
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "events",
+    "column": "status",
+    "schema": "public",
+    "default": "'draft'::text",
+    "nullable": "NO",
+    "position": 12
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "events",
+    "column": "created_by",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 13
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "events",
+    "column": "created_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 14
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "events",
+    "column": "updated_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 15
+  },
+  {
+    "udt": "bool",
+    "type": "boolean",
+    "table": "events",
+    "column": "is_trending",
+    "schema": "public",
+    "default": "false",
+    "nullable": "NO",
+    "position": 16
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "events",
+    "column": "location_url",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 17
+  },
+  {
+    "udt": "numeric",
+    "type": "numeric",
+    "table": "events",
+    "column": "platform_fee_percent",
+    "schema": "public",
+    "default": "0",
+    "nullable": "NO",
+    "position": 18
+  },
+  {
+    "udt": "bool",
+    "type": "boolean",
+    "table": "events",
+    "column": "is_continuous",
+    "schema": "public",
+    "default": "false",
+    "nullable": "NO",
+    "position": 19
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "gatekeeper_scan_logs",
+    "column": "id",
+    "schema": "public",
+    "default": "gen_random_uuid()",
+    "nullable": "NO",
+    "position": 1
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "gatekeeper_scan_logs",
+    "column": "gatekeeper_user_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 2
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "gatekeeper_scan_logs",
+    "column": "event_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 3
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "gatekeeper_scan_logs",
+    "column": "ticket_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 4
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "gatekeeper_scan_logs",
+    "column": "outcome",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 5
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "gatekeeper_scan_logs",
+    "column": "scanned_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 6
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "gatekeeper_scan_logs",
+    "column": "entry_method",
+    "schema": "public",
+    "default": "'qr'::text",
+    "nullable": "NO",
+    "position": 7
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "gatekeeper_scan_logs",
+    "column": "entered_code",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 8
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "notifications",
+    "column": "id",
+    "schema": "public",
+    "default": "gen_random_uuid()",
+    "nullable": "NO",
+    "position": 1
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "notifications",
+    "column": "user_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 2
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "notifications",
+    "column": "booking_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 3
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "notifications",
+    "column": "title",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 4
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "notifications",
+    "column": "message",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 5
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "notifications",
+    "column": "type",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 6
+  },
+  {
+    "udt": "bool",
+    "type": "boolean",
+    "table": "notifications",
+    "column": "is_read",
+    "schema": "public",
+    "default": "false",
+    "nullable": "NO",
+    "position": 7
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "notifications",
+    "column": "created_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 8
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "payment_methods",
+    "column": "id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 1
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "payment_methods",
+    "column": "name",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 2
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "payment_methods",
+    "column": "account_details",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 3
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "payment_methods",
+    "column": "beneficiary",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 4
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "payment_methods",
+    "column": "instructions",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 5
+  },
+  {
+    "udt": "bool",
+    "type": "boolean",
+    "table": "payment_methods",
+    "column": "is_active",
+    "schema": "public",
+    "default": "true",
+    "nullable": "NO",
+    "position": 6
+  },
+  {
+    "udt": "int4",
+    "type": "integer",
+    "table": "payment_methods",
+    "column": "sort_order",
+    "schema": "public",
+    "default": "0",
+    "nullable": "NO",
+    "position": 7
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "payment_methods",
+    "column": "created_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 8
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "payment_methods",
+    "column": "updated_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 9
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "payment_submissions",
+    "column": "id",
+    "schema": "public",
+    "default": "gen_random_uuid()",
+    "nullable": "NO",
+    "position": 1
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "payment_submissions",
+    "column": "booking_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 2
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "payment_submissions",
+    "column": "submitted_by",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 3
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "payment_submissions",
+    "column": "transfer_reference",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 4
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "payment_submissions",
+    "column": "receipt_path",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 5
+  },
+  {
+    "udt": "numeric",
+    "type": "numeric",
+    "table": "payment_submissions",
+    "column": "amount",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 6
+  },
+  {
+    "udt": "bpchar",
+    "type": "character",
+    "table": "payment_submissions",
+    "column": "currency",
+    "schema": "public",
+    "default": "'SDG'::bpchar",
+    "nullable": "NO",
+    "position": 7
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "payment_submissions",
+    "column": "status",
+    "schema": "public",
+    "default": "'submitted'::text",
+    "nullable": "NO",
+    "position": 8
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "payment_submissions",
+    "column": "reviewed_by",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 9
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "payment_submissions",
+    "column": "reviewed_at",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 10
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "payment_submissions",
+    "column": "review_note",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 11
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "payment_submissions",
+    "column": "created_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 12
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "payment_submissions",
+    "column": "payment_account_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 13
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "payment_submissions",
+    "column": "payment_account_name",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 14
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "payment_submissions",
+    "column": "payment_account_number",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 15
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "payment_submissions",
+    "column": "payment_account_beneficiary",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 16
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "profiles",
+    "column": "id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 1
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "profiles",
+    "column": "full_name",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 2
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "profiles",
+    "column": "phone",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 3
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "profiles",
+    "column": "role",
+    "schema": "public",
+    "default": "'customer'::text",
+    "nullable": "NO",
+    "position": 4
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "profiles",
+    "column": "created_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 5
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "profiles",
+    "column": "updated_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 6
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "push_subscriptions",
+    "column": "id",
+    "schema": "public",
+    "default": "gen_random_uuid()",
+    "nullable": "NO",
+    "position": 1
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "push_subscriptions",
+    "column": "user_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 2
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "push_subscriptions",
+    "column": "endpoint",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 3
+  },
+  {
+    "udt": "jsonb",
+    "type": "jsonb",
+    "table": "push_subscriptions",
+    "column": "subscription",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 4
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "push_subscriptions",
+    "column": "device_label",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 5
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "push_subscriptions",
+    "column": "created_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 6
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "push_subscriptions",
+    "column": "updated_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 7
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "ticket_types",
+    "column": "id",
+    "schema": "public",
+    "default": "gen_random_uuid()",
+    "nullable": "NO",
+    "position": 1
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "ticket_types",
+    "column": "event_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 2
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "ticket_types",
+    "column": "name",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 3
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "ticket_types",
+    "column": "description",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 4
+  },
+  {
+    "udt": "numeric",
+    "type": "numeric",
+    "table": "ticket_types",
+    "column": "price",
+    "schema": "public",
+    "default": "0",
+    "nullable": "NO",
+    "position": 5
+  },
+  {
+    "udt": "bpchar",
+    "type": "character",
+    "table": "ticket_types",
+    "column": "currency",
+    "schema": "public",
+    "default": "'SDG'::bpchar",
+    "nullable": "NO",
+    "position": 6
+  },
+  {
+    "udt": "int4",
+    "type": "integer",
+    "table": "ticket_types",
+    "column": "quantity_total",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 7
+  },
+  {
+    "udt": "int4",
+    "type": "integer",
+    "table": "ticket_types",
+    "column": "quantity_sold",
+    "schema": "public",
+    "default": "0",
+    "nullable": "NO",
+    "position": 8
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "ticket_types",
+    "column": "sales_start_at",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 9
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "ticket_types",
+    "column": "sales_end_at",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 10
+  },
+  {
+    "udt": "bool",
+    "type": "boolean",
+    "table": "ticket_types",
+    "column": "is_active",
+    "schema": "public",
+    "default": "true",
+    "nullable": "NO",
+    "position": 11
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "ticket_types",
+    "column": "created_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 12
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "ticket_types",
+    "column": "updated_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 13
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "tickets",
+    "column": "id",
+    "schema": "public",
+    "default": "gen_random_uuid()",
+    "nullable": "NO",
+    "position": 1
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "tickets",
+    "column": "booking_item_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 2
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "tickets",
+    "column": "booking_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 3
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "tickets",
+    "column": "event_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 4
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "tickets",
+    "column": "ticket_type_id",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 5
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "tickets",
+    "column": "ticket_code",
+    "schema": "public",
+    "default": null,
+    "nullable": "NO",
+    "position": 6
+  },
+  {
+    "udt": "uuid",
+    "type": "uuid",
+    "table": "tickets",
+    "column": "qr_token",
+    "schema": "public",
+    "default": "gen_random_uuid()",
+    "nullable": "NO",
+    "position": 7
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "tickets",
+    "column": "attendee_name",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 8
+  },
+  {
+    "udt": "text",
+    "type": "text",
+    "table": "tickets",
+    "column": "status",
+    "schema": "public",
+    "default": "'valid'::text",
+    "nullable": "NO",
+    "position": 9
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "tickets",
+    "column": "issued_at",
+    "schema": "public",
+    "default": "now()",
+    "nullable": "NO",
+    "position": 10
+  },
+  {
+    "udt": "timestamptz",
+    "type": "timestamp with time zone",
+    "table": "tickets",
+    "column": "used_at",
+    "schema": "public",
+    "default": null,
+    "nullable": "YES",
+    "position": 11
+  }
+]
