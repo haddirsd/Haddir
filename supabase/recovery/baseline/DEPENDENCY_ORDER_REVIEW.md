@@ -53,7 +53,7 @@ The order above makes the principal business entities easy to inspect first. It 
 
 ## 3. Foreign-key dependency map
 
-Production has 30 observed foreign-key constraints. All 16 application tables should exist before adding these constraints. The references to `auth.users` require the Supabase Auth schema to be present.
+Production has 32 observed foreign-key constraints. All 16 application tables should exist before adding these constraints. The references to `auth.users` require the Supabase Auth schema to be present.
 
 | Child table | Referenced table(s) |
 |---|---|
@@ -190,7 +190,7 @@ These are observed ACL entries, not an endorsement that every current grant is i
 
 All 32 routines are owned by `postgres` and have an explicitly empty `search_path`. The inventory distinguishes routine signatures to avoid accidentally merging overloaded names.
 
-## 7. Proposed baseline phase order
+## 8. Proposed baseline phase order
 
 | Phase | Objects |
 |---|---|
@@ -208,9 +208,10 @@ All 32 routines are owned by `postgres` and have an explicitly empty `search_pat
 
 The ordering of grants is deliberately late in the proposed sequence, but function EXECUTE ACLs must be applied as part of the routine security stage and checked before policies or application tests rely on them. Do not copy broad project default privileges.
 
-## 8. Open validation gates
+## 9. Open validation gates
 
 - Inspect all 32 routine definitions for cross-routine calls and managed extension references, including SQL wrappers, trigger functions, cron workers, Vault, and `net`.
+- Constraint/index audit is documented in `CONSTRAINTS_INDEXES_REVIEW.md`: 81 constraints (16 PK, 8 UNIQUE, 32 FK, 25 CHECK), all validated and non-deferrable; 57 indexes, all valid/ready; two FKs have no child-side leading index; and one redundant unique index duplicates a constraint-backed key. The global UNIQUE on `event_role_assignments.user_id` is a product-rule confirmation item.
 - Verify whether every required extension is already provisioned by the target Supabase project; do not assume extension installation rights in generic PostgreSQL.
 - Confirm exact trigger-to-table bindings and trigger firing order.
 - Reconcile every table/column grant and every default ACL entry against least privilege.
