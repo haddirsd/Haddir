@@ -177,7 +177,7 @@ BEGIN
     OR (SELECT count(*) FROM public.gatekeeper_scan_logs WHERE entered_code='3333333333' AND outcome='used' AND entry_method='qr') <> 1
     OR (SELECT count(*) FROM public.notifications WHERE booking_id='30000000-0000-4000-8000-000000000004' AND type='ticket_checked_in') <> 1
   THEN RAISE EXCEPTION 'CONCURRENCY TEST FAILED: check-in was not exactly once'; END IF;
-END $;
+END $assert$;
 SELECT 'PASS: two-session concurrent check-in is exactly once.' AS result;
 """
     run_file("97-security-concurrency-assertions", concurrency_assertions, temp)
