@@ -120,3 +120,21 @@ This review establishes static parameter, return-shape, relationship, path, and 
 - Realtime delivery, push delivery, or background workers.
 
 No app source, production data, production routine, grant, policy, or deployment was changed during this review.
+
+
+## 9. Additional role/statistics RPCs and Edge Function
+
+Additional frontend/edge sources:
+- `features/users/admin/admin-users.service.ts`
+- `features/advertiser/services/advertiser.service.ts`
+- `features/gatekeeper/services/gatekeeper.service.ts`
+- `supabase/functions/send-web-push/index.ts`
+
+**Contract match:**
+- `admin_search_profiles`: frontend sends `p_query`, `p_limit`, `p_offset`, and `p_role`; the public wrapper signature and parameter order match.
+- `admin_update_profile_role`: frontend sends `p_user_id`, `p_role`, and `p_event_id`; wrapper signature matches.
+- `get_advertiser_event_statistics()`: no-argument call matches the public wrapper; frontend expects the JSON event payload.
+- `get_gatekeeper_scan_stats(p_event_id)` and `get_gatekeeper_scan_history(p_event_id)`: event parameter names match; the UI types align with the returned JSON object/array.
+- The `send-web-push` Edge Function calls `get_haddir_push_config()` using the service-role client, then uses the returned Vault-backed keys server-side. This matches the restricted service_role EXECUTE grant; no browser call to the secret-returning routine was found.
+
+The admin user service builds its event-assignment map by user ID. This is compatible with the observed global UNIQUE(user_id) constraint on event_role_assignments; that global one-assignment rule must remain preserved in a faithful baseline.
