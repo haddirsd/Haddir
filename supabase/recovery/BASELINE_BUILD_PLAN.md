@@ -36,13 +36,14 @@ Keep all generated artifacts quarantined under `supabase/recovery/baseline/`:
 - `50-triggers-draft.sql.md` — 12 distinct trigger definitions across eight target tables.
 - `60-privileges-draft.sql.md` — grouped app-table grants, three explicit column-only UPDATE grants, and exact routine EXECUTE ACL reconstruction; no hosted default privileges or managed role memberships.
 - `DDL_RECONCILIATION_AUDIT.md` — source-level structural comparison of table/column, constraint/index, policy, trigger, and privilege drafts against the production catalog.
+- `70-storage-cron-draft.md` — Storage bucket config excerpt, six Storage policies, and two cron definitions; no Storage schema recreation or secret values.
 - `SECURITY_REVIEW.md` — routine ownership, security mode, search_path and EXECUTE ACL review.
 - `ACCESS_CONTROL_STORAGE_CRON.md` — exact Storage bucket/policy inventory, cron job definitions, schema/object grants, and default-privilege findings.
 - `RLS_EFFECTIVE_ACCESS_REVIEW.md` — effective row-level access matrix, public payment-account data boundary, broad SQL grant/RLS interaction, and static review of key SECURITY DEFINER routines.
 - `DEPENDENCY_ORDER_REVIEW.md` — table/FK/function/policy/trigger ordering, observed extension prerequisites, and exact per-signature routine EXECUTE ACL inventory.
 - `ROUTINE_DEPENDENCY_AUDIT.md` — source-level dependency graph and managed-service references for all 32 routines.
 - `CONSTRAINTS_INDEXES_REVIEW.md` — reconciled constraint/index counts, FK index coverage, duplicate unique index, and event-role uniqueness semantics.
-- Storage and scheduled jobs remain separate deployment steps and must not be silently omitted from a future full bootstrap.
+- Storage and scheduled jobs are now separately drafted in `baseline/70-storage-cron-draft.md`; they still require compatible Supabase runtime validation and separate configuration of Vault secrets / Edge Function integrations.
 
 All SQL is embedded in Markdown with a `.sql.md` suffix deliberately; these are evidence-backed drafts, not deployable SQL files.
 
