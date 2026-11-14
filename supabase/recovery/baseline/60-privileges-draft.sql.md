@@ -38,10 +38,11 @@ GRANT USAGE ON SCHEMA private TO authenticated;
 GRANT USAGE, CREATE ON SCHEMA private TO postgres;
 
 -- public schema is managed by Supabase and is not created or re-owned here.
--- Observed: USAGE to PUBLIC, anon, authenticated, service_role;
--- CREATE to pg_database_owner and postgres.
--- Reconcile these with the target project's platform-managed schema ACL rather
--- than blindly changing public schema privileges from an application bootstrap.
+-- Direct catalog ACL observed: USAGE to PUBLIC, pg_database_owner, and postgres;
+-- CREATE to pg_database_owner only. anon/authenticated/service_role inherit
+-- USAGE through PUBLIC; they are not separate direct grantees in the schema ACL.
+-- Reconcile with the target project's platform-managed schema ACL rather than
+-- changing public schema privileges from an application bootstrap.
 ```
 
 ## Table-level ACLs
@@ -171,6 +172,14 @@ GRANT EXECUTE ON FUNCTION public.sync_haddir_push_subscription(text, jsonb, text
 - No storage schema/table grants or Storage object policies: those are separately documented in `ACCESS_CONTROL_STORAGE_CRON.md`.
 - No cron job creation or execution.
 - No Vault secret values or Edge Function credentials.
+
+
+
+## Fresh live-production ACL reconciliation — 2026-11-14
+
+A fresh read-only comparison confirmed all 333 table-grant rows and all 1,961 column-privilege rows in the catalog export match the live information-schema results. The three explicit column-only UPDATE grants remain profiles.full_name, profiles.phone, and notifications.is_read for authenticated.
+
+The routine section contains 32 per-signature REVOKE statements and 41 explicit EXECUTE grant entries. All 41 grants match the current live routine ACLs exactly, and every one of the 32 routines has its expected owner ACL entry. No unexpected non-owner EXECUTE entries were found outside the documented grants. Schema ACL detail is described above; hosted default privileges remain intentionally excluded.
 
 ## ACL findings kept separate from faithful recovery
 
