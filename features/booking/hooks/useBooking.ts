@@ -3,8 +3,8 @@
 import { useCallback, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
-import { getEventPaymentAccounts, createBooking, uploadPaymentReceipt, getBookingPaymentSubmission, submitPayment } from "../services/booking.service";
-import type { EventPaymentAccount } from "../types";
+import { createBooking, uploadPaymentReceipt, getBookingPaymentSubmission, submitPayment } from "../services/booking.service";
+import { useBookingPaymentAccounts } from "./useBookingPaymentAccounts";
 
 type BookingUser = { id: string } | null;
 type BookingEvent = { id: string; tiers: Array<{ id: string }> } | null;
@@ -12,8 +12,6 @@ type PendingReceiptUpload = { bookingId: string; file: File; path: string };
 type UseBookingOptions = { authUser: BookingUser; selected: BookingEvent; selectedTier: number; ticketCount: number; onSuccess?: () => void };
 
 export function useBooking({ authUser, selected, selectedTier, ticketCount, onSuccess }: UseBookingOptions) {
-  const [eventPaymentAccounts, setEventPaymentAccounts] = useState<EventPaymentAccount[]>([]);
-  const [paymentMethod, setPaymentMethod] = useState("");
   const [receipt, setReceipt] = useState<File | null>(null);
   const [bookingDone, setBookingDone] = useState(false);
   const [bookingId, setBookingId] = useState<string | null>(null);
@@ -21,32 +19,20 @@ export function useBooking({ authUser, selected, selectedTier, ticketCount, onSu
   const [bookingContext, setBookingContext] = useState<{ eventId: string; ticketTypeId: string; quantity: number; createdAt: number } | null>(null);
   const [bookingError, setBookingError] = useState("");
   const [bookingSubmitting, setBookingSubmitting] = useState(false);
-  const [accountCopied, setAccountCopied] = useState(false);
   const submissionLock = useRef(false);
-  const paymentAccountsRequest = useRef(0);
   const pendingReceiptUpload = useRef<PendingReceiptUpload | null>(null);
 
-  const loadPaymentAccounts = useCallback(async (eventId: string) => {
-    const requestId = ++paymentAccountsRequest.current;
-    if (!getSupabaseBrowserClient()) return true;
-    const { data, error } = await getEventPaymentAccounts(eventId);
-    if (requestId !== paymentAccountsRequest.current) return false;
-    if (error) { setBookingError("تعذر تحميل حسابات الدفع لهذه الفعالية: " + (error.message || "")); return false; }
-    setEventPaymentAccounts(data || []);
-    setPaymentMethod("");
-    setAccountCopied(false);
-    setBookingError("");
-    return true;
-  }, []);
-
-  const copyAccount = useCallback(async (accountNumber: string) => {
-    if (!accountNumber) return;
-    try {
-      await navigator.clipboard.writeText(accountNumber);
-      setAccountCopied(true);
-      window.setTimeout(() => setAccountCopied(false), 1800);
-    } catch { setBookingError("تعذر نسخ رقم الحساب. يمكنك تحديد الرقم ونسخه يدوياً."); }
-  }, []);
+  const {
+    eventPaymentAccounts,
+    paymentMethod,
+    setPaymentMethod,
+    accountCopied,
+    setAccountCopied,
+    loadPaymentAccounts,
+    copyAccount,
+    invalidatePaymentAccountsRequest,
+    resetPaymentAccounts,
+  } = useBookingPaymentAccounts(setBookingError);
 
   const submitBooking = useCallback(async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -130,11 +116,12 @@ export function useBooking({ authUser, selected, selectedTier, ticketCount, onSu
   }, [authUser, selected, selectedTier, ticketCount, receipt, eventPaymentAccounts, paymentMethod, bookingId, bookingContext, onSuccess]);
 
   const resetBooking = useCallback(() => {
-    paymentAccountsRequest.current += 1;
-    setEventPaymentAccounts([]); setPaymentMethod(""); setReceipt(null); setBookingDone(false);
+    invalidatePaymentAccountsRequest();
+    resetPaymentAccounts();
+    setReceipt(null); setBookingDone(false);
     setBookingId(null); setBookingNumber(""); setBookingContext(null); setBookingError("");
     setBookingSubmitting(false); setAccountCopied(false); pendingReceiptUpload.current = null;
-  }, []);
+  }, [invalidatePaymentAccountsRequest, resetPaymentAccounts]);
 
   return {
     eventPaymentAccounts, paymentMethod, setPaymentMethod, receipt, setReceipt, bookingDone,
