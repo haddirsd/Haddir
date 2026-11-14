@@ -1,6 +1,6 @@
 # Haddir Supabase recovery — closure report
 
-**Status:** forensic recovery and catalog-derived baseline validation completed within the documented scope. Historical migration recovery remains incomplete. The baseline is not approved for production replay.
+**Status:** forensic recovery and catalog-derived baseline validation completed within the documented scope. The 15 early SQL payloads have been recovered from the production migration ledger; the original Git file history remains unavailable. The baseline is not approved for production replay.
 
 ## Scope and safety boundary
 
@@ -24,9 +24,10 @@ Target: haddirsd/Haddir, branch chore/restore-supabase-migration-history.
 | Same-name entries with timestamp mismatch | 21 |
 | Production entries with no same-name file in active migration directory | 22 |
 | Candidate SQL files recovered verbatim from GitHub history into archive | 7 |
-| Production entries still missing original SQL by name after candidate archive | 15 |
+| SQL payloads recovered verbatim from production ledger | 15 |
+| Ledger-to-archive text verification | 15/15 exact |
 
-The 15 missing entries are listed individually in MISSING_MIGRATIONS_REGISTER.md. They are early entries dated 2026-11-02 and 2026-11-03. The inspected GitHub migration-path history begins with the payment-methods/receipts migration on 2026-11-03 and did not contain their original SQL.
+The 15 entries are listed individually in MISSING_MIGRATIONS_REGISTER.md. They are early entries dated 2026-11-02 and 2026-11-03. The inspected GitHub migration-path history did not contain their original Git files. A read-only extraction from production `supabase_migrations.schema_migrations.statements` returned one stored SQL text for each entry. Those 15 texts are archived under `supabase/recovery/production-ledger-sql/` and were fetched back from GitHub and compared character-for-character against a fresh ledger read: **15/15 exact**. This recovers the ledger-preserved SQL payloads, not the lost Git commit history or any separate workstation file bytes.
 
 The seven archived files are source-provenanced GitHub artifacts, but only candidate correspondences to production ledger entries. They are not asserted to be byte-for-byte copies of the exact production-applied SQL. Do not rename, replay, or promote them as original migration history.
 
@@ -35,6 +36,7 @@ The 21 timestamp mismatches remain explicit. For example, production records 202
 ## 2. What was restored
 
 - Seven historical SQL files recovered from identifiable GitHub commits and archived under supabase/recovery/historical-sql/.
+- Fifteen early migration SQL payloads extracted verbatim from the production ledger and archived under supabase/recovery/production-ledger-sql/; all 15 were verified against the live ledger text.
 - Read-only production catalog evidence under supabase/recovery/production-catalog/: migration ledger, columns, structure, functions/grants, and Storage/RLS/Cron.
 - Catalog-derived baseline drafts for tables, routines, constraints/indexes, RLS, triggers, privileges, Storage and Cron.
 - Detailed audit reports covering dependencies, table/data integrity, workflow routines, application integration, RLS/effective access, routine ACLs, and Storage/Cron.
@@ -66,7 +68,7 @@ An isolated PostgreSQL 17.12 GitHub Actions service-container test passed the st
 
 ## 4. Known findings and remaining uncertainty
 
-1. **Historical gap:** the original SQL for the 15 listed migrations remains unavailable from the inspected repository history. External backups/artifacts have not been exhausted or proven absent.
+1. **Original Git history gap:** the original Git file objects/commit history for the 15 early migrations remain absent from inspected repository history. Their SQL payloads are now recovered from the production ledger; this does not recreate Git history or prove equivalence to a separate lost workstation copy.
 2. **Candidate provenance:** seven archived scripts are not proven byte-for-byte identical to production-applied migration SQL.
 3. **Timestamp drift:** 21 same-name production/repository migration pairs have version mismatch; no mass renaming was performed.
 4. **Full Supabase integration:** Auth JWT/RLS runtime, Storage provisioning/API, Vault secret delivery, pg_cron worker behavior, pg_net delivery, Realtime, and Edge Functions were not exercised by the PostgreSQL stubs test.
@@ -82,7 +84,7 @@ An isolated PostgreSQL 17.12 GitHub Actions service-container test passed the st
 
 **Catalog-derived baseline:** structurally reconciled and passed isolated PostgreSQL 17 DDL smoke testing, subject to the test limitations above.
 
-**Historical migration history:** not fully recovered; 15 original SQL files remain missing from inspected GitHub path history, and seven candidate archives are not asserted to be exact production originals.
+**Historical SQL payload recovery:** 15/15 early SQL texts recovered verbatim from the production ledger and archived; original Git file/commit history for those entries remains unavailable. Seven later candidate archives remain unverified mappings and are not asserted to be byte-for-byte production originals. The 21 timestamp mismatches remain explicit.
 
 **Production readiness:** not approved. Do not replay this baseline or archived SQL on production. A future controlled migration/rebuild would require a separate review, full Supabase-compatible validation, and explicit approval.
 
