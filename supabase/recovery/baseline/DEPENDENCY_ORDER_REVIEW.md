@@ -267,3 +267,18 @@ The exact observed application-object grants are now represented in `60-privileg
 This is a faithful catalog reconstruction draft, not a least-privilege recommendation. It intentionally records broad anon/authenticated table grants that are constrained by RLS in production. The private gatekeeper core authenticated EXECUTE grant is also recorded as observed but remains a high-priority hardening finding; do not confuse a recovery snapshot with approval of that grant.
 
 The draft ACL statements have not been applied or tested. Before execution, verify every role and object on the target and compare effective privileges, including PUBLIC inheritance, against the intended recovery policy.
+
+
+## 13. Constraint-stage execution order confirmed by PostgreSQL smoke test
+
+The first PostgreSQL 17 smoke-test attempt exposed an ordering defect in the draft: the alphabetically arranged constraint statements attempted to add foreign keys before the referenced tables' primary/unique constraints existed. PostgreSQL rejected the first FK referencing profiles(id) with “there is no unique constraint matching given keys”.
+
+The draft was reordered without changing any constraint or index definition:
+
+1. 16 primary keys.
+2. 8 UNIQUE constraints.
+3. 25 CHECK constraints.
+4. 32 foreign keys.
+5. 33 standalone indexes.
+
+All 81 constraints and 33 index definitions remain byte-for-byte unchanged; only statement order changed. The next isolated PostgreSQL run will verify this corrected order.
