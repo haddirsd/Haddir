@@ -10,8 +10,8 @@ Contains **32 public/private routine definitions** from the production catalog s
 
 ```sql
 -- DRAFT ONLY: public/private routine definitions captured from the production catalog.
--- Dependency ordering, ownership, SECURITY DEFINER/search_path review and EXECUTE ACLs remain pending.
--- Do not run until those checks and a PostgreSQL validation pass are complete.
+-- Dependency and ACL reviews are documented separately; this draft is not executable or approved.
+-- It must pass the isolated PostgreSQL harness and a compatible Supabase integration test before adoption.
 
 -- private.admin_search_profiles(p_query text, p_limit integer, p_offset integer, p_role text)
 CREATE OR REPLACE FUNCTION private.admin_search_profiles(p_query text DEFAULT NULL::text, p_limit integer DEFAULT 100, p_offset integer DEFAULT 0, p_role text DEFAULT NULL::text)
@@ -40,7 +40,7 @@ begin
   order by p.created_at desc
   limit greatest(1,least(coalesce(p_limit,100),200))
   offset greatest(0,coalesce(p_offset,0));
-end; $function$
+end; $function$;
 
 -- private.admin_update_profile_role(p_user_id uuid, p_role text, p_event_id uuid)
 CREATE OR REPLACE FUNCTION private.admin_update_profile_role(p_user_id uuid, p_role text, p_event_id uuid DEFAULT NULL::uuid)
@@ -118,7 +118,7 @@ begin
     values (p_user_id,p_event_id,p_role);
   end if;
 end;
-$function$
+$function$;
 
 -- private.capture_admin_activity()
 CREATE OR REPLACE FUNCTION private.capture_admin_activity()
@@ -179,7 +179,7 @@ begin
  insert into public.admin_activity_log(actor_id,actor_name,actor_role,action,entity_type,entity_id,entity_label,event_id,booking_id,details)
  values(v_actor,v_actor_name,v_actor_role,v_action,v_entity_type,v_entity_id,v_label,v_event_id,v_booking_id,v_details);
  if tg_op='DELETE' then return old; end if; return new;
-end; $function$
+end; $function$;
 
 -- private.current_profile_role()
 CREATE OR REPLACE FUNCTION private.current_profile_role()
@@ -189,7 +189,7 @@ CREATE OR REPLACE FUNCTION private.current_profile_role()
  SET search_path TO ''
 AS $function$
   select p.role from public.profiles p where p.id = (select auth.uid()) limit 1
-$function$
+$function$;
 
 -- private.current_user_is_owner()
 CREATE OR REPLACE FUNCTION private.current_user_is_owner()
@@ -197,7 +197,7 @@ CREATE OR REPLACE FUNCTION private.current_user_is_owner()
  LANGUAGE sql
  STABLE SECURITY DEFINER
  SET search_path TO ''
-AS $function$ select exists (select 1 from public.profiles where id = (select auth.uid()) and role = 'owner'); $function$
+AS $function$ select exists (select 1 from public.profiles where id = (select auth.uid()) and role = 'owner'); $function$;
 
 -- private.dispatch_haddir_web_push()
 CREATE OR REPLACE FUNCTION private.dispatch_haddir_web_push()
@@ -245,7 +245,7 @@ begin
 
   return new;
 end;
-$function$
+$function$;
 
 -- private.enqueue_booking_notification_email()
 CREATE OR REPLACE FUNCTION private.enqueue_booking_notification_email()
@@ -262,7 +262,7 @@ begin
   end if;
   return new;
 end;
-$function$
+$function$;
 
 -- private.expire_pending_bookings()
 CREATE OR REPLACE FUNCTION private.expire_pending_bookings()
@@ -325,7 +325,7 @@ begin
 
   return v_expired_count;
 end;
-$function$
+$function$;
 
 -- private.gatekeeper_manual_ticket_action(p_ticket_code text, p_confirm boolean)
 CREATE OR REPLACE FUNCTION private.gatekeeper_manual_ticket_action(p_ticket_code text, p_confirm boolean DEFAULT true)
@@ -368,7 +368,7 @@ begin
   values(v_uid,v_assigned_event_id,v_ticket_id,v_outcome,'manual',btrim(p_ticket_code));
  end if;
  return v_result;
-end; $function$
+end; $function$;
 
 -- private.gatekeeper_ticket_action(p_ticket_code text, p_confirm boolean)
 CREATE OR REPLACE FUNCTION private.gatekeeper_ticket_action(p_ticket_code text, p_confirm boolean DEFAULT false)
@@ -407,7 +407,7 @@ begin
   values(v_uid,v_event_id,v_ticket_id,v_outcome,'qr',btrim(p_ticket_code));
  end if;
  return v_result;
-end; $function$
+end; $function$;
 
 -- private.gatekeeper_ticket_action_core(p_ticket_code text, p_confirm boolean)
 CREATE OR REPLACE FUNCTION private.gatekeeper_ticket_action_core(p_ticket_code text, p_confirm boolean DEFAULT false)
@@ -479,7 +479,7 @@ begin
  end if;
  return jsonb_build_object('ok',true,'status','valid','message','التذكرة صالحة ويمكن تأكيد الدخول','ticket_id',v_ticket.id,'ticket_code',v_ticket.ticket_code,'attendee_name',v_ticket.attendee_name,'buyer_name',v_buyer_name,'attendee_count',v_attendee_count,'event_title',v_event_title,'venue',v_event_venue,'starts_at',v_event_starts_at,'ticket_type',v_type_name);
 end;
-$function$
+$function$;
 
 -- private.generate_event_reminders()
 CREATE OR REPLACE FUNCTION private.generate_event_reminders()
@@ -537,7 +537,7 @@ begin
   get diagnostics inserted_count = row_count;
   return inserted_count;
 end;
-$function$
+$function$;
 
 -- private.get_advertiser_event_statistics()
 CREATE OR REPLACE FUNCTION private.get_advertiser_event_statistics()
@@ -621,7 +621,7 @@ begin
 
   return v_result;
 end;
-$function$
+$function$;
 
 -- private.get_gatekeeper_scan_history(p_event_id uuid)
 CREATE OR REPLACE FUNCTION private.get_gatekeeper_scan_history(p_event_id uuid)
@@ -667,7 +667,7 @@ begin
   left join public.tickets t on t.id = l.ticket_id;
   return v_history;
 end;
-$function$
+$function$;
 
 -- private.get_gatekeeper_scan_stats(p_event_id uuid)
 CREATE OR REPLACE FUNCTION private.get_gatekeeper_scan_stats(p_event_id uuid)
@@ -703,7 +703,7 @@ begin
 
   return coalesce(v_stats, '{"accepted":0,"used":0,"forged":0,"invalid":0}'::jsonb);
 end;
-$function$
+$function$;
 
 -- private.handle_new_user()
 CREATE OR REPLACE FUNCTION private.handle_new_user()
@@ -723,7 +723,7 @@ begin
     set role = case when lower(coalesce(new.email, '')) = 'a7mdtayb@gmail.com' then 'owner' else public.profiles.role end;
   return new;
 end;
-$function$
+$function$;
 
 -- private.save_admin_event(p_event_id uuid, p_event jsonb, p_tickets jsonb, p_accounts jsonb)
 CREATE OR REPLACE FUNCTION private.save_admin_event(p_event_id uuid, p_event jsonb, p_tickets jsonb, p_accounts jsonb)
@@ -892,7 +892,7 @@ begin
   end loop;
   return v_event_id;
 end;
-$function$
+$function$;
 
 -- public.admin_search_profiles(p_query text, p_limit integer, p_offset integer, p_role text)
 CREATE OR REPLACE FUNCTION public.admin_search_profiles(p_query text DEFAULT NULL::text, p_limit integer DEFAULT 100, p_offset integer DEFAULT 0, p_role text DEFAULT NULL::text)
@@ -901,7 +901,7 @@ CREATE OR REPLACE FUNCTION public.admin_search_profiles(p_query text DEFAULT NUL
  SET search_path TO ''
 AS $function$
   select * from private.admin_search_profiles(p_query,p_limit,p_offset,p_role);
-$function$
+$function$;
 
 -- public.admin_update_profile_role(p_user_id uuid, p_role text, p_event_id uuid)
 CREATE OR REPLACE FUNCTION public.admin_update_profile_role(p_user_id uuid, p_role text, p_event_id uuid DEFAULT NULL::uuid)
@@ -910,7 +910,7 @@ CREATE OR REPLACE FUNCTION public.admin_update_profile_role(p_user_id uuid, p_ro
  SET search_path TO ''
 AS $function$
   select private.admin_update_profile_role(p_user_id,p_role,p_event_id);
-$function$
+$function$;
 
 -- public.create_booking(p_event_id uuid, p_ticket_type_id uuid, p_quantity integer)
 CREATE OR REPLACE FUNCTION public.create_booking(p_event_id uuid, p_ticket_type_id uuid, p_quantity integer)
@@ -978,7 +978,7 @@ begin
   update public.ticket_types set quantity_sold=quantity_sold+p_quantity,updated_at=now() where id=p_ticket_type_id;
   return query select v_booking_id,v_booking_number,v_total,v_ticket.currency;
 end;
-$function$
+$function$;
 
 -- public.gatekeeper_manual_ticket_action(p_ticket_code text, p_confirm boolean)
 CREATE OR REPLACE FUNCTION public.gatekeeper_manual_ticket_action(p_ticket_code text, p_confirm boolean DEFAULT true)
@@ -987,7 +987,7 @@ CREATE OR REPLACE FUNCTION public.gatekeeper_manual_ticket_action(p_ticket_code 
  SET search_path TO ''
 AS $function$
  select private.gatekeeper_manual_ticket_action(p_ticket_code,p_confirm);
-$function$
+$function$;
 
 -- public.gatekeeper_ticket_action(p_ticket_code text, p_confirm boolean)
 CREATE OR REPLACE FUNCTION public.gatekeeper_ticket_action(p_ticket_code text, p_confirm boolean DEFAULT false)
@@ -996,7 +996,7 @@ CREATE OR REPLACE FUNCTION public.gatekeeper_ticket_action(p_ticket_code text, p
  SET search_path TO ''
 AS $function$
  select private.gatekeeper_ticket_action(p_ticket_code,p_confirm);
-$function$
+$function$;
 
 -- public.get_advertiser_event_statistics()
 CREATE OR REPLACE FUNCTION public.get_advertiser_event_statistics()
@@ -1005,7 +1005,7 @@ CREATE OR REPLACE FUNCTION public.get_advertiser_event_statistics()
  SET search_path TO ''
 AS $function$
   select private.get_advertiser_event_statistics();
-$function$
+$function$;
 
 -- public.get_gatekeeper_manual_history(p_event_id uuid)
 CREATE OR REPLACE FUNCTION public.get_gatekeeper_manual_history(p_event_id uuid)
@@ -1038,7 +1038,7 @@ begin
   order by scanned_at desc limit 50
  ) l;
  return v_history;
-end; $function$
+end; $function$;
 
 -- public.get_gatekeeper_scan_history(p_event_id uuid)
 CREATE OR REPLACE FUNCTION public.get_gatekeeper_scan_history(p_event_id uuid)
@@ -1047,7 +1047,7 @@ CREATE OR REPLACE FUNCTION public.get_gatekeeper_scan_history(p_event_id uuid)
  SET search_path TO ''
 AS $function$
   select private.get_gatekeeper_scan_history(p_event_id);
-$function$
+$function$;
 
 -- public.get_gatekeeper_scan_stats(p_event_id uuid)
 CREATE OR REPLACE FUNCTION public.get_gatekeeper_scan_stats(p_event_id uuid)
@@ -1056,7 +1056,7 @@ CREATE OR REPLACE FUNCTION public.get_gatekeeper_scan_stats(p_event_id uuid)
  SET search_path TO ''
 AS $function$
   select private.get_gatekeeper_scan_stats(p_event_id);
-$function$
+$function$;
 
 -- public.get_haddir_push_config()
 CREATE OR REPLACE FUNCTION public.get_haddir_push_config()
@@ -1070,7 +1070,7 @@ AS $function$
     'private_key', (select ds.decrypted_secret from vault.decrypted_secrets ds where ds.name = 'haddir_vapid_private_key' limit 1),
     'hook_secret', (select ds.decrypted_secret from vault.decrypted_secrets ds where ds.name = 'haddir_push_hook_secret' limit 1)
   );
-$function$
+$function$;
 
 -- public.review_payment_submission(p_submission_id uuid, p_decision text, p_rejection_reason text)
 CREATE OR REPLACE FUNCTION public.review_payment_submission(p_submission_id uuid, p_decision text, p_rejection_reason text DEFAULT NULL::text)
@@ -1163,7 +1163,7 @@ begin
   'attendee_count',v_attendee_count,'booking_id',v_booking.id
  );
 end;
-$function$
+$function$;
 
 -- public.save_admin_event(p_event_id uuid, p_event jsonb, p_tickets jsonb, p_accounts jsonb)
 CREATE OR REPLACE FUNCTION public.save_admin_event(p_event_id uuid, p_event jsonb, p_tickets jsonb, p_accounts jsonb)
@@ -1172,7 +1172,7 @@ CREATE OR REPLACE FUNCTION public.save_admin_event(p_event_id uuid, p_event json
  SET search_path TO ''
 AS $function$
   select private.save_admin_event(p_event_id, p_event, p_tickets, p_accounts);
-$function$
+$function$;
 
 -- public.set_updated_at()
 CREATE OR REPLACE FUNCTION public.set_updated_at()
@@ -1184,7 +1184,7 @@ begin
   new.updated_at = pg_catalog.now();
   return new;
 end;
-$function$
+$function$;
 
 -- public.submit_payment(p_booking_id uuid, p_payment_method_id text, p_receipt_path text, p_transfer_reference text)
 CREATE OR REPLACE FUNCTION public.submit_payment(p_booking_id uuid, p_payment_method_id text, p_receipt_path text, p_transfer_reference text DEFAULT NULL::text)
@@ -1269,7 +1269,7 @@ begin
 
   return v_submission;
 end;
-$function$
+$function$;
 
 -- public.sync_haddir_push_subscription(p_endpoint text, p_subscription jsonb, p_device_label text)
 CREATE OR REPLACE FUNCTION public.sync_haddir_push_subscription(p_endpoint text, p_subscription jsonb, p_device_label text DEFAULT NULL::text)
@@ -1307,6 +1307,6 @@ begin
         device_label = excluded.device_label,
         updated_at = now();
 end;
-$function$
+$function$;
 
 ```
