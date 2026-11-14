@@ -86,3 +86,33 @@ The new `70-storage-cron-draft.md` was cross-checked against `storage-rls-cron.j
 - Cron job IDs are not copied; stable names are used because IDs are environment-specific.
 
 This is a source-level cross-check only. It does not validate bucket synchronization, policy execution, scheduled worker behavior, or external push delivery.
+
+
+## 7. Fresh live-production reconciliation — 2026-11-14
+
+A second read-only catalog extraction was run directly against the active production project on 2026-11-14. The current live catalog was compared again with the recovery-branch drafts and the preserved production snapshots.
+
+| Object/check | Live production | Draft | Result |
+|---|---:|---:|---|
+| Public application tables | 16 | 16 | Exact identity set |
+| Public columns | 158 | 158 | Exact identity set |
+| Column type / type modifier | 158 | 158 | 0 differences |
+| NULL / NOT NULL | 158 | 158 | 0 differences |
+| Column defaults | 158 | 158 | 0 differences |
+| Constraints | 81 | 81 | Exact name and table set |
+| Standalone index definitions | 33 | 33 | 0 definition differences |
+| All indexes, including constraint-backed | 57 | 57 | Exact name set |
+
+The live column extraction independently confirmed the draft's numeric precision/scale and character(3) currency widths. No column was missing, extra, reordered within its table, or different in type, nullability, or default.
+
+All 81 constraint names and owning tables match the live catalog. The 16 primary keys, 8 unique constraints, 32 foreign keys, and 25 CHECK constraints are all present. The CHECK expressions are emitted with different redundant grouping parentheses in parts of the draft compared with the current server's pg_get_constraintdef formatting; the expressions preserve the same tested columns, operators, constants, and allowed-value sets. This is SQL pretty-printing, not an observed rule change. All FK targets and ON DELETE actions are retained.
+
+All 33 standalone index statements match the live pg_indexes.indexdef output exactly after whitespace normalization. The remaining 24 of 57 live indexes are created by PK/UNIQUE constraints and are correctly omitted from the standalone index section.
+
+### Structural reconciliation conclusion
+
+**PASS — no missing or extra tables, columns, constraints, or indexes were found.** No type, type modifier, nullability, default, or standalone index definition drift was found between the current production catalog and the recovery drafts.
+
+This conclusion is limited to the public application table/column/constraint/index scope above. It does not certify routine bodies, grants, policies, triggers, Supabase-managed schemas, Storage, cron execution, application behavior, or historical migration completeness; those have separate audits and/or remain separate validation work.
+
+The production queries used for this reconciliation were catalog-only SELECTs. No production DDL/DML, migration, grant, policy, or index change was made. The report update is documentation-only on chore/restore-supabase-migration-history; main remains untouched and no Vercel deployment was triggered.
