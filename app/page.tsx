@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import { WelcomeSplash } from "../components/layout/WelcomeSplash";
 import { THEME_STORAGE_KEY } from "../lib/constants";
 import { AppShell } from "../components/layout/AppShell";
+import { AppHeader } from "../components/layout/AppHeader";
 import { AppOverlays } from "../components/layout/AppOverlays";
 import { BottomNav, DesktopNav } from "../components/layout/BottomNav";
-import { PageHeader } from "../components/layout/PageHeader";
 import { formatEventDate } from "../features/events/events.formatters";
 import { downloadTicketAsImage } from "../features/customer-account/utils/ticket-image";
 import { ProfileWorkspace } from "../features/customer-account/components/ProfileWorkspace";
@@ -19,7 +19,6 @@ import { useAuth } from "../features/auth/hooks/useAuth";
 import { useGatekeeper } from "../features/gatekeeper/hooks/useGatekeeper";
 import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
 import type { AccountDialog } from "../features/customer-account/components/AccountDialogs";
-import { Bell, Ticket, UserRound, ChevronLeft, ScanLine, ShieldCheck, Sun, Moon } from "lucide-react";
 
 type Tab="home"|"tickets"|"notifications"|"profile";
 export default function Home(){
@@ -90,7 +89,23 @@ export default function Home(){
 
  return <AppShell darkMode={darkMode}>
  <>
- {!isEventDetailOpen&&(showPrivacySecurity&&!isGatekeeperPage?<header className="screen-topbar privacy-screen-topbar"><button type="button" className="privacy-back-button" onClick={()=>setShowPrivacySecurity(false)}><ChevronLeft size={18}/> رجوع</button><strong>الخصوصية والأمان</strong><span className="screen-icon"><ShieldCheck/></span></header>:isGatekeeperPage?<header className="screen-topbar gatekeeper-page-topbar"><button type="button" className="btn btn-outline" onClick={()=>{setIsGatekeeperPage(false);setActiveWorkspace(null);const url=new URL(window.location.href);url.searchParams.delete("workspace");window.location.assign(url.pathname+url.search+url.hash);}}>العودة للملف الشخصي</button><strong>مسح التذاكر</strong><span className="screen-icon"><ScanLine/></span></header>:activeTab==="home"?<header className="topbar"><div className="container header-inner"><button className="brand brand-button" onClick={()=>go("home")}><img className="brand-logo" src={darkMode?"/dark.svg?v=20261111-home-logo":"/light.svg?v=20261111-home-logo"} alt="حاضر" /></button><div className="desktop-greeting">من السودان، لكل لحظة تستاهل الحضور.</div><button className="header-icon theme-toggle" type="button" aria-label={darkMode?"تفعيل الوضع النهاري":"تفعيل الوضع الليلي"} aria-pressed={darkMode} title={darkMode?"تفعيل الوضع النهاري":"تفعيل الوضع الليلي"} onClick={()=>setDarkMode(v=>!v)}><span className="theme-toggle-track" aria-hidden="true"><span className="theme-toggle-knob">{darkMode?<Sun size={17} strokeWidth={2.3}/>:<Moon size={16} strokeWidth={2.3}/>}</span></span></button></div></header>:<PageHeader title={({tickets:"تذاكري",notifications:"الإشعارات",profile:"الملف الشخصي"} as Record<string,string>)[activeTab]} icon={activeTab==="tickets"?<Ticket/>:activeTab==="notifications"?<Bell/>:<UserRound/>}/>)}
+ <AppHeader
+  activeTab={activeTab}
+  darkMode={darkMode}
+  isEventDetailOpen={isEventDetailOpen}
+  isGatekeeperPage={isGatekeeperPage}
+  showPrivacySecurity={showPrivacySecurity}
+  onGoHome={()=>go("home")}
+  onToggleTheme={()=>setDarkMode(value=>!value)}
+  onBackFromPrivacy={()=>setShowPrivacySecurity(false)}
+  onBackFromGatekeeper={()=>{
+   setIsGatekeeperPage(false);
+   setActiveWorkspace(null);
+   const url=new URL(window.location.href);
+   url.searchParams.delete("workspace");
+   window.location.assign(url.pathname+url.search+url.hash);
+  }}
+ />
  {!isGatekeeperPage&&!showPrivacySecurity&&<DesktopNav activeTab={activeTab} unreadCount={notificationView.unreadCount} onNavigate={go}/>}
  <div className="app-content">
  <WelcomeSplash />
