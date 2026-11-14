@@ -126,7 +126,7 @@ PostgreSQL's dependency catalog does not provide a complete dependency graph for
 
 ## 5. Trigger-to-table dependency map
 
-A fresh `pg_trigger` inventory confirms 12 distinct non-internal triggers across seven tables. Their target tables and trigger functions are:
+A fresh `pg_trigger` inventory confirms 12 distinct non-internal triggers across eight tables. Their target tables and trigger functions are:
 
 | Table | Trigger | Timing / events | Trigger function |
 |---|---|---|---|
@@ -238,3 +238,17 @@ The scan also recorded direct Auth, Storage, Vault, pg_net, and advisory-lock de
 The email enqueue function has no corresponding active trigger in the preserved 12-trigger inventory; do not invent one. The push trigger depends on Vault and pg_net configuration as well as the trigger function. Keep all secret values outside the repository.
 
 See `ROUTINE_DEPENDENCY_AUDIT.md` for the full call graph, managed-platform dependency matrix, creation groups, ACL-sensitive notes, and outstanding validation gates.
+
+
+## 11. RLS and trigger draft cross-check (completed)
+
+The SQL blocks in the policy, trigger, and table drafts were cross-checked directly:
+
+- 16 `CREATE TABLE` definitions are present.
+- 29 `CREATE POLICY` statements target 15 of those 16 tables. The remaining table has no RLS policy in the production snapshot; do not invent one.
+- The only application helper routines referenced directly by policy expressions are `private.current_profile_role()` and `private.current_user_is_owner()`; both exist in the 32-routine draft.
+- 12 `CREATE TRIGGER` statements are present and target eight existing application tables: bookings, event_payment_accounts, events, notifications, payment_submissions, profiles, ticket_types, and tickets.
+- The trigger statements reference three captured trigger functions: `private.capture_admin_activity()`, `private.dispatch_haddir_web_push()`, and the unqualified `set_updated_at()` (captured as `public.set_updated_at()`). All three definitions exist in the routine draft.
+- No missing policy helper, trigger target table, or trigger function was found in this source-level cross-check.
+
+This corrects the earlier seven-table wording: the live 12-trigger inventory spans **eight** target tables. The audit/activity log table is written by the audit trigger function but is not itself a trigger target.
