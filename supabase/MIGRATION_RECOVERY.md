@@ -106,7 +106,7 @@ The recovery workspace has advanced beyond the initial inventory described above
 - A complete catalog-derived baseline draft set is now indexed in supabase/recovery/baseline/README.md: tables, routines, constraints/indexes, RLS policies, triggers, privileges, Storage/cron configuration, and reconciliation/dependency/security audits.
 - Structural reconciliation found 16 tables/158 columns, 81 constraints, 33 standalone indexes, 29 policies, and 12 trigger objects matching the preserved catalog. Constraint and standalone-index definitions matched exactly.
 - Routine dependency, ACL, workflow, Storage, and cron findings are documented. Known payment-review NULL-decision and gatekeeper-core EXECUTE findings remain unpatched in production.
-- The baseline remains **not executable, not tested, and not approved**. The current environment still has no PostgreSQL server, psql, Docker, or Supabase CLI. A real compatible PostgreSQL/Supabase validation run is still required.
+- The baseline remains **not approved for production use**. It passed an isolated PostgreSQL 17.12 DDL smoke test with minimal platform stubs; it has not passed a full Supabase integration test. The current local environment still has no PostgreSQL server, psql, Docker, or Supabase CLI.
 
 Safety boundaries remain unchanged: production was read-only, main was not modified, no paid Supabase branch/resource was created, and no Vercel deployment was triggered.
 
