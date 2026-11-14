@@ -55,12 +55,12 @@ Current data checks found 57 payment submissions, no missing receipt paths, no m
 The current production `public.review_payment_submission(...)` definition inserts one ticket per `booking_items` row, not one ticket per unit in `booking_items.quantity`. It separately calculates the attendee count by summing the item quantities.
 
 Current data is consistent with this group-ticket model:
-- 64 confirmed booking-item rows;
-- 175 total attendee units across those rows;
+- 55 confirmed booking-item rows;
+- 137 total attendee units across those rows;
 - 64 issued tickets;
-- 27 confirmed booking items have quantity greater than their ticket-row count (one ticket for a multi-attendee booking item).
+- 52 items have one ticket row each, while 3 older items have 3, 4, and 5 ticket rows (12 legacy attendee-level ticket rows).
 
-This is **not classified as a data-integrity defect by itself**: it matches the current routine's one-ticket-per-booking-item behavior and the restored group-ticket semantics. It is a product/entry-flow contract that must remain explicit. The ticket UI and gatekeeper flow must clearly represent the attendee count covered by a group ticket. If the intended product rule changes to one QR ticket per attendee, that requires a separately designed migration and issuance/reconciliation plan; do not silently change the baseline to imply attendee-level ticket rows.
+This is a **mixed historical issuance model**, not one uniform pattern: the current routine creates one ticket per booking-item row, while three older confirmed booking items retain 3, 4, and 5 attendee-level ticket rows. Preserve all 64 existing ticket rows exactly. The ticket UI and gatekeeper flow must support both legacy individual tickets and current group tickets, clearly showing the attendee quantity covered by a group ticket. Any future issuance-model change requires a separately designed migration and reconciliation plan.
 
 ## Schema design observations requiring explicit decisions
 
