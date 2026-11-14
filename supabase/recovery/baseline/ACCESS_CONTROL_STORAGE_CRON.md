@@ -58,4 +58,4 @@ Important review gate:
 
 This evidence does not include Storage object data, Auth user data, Vault secrets, API keys, or cron credentials. The bucket and policy configuration plus cron job definitions still need dependency/order review before any executable baseline can be proposed.
 
-No production changes, migrations, or Vercel deployments were performed.
+The corresponding non-executable configuration draft is preserved in `baseline/70-storage-cron-draft.md`. No production changes, migrations, or Vercel deployments were performed.
