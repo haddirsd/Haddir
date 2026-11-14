@@ -1,6 +1,6 @@
 # Haddir production baseline — build plan
 
-Status: **planning document only; no executable SQL generated or run**.
+Status: **first-pass SQL reconstruction artifacts drafted in Markdown; not executable, not tested, and not approved**.
 
 This plan is based on the read-only production catalog evidence stored in this directory. The goal is to preserve the current Haddir application schema as a reproducible baseline without pretending that reconstructed SQL is the original migration history.
 
@@ -28,16 +28,16 @@ The trigger counts are different measures: multi-event triggers produce multiple
 
 Keep all generated artifacts quarantined under `supabase/recovery/baseline/`:
 
-- `README.md` — prerequisites, provenance, limitations, and safe-use instructions.
-- `00-prerequisites.sql` — only app-owned schema/extension prerequisites that are safe and supported on a fresh Supabase project.
-- `10-routines.sql` — routines in dependency order, after their referenced schemas and types exist.
-- `20-tables.sql` — tables and column definitions in dependency order.
-- `30-constraints-indexes.sql` — primary/unique/check/foreign-key constraints and indexes, with foreign keys added after all referenced tables exist.
-- `40-privileges-rls.sql` — schema/table/column/function grants, RLS enablement, and policies.
-- `50-triggers.sql` — trigger functions and trigger bindings after their target tables and routines exist.
-- Storage and scheduled jobs remain separate deployment steps, not part of the generic database bootstrap.
+- `README.md` — added with safety boundaries and artifact inventory.
+- `10-routines-draft.sql.md` — 32 routine definitions, still requiring dependency/ACL review.
+- `20-tables-draft.sql.md` — all 16 public tables / 158 columns.
+- `30-constraints-indexes-draft.sql.md` — 81 constraints and 33 standalone index definitions.
+- `40-rls-policies-draft.sql.md` — RLS enabled on 16 public tables and 29 policy definitions.
+- `50-triggers-draft.sql.md` — 12 distinct trigger definitions.
+- `SECURITY_REVIEW.md` — routine ownership, security mode, search_path and EXECUTE ACL review.
+- Storage and scheduled jobs remain separate deployment steps.
 
-These are proposed file names, not files already generated.
+All SQL is embedded in Markdown with a `.sql.md` suffix deliberately; these are evidence-backed drafts, not deployable SQL files.
 
 ## Dependency and safety rules
 
@@ -54,10 +54,10 @@ These are proposed file names, not files already generated.
 ## Remaining evidence/review gates
 
 - Review every column's exact type, default, collation, identity/generated status, and nullability against `columns.json`.
-- Review all 32 routine definitions, their owners, security-definer settings, search paths, and EXECUTE ACLs against `functions-and-grants.json`.
+- Routine definitions are now drafted. The read-only review found all 32 owned by `postgres`, all with empty `search_path`, and mixed SECURITY DEFINER / INVOKER execution; per-routine EXECUTE ACLs must be reconstructed exactly and reviewed before executable SQL is produced.
 - Reconcile the complete grant/default-privilege model with Supabase-managed roles; do not copy managed role memberships into a generic bootstrap.
 - Verify table dependency order and confirm all foreign-key targets exist before constraints are added.
-- Review Storage bucket configuration, object policies, and cron definitions separately.
+- Review Storage bucket configuration, object policies, and cron definitions separately. The current catalog evidence identifies 2 Haddir buckets, 6 object policies, and 2 active cron jobs.
 - Obtain a real PostgreSQL/Supabase-compatible validation runtime before calling the result tested. The current execution environment has no `psql`, `postgres`, Docker, or Supabase CLI; no database execution test has been performed.
 
 ## Current safety status
