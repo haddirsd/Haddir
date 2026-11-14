@@ -54,6 +54,22 @@ Important review gate:
 - Do not copy blanket grants or default privileges into the baseline. Reconstruct object-by-object ACLs and preserve only verified grants.
 - Do not recreate Supabase-managed roles, memberships, or managed schemas. The default ACL entries for `supabase_admin` are evidence of the hosted platform configuration, not instructions to create that role in a generic PostgreSQL environment.
 
+## 2026-11-14 live reconciliation and runtime checks
+
+A fresh catalog-only query was run against production and compared with `supabase/recovery/production-catalog/storage-rls-cron.json` and `baseline/70-storage-cron-draft.md`.
+
+- Buckets: **2/2 exact matches** for ID, public/private flag, byte size limit, and MIME allow-list. Production reports `STANDARD` type, versioning disabled, no explicit lifecycle configuration, and null owner fields for both buckets.
+- Storage policies: **6/6 exact matches** for policy name, command, role, permissive mode, USING, and WITH CHECK expressions. No extra `storage.objects` policies were observed.
+- Cron: **2/2 exact matches** for job name, active state, schedule, database, execution user, and command.
+- Required routines: both cron targets exist, are owned by `postgres`, are SECURITY DEFINER, and have explicit empty `search_path`.
+- Extensions observed: `pg_cron 1.6.4` in `pg_catalog`, `pg_net 0.20.4` in `extensions`; the catalog also reports `supabase_vault 0.3.1`.
+- Cron run history over the latest 24 hours at inspection time: `haddir-event-reminders` **288 succeeded / 0 failed**; `haddir-expire-pending-bookings` **1,440 succeeded / 0 failed**. Latest recorded executions were at 2026-11-14 21:10 UTC. This verifies scheduler invocations, not the business correctness of every notification or expiration result.
+- The two migration ledger entries are present in production: `20261105131539 / event_reminder_notifications` and `20261107100841 / expire_pending_bookings_and_serialize_inventory`. The expiration migration timestamp matches the GitHub file; the reminder migration's GitHub filename timestamp is `20261105190000`, which differs from the production ledger version `20261105131539`. This is a migration-history identity mismatch, not a difference in the observed live job definition.
+- Application integration spot-check: the receipt API enforces exactly JPEG/PNG/WebP and 5 MiB, uploads to `payment-receipts` using `<user UUID>/<booking UUID>/<random file>` and `upsert: false`; admin screens create 15-minute signed URLs for the private bucket. Cover uploads use `event-covers`, a user-UUID-prefixed path, `upsert: false`, and a 10 MiB client size check.
+- Minor client-validation mismatch: the cover uploader accepts any browser MIME beginning with `image/`, while the bucket allow-list accepts only JPEG/PNG/WebP/GIF/AVIF. Storage remains the enforcing boundary, but unsupported image formats may fail only after upload is attempted; align the client allow-list in a separate application change if desired.
+- **Repository configuration gap:** `supabase/config.toml` is absent from the inspected recovery branch (and no active bucket configuration file was found by repository search). The TOML bucket excerpt remains only in the quarantined recovery draft; it is not an active local Supabase CLI config. Do not mistake the smoke-test's parsed excerpt for a checked-in active config.
+- All queries in this reconciliation were read-only. No bucket, policy, cron job, extension, secret, Storage object, production schema, or application data was changed. No scheduled job was manually invoked.
+
 ## Reproduction boundary
 
 This evidence does not include Storage object data, Auth user data, Vault secrets, API keys, or cron credentials. The bucket and policy configuration plus cron job definitions still need dependency/order review before any executable baseline can be proposed.
