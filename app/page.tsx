@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { WelcomeSplash } from "../components/layout/WelcomeSplash";
-import { THEME_STORAGE_KEY } from "../lib/constants";
 import { AppShell } from "../components/layout/AppShell";
 import { AppHeader } from "../components/layout/AppHeader";
 import { AppOverlays } from "../components/layout/AppOverlays";
@@ -20,8 +19,10 @@ import { useGatekeeper } from "../features/gatekeeper/hooks/useGatekeeper";
 import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
 import type { AccountDialog } from "../features/customer-account/components/AccountDialogs";
 import { useAppNavigation } from "../components/layout/hooks/useAppNavigation";
+import { useAppTheme } from "../components/layout/hooks/useAppTheme";
 export default function Home(){
- const [darkMode,setDarkMode]=useState(false),[deletingAccount,setDeletingAccount]=useState(false);
+ const [deletingAccount,setDeletingAccount]=useState(false);
+ const { darkMode, setDarkMode } = useAppTheme();
  const [accountDialog,setAccountDialog]=useState<AccountDialog>(null),[deleteEmailInput,setDeleteEmailInput]=useState(""),[uiNotice,setUiNotice]=useState("");
  const [bookingGate,setBookingGate]=useState<"login"|"phone"|null>(null);
  const [isEventDetailOpen,setIsEventDetailOpen]=useState(false);
@@ -31,8 +32,6 @@ export default function Home(){
  const { myTickets, myNotifications, accountDataLoading, accountDataError, markNotificationRead: markCustomerNotificationReadAction, markAllNotificationsRead: markAllCustomerNotificationsReadAction } = useCustomerAccount(authUser?.id ?? null);
  const [ticketFilter,setTicketFilter]=useState<"new"|"used">("new");
  const [expandedTicketId,setExpandedTicketId]=useState<string|null>(null);
- useEffect(()=>{const saved=window.localStorage.getItem(THEME_STORAGE_KEY);const prefersDark=window.matchMedia?.("(prefers-color-scheme: dark)").matches;setDarkMode(saved?saved==="dark":!!prefersDark);},[]);
- useEffect(()=>{document.documentElement.dataset.theme=darkMode?"dark":"light";document.documentElement.style.colorScheme=darkMode?"dark":"light";window.localStorage.setItem(THEME_STORAGE_KEY,darkMode?"dark":"light");const themeMeta=document.querySelector('meta[name="theme-color"]');themeMeta?.setAttribute("content",darkMode?"#1D135D":"#F6F4FF");},[darkMode]);
  const gatekeeper = useGatekeeper({ authUser, assignedEvent, userRole, isGatekeeperPage, activeWorkspace });
  const {
   gatekeeperCode, setGatekeeperCode, gatekeeperResult, setGatekeeperResult,
