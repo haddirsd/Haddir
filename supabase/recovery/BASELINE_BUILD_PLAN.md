@@ -36,6 +36,7 @@ Keep all generated artifacts quarantined under `supabase/recovery/baseline/`:
 - `50-triggers-draft.sql.md` — 12 distinct trigger definitions.
 - `SECURITY_REVIEW.md` — routine ownership, security mode, search_path and EXECUTE ACL review.
 - `ACCESS_CONTROL_STORAGE_CRON.md` — exact Storage bucket/policy inventory, cron job definitions, schema/object grants, and default-privilege findings.
+- `RLS_EFFECTIVE_ACCESS_REVIEW.md` — effective row-level access matrix, public payment-account data boundary, broad SQL grant/RLS interaction, and static review of key SECURITY DEFINER routines.
 - Storage and scheduled jobs remain separate deployment steps and must not be silently omitted from a future full bootstrap.
 
 All SQL is embedded in Markdown with a `.sql.md` suffix deliberately; these are evidence-backed drafts, not deployable SQL files.
@@ -60,7 +61,9 @@ All SQL is embedded in Markdown with a `.sql.md` suffix deliberately; these are 
 - Verify table dependency order and confirm all foreign-key targets exist before constraints are added.
 - Storage review is now documented in `baseline/ACCESS_CONTROL_STORAGE_CRON.md`: 2 buckets, 6 object policies, and 2 active cron jobs. Preserve the private receipt bucket, public cover reads, user/booking path checks, and the exact cron schedules/functions.
 - Grant review is documented alongside Storage: public/private schema ACLs, per-object table/routine grants, three column-level UPDATE grant groups, and default privileges for postgres/supabase_admin. Do not copy the broad hosted-project default ACLs as generic defaults. Reconstruct only verified object-specific grants.
-- Security follow-up: some existing application tables have broad anon/authenticated table-level SQL grants while RLS is enabled. Review each table's effective policy/grant combination before executable DDL; do not assume the grants alone prove exposure or that RLS makes every grant harmless.
+- Security follow-up: the effective policy map is now documented in `baseline/RLS_EFFECTIVE_ACCESS_REVIEW.md`. All 16 public tables have RLS enabled; anon policies are limited to published event/ticket/payment-account reads. Sensitive application tables have no anon row policy. Broad anon/authenticated SQL grants remain a least-privilege hardening backlog item, but no exploit was demonstrated. Do not assume grants alone prove exposure or that RLS makes every grant harmless.
+- The public `event_payment_accounts` SELECT policy exposes account name, account number, and beneficiary for active accounts on published events. Confirm these are all intended customer-facing payment details before any future schema expansion.
+- The SECURITY DEFINER static review confirmed key booking, payment, role-management, event-save, gatekeeper, and push-subscription RPCs contain explicit identity/role/ownership checks. `get_haddir_push_config()` returns Vault secrets but EXECUTE is restricted to postgres/service_role; keep it server-side. This was source review, not runtime penetration testing.
 - Obtain a real PostgreSQL/Supabase-compatible validation runtime before calling the result tested. The current execution environment has no `psql`, `postgres`, Docker, or Supabase CLI; no database execution test has been performed.
 
 ## Current safety status
