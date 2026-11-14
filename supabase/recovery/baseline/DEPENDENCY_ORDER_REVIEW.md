@@ -124,6 +124,29 @@ Important known routine dependencies from source review:
 
 PostgreSQL's dependency catalog does not provide a complete dependency graph for PL/pgSQL body references. A catalog query returning no routine-to-routine edges is therefore not proof of independence. The source definitions must be statically reviewed, and actual creation must be tested in a compatible PostgreSQL/Supabase environment.
 
+## 5. Trigger-to-table dependency map
+
+A fresh `pg_trigger` inventory confirms 12 distinct non-internal triggers across seven tables. Their target tables and trigger functions are:
+
+| Table | Trigger | Timing / events | Trigger function |
+|---|---|---|---|
+| `bookings` | `audit_bookings` | AFTER INSERT OR UPDATE OR DELETE | `private.capture_admin_activity()` |
+| `bookings` | `bookings_set_updated_at` | BEFORE UPDATE | `public.set_updated_at()` |
+| `event_payment_accounts` | `audit_event_payment_accounts` | AFTER INSERT OR UPDATE OR DELETE | `private.capture_admin_activity()` |
+| `events` | `audit_events` | AFTER INSERT OR UPDATE OR DELETE | `private.capture_admin_activity()` |
+| `events` | `events_set_updated_at` | BEFORE UPDATE | `public.set_updated_at()` |
+| `notifications` | `dispatch_haddir_web_push_after_insert` | AFTER INSERT | `private.dispatch_haddir_web_push()` |
+| `payment_submissions` | `audit_payment_submissions` | AFTER INSERT OR UPDATE OR DELETE | `private.capture_admin_activity()` |
+| `profiles` | `audit_profiles` | AFTER INSERT OR UPDATE OR DELETE | `private.capture_admin_activity()` |
+| `profiles` | `profiles_set_updated_at` | BEFORE UPDATE | `public.set_updated_at()` |
+| `ticket_types` | `audit_ticket_types` | AFTER INSERT OR UPDATE OR DELETE | `private.capture_admin_activity()` |
+| `ticket_types` | `ticket_types_set_updated_at` | BEFORE UPDATE | `public.set_updated_at()` |
+| `tickets` | `audit_tickets` | AFTER INSERT OR UPDATE OR DELETE | `private.capture_admin_activity()` |
+
+The trigger stage therefore requires the seven target tables and three trigger functions (`private.capture_admin_activity()`, `private.dispatch_haddir_web_push()`, and `public.set_updated_at()`) to exist first. The notification push trigger also depends operationally on its external push-dispatch configuration; do not assume that creating the trigger alone configures delivery.
+
+The four `*_set_updated_at` triggers are BEFORE UPDATE and must remain distinct per table. Audit triggers are AFTER row triggers. Preserve the captured trigger definitions rather than regenerating them from the 26 event-expanded information-schema rows.
+
 ## 5. Exact routine ACL inventory
 
 The following EXECUTE ACLs were read from `pg_proc.proacl` by schema, routine name, and identity arguments. `X` means EXECUTE. `PUBLIC` is represented by the empty grantee before `=X`.
