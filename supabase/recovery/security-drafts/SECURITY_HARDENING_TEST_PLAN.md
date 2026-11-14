@@ -1,57 +1,24 @@
 # Security hardening test plan
 
-Status: catalog assertions are wired into the PostgreSQL 17 GitHub Actions smoke harness; runtime result for the latest commit has not yet been retrieved. Payment-state and gatekeeper workflow cases below require a disposable Supabase environment with representative fixtures and have not been executed. No production writes or live role simulations were performed.
+The PostgreSQL 17 disposable harness now includes fixture-backed payment and gatekeeper workflow assertions. These tests use reconstructed production DDL and lightweight platform stubs; they are not full Supabase integration tests.
 
-## A. Payment review — negative cases
+## Payment
+- NULL, unknown decisions and whitespace rejection reason are rejected.
+- Negative cases preserve payment/booking state, inventory, tickets and notifications.
+- Approval confirms payment and booking, issues one group ticket per booking item, preserves pre-reserved inventory, and emits one approval notification and email-outbox row.
+- Rejection persists its reason, rejects the booking/payment, releases exactly the reserved stock, creates no tickets, and emits one rejection notification and email-outbox row.
+- Repeated approve/reject calls cannot repeat side effects.
 
-Run as an authenticated user whose profile role is owner/admin/supervisor, against a valid submitted payment fixture. Snapshot the payment row, booking row, relevant ticket-type inventory, tickets, and notifications before each call.
+## Gatekeeper
+- Authenticated direct invocation of the private core is denied; public QR/manual wrappers remain usable.
+- QR and manual preview, confirmation and repeat-confirmation paths are asserted.
+- Correct scan-log methods/outcomes and one check-in notification are asserted.
+- Gatekeeper access to an unassigned event is denied.
 
-| Input | Expected result | Required invariant |
-|---|---|---|
-| `p_decision = NULL` | exception: invalid decision | All snapshots unchanged |
-| empty string | exception: invalid decision | All snapshots unchanged |
-| arbitrary value (e.g. `approve_now`) | exception: invalid decision | All snapshots unchanged |
-| reject + NULL reason | exception: reason required | All snapshots unchanged |
-| reject + whitespace reason | exception: reason required | All snapshots unchanged |
-| approve | success | payment approved, booking confirmed, tickets issued once, one approval notification |
-| reject + non-empty reason | success | payment rejected, reason persisted, reserved inventory released once, one rejection notification |
-| repeat review | exception: already reviewed | No second ticket issuance, stock release, or notification |
+## Concurrency
+Two separate psql processes run concurrently against one ticket. Session A holds the row lock, confirms the ticket and delays commit; session B invokes the same QR wrapper while A is uncommitted. Assertions require one accepted scan, one losing used scan, final used state and one check-in notification.
 
-Also run NULL/invalid decision against a nonexistent submission ID and verify the invalid-decision validation happens before the lookup error. This confirms validation order but does not replace the fixture-backed no-mutation tests.
-
-## B. Gatekeeper access and scan audit
-
-Using an assigned gatekeeper and a valid ticket fixture:
-
-1. Direct invocation of `private.gatekeeper_ticket_action_core(text,boolean)` as `authenticated` must fail with permission denied.
-2. QR preview through the public QR wrapper returns `status=valid`; the current wrapper intentionally does not write a scan-log row for a valid preview (`v_outcome` is NULL for `valid`).
-3. QR confirmation through the public QR wrapper marks a valid ticket used exactly once and writes one `accepted` scan-log row with `entry_method=qr`.
-4. Manual confirmation through the public manual wrapper preserves `entry_method=manual` and writes one `accepted` scan-log row. Manual preview with `p_confirm=false` should return valid without a scan-log row.
-5. A gatekeeper assigned to Event A cannot inspect or confirm Event B's ticket.
-6. A customer, supervisor without gate assignment, and anon cannot use gatekeeper wrappers.
-7. Concurrent confirmation attempts result in exactly one valid-to-used transition and no duplicate check-in notification.
-
-Do not revoke schema `private` USAGE as part of this fix; test wrapper behavior after the function-level revoke.
-
-## C. Trigger helper ACL
-
-After applying the draft in the disposable database:
-
-- `has_function_privilege('authenticated','public.set_updated_at()','EXECUTE')` is false.
-- The same check for `anon` and `service_role` is false.
-- Updating representative rows in bookings, events, profiles, and ticket_types still advances `updated_at` through their existing triggers.
-- No application source invokes `set_updated_at` as an RPC.
-
-## D. Catalog assertions
-
-After applying the draft in the disposable database:
-
-- authenticated cannot execute the private gatekeeper core.
-- public QR/manual wrappers remain executable by authenticated and retain their existing definitions and security mode.
-- service_role remains the only non-owner role able to execute `get_haddir_push_config()`.
-- `set_updated_at()` remains attached to the same four triggers.
-- `review_payment_submission` retains SECURITY DEFINER and an empty search_path.
-
-## E. Release gate
-
-Do not promote unless all tests pass, SQL diff is reviewed against fresh production definitions, the Supabase API exposed-schema setting is checked, and the user explicitly approves the production change. Do not use a paid Supabase branch; use an existing free disposable PostgreSQL/GitHub Actions test harness if available.
+## Still not covered
+- Real Supabase Auth JWT validation, PostgREST, RLS request context, Storage and Edge Functions.
+- Full browser/device payment and receipt flow, QR camera flow and network retry behavior.
+- A production change remains blocked until a real disposable Supabase integration run, fresh live-definition reconciliation and explicit user approval.
