@@ -16,7 +16,8 @@ Captured directly from project `puhmvcekxkcxfdvgygpk`:
 | Public indexes | 57 |
 | Public RLS policies | 29 |
 | Public/private application routines | 32 |
-| Application triggers in the preserved structure snapshot | 12 |
+| Application trigger objects in the preserved structure snapshot | 12 |
+| Trigger event bindings (INSERT/UPDATE/DELETE rows in information_schema) | 26 |
 | Storage buckets used by Haddir | 2 |
 | Storage object policies | 6 |
 | Active cron jobs | 2 |
@@ -63,5 +64,7 @@ Complete the missing privilege/ownership evidence, then generate a clearly label
 - Function ACLs were inspected for all 32 application routines. Several private worker/trigger functions are postgres-only, while selected RPC/helper functions grant EXECUTE to `authenticated`; selected public RPCs also grant EXECUTE to `service_role`. `set_updated_at()` currently grants EXECUTE to PUBLIC, so preserve that deliberately rather than applying a blanket function grant.
 - Default privileges exist for both `postgres` and `supabase_admin` in `public` for tables, sequences, and functions. This is deployment-managed privilege state and must be reconciled, not blindly copied into a generic PostgreSQL instance.
 - Role memberships include Supabase-managed roles and service principals. Do not create or alter these memberships in an app bootstrap; the target Supabase environment owns them.
+
+Trigger-count clarification: the production catalog has **12 distinct trigger objects**. The `information_schema.triggers` view returns **26 rows** because multi-event triggers (INSERT/UPDATE/DELETE) appear once per event. The snapshot's trigger-object count of 12 is therefore correct.
 
 These results close the earlier ACL discovery gap at the evidence level. A structured, exact ACL export and the baseline DDL ordering review are still required before calling the SQL baseline runnable.
