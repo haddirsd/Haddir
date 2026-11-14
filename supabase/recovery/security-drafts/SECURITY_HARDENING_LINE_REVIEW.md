@@ -1,77 +1,92 @@
 # Security hardening — line-by-line review
 
-Review date: 2026-11-15
-Branch: `chore/restore-supabase-migration-history`
-Production access: read-only catalog/function inspection only.
-Status: review draft; not approved for production.
+Review date: 2026-11-15  
+Branch: \`chore/restore-supabase-migration-history\`  
+Production access during this review: SELECT-only catalog/function/trigger inspection.  
+Status: disposable PostgreSQL workflow tests passed; production approval remains deferred.
 
 ## 1. Payment decision validation
 
-Live production definition was re-fetched and compared with the replacement body in `SECURITY_HARDENING_DRAFT.sql.md`.
+The replacement in \`SECURITY_HARDENING_DRAFT.sql.md\` was compared with the live production function definition.
 
-The replacement retains the live function signature, return type, PL/pgSQL language, SECURITY DEFINER mode, empty search_path, role check, advisory transaction lock, row-locking order, approval/rejection mutations, ticket issuance, and notifications.
+The function retains its signature, return type, PL/pgSQL language, SECURITY DEFINER mode, empty search_path, role check, advisory transaction lock, row-locking order, payment/booking mutations, ticket issuance and in-app notification behavior.
 
-Only two control-flow changes are intended:
-- Add an explicit `p_decision IS NULL OR ... NOT IN ('approve','reject')` guard. This closes the SQL three-valued-logic hole where `NULL NOT IN (...)` evaluates to NULL rather than TRUE.
-- Change the rejection `ELSE` into `ELSIF p_decision='reject'`, with a final defensive exception branch.
+The intended functional changes are narrow:
+- Explicitly reject \`p_decision IS NULL\` as well as values outside \`approve\` and \`reject\`.
+- Make the rejection branch explicit with \`ELSIF\`, retaining a final defensive exception.
 
-The rejection-reason nonblank validation remains before any row lookup or mutation. Invalid decisions therefore fail before taking the advisory lock or reading/mutating booking rows.
-
-**Review caveat:** this is a high-impact SECURITY DEFINER function. Although the live body was fetched and the intended diff is narrow, the complete SQL has not yet been compiled or exercised against representative payment fixtures. Do not promote until that test is done.
+The rejection-reason validation remains before row lookup/mutation. Invalid decisions fail before taking the advisory lock.
 
 ## 2. Gatekeeper core EXECUTE
 
-Live catalog confirms:
-- `private.gatekeeper_ticket_action_core(text,boolean)` is SECURITY DEFINER.
-- Its current explicit ACL grants EXECUTE to `authenticated` and owner `postgres`.
-- The two private entry wrappers `private.gatekeeper_ticket_action` and `private.gatekeeper_manual_ticket_action` are also SECURITY DEFINER and currently executable by authenticated.
-- Public QR/manual wrappers are SQL SECURITY INVOKER functions which delegate to the corresponding private SECURITY DEFINER wrappers.
-- The private wrappers perform role and event-assignment checks, call the core, and write scan audit rows.
+Live production inspection confirmed:
+- The internal core is SECURITY DEFINER and had a direct EXECUTE grant to authenticated.
+- The private QR/manual wrapper functions are SECURITY DEFINER and perform role/event-assignment checks before calling the core.
+- The public QR/manual RPC functions delegate to those private wrappers.
 
-The proposed revoke targets only direct execution of the core from PUBLIC/anon/authenticated. It does not revoke EXECUTE from the private wrapper owner, change wrapper grants, change schema USAGE, or change public RPC wrappers.
+The draft revokes direct EXECUTE on the core from PUBLIC, anon and authenticated only. It does not remove wrapper grants, schema USAGE, or owner execution.
 
-**Review caveat:** runtime tests must verify both QR and manual paths after the revoke, including cross-event rejection and exactly-once check-in. The draft must not be widened to revoke the private wrapper functions.
+Disposable runtime tests passed:
+- authenticated direct core invocation denied;
+- QR/manual public wrappers work for an assigned gatekeeper;
+- preview, confirmation and repeat-confirmation paths behave as expected;
+- cross-event ticket access is rejected;
+- scan-log outcomes/methods and notification counts match expected behavior.
 
 ## 3. Trigger helper ACL
 
-Live production confirms `public.set_updated_at()` is a non-SECURITY-DEFINER trigger function attached to exactly four public tables:
-- bookings
-- events
-- profiles
-- ticket_types
+Live production inspection confirmed \`public.set_updated_at()\` is attached to four triggers: profiles, events, bookings and ticket_types.
 
-The draft removes API-role EXECUTE grants from PUBLIC, anon, authenticated, and service_role. It does not drop or recreate any trigger. PostgreSQL trigger execution does not require the calling DML role to have direct EXECUTE on the trigger function.
+The draft removes direct EXECUTE grants from PUBLIC, anon, authenticated and service_role without dropping/recreating triggers. In PostgreSQL, a caller's direct EXECUTE privilege is not rechecked when an already-created trigger fires.
 
-**Review caveat:** disposable-database tests must update representative rows and verify all four triggers still advance `updated_at`. Also search all app and Edge Function source for direct RPC calls before promotion.
+Disposable tests passed for all four trigger updates after the ACL revoke, and catalog assertions confirmed the expected grants were absent.
 
-## 4. Push configuration function
+A source search for direct RPC use of \`set_updated_at\` remains a release gate; the limited GitHub code search is not proof that no dynamic RPC calls exist.
 
-No change proposed. Live ACL remains restricted to service_role and postgres. The function returns private VAPID/hook secrets and must not be exposed to anon/authenticated. Keep it unchanged.
+## 4. Push configuration
 
-## 5. Test harness review
+No change proposed. The production ACL remains service_role-only. Catalog assertions confirm it remains unchanged.
 
-The existing PostgreSQL 17 smoke runner was extended to:
-- extract and execute the quarantined hardening SQL after baseline DDL setup;
-- run catalog assertions for the private core, public QR/manual wrappers, push config, and trigger helper;
-- run the security catalog assertion SQL file.
+## 5. Actual CI execution and failures resolved
 
-The GitHub Actions workflow path filter includes `supabase/recovery/security-drafts/**`, so changes to these files trigger the workflow on the recovery branch.
+Latest run: [GitHub Actions #47](https://github.com/haddirsd/Haddir/actions/runs/43649283501)  
+Commit: \`3f91df39d1d869bb3e88d4d3841a1d38f00d8fc0\`  
+Result: **success** on PostgreSQL 17.12.
 
-**Execution status:** the GitHub connector available in this session does not expose a general workflow-run listing/dispatch action. The commit's combined status currently shows only the Vercel rate-limit failure and no GitHub Actions result. The commit-to-workflow lookup returned no PR-associated runs. Therefore the latest PostgreSQL workflow result cannot be verified here; it is not accurate to call the new tests passed.
+Successful stages included:
+- baseline DDL and catalog assertions;
+- security catalog assertions;
+- NULL/invalid payment and trigger behavior;
+- payment approve/reject workflows and invariants;
+- QR/manual gatekeeper workflows;
+- two-session concurrent check-in exactly-once assertions.
 
-The runner requires a PostgreSQL client and server. Neither `psql` nor `postgres` nor Docker is installed in the current execution environment, so local execution is unavailable.
+Two test defects were found and corrected before the passing run:
+1. The first test expected an email_outbox row. Live production has \`private.enqueue_booking_notification_email()\` but no trigger attached to it. The payment function inserts in-app notifications; the current notification trigger dispatches web push only. The invalid email-outbox expectation was removed and this separate pre-existing integration gap documented.
+2. The stock assertion read the quantity after both approval and rejection, then compared it to the pre-rejection quantity. The test now asserts stock remains at 5 immediately after approval and before rejection; after rejection it asserts stock falls to 2. This was an assertion-order bug, not a change to payment logic.
 
-## 6. Remaining runtime tests
+## 6. Side-effect review
 
-The catalog assertions are not substitutes for behavior tests. Still required in a disposable environment:
-- payment NULL/invalid decision cases with no state changes;
-- approval and rejection with representative fixtures and exact ticket/inventory/notification counts;
-- repeat-review idempotency;
-- QR/manual gatekeeper preview and confirmation, audit semantics, cross-event denial, and concurrent double-scan;
-- updated_at trigger behavior on all four tables.
+Passing disposable tests establish:
+- invalid decision/rejection inputs do not mutate payment, booking, inventory, ticket or notification state;
+- approval confirms payment/booking, issues one group ticket for the booking item, leaves already-reserved stock unchanged, and creates one approval notification;
+- rejection persists the reason, rejects payment/booking, releases reserved stock once, creates no ticket, and creates one rejection notification;
+- repeated review attempts do not repeat terminal side effects;
+- QR/manual successful check-in creates one accepted audit row and one notification; a repeat is audited as used without a second notification;
+- concurrent check-in attempts produce one accepted scan, one losing used scan and one notification;
+- all four updated_at triggers still work after helper EXECUTE revokes.
 
-The test plan was corrected: valid-ticket preview currently returns `status=valid` and intentionally does not create a scan-log row; confirmation creates the accepted audit row.
+## 7. Remaining limitations / release gates
+
+The passing harness uses reconstructed production DDL and lightweight PostgreSQL platform stubs. It does not prove real Supabase Auth JWT validation, PostgREST role switching, RLS behavior, Storage integration, Edge Function delivery or browser/device flows.
+
+Before promotion:
+- run the suite against a real disposable Supabase project/environment if available;
+- re-fetch and compare live production function definitions, ACLs and trigger inventory immediately before preparing a migration;
+- search frontend and Edge Function code for direct RPC calls to \`set_updated_at\`;
+- review the email-outbox trigger gap separately if email notifications are expected;
+- obtain explicit user approval.
 
 ## Decision
 
-The proposed SQL diff is narrowly scoped and structurally consistent with the live definitions reviewed. It is **not yet test-verified**. Keep all changes quarantined under `supabase/recovery/security-drafts/`. No active migration, production SQL, main-branch change, or deployment is authorized by this review.
+The narrow security draft has passed the expanded isolated PostgreSQL 17 regression suite and no unintended side effect was observed in the covered workflows. **This is sufficient to close the isolated-database test gate, not to approve production rollout.** Keep the SQL quarantined. No active migration, production write, \`main\` update or Vercel deployment was performed.
