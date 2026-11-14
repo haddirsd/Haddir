@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { WelcomeSplash } from "../components/layout/WelcomeSplash";
 import { THEME_STORAGE_KEY } from "../lib/constants";
 import { AppShell } from "../components/layout/AppShell";
+import { AppOverlays } from "../components/layout/AppOverlays";
 import { BottomNav, DesktopNav } from "../components/layout/BottomNav";
 import { PageHeader } from "../components/layout/PageHeader";
 import { formatEventDate } from "../features/events/events.formatters";
@@ -17,8 +18,7 @@ import { useCustomerNotificationView } from "../features/customer-account/hooks/
 import { useAuth } from "../features/auth/hooks/useAuth";
 import { useGatekeeper } from "../features/gatekeeper/hooks/useGatekeeper";
 import { GatekeeperWorkspace } from "../features/gatekeeper/components/GatekeeperWorkspace";
-import { HaddirDialog } from "../components/ui/HaddirDialog";
-import { AccountDialogs, type AccountDialog } from "../features/customer-account/components/AccountDialogs";
+import type { AccountDialog } from "../features/customer-account/components/AccountDialogs";
 import { Bell, Ticket, UserRound, ChevronLeft, ScanLine, ShieldCheck, Sun, Moon } from "lucide-react";
 
 type Tab="home"|"tickets"|"notifications"|"profile";
@@ -160,8 +160,9 @@ export default function Home(){
    onClose={()=>{const url=new URL(window.location.href);url.searchParams.delete("workspace");url.searchParams.set("tab","profile");window.location.assign(url.pathname+url.search+url.hash);}}
   />}
  </div>
- {uiNotice&&<HaddirDialog open title="تنبيه من حاضر" description={uiNotice} confirmLabel="حسناً" onConfirm={()=>setUiNotice("")} onCancel={()=>setUiNotice("")}/>}
- <AccountDialogs
+ <AppOverlays
+  uiNotice={uiNotice}
+  onCloseNotice={()=>setUiNotice("")}
   accountDialog={accountDialog}
   deleteEmailInput={deleteEmailInput}
   setDeleteEmailInput={setDeleteEmailInput}
@@ -173,9 +174,21 @@ export default function Home(){
    setAccountDialog("delete-final");
   }}
   onExecuteDelete={accountActions.executeDeleteAccount}
-  onClose={()=>setAccountDialog(null)}
+  onCloseAccountDialog={()=>setAccountDialog(null)}
+  bookingGate={bookingGate}
+  onContinueBookingGate={()=>{
+   const gate=bookingGate;
+   if(!gate)return;
+   if(gate==="login")window.sessionStorage.setItem("haddir_booking_phone_required","1");
+   setBookingGate(null);
+   setEventResetKey(value=>value+1);
+   setActiveTab("profile");
+   setAuthMessage(gate==="login"?"سجّل الدخول لمواصلة الحجز.":"أضف رقم جوالك لمواصلة الحجز.");
+   if(gate==="phone")setProfileEditing(true);
+   window.scrollTo({top:0,behavior:"smooth"});
+  }}
+  onCloseBookingGate={()=>setBookingGate(null)}
  />
- {bookingGate&&<div className="booking-gate-backdrop" role="presentation"><section className="booking-gate-dialog" role="dialog" aria-modal="true" aria-labelledby="booking-gate-title"><span className="booking-gate-icon"><UserRound size={28}/></span><h2 id="booking-gate-title">{bookingGate==="phone"?"أضف رقم جوالك لإكمال الحجز":"سجّل الدخول لإكمال الحجز"}</h2><p>{bookingGate==="phone"?"باقي خطوة واحدة! أضف رقم جوالك عشان نقدر نكمل حجزك ونتواصل معاك عند الحاجة.":"تحتاج تسجّل الدخول أولاً عشان نربط الحجز بحسابك ونقدر نتابع تذكرتك."}</p><button type="button" className="booking-gate-primary" onClick={()=>{const gate=bookingGate;if(gate==="login")window.sessionStorage.setItem("haddir_booking_phone_required","1");setBookingGate(null);setEventResetKey(value=>value+1);setActiveTab("profile");setAuthMessage(gate==="login"?"سجّل الدخول لمواصلة الحجز.":"أضف رقم جوالك لمواصلة الحجز.");if(gate==="phone")setProfileEditing(true);window.scrollTo({top:0,behavior:"smooth"});}}>{bookingGate==="phone"?"إضافة رقم الجوال":"الانتقال لتسجيل الدخول"}</button><button type="button" className="booking-gate-secondary" onClick={()=>setBookingGate(null)}>لاحقاً</button></section></div>}
  {!isGatekeeperPage&&!isEventDetailOpen&&<BottomNav activeTab={activeTab} unreadCount={notificationView.unreadCount} onNavigate={go}/>}
  </>
  
