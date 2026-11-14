@@ -72,3 +72,17 @@ This is generated from catalog evidence and ACL inventory. It has not been execu
 The source-level checks above establish that the drafts contain the expected object identities and that the constraints/index definitions match the catalog text. They do **not** establish that the complete baseline will execute successfully. PostgreSQL creation order, SQL/PLpgSQL body compilation, platform integration availability, Storage policies, cron behavior, ACL inheritance, and runtime application workflows remain untested until a compatible disposable PostgreSQL/Supabase environment is available.
 
 No production DDL, data, grants, policies, triggers, Storage objects, or cron jobs were changed. No migration was run and no deployment was triggered.
+
+
+## 6. Storage and cron draft
+
+The new `70-storage-cron-draft.md` was cross-checked against `storage-rls-cron.json`:
+
+- 2 bucket configuration blocks match the production IDs and settings.
+- 6 Storage policy statements match all six production policy names.
+- 2 cron schedule statements preserve both job names, cron expressions, and command strings.
+- No secret values, Vault payloads, or credentials were included.
+- The Storage schema is treated as Supabase-managed; bucket configuration is represented as TOML and policy DDL targets only `storage.objects`.
+- Cron job IDs are not copied; stable names are used because IDs are environment-specific.
+
+This is a source-level cross-check only. It does not validate bucket synchronization, policy execution, scheduled worker behavior, or external push delivery.
