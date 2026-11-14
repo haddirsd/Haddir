@@ -3,7 +3,7 @@
 This draft reconstructs **81 constraints** and the standalone indexes from the production catalog. Indexes that back primary-key/unique constraints are deliberately excluded from the standalone index section to avoid duplicate index creation.
 
 - Requires all table definitions in `20-tables-draft.sql.md` to be created first.
-- Foreign keys rely on Supabase-managed `auth.users` where specified.
+- Primary-key and unique constraints are applied before CHECK and foreign-key constraints so referenced candidate keys exist before FK creation. Foreign keys rely on Supabase-managed `auth.users` where specified.
 - Review every dependency and duplicate-index edge before execution.
 - Not tested on PostgreSQL; never apply to production.
 
@@ -11,7 +11,6 @@ This draft reconstructs **81 constraints** and the standalone indexes from the p
 
 -- DRAFT ONLY: reconstructed from production pg_constraint / pg_indexes catalog definitions.
 -- Run only after all 16 public tables exist. Not tested. Do not apply to production.
--- Standalone indexes only. Constraint-backed indexes are created by the ALTER TABLE statements above.
 ALTER TABLE public."admin_activity_log" ADD CONSTRAINT "admin_activity_log_pkey" PRIMARY KEY (id);
 ALTER TABLE public."booking_items" ADD CONSTRAINT "booking_items_pkey" PRIMARY KEY (id);
 ALTER TABLE public."bookings" ADD CONSTRAINT "bookings_pkey" PRIMARY KEY (id);
@@ -93,6 +92,8 @@ ALTER TABLE public."tickets" ADD CONSTRAINT "tickets_booking_id_fkey" FOREIGN KE
 ALTER TABLE public."tickets" ADD CONSTRAINT "tickets_booking_item_id_fkey" FOREIGN KEY (booking_item_id) REFERENCES booking_items(id) ON DELETE CASCADE;
 ALTER TABLE public."tickets" ADD CONSTRAINT "tickets_event_id_fkey" FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE RESTRICT;
 ALTER TABLE public."tickets" ADD CONSTRAINT "tickets_ticket_type_id_fkey" FOREIGN KEY (ticket_type_id) REFERENCES ticket_types(id) ON DELETE RESTRICT;
+
+-- Standalone indexes only. Constraint-backed indexes are created by the ALTER TABLE statements above.
 CREATE INDEX admin_activity_log_actor_idx ON public.admin_activity_log USING btree (actor_id, created_at DESC);
 CREATE INDEX admin_activity_log_booking_idx ON public.admin_activity_log USING btree (booking_id, created_at DESC);
 CREATE INDEX admin_activity_log_created_at_idx ON public.admin_activity_log USING btree (created_at DESC);
