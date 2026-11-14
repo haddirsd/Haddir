@@ -4,13 +4,17 @@ This draft reconstructs **81 constraints** and the standalone indexes from the p
 
 - Requires all table definitions in `20-tables-draft.sql.md` to be created first.
 - Primary-key and unique constraints are applied before CHECK and foreign-key constraints so referenced candidate keys exist before FK creation. Foreign keys rely on Supabase-managed `auth.users` where specified.
-- Review every dependency and duplicate-index edge before execution.
+- Apply primary-key and unique constraints first, then checks, then foreign keys so every referenced unique key already exists.
+- Standalone indexes follow all constraints; constraint-backed indexes are not duplicated.
 - Not tested on PostgreSQL; never apply to production.
 
 ```sql
 
 -- DRAFT ONLY: reconstructed from production pg_constraint / pg_indexes catalog definitions.
 -- Run only after all 16 public tables exist. Not tested. Do not apply to production.
+
+-- Standalone indexes only. Constraint-backed indexes are created by the ALTER TABLE statements above.
+
 ALTER TABLE public."admin_activity_log" ADD CONSTRAINT "admin_activity_log_pkey" PRIMARY KEY (id);
 ALTER TABLE public."booking_items" ADD CONSTRAINT "booking_items_pkey" PRIMARY KEY (id);
 ALTER TABLE public."bookings" ADD CONSTRAINT "bookings_pkey" PRIMARY KEY (id);
@@ -92,8 +96,6 @@ ALTER TABLE public."tickets" ADD CONSTRAINT "tickets_booking_id_fkey" FOREIGN KE
 ALTER TABLE public."tickets" ADD CONSTRAINT "tickets_booking_item_id_fkey" FOREIGN KEY (booking_item_id) REFERENCES booking_items(id) ON DELETE CASCADE;
 ALTER TABLE public."tickets" ADD CONSTRAINT "tickets_event_id_fkey" FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE RESTRICT;
 ALTER TABLE public."tickets" ADD CONSTRAINT "tickets_ticket_type_id_fkey" FOREIGN KEY (ticket_type_id) REFERENCES ticket_types(id) ON DELETE RESTRICT;
-
--- Standalone indexes only. Constraint-backed indexes are created by the ALTER TABLE statements above.
 CREATE INDEX admin_activity_log_actor_idx ON public.admin_activity_log USING btree (actor_id, created_at DESC);
 CREATE INDEX admin_activity_log_booking_idx ON public.admin_activity_log USING btree (booking_id, created_at DESC);
 CREATE INDEX admin_activity_log_created_at_idx ON public.admin_activity_log USING btree (created_at DESC);
@@ -126,5 +128,4 @@ CREATE INDEX tickets_booking_item_id_idx ON public.tickets USING btree (booking_
 CREATE INDEX tickets_event_status_idx ON public.tickets USING btree (event_id, status);
 CREATE UNIQUE INDEX tickets_one_active_per_booking_item_uidx ON public.tickets USING btree (booking_item_id) WHERE ((booking_item_id IS NOT NULL) AND (status = ANY (ARRAY['valid'::text, 'used'::text])));
 CREATE UNIQUE INDEX tickets_ticket_code_unique ON public.tickets USING btree (ticket_code);
-CREATE INDEX tickets_ticket_type_id_idx ON public.tickets USING btree (ticket_type_id);
-```
+CREATE INDEX tickets_ticket_type_id_idx ON public.tickets USING btree (ticket_type_id);```
