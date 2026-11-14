@@ -12,12 +12,13 @@ This directory contains first-pass SQL reconstruction artifacts based on read-on
 - `40-rls-policies-draft.sql.md` — RLS enablement for 16 tables and all 29 policies.
 - `50-triggers-draft.sql.md` — 12 distinct trigger definitions.
 - `SECURITY_REVIEW.md` — ownership, SECURITY DEFINER, search_path and EXECUTE ACL findings.
+- `ACCESS_CONTROL_STORAGE_CRON.md` — bucket configuration, six Storage policies, two active cron jobs, schema/object grants, and default-privilege review.
 
 The `.sql.md` suffix is deliberate: the SQL is embedded in Markdown so these files cannot be mistaken for deployable migration scripts by Supabase tooling.
 
 ## Important exclusions
 
-The drafts do not yet reconstruct application routines, RLS policies, grants/default privileges, trigger functions/triggers, Storage buckets/policies, or scheduled jobs. Supabase-managed schemas and roles are prerequisites and must not be recreated.
+The drafts do not yet reconstruct a complete executable bootstrap. The catalog evidence now includes routines, RLS policies, triggers, Storage buckets/policies, cron jobs, and grant/default-privilege findings. These still require dependency-aware conversion and exact ACL review. Supabase-managed schemas and roles are prerequisites and must not be recreated.
 
 ## Safe-use rules
 
