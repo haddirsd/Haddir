@@ -131,6 +131,7 @@ SELECT 'PASS: all baseline DDL stages created and catalog assertions matched.' A
 """
     run_file("90-assertions", assertions, temp)
     run_file("95-security-catalog-assertions", (SECURITY / "security_hardening_catalog_assertions.sql").read_text(encoding="utf-8"), temp)
+    run_file("96-security-behavior-assertions", (SECURITY / "security_hardening_behavior_assertions.sql").read_text(encoding="utf-8"), temp)
 
 print("\nPASS: PostgreSQL 17 DDL smoke test completed using disposable platform stubs.")
 print("This is not a Supabase platform integration test and does not execute application workflows.")
