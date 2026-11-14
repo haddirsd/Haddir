@@ -96,3 +96,16 @@ This is a read-only catalog evidence snapshot, **not yet a runnable bootstrap SQ
 6. Obtain a real free PostgreSQL-compatible validation runtime and test the generated baseline before proposing any changes to `main`. The current environment has no local PostgreSQL runtime, so no SQL execution test has been claimed.
 
 Local tooling check in the current work environment found Git and Node.js, but no `psql`, `postgres`, Docker, or Supabase CLI. No local database test has been claimed or run.
+
+## Latest status — 2026-11-14
+
+The recovery workspace has advanced beyond the initial inventory described above:
+
+- Seven candidate historical SQL files remain archived under supabase/recovery/historical-sql/; they are not runnable migrations and their production mapping is not claimed as byte-for-byte provenance.
+- Fifteen production migrations missing by name from GitHub remain unrecovered from repository path history. Their original SQL has not been fabricated.
+- A complete catalog-derived baseline draft set is now indexed in supabase/recovery/baseline/README.md: tables, routines, constraints/indexes, RLS policies, triggers, privileges, Storage/cron configuration, and reconciliation/dependency/security audits.
+- Structural reconciliation found 16 tables/158 columns, 81 constraints, 33 standalone indexes, 29 policies, and 12 trigger objects matching the preserved catalog. Constraint and standalone-index definitions matched exactly.
+- Routine dependency, ACL, workflow, Storage, and cron findings are documented. Known payment-review NULL-decision and gatekeeper-core EXECUTE findings remain unpatched in production.
+- The baseline remains **not executable, not tested, and not approved**. The current environment still has no PostgreSQL server, psql, Docker, or Supabase CLI. A real compatible PostgreSQL/Supabase validation run is still required.
+
+Safety boundaries remain unchanged: production was read-only, main was not modified, no paid Supabase branch/resource was created, and no Vercel deployment was triggered.
