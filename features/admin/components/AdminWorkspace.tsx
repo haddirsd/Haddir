@@ -12,17 +12,14 @@ import AdminReportsWorkspace from "../reports/AdminReportsWorkspace";
 import AdminOverviewWorkspace from "../overview/AdminOverviewWorkspace";
 import { Activity, BadgeCheck, Banknote, CalendarDays, ClipboardCheck, LayoutDashboard, LogOut, Shield, Ticket, Users } from "lucide-react";
 import { HaddirDialog } from "../../../components/ui/HaddirDialog";
-import { ADMIN_ROLE_LABELS, ADMIN_SECTION_LABELS, getAdminNavigationSections, type AdminRole, type AdminSection } from "../types";
+import { ADMIN_ROLE_LABELS, ADMIN_SECTION_LABELS, getAdminNavigationSections, type AdminSection } from "../types";
+import { useAdminAccess } from "../hooks/useAdminAccess";
 
 
 export default function AdminPage() {
   const router = useRouter();
-  const [role, setRole] = useState<AdminRole | null>(null);
-  const [name, setName] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("");
+  const { role, name, avatarUrl, loading, error } = useAdminAccess();
   const [section, setAdminSection] = useState<AdminSection>("overview");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [userSearchTerm,setUserSearchTerm]=useState("");
   const [darkMode,setDarkMode]=useState(false);
   const [showLogoutConfirm,setShowLogoutConfirm]=useState(false);
@@ -39,28 +36,6 @@ export default function AdminPage() {
     window.addEventListener("storage", syncTheme);
     return () => window.removeEventListener("storage", syncTheme);
   }, []);
-
-  useEffect(() => {
-    const supabase = getSupabaseBrowserClient();
-    if (!supabase) { setError("إعدادات الاتصال بقاعدة البيانات غير مكتملة."); setLoading(false); return; }
-    let alive = true;
-    const init = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.replace("/"); return; }
-      const { data: profile, error: profileError } = await supabase.from("profiles").select("role,full_name").eq("id", user.id).maybeSingle();
-      if (!alive) return;
-      if (profileError || !profile || !["owner", "admin", "supervisor"].includes(profile.role)) {
-        setError("ليس لديك صلاحية الوصول إلى لوحة الإدارة."); setLoading(false); return;
-      }
-      setRole(profile.role as AdminRole);
-      const metadata = user.user_metadata || {};
-      setName(profile.full_name || metadata.full_name || metadata.name || user.email || "فريق حاضر");
-      setAvatarUrl(String(metadata.avatar_url || metadata.picture || metadata.photo_url || ""));
-      setLoading(false);
-    };
-    void init();
-    return () => { alive = false; };
-  }, [router]);
 
   const nav = useMemo(() => role ? getAdminNavigationSections(role) : [], [role]);
 
