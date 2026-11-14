@@ -10823,3 +10823,12 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 
 /* Loading indicator inside shared buttons */
 .haddir-button-spinner{flex:0 0 auto;animation:haddir-spin .9s linear infinite}
+
+/* Profile save success feedback */
+.profile-account-card>.profile-save-success{display:flex;align-items:center;gap:11px;margin:18px 0 0;padding:12px 14px;border:1px solid rgba(34,153,105,.2);border-radius:14px;background:linear-gradient(110deg,rgba(34,153,105,.09),rgba(91,46,255,.045));color:var(--fg);text-align:right;}
+.profile-save-success-icon{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:11px;background:rgba(34,153,105,.13);color:#21865f}
+.profile-save-success>span:last-child{display:grid;gap:3px}
+.profile-save-success strong{font-size:12px;font-weight:800;line-height:1.5;color:var(--fg)}
+.profile-save-success small{font-size:11px;line-height:1.6;color:var(--muted)}
+.theme-dark .profile-account-card>.profile-save-success{border-color:rgba(77,190,145,.24);background:linear-gradient(110deg,rgba(34,153,105,.15),rgba(91,46,255,.09))}
+.theme-dark .profile-save-success-icon{background:rgba(77,190,145,.16);color:#70d6ad}
