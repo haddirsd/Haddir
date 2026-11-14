@@ -1,4 +1,4 @@
-const CACHE_NAME = "haddir-static-v17";
+const CACHE_NAME = "haddir-static-v18";
 const PRECACHE_URLS = [
   "/icons/icon-192-brand.svg",
   "/icons/icon-192.png",
@@ -15,6 +15,8 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
       await Promise.allSettled(PRECACHE_URLS.map((url) => cache.add(url)));
+      // Activate immediately so installed PWAs do not keep an older worker waiting.
+      await self.skipWaiting();
     })
   );
 });
@@ -76,26 +78,59 @@ self.addEventListener("fetch", (event) => {
 
 
 self.addEventListener("push", (event) => {
-  let payload = {};
-  try {
-    payload = event.data ? event.data.json() : {};
-  } catch {
-    payload = { body: event.data ? event.data.text() : "" };
-  }
-  const title = payload.title || "حاضر";
-  const options = {
-    body: payload.body || "عندك تحديث جديد في حاضر.",
-    icon: payload.icon || "/icons/icon-192-brand.svg",
-    badge: payload.badge || "/icons/icon-192-brand.svg",
-    tag: payload.tag || "haddir-notification",
-    data: { url: payload.url || "/?tab=notifications" },
-    vibrate: [180, 80, 180],
-    renotify: false,
-    silent: false,
-    dir: "rtl",
-    lang: "ar",
-  };
-  event.waitUntil(self.registration.showNotification(title, options));
+  event.waitUntil((async () => {
+    let payload = {};
+    try {
+      payload = event.data ? event.data.json() : {};
+    } catch {
+      payload = { body: event.data ? event.data.text() : "" };
+    }
+
+    const title = typeof payload.title === "string" && payload.title.trim()
+      ? payload.title
+      : "حاضر";
+    const body = typeof payload.body === "string" && payload.body.trim()
+      ? payload.body
+      : "عندك تحديث جديد في حاضر.";
+    const url = typeof payload.url === "string"
+      && payload.url.startsWith("/")
+      && !payload.url.startsWith("//")
+      ? payload.url
+      : "/?tab=notifications";
+    const tag = typeof payload.tag === "string" && payload.tag
+      ? payload.tag
+      : "haddir-notification";
+
+    const options = {
+      body,
+      // PNG assets are more consistently supported by Android notification UI.
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      tag,
+      data: { url },
+      timestamp: Date.now(),
+      vibrate: [180, 80, 180],
+      renotify: false,
+      silent: false,
+      dir: "rtl",
+      lang: "ar",
+    };
+
+    try {
+      await self.registration.showNotification(title, options);
+      console.info("[Haddir SW] Push notification displayed", { tag });
+    } catch (error) {
+      console.error("[Haddir SW] Notification display failed", error);
+      // Retry without optional visual fields if the platform rejects them.
+      await self.registration.showNotification(title, {
+        body,
+        tag,
+        data: { url },
+        dir: "rtl",
+        lang: "ar",
+      });
+    }
+  })());
 });
 
 self.addEventListener("notificationclick", (event) => {
