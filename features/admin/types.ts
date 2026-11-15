@@ -22,7 +22,7 @@ export const ADMIN_SECTION_LABELS: Record<AdminSection, string> = {
 export const ADMIN_ROLE_LABELS: Record<AdminRole, string> = {
   owner: "مالك المنصة",
   admin: "المشرف الإداري",
-  supervisor: "موظف حاضر",
+  supervisor: "مشرف فعالية",
 };
 
 export function getAdminNavigationSections(role: AdminRole): AdminSection[] {
