@@ -1,4 +1,4 @@
-name: Supabase Auth and PostgREST HTTP integration
+name: Supabase Auth and PostgREST HTTP integration (syntax-fixed)
 on:
   push:
     branches:
