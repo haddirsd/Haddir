@@ -19,6 +19,7 @@ import type { AccountDialog } from "../features/customer-account/components/Acco
 import { useAppNavigation } from "../components/layout/hooks/useAppNavigation";
 import { useAppTheme } from "../components/layout/hooks/useAppTheme";
 import { GatekeeperPage } from "../features/gatekeeper/GatekeeperPage";
+import { OrganizerTermsConsent } from "../features/legal/OrganizerTermsConsent";
 export default function Home(){
  const [deletingAccount,setDeletingAccount]=useState(false);
  const { darkMode, setDarkMode } = useAppTheme();
@@ -27,7 +28,7 @@ export default function Home(){
  const [isEventDetailOpen,setIsEventDetailOpen]=useState(false);
  const [profileSaving,setProfileSaving]=useState(false);
  const { activeTab, setActiveTab, showPrivacySecurity, setShowPrivacySecurity, eventResetKey, setEventResetKey, activeWorkspace, isGatekeeperPage, go, backFromGatekeeper, closeGatekeeper } = useAppNavigation();
- const { authUser, userRole, assignedEvent, fullName, setFullName, email, phone, setPhone, avatarUrl, profileEditing, setProfileEditing, saved, setSaved, authMessage, setAuthMessage } = useAuth();
+ const { authUser, userRole, pendingLegalRole, acceptOrganizerTerms, assignedEvent, fullName, setFullName, email, phone, setPhone, avatarUrl, profileEditing, setProfileEditing, saved, setSaved, authMessage, setAuthMessage } = useAuth();
  const { myTickets, myNotifications, accountDataLoading, accountDataError, markNotificationRead: markCustomerNotificationReadAction, markAllNotificationsRead: markAllCustomerNotificationsReadAction } = useCustomerAccount(authUser?.id ?? null);
  const ticketsView = useCustomerTicketsView(setUiNotice);
  const accountActions = useCustomerAccountActions({
@@ -65,6 +66,7 @@ export default function Home(){
   onBackFromPrivacy={()=>setShowPrivacySecurity(false)}
   onBackFromGatekeeper={backFromGatekeeper}
  />
+ {pendingLegalRole === "advertiser" && <OrganizerTermsConsent onAccept={acceptOrganizerTerms} onReadDocuments={()=>{setActiveTab("profile");setShowPrivacySecurity(true);window.scrollTo({top:0,behavior:"auto"});}} />}
  {!isGatekeeperPage&&!showPrivacySecurity&&<DesktopNav activeTab={activeTab} unreadCount={notificationView.unreadCount} onNavigate={go}/>}
  <div className="app-content">
  <WelcomeSplash />
