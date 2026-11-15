@@ -10954,15 +10954,27 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 .app-shell .privacy-delete-card>p{font-size:11px;line-height:1.9}
 .app-shell .privacy-delete-card .privacy-danger-button{width:100%;min-height:48px;margin-top:3px;border-radius:13px;background:#c43d49;font-size:12px}
 .app-shell .privacy-delete-card .privacy-danger-button:focus-visible,.app-shell .legal-accordion summary:focus-visible,.app-shell .privacy-entry-button:focus-visible{outline:3px solid rgba(91,46,255,.35);outline-offset:3px}
-.theme-dark .app-shell .legal-page-hero{background:linear-gradient(135deg,rgba(145,119,255,.12),rgba(11,127,108,.1)),var(--surface)}
-.theme-dark .app-shell .legal-page-symbol{background:rgba(22,31,35,.72);color:#b6a5ff}
-.theme-dark .app-shell .legal-page-privacy .legal-page-symbol{background:rgba(11,127,108,.16);color:#5ad0b8}
-.theme-dark .app-shell .legal-page-note{background:rgba(12,20,23,.42)}
-.theme-dark .app-shell .legal-accordion summary:before{background:rgba(145,119,255,.16);color:#b6a5ff}
-.theme-dark .app-shell .legal-accordion summary:after{background:rgba(255,255,255,.05)}
-.theme-dark .app-shell .legal-accordion[open] summary:after{background:rgba(145,119,255,.18);color:#b6a5ff}
-.theme-dark .app-shell .profile-legal-icon.terms{background:rgba(145,119,255,.16);color:#b6a5ff}
-.theme-dark .app-shell .profile-legal-icon.privacy{background:rgba(11,127,108,.18);color:#5ad0b8}
+.app-shell.theme-dark .legal-page-hero{background:linear-gradient(135deg,rgba(145,119,255,.12),rgba(11,127,108,.1)),var(--surface)}
+.app-shell.theme-dark .legal-page-symbol{background:rgba(22,31,35,.72);color:#b6a5ff}
+.app-shell.theme-dark .legal-page-privacy .legal-page-symbol{background:rgba(11,127,108,.16);color:#5ad0b8}
+.app-shell.theme-dark .legal-page-note{background:rgba(12,20,23,.42)}
+.app-shell.theme-dark .legal-accordion summary:before{background:rgba(145,119,255,.16);color:#b6a5ff}
+.app-shell.theme-dark .legal-accordion summary:after{background:rgba(255,255,255,.05)}
+.app-shell.theme-dark .legal-accordion[open] summary:after{background:rgba(145,119,255,.18);color:#b6a5ff}
+.app-shell.theme-dark .profile-legal-icon.terms{background:rgba(145,119,255,.16);color:#b6a5ff}
+.app-shell.theme-dark .profile-legal-icon.privacy{background:rgba(11,127,108,.18);color:#5ad0b8}
+.app-shell.theme-dark .legal-page-kicker span:first-child{background:rgba(185,168,255,.14);color:#c8baff}
+.app-shell.theme-dark .legal-page-note{border-color:var(--line);color:var(--muted)}
+.app-shell.theme-dark .legal-page-note svg{color:#70d6c4}
+.app-shell.theme-dark .legal-content-heading>span{background:var(--surface);color:var(--muted)}
+.app-shell.theme-dark .legal-accordion{background:var(--surface);border-color:var(--line)}
+.app-shell.theme-dark .legal-accordion-content{border-top-color:var(--line);color:var(--muted)}
+.app-shell.theme-dark .legal-accordion-content h3{color:var(--fg)}
+.app-shell.theme-dark .privacy-delete-card{background:linear-gradient(135deg,rgba(255,84,112,.09),transparent 75%),var(--surface);border-color:rgba(255,113,136,.24)}
+.app-shell.theme-dark .privacy-delete-card h2{color:var(--fg)}
+.app-shell.theme-dark .privacy-delete-card>p{color:var(--muted)}
+.app-shell.theme-dark .privacy-delete-card .privacy-icon{background:rgba(255,113,136,.13);color:#ff8296}
+
 @media(max-width:600px){
  .app-shell .privacy-screen{width:calc(100% - 26px);padding-top:14px;gap:14px}
  .app-shell .legal-page-hero{padding:18px;border-radius:19px;gap:15px}
