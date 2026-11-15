@@ -10832,3 +10832,39 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 .profile-save-success small{font-size:11px;line-height:1.6;color:var(--muted)}
 .theme-dark .profile-account-card>.profile-save-success{border-color:rgba(77,190,145,.24);background:linear-gradient(110deg,rgba(34,153,105,.15),rgba(91,46,255,.09))}
 .theme-dark .profile-save-success-icon{background:rgba(77,190,145,.16);color:#70d6ad}
+
+
+/* Compact, balanced customer ticket layout */
+.app-shell .tickets-screen.screen:has(.ticket-card-wrap){
+  width:min(100% - 28px,680px);
+  padding-top:22px;
+  padding-bottom:26px;
+}
+.app-shell .tickets-screen .ticket-list{gap:14px}
+.app-shell .tickets-screen .ticket-card-wrap{gap:8px}
+.app-shell .tickets-screen .ticket-expanded-panel{width:100%;display:flex;flex-direction:column;align-items:center;gap:9px}
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket{
+  width:100%;max-width:500px;padding:18px 20px;border-radius:20px;
+}
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket-head{min-height:0;padding-bottom:10px;gap:10px}
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket-logo{width:88px;height:42px}
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket-event{padding:13px 0 8px}
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket-event h2{font-size:clamp(18px,4vw,22px);line-height:1.4}
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket-meta{gap:10px 14px;padding:10px 0}
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket-meta small{margin-bottom:3px;font-size:10px}
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket-meta strong{font-size:12px;line-height:1.55}
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket-qr{gap:6px;padding:11px 0 9px}
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket-qr svg{width:188px!important;height:188px!important}
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket-qr small{max-width:300px;font-size:10px;line-height:1.5}
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket-code{padding:10px 0 5px}
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket-code strong{font-size:23px;letter-spacing:2px}
+.app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket-footer{margin:9px -20px -18px;padding:10px 8px;font-size:10px}
+.app-shell .tickets-screen .ticket-expanded-panel>.pay-button{width:100%;max-width:500px;min-height:45px;margin-top:0}
+@media(max-width:520px){
+  .app-shell .tickets-screen.screen:has(.ticket-card-wrap){width:calc(100% - 24px);padding-top:18px}
+  .app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket{padding:15px 15px 0;border-radius:17px}
+  .app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket-logo{width:78px;height:38px}
+  .app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket-meta{gap:9px 10px}
+  .app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket-qr svg{width:176px!important;height:176px!important}
+  .app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket-footer{margin:9px -15px 0}
+}
