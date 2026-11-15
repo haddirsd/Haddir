@@ -2,16 +2,39 @@
 
 Project: `haddir` (`puhmvcekxkcxfdvgygpk`).
 
+يحتوي هذا المجلد على مصادر مرتبطة بمشروع Supabase، بما فيها ملفات SQL وEdge Functions. وجود الملفات هنا لا يعني أنها نُشرت تلقائياً إلى المشروع البعيد.
+
 ## Edge Functions
 
-The source files in `functions/` are snapshots of the active Edge Functions retrieved from Supabase. GitHub edits to these files do not deploy or change the live functions.
+المصادر موجودة في `supabase/functions/`:
 
-- `send-booking-email` — JWT verification enabled.
-- `send-web-push` — gateway JWT verification disabled; the function validates its private hook secret.
-- `delete-customer-account` — JWT verification enabled.
+- `send-booking-email` — التحقق من JWT مفعّل.
+- `send-web-push` — التحقق من JWT على بوابة Edge Function معطّل؛ الوظيفة تتحقق من سرّ الاستدعاء الخاص بها.
+- `delete-customer-account` — التحقق من JWT مفعّل.
+
+تعديل ملفات المصدر في GitHub لا يغيّر الوظائف الحية ولا ينشرها تلقائياً. يجب مراجعة إعدادات كل وظيفة وأسرارها ثم نشرها بإجراء مقصود ومتحقق منه.
 
 ## Migrations
 
-The active Supabase project has an applied migration history, but its corresponding SQL migration files are not currently present in this repository. Migration names alone are not sufficient to recreate safe files, particularly where RLS policies, triggers, RPC functions, and storage policies are involved. Recover the original SQL history or pull a verified schema baseline before adding or applying migrations.
+**ملفات migrations موجودة بالفعل في المستودع** داخل `supabase/migrations/`. لذلك فإن القول إن ملفات SQL غير موجودة لم يعد وصفاً صحيحاً لحالة المستودع.
 
-No database schema or live Edge Function was changed as part of this source-organization work.
+لكن يجب التفريق بين أمرين:
+
+1. **وجود ملفات SQL الحالية:** يحتوي المستودع على مجموعة ملفات migration فعلية تمثل تغييرات قاعدة البيانات التي أضيفت إلى سجل الكود.
+2. **اكتمال ومطابقة التاريخ مع الإنتاج:** لم تُحسم بعد المطابقة التاريخية الكاملة واحداً لواحد بين كل ملفات المستودع وسجل migrations المطبق في قاعدة الإنتاج. توجد اختلافات في بعض الإصدارات والطوابع الزمنية، كما أن بعض سجلات الإنتاج لا يقابلها ملف بالاسم نفسه في المستودع.
+
+لهذا السبب، لا تعتبر مجلد migrations نسخة تاريخية مكتملة ومثبتة تلقائياً من كل ما طُبق على الإنتاج، ولا تشغّل جميع ملفاته على قاعدة قائمة لمجرد وجودها. قبل أي تطبيق:
+
+- طابق إصدار migration واسمه ومحتواه مع سجل قاعدة البيانات المستهدفة.
+- راجع أثر SQL على الجداول والقيود والفهارس والدوال والمشغلات وRLS وStorage.
+- استخدم قاعدة اختبار منفصلة للتحقق من الترتيب والنتائج.
+- لا تعِد تطبيق migration سبق تنفيذه، ولا تنشئ ملفاً تاريخياً تخمينياً لسد فجوة في السجل.
+- لا تطبق تغييرات على الإنتاج إلا بعد مراجعة مستقلة وموافقة صريحة.
+
+## مراجع التحقق
+
+راجع تقارير استعادة ومطابقة migrations وتقارير الأمان الموجودة في المستودع عند توفرها، ولا تعتمد على أسماء الملفات وحدها لإثبات التطابق. كما أن نجاح اختبار SQL محلي أو في بيئة مؤقتة لا يثبت وحده نجاح Auth أو RLS أو PostgREST عبر HTTP.
+
+## نطاق هذا المجلد
+
+هذا المجلد يوثق مصادر المشروع وإرشادات التعامل معها. لا يؤدي تعديل README أو ملفات SQL أو Edge Functions في GitHub بذاته إلى تعديل قاعدة الإنتاج أو الوظائف المنشورة.
