@@ -51,7 +51,7 @@ jobs:
                 const password = crypto.randomBytes(24).toString('base64url') + 'Aa1!';
                 const created = await req('/auth/v1/admin/users', service, {method:'POST', body:JSON.stringify({email,password,email_confirm:true})});
                 if (!(created.status===200 || created.status===201)) throw new Error('Admin user creation failed: HTTP '+created.status+'; response='+JSON.stringify(created.data).slice(0,1200));
-        console.log('PASS: Admin API creates confirmed disposable user '+(i+1));
+                console.log('PASS: Admin API creates confirmed disposable user '+(i+1));
                 users.push({id:created.data.id, token:null});
                 const login = await req('/auth/v1/token?grant_type=password', anon, {method:'POST', body:JSON.stringify({email,password})});
                 assert(login.status===200 && !!login.data.access_token, 'Password login issues real JWT for user '+(i+1));
