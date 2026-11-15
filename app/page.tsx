@@ -66,7 +66,7 @@ export default function Home(){
   onBackFromPrivacy={()=>setShowPrivacySecurity(false)}
   onBackFromGatekeeper={backFromGatekeeper}
  />
- {pendingLegalRole === "advertiser" && <OrganizerTermsConsent onAccept={acceptOrganizerTerms} onReadDocuments={()=>{setActiveTab("profile");setShowPrivacySecurity(true);window.scrollTo({top:0,behavior:"auto"});}} />}
+ {pendingLegalRole === "advertiser" && <OrganizerTermsConsent onAccept={acceptOrganizerTerms} />}
  {!isGatekeeperPage&&!showPrivacySecurity&&<DesktopNav activeTab={activeTab} unreadCount={notificationView.unreadCount} onNavigate={go}/>}
  <div className="app-content">
  <WelcomeSplash />
