@@ -36,7 +36,7 @@ jobs:
         with:
           deno-version: v2.x
       - name: Type-check Edge Function
-        run: deno check supabase/functions/delete-customer-account/index.ts
+        run: deno check --node-modules-dir=auto supabase/functions/delete-customer-account/index.ts
       - name: Install PostgreSQL client
         run: |
           sudo apt-get update -qq
