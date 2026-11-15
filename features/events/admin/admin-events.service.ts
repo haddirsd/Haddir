@@ -39,20 +39,43 @@ export async function getAdminEventEditorData(eventId: string): Promise<{ data: 
 export async function deleteOrCancelAdminEvent(eventId: string): Promise<{ message: string; error: string | null }> {
   const supabase = getSupabaseBrowserClient();
   if (!supabase) return { message: "", error: "تعذر الاتصال بقاعدة البيانات." };
-  const [{ count: bookings, error: bookingsError }, { count: tickets, error: ticketsError }] = await Promise.all([
-    supabase.from("bookings").select("id", { count: "exact", head: true }).eq("event_id", eventId),
-    supabase.from("tickets").select("id", { count: "exact", head: true }).eq("event_id", eventId),
-  ]);
-  if (bookingsError || ticketsError) return { message: "", error: "تعذر التحقق من ارتباطات الفعالية قبل الحذف." };
-  if ((bookings || 0) > 0 || (tickets || 0) > 0) {
-    const { error } = await supabase.from("events").update({ status: "cancelled", is_trending: false }).eq("id", eventId);
-    if (error) return { message: "", error: "تعذر إلغاء الفعالية: " + error.message };
-    const { error: ticketError } = await supabase.from("ticket_types").update({ is_active: false }).eq("event_id", eventId);
-    if (ticketError) return { message: "", error: "أُلغيت الفعالية لكن تعذر إيقاف أنواع التذاكر: " + ticketError.message };
-    return { message: "الفعالية مرتبطة بحجوزات/تذاكر؛ ألغيناها وأخفيناها مع الاحتفاظ بالسجلات.", error: null };
+
+  const { data: prepared, error: prepareError } = await supabase.rpc("prepare_settled_event_deletion", {
+    p_event_id: eventId,
+    p_settlement_confirmed: true,
+  });
+  if (prepareError || !prepared) {
+    return { message: "", error: "تعذر تجهيز الحذف الآمن: " + (prepareError?.message || "لم تصل استجابة من قاعدة البيانات.") };
   }
-  const { error } = await supabase.from("events").delete().eq("id", eventId);
-  return error ? { message: "", error: "تعذر حذف الفعالية: " + error.message } : { message: "تم حذف الفعالية نهائياً.", error: null };
+
+  const receiptPaths = Array.isArray(prepared.receipt_paths) ? prepared.receipt_paths as string[] : [];
+  const coverPaths = Array.isArray(prepared.cover_paths) ? prepared.cover_paths as string[] : [];
+
+  if (receiptPaths.length) {
+    const { error } = await supabase.storage.from("payment-receipts").remove(receiptPaths);
+    if (error) return { message: "", error: "لم تكتمل إزالة إيصالات الدفع؛ أبقينا سجلات الفعالية كما هي. أعد المحاولة بعد معالجة الخطأ: " + error.message };
+  }
+  if (coverPaths.length) {
+    const { error } = await supabase.storage.from("event-covers").remove(coverPaths);
+    if (error) return { message: "", error: "لم تكتمل إزالة صور الفعالية؛ أبقينا سجلاتها كما هي. أعد المحاولة بعد معالجة الخطأ: " + error.message };
+  }
+
+  const { data: finalized, error: finalizeError } = await supabase.rpc("finalize_settled_event_deletion", {
+    p_event_id: eventId,
+    p_settlement_confirmed: true,
+  });
+  if (finalizeError || !finalized?.success) {
+    return { message: "", error: "تم تجهيز الإحصائيات وإزالة الملفات، لكن لم تكتمل إزالة سجلات الفعالية: " + (finalizeError?.message || "تعذر تأكيد الحذف النهائي.") };
+  }
+
+  return { message: "تم حذف الفعالية وبياناتها التشغيلية وإيصالاتها، مع الاحتفاظ بإحصائيات حاضِر الإجمالية.", error: null };
+}
+
+export async function markAdminEventCompleted(eventId: string): Promise<{ error: string | null }> {
+  const supabase = getSupabaseBrowserClient();
+  if (!supabase) return { error: "تعذر الاتصال بقاعدة البيانات." };
+  const { error } = await supabase.rpc("admin_complete_event", { p_event_id: eventId });
+  return { error: error ? "تعذر إنهاء الفعالية: " + error.message : null };
 }
 
 export async function publishDraftAdminEvent(eventId: string): Promise<{ error: string | null }> {
