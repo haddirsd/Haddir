@@ -85,7 +85,7 @@ export function useEventNavigation({
     url.searchParams.delete("checkout");
     url.searchParams.delete("tier");
     url.searchParams.delete("qty");
-    const historyState = { ...(window.history.state ?? {}) };
+    const historyState: Record<string, unknown> = { ...((window.history.state ?? {}) as Record<string, unknown>) };
     delete historyState.haddirPage;
     window.history.replaceState(historyState, "", url.pathname + url.search + url.hash);
   }, []);
