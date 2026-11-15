@@ -69,7 +69,7 @@ export async function getPublishedEvents(): Promise<PublicEventsResult> {
           quantityTotal: total,
           quantitySold: sold,
           available,
-          availableNow: (unlimited || available > 0) && (event.is_continuous || (!!event.starts_at && new Date(event.starts_at).getTime() > now)) && now >= starts && now <= ends,
+          availableNow: (unlimited || available > 0) && (event.is_continuous || (!!event.starts_at && (event.ends_at ? new Date(event.ends_at).getTime() : new Date(event.starts_at).getTime()) > now)) && now >= starts && now <= ends,
         };
       });
 
