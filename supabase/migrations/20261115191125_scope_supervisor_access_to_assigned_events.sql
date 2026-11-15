@@ -283,3 +283,5 @@ $$;
 
 revoke all on function public.review_payment_submission(uuid,text,text) from public,anon;
 grant execute on function public.review_payment_submission(uuid,text,text) to authenticated;
+
+notify pgrst, 'reload schema';
