@@ -4,8 +4,13 @@ import { useCallback, useEffect, useState } from "react";
 
 export type AppTab = "home" | "tickets" | "notifications" | "profile";
 type AppWorkspace = "customer" | "organizer" | "gatekeeper" | "advertiser" | "admin" | "owner" | null;
+type HaddirHistoryState = { __haddirApp?: boolean; __haddirLegal?: boolean; tab?: AppTab; workspace?: string };
 
-const LEGAL_HISTORY_KEY = "__haddirLegalView";
+const LEGAL_HISTORY_KEY = "__haddirLegal";
+
+function isAppTab(value: unknown): value is AppTab {
+  return value === "home" || value === "tickets" || value === "notifications" || value === "profile";
+}
 
 export function useAppNavigation() {
   const [activeTab, setActiveTab] = useState<AppTab>("home");
@@ -15,34 +20,81 @@ export function useAppNavigation() {
   const [isGatekeeperPage, setIsGatekeeperPage] = useState(false);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const tab = params.get("tab");
-    if (tab === "tickets" || tab === "notifications" || tab === "profile") {
-      setActiveTab(tab);
+    const initialUrl = new URL(window.location.href);
+    const tabParam = initialUrl.searchParams.get("tab");
+    const initialTab: AppTab = isAppTab(tabParam) ? tabParam : "home";
+    const legalInitiallyOpen = initialUrl.searchParams.get("legal") === "1";
+    const workspace = initialUrl.searchParams.get("workspace");
+
+    setActiveTab(initialTab);
+
+    // Give the in-app screens a real history entry so Android Back returns
+    // to the previous Haddir screen instead of immediately leaving the site.
+    const homeUrl = new URL(initialUrl);
+    homeUrl.searchParams.delete("tab");
+    homeUrl.searchParams.delete("legal");
+    homeUrl.searchParams.delete("workspace");
+    window.history.replaceState(
+      { __haddirApp: true, tab: "home" } satisfies HaddirHistoryState,
+      "",
+      homeUrl.pathname + homeUrl.search + homeUrl.hash,
+    );
+
+    if (initialTab !== "home" || workspace) {
+      window.history.pushState(
+        { __haddirApp: true, tab: initialTab, workspace: workspace ?? undefined } satisfies HaddirHistoryState,
+        "",
+        (() => {
+          const url = new URL(initialUrl);
+          url.searchParams.delete("legal");
+          return url.pathname + url.search + url.hash;
+        })(),
+      );
     }
-    if (params.get("legal") === "1") {
-      window.history.pushState({ ...(window.history.state ?? {}), [LEGAL_HISTORY_KEY]: true }, "", window.location.href);
-      setShowPrivacySecurityState(true);
-    }
-    if (params.get("workspace") === "gatekeeper") {
+
+    if (workspace === "gatekeeper") {
       setActiveWorkspace("gatekeeper");
       setIsGatekeeperPage(true);
+    }
+
+    if (legalInitiallyOpen) {
+      window.history.pushState(
+        { __haddirApp: true, __haddirLegal: true, tab: initialTab } satisfies HaddirHistoryState,
+        "",
+        initialUrl.pathname + initialUrl.search + initialUrl.hash,
+      );
+      setShowPrivacySecurityState(true);
     }
   }, []);
 
   useEffect(() => {
-    const handlePopState = () => {
-      if (showPrivacySecurity) setShowPrivacySecurityState(false);
+    const handlePopState = (event: PopStateEvent) => {
+      const state = (event.state ?? {}) as HaddirHistoryState;
+      setShowPrivacySecurityState(Boolean(state[LEGAL_HISTORY_KEY]));
+      if (state.__haddirApp) {
+        setActiveTab(isAppTab(state.tab) ? state.tab : "home");
+        setEventResetKey((value) => value + 1);
+        if (state.workspace === "gatekeeper") {
+          setActiveWorkspace("gatekeeper");
+          setIsGatekeeperPage(true);
+        } else {
+          setActiveWorkspace(null);
+          setIsGatekeeperPage(false);
+        }
+        window.scrollTo({ top: 0, behavior: "auto" });
+      }
     };
+
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
-  }, [showPrivacySecurity]);
+  }, []);
 
   const setShowPrivacySecurity = useCallback((visible: boolean) => {
     if (visible) {
       if (!showPrivacySecurity) {
+        const current = (window.history.state ?? {}) as HaddirHistoryState;
         window.history.pushState(
-          { ...(window.history.state ?? {}), [LEGAL_HISTORY_KEY]: true },
+          { ...current, __haddirApp: true, __haddirLegal: true, tab: activeTab },
           "",
           window.location.href,
         );
@@ -51,12 +103,12 @@ export function useAppNavigation() {
       return;
     }
 
-    if (window.history.state?.[LEGAL_HISTORY_KEY]) {
+    if ((window.history.state as HaddirHistoryState | null)?.[LEGAL_HISTORY_KEY]) {
       window.history.back();
     } else {
       setShowPrivacySecurityState(false);
     }
-  }, [showPrivacySecurity]);
+  }, [activeTab, showPrivacySecurity]);
 
   const go = (tab: AppTab) => {
     setShowPrivacySecurityState(false);
@@ -67,10 +119,15 @@ export function useAppNavigation() {
     if (tab === "home") url.searchParams.delete("tab");
     else url.searchParams.set("tab", tab);
     url.searchParams.delete("workspace");
+    url.searchParams.delete("legal");
 
     setIsGatekeeperPage(false);
     setActiveWorkspace(null);
-    window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+    window.history.pushState(
+      { __haddirApp: true, tab } satisfies HaddirHistoryState,
+      "",
+      url.pathname + url.search + url.hash,
+    );
     window.scrollTo({
       top: 0,
       behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
@@ -78,6 +135,10 @@ export function useAppNavigation() {
   };
 
   const backFromGatekeeper = () => {
+    if ((window.history.state as HaddirHistoryState | null)?.__haddirApp) {
+      window.history.back();
+      return;
+    }
     setIsGatekeeperPage(false);
     setActiveWorkspace(null);
     const url = new URL(window.location.href);
