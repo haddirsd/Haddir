@@ -99,16 +99,26 @@ returns void
 language plpgsql
 security definer
 set search_path = ''
-as $$
+as $
+declare
+  v_rows integer;
 begin
   if p_user_id is null then
     raise exception 'معرّف الحساب مطلوب';
   end if;
 
-  delete from private.customer_account_deletion_cleanup
+  -- Keep an empty-path tombstone so a still-valid access JWT cannot resume writes.
+  update private.customer_account_deletion_cleanup
+     set receipt_paths = '{}'::text[],
+         updated_at = now()
    where user_id = p_user_id;
+
+  get diagnostics v_rows = row_count;
+  if v_rows = 0 then
+    raise exception 'سجل حذف الحساب غير موجود';
+  end if;
 end;
-$$;
+$;
 
 -- A pending cleanup row is also a write barrier. The advisory lock serializes
 -- the barrier with create_booking and submit_payment transactions.
