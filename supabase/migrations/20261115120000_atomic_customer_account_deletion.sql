@@ -24,6 +24,9 @@ begin
     raise exception 'معرّف الحساب مطلوب';
   end if;
 
+  -- Serialize with booking creation and payment submission guards.
+  perform pg_catalog.pg_advisory_xact_lock(748231905441::bigint);
+
   select p.role into v_role
     from public.profiles p
    where p.id = p_user_id
@@ -107,6 +110,86 @@ begin
 end;
 $$;
 
+-- A pending cleanup row is also a write barrier. The advisory lock serializes
+-- the barrier with create_booking and submit_payment transactions.
+create or replace function private.guard_customer_account_deletion_writes()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_user_id uuid;
+begin
+  if coalesce(auth.role(), '') = 'service_role' then
+    if tg_op = 'DELETE' then return old; else return new; end if;
+  end if;
+
+  perform pg_catalog.pg_advisory_xact_lock(748231905441::bigint);
+
+  if tg_table_name = 'bookings' then
+    if tg_op <> 'INSERT' then
+      v_user_id := old.user_id;
+      if v_user_id is not null and exists (
+        select 1 from private.customer_account_deletion_cleanup q where q.user_id = v_user_id
+      ) then
+        raise exception 'الحساب قيد الحذف ولا يمكن تعديل الحجوزات';
+      end if;
+    end if;
+    if tg_op <> 'DELETE' then
+      v_user_id := new.user_id;
+      if v_user_id is not null and exists (
+        select 1 from private.customer_account_deletion_cleanup q where q.user_id = v_user_id
+      ) then
+        raise exception 'الحساب قيد الحذف ولا يمكن إنشاء حجوزات جديدة';
+      end if;
+    end if;
+  else
+    if tg_op <> 'INSERT' then
+      if old.submitted_by is not null and exists (
+        select 1 from private.customer_account_deletion_cleanup q where q.user_id = old.submitted_by
+      ) then
+        raise exception 'الحساب قيد الحذف ولا يمكن تعديل إثباتات الدفع';
+      end if;
+      if exists (
+        select 1 from public.bookings b
+        join private.customer_account_deletion_cleanup q on q.user_id = b.user_id
+        where b.id = old.booking_id
+      ) then
+        raise exception 'الحساب قيد الحذف ولا يمكن تعديل إثباتات الدفع';
+      end if;
+    end if;
+    if tg_op <> 'DELETE' then
+      if new.submitted_by is not null and exists (
+        select 1 from private.customer_account_deletion_cleanup q where q.user_id = new.submitted_by
+      ) then
+        raise exception 'الحساب قيد الحذف ولا يمكن إرسال إثباتات دفع جديدة';
+      end if;
+      if exists (
+        select 1 from public.bookings b
+        join private.customer_account_deletion_cleanup q on q.user_id = b.user_id
+        where b.id = new.booking_id
+      ) then
+        raise exception 'الحساب قيد الحذف ولا يمكن إرسال إثباتات دفع جديدة';
+      end if;
+    end if;
+  end if;
+
+  if tg_op = 'DELETE' then return old; else return new; end if;
+end;
+$$;
+
+drop trigger if exists guard_customer_account_deletion_bookings on public.bookings;
+create trigger guard_customer_account_deletion_bookings
+before insert or update or delete on public.bookings
+for each row execute function private.guard_customer_account_deletion_writes();
+
+drop trigger if exists guard_customer_account_deletion_payments on public.payment_submissions;
+create trigger guard_customer_account_deletion_payments
+before insert or update or delete on public.payment_submissions
+for each row execute function private.guard_customer_account_deletion_writes();
+
+revoke all on function private.guard_customer_account_deletion_writes() from public, anon, authenticated, service_role;
 revoke all on function public.prepare_customer_account_deletion(uuid) from public, anon, authenticated;
 revoke all on function public.complete_customer_account_deletion(uuid) from public, anon, authenticated;
 grant execute on function public.prepare_customer_account_deletion(uuid) to service_role;
