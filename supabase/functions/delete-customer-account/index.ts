@@ -77,17 +77,19 @@ Deno.serve(async (req: Request) => {
     }
   }
 
+  // Keep the durable cleanup marker until Auth deletion has definitely succeeded.
+  const { error: deleteError } = await admin.auth.admin.deleteUser(user.id, false);
+  if (deleteError) {
+    return json({ error: "اكتمل تنظيف البيانات وإزالة الإيصالات، لكن تعذر إغلاق تسجيل الدخول. يمكنك إعادة المحاولة بأمان." }, 500);
+  }
+
+  // If this final bookkeeping step fails, the account is already deleted and the
+  // leftover marker is harmless; it can be cleared by the service maintenance path.
   const { error: completeError } = await admin.rpc("complete_customer_account_deletion", {
     p_user_id: user.id,
   });
   if (completeError) {
-    return json({ error: "اكتمل تنظيف بيانات الحساب وملفاته، لكن تعذر إنهاء سجل التنظيف. أعد المحاولة لإكمال العملية." }, 500);
-  }
-
-  // Auth is hard-deleted only after the transactional DB cleanup and Storage removal succeed.
-  const { error: deleteError } = await admin.auth.admin.deleteUser(user.id, false);
-  if (deleteError) {
-    return json({ error: "اكتمل تنظيف بيانات الحساب وملفاته، لكن تعذر إغلاق تسجيل الدخول. سجّل الدخول وحاول مرة أخرى أو تواصل مع الدعم." }, 500);
+    return json({ success: true, message: "تم حذف الحساب وبياناته. بقي سجل تنظيف داخلي سيُزال آلياً." });
   }
 
   return json({ success: true, message: "تم حذف الحساب وإزالة بياناته الشخصية." });
