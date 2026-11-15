@@ -53,41 +53,43 @@ Deno.serve(async (req: Request) => {
     return json({ error: "الحساب مرتبط بمهام أو فعاليات على المنصة. تواصل مع الإدارة قبل حذفه." }, 409);
   }
 
-  const hasUpcomingConfirmedTicket = (bookings.data || []).some((booking: any) => booking.status === "confirmed" && booking.events?.starts_at && new Date(booking.events.starts_at).getTime() > Date.now());
-  if (hasUpcomingConfirmedTicket) return json({ error: "لديك تذكرة مؤكدة لفعالية لم تبدأ بعد. احتفظ بحسابك حتى تحضر الفعالية أو تواصل مع الدعم قبل الحذف." }, 409);
+  const hasUpcomingConfirmedTicket = (bookings.data || []).some((booking: any) =>
+    booking.status === "confirmed" && booking.events?.starts_at &&
+    new Date(booking.events.starts_at).getTime() > Date.now()
+  );
+  if (hasUpcomingConfirmedTicket) {
+    return json({ error: "لديك تذكرة مؤكدة لفعالية لم تبدأ بعد. احتفظ بحسابك حتى تحضر الفعالية أو تواصل مع الدعم قبل الحذف." }, 409);
+  }
 
-  const bookingIds = (bookings.data || []).map((row) => row.id);
-  if (bookingIds.length) {
-    const { data: receipts, error: receiptsError } = await admin.from("payment_submissions")
-      .select("receipt_path").in("booking_id", bookingIds).not("receipt_path", "is", null);
-    if (receiptsError) return json({ error: "تعذر تجهيز ملفات إيصالات الدفع للحذف." }, 500);
-    const paths = [...new Set((receipts || []).map((row) => row.receipt_path).filter((path): path is string => typeof path === "string" && path.length > 0))];
-    if (paths.length) {
-      const { error: storageError } = await admin.storage.from("payment-receipts").remove(paths);
-      if (storageError) return json({ error: "تعذر حذف إيصالات التحويل بأمان. لم يتم إغلاق الحساب." }, 500);
+  // This RPC performs all database changes in one transaction and persists pending file cleanup.
+  const { data: receiptPaths, error: prepareError } = await admin.rpc("prepare_customer_account_deletion", {
+    p_user_id: user.id,
+  });
+  if (prepareError || !Array.isArray(receiptPaths)) {
+    return json({ error: "تعذر تجهيز حذف الحساب بصورة آمنة. لم يتم إغلاق تسجيل الدخول؛ حاول لاحقاً." }, 500);
+  }
+
+  const paths = [...new Set(receiptPaths.filter((path): path is string => typeof path === "string" && path.length > 0))];
+  if (paths.length) {
+    const { error: storageError } = await admin.storage.from("payment-receipts").remove(paths);
+    if (storageError) {
+      return json({ error: "تعذر حذف بعض إيصالات التحويل. بيانات التنظيف محفوظة لإكمال العملية عند إعادة المحاولة." }, 500);
     }
   }
 
-  const cleanupSteps = [
-    await admin.from("email_outbox").delete().eq("recipient_user_id", user.id),
-    await admin.from("notifications").delete().eq("user_id", user.id),
-    await admin.from("push_subscriptions").delete().eq("user_id", user.id),
-    await admin.from("payment_submissions").update({ submitted_by: null, receipt_path: null }).eq("submitted_by", user.id),
-    await admin.from("bookings").update({
-      user_id: null,
-      customer_name: "مستخدم محذوف",
-      customer_email: null,
-      customer_phone: "محذوف",
-    }).eq("user_id", user.id),
-  ];
-  const failed = cleanupSteps.find((result) => result.error);
-  if (failed?.error) {
-    return json({ error: "تعذر إكمال إزالة بيانات الحساب. لم يتم حذف تسجيل الدخول؛ تواصل مع الدعم قبل إعادة المحاولة." }, 500);
-  }
-
+  // Keep the durable cleanup marker until Auth deletion has definitely succeeded.
   const { error: deleteError } = await admin.auth.admin.deleteUser(user.id, false);
   if (deleteError) {
-    return json({ error: "تمت إزالة بيانات الملف الشخصي وإيصالات الدفع، لكن تعذر إغلاق تسجيل الدخول. تواصل مع الدعم لإكمال العملية." }, 500);
+    return json({ error: "اكتمل تنظيف البيانات وإزالة الإيصالات، لكن تعذر إغلاق تسجيل الدخول. يمكنك إعادة المحاولة بأمان." }, 500);
+  }
+
+  // If this final bookkeeping step fails, the account is already deleted and the
+  // leftover marker is harmless; it can be cleared by the service maintenance path.
+  const { error: completeError } = await admin.rpc("complete_customer_account_deletion", {
+    p_user_id: user.id,
+  });
+  if (completeError) {
+    return json({ success: true, message: "تم حذف الحساب وبياناته. بقي سجل تنظيف داخلي سيُزال آلياً." });
   }
 
   return json({ success: true, message: "تم حذف الحساب وإزالة بياناته الشخصية." });
