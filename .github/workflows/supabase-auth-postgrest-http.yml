@@ -1,0 +1,80 @@
+name: Supabase Auth and PostgREST HTTP integration
+on:
+  push:
+    branches:
+      - test/supabase-auth-postgrest-http
+    paths:
+      - .github/workflows/supabase-auth-postgrest-http.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  auth-postgrest-rls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_URL: https://adbpeojpscwnsombisif.supabase.co
+      SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkYnBlb2pwc2N3bnNvbWJpc2lmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ2OTQyNzcsImV4cCI6MjExMDI3MDI3N30.CHUq7S-WVQeA
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - name: Run real HTTPS Auth, JWT, PostgREST and RLS tests
+        shell: bash
+        run: |
+          node <<'NODE'
+          const crypto = require('node:crypto');
+          const base = process.env.SUPABASE_URL;
+          const anon = process.env.SUPABASE_ANON_KEY;
+          const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+          if (!service) throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY repository secret');
+          const headers = (key, extra={}) => ({ apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', ...extra });
+          async function req(path, key, opts={}) {
+            const r = await fetch(base + path, { ...opts, headers: headers(key, opts.headers || {}) });
+            const body = await r.text();
+            let data; try { data = body ? JSON.parse(body) : null; } catch { data = body; }
+            return { status:r.status, data };
+          }
+          const assert = (ok, msg) => { if (!ok) throw new Error(msg); console.log('PASS:', msg); };
+          const users = [];
+          const rowIds = [];
+          async function cleanup() {
+            for (const id of rowIds) await req('/rest/v1/rls_auth_probe?id=eq.'+id, service, {method:'DELETE'});
+            for (const id of users) await req('/auth/v1/admin/users/'+id, service, {method:'DELETE'});
+          }
+          (async () => {
+            try {
+              const health = await fetch(base + '/auth/v1/health');
+              assert(health.ok, 'Auth HTTPS health endpoint responds');
+              for (let i=0;i<2;i++) {
+                const email = `rls-http-${crypto.randomUUID()}@example.com`;
+                const password = crypto.randomBytes(24).toString('base64url') + 'Aa1!';
+                const created = await req('/auth/v1/admin/users', service, {method:'POST', body:JSON.stringify({email,password,email_confirm:true})});
+                assert(created.status===200 || created.status===201, 'Admin API creates confirmed disposable user '+(i+1));
+                users.push(created.data.id);
+                const login = await req('/auth/v1/token?grant_type=password', anon, {method:'POST', body:JSON.stringify({email,password})});
+                assert(login.status===200 && !!login.data.access_token, 'Password login issues real JWT for user '+(i+1));
+                users[i] = {id:created.data.id, token:login.data.access_token};
+              }
+              const [a,b] = users;
+              const insert = await req('/rest/v1/rls_auth_probe', anon, {method:'POST', headers:{Authorization:'Bearer '+a.token, Prefer:'return=representation'}, body:JSON.stringify({owner_id:a.id,payload:'owned-by-a'})});
+              assert(insert.status===201 && Array.isArray(insert.data) && insert.data.length===1, 'User A inserts own row through PostgREST');
+              const rowId = insert.data[0].id; rowIds.push(rowId);
+              const aRead = await req('/rest/v1/rls_auth_probe?select=id,owner_id,payload', anon, {headers:{Authorization:'Bearer '+a.token}});
+              assert(aRead.status===200 && aRead.data.some(x=>x.id===rowId), 'User A reads own row');
+              const bRead = await req('/rest/v1/rls_auth_probe?select=id,owner_id,payload', anon, {headers:{Authorization:'Bearer '+b.token}});
+              assert(bRead.status===200 && !bRead.data.some(x=>x.id===rowId), 'User B cannot read User A row');
+              const crossInsert = await req('/rest/v1/rls_auth_probe', anon, {method:'POST', headers:{Authorization:'Bearer '+a.token, Prefer:'return=representation'}, body:JSON.stringify({owner_id:b.id,payload:'forbidden'})});
+              assert(crossInsert.status>=400, 'User A cannot insert a row owned by User B');
+              const crossUpdate = await req('/rest/v1/rls_auth_probe?id=eq.'+rowId, anon, {method:'PATCH', headers:{Authorization:'Bearer '+b.token, Prefer:'return=representation'}, body:JSON.stringify({payload:'tampered'})});
+              assert(crossUpdate.status===200 && Array.isArray(crossUpdate.data) && crossUpdate.data.length===0, 'User B cannot update User A row');
+              const ownUpdate = await req('/rest/v1/rls_auth_probe?id=eq.'+rowId, anon, {method:'PATCH', headers:{Authorization:'Bearer '+a.token, Prefer:'return=representation'}, body:JSON.stringify({payload:'updated-by-a'})});
+              assert(ownUpdate.status===200 && ownUpdate.data.length===1, 'User A can update own row');
+              const anonRead = await req('/rest/v1/rls_auth_probe?select=id', anon);
+              assert(anonRead.status===200 && Array.isArray(anonRead.data) && anonRead.data.length===0, 'Anonymous request cannot read protected rows');
+              const invalid = await fetch(base+'/rest/v1/rls_auth_probe?select=id', {headers:{apikey:anon,Authorization:'Bearer invalid.jwt.token'}});
+              assert(invalid.status===401, 'Invalid JWT is rejected by PostgREST');
+              console.log('RESULT: all HTTP Auth/JWT/PostgREST/RLS assertions passed');
+            } finally { await cleanup(); }
+          })().catch(e=>{ console.error(e.message); process.exitCode=1; });
+          NODE
