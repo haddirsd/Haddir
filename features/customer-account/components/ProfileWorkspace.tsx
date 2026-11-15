@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type Dispatch, type SetStateAction } from "react";
-import { CheckCircle2, UserRound, ChevronLeft, ShieldCheck, ClipboardList, ScanLine, Pencil, Share2, CloudUpload, LockKeyhole, Trash2, Ticket } from "lucide-react";
+import { CheckCircle2, UserRound, ChevronLeft, ShieldCheck, ClipboardList, ScanLine, Pencil, Trash2 } from "lucide-react";
 import AdvertiserWorkspace from "../../advertiser/components/AdvertiserWorkspace";
 
 type AuthUser = { id: string; email?: string } | null;
