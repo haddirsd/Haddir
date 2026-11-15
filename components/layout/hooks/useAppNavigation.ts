@@ -18,6 +18,7 @@ export function useAppNavigation() {
     if (tab === "tickets" || tab === "notifications" || tab === "profile") {
       setActiveTab(tab);
     }
+    if (params.get("legal") === "1") setShowPrivacySecurity(true);
     if (params.get("workspace") === "gatekeeper") {
       setActiveWorkspace("gatekeeper");
       setIsGatekeeperPage(true);
