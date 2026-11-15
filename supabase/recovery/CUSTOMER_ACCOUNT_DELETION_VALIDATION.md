@@ -2,37 +2,47 @@
 
 ## Change summary
 
-- Moves all PostgreSQL cleanup into one SECURITY DEFINER RPC transaction.
+- Moves PostgreSQL cleanup into one SECURITY DEFINER RPC transaction.
 - Persists receipt object paths in a private retry queue before anonymizing booking/payment rows.
 - Removes Storage objects only after the DB transaction succeeds.
 - Keeps the queue if Storage removal fails so a retry can finish without losing the paths.
-- Deletes the Auth user only after the database cleanup and Storage removal succeed.
-- Restricts both RPCs to `service_role`; `anon` and `authenticated` cannot execute them.
+- Keeps the durable cleanup marker until the Auth Admin API confirms hard deletion.
+- If final queue cleanup fails after Auth deletion, the account remains deleted and only a harmless internal cleanup marker remains.
+- Uses the same transaction advisory lock as booking creation; booking/payment triggers enforce the pending-deletion write barrier.
+- Restricts cleanup RPCs to service_role; anon and authenticated cannot execute them.
 - Rechecks staff/event assignments and upcoming confirmed bookings inside the database transaction.
 
-## Disposable PostgreSQL validation
+## Disposable PostgreSQL 17 validation
 
-Applied `20261115120000_atomic_customer_account_deletion.sql` only to the free disposable Supabase project `haddir-auth-postgrest-http` after creating minimal fixture tables. No production objects or data were changed.
+The migration was applied only to the free disposable Supabase project `adbpeojpscwnsombisif`. No production objects or data were changed.
 
-Observed checks:
-
-- Migration applied successfully on PostgreSQL 17.
-- A customer with an expired booking returned the receipt path and had booking identity anonymized.
-- A second call returned the same persisted receipt path, proving retry retains the cleanup work item after the first DB transaction.
-- Personal notifications, Push subscriptions, and email outbox rows were removed by the transaction.
-- Payment submitter and receipt path were cleared; booking customer name/email/phone were anonymized while the booking remained.
-- Completing cleanup removed the durable retry row.
+Checks that passed:
+- Migration and function definitions applied successfully.
+- Customer booking identity and payment submitter/receipt path were anonymized.
+- Receipt object path persisted in the cleanup queue.
+- Repeated prepare calls preserve queued paths for retry.
+- New booking writes were rejected while deletion was pending.
+- New payment submission writes were rejected while deletion was pending.
+- Cleanup queue remained present after the database cleanup.
+- Final cleanup RPC removed the queue after the simulated Auth deletion boundary.
 - Admin-role account was rejected.
 - Customer with a confirmed upcoming event was rejected; its booking remained linked.
-- Function ACL assertions: anon=false, authenticated=false, service_role=true for both RPCs.
+- Function ACL assertions: anon=false, authenticated=false, service_role=true for both cleanup RPCs.
 
-## Not yet validated
+## Disposable Edge Function deployment
 
-- Full Edge Function execution against a disposable Auth user and Storage bucket.
-- Actual Storage object deletion failure/retry through the Edge Function.
-- Auth hard-delete and session behavior through the live Auth Admin API.
-- End-to-end browser UI behavior after successful deletion.
+- Updated `delete-customer-account` Edge Function deployed successfully to the disposable project.
+- Function is ACTIVE and `verify_jwt=true`.
+- This confirms deployment/packaging only; it is not an end-to-end HTTP/Auth/Storage test.
+
+## Still not validated
+
+- Invoke the Edge Function over HTTP using a disposable Auth JWT.
+- Exercise a real Storage receipt object deletion and forced Storage failure/retry.
+- Confirm Auth hard-delete success/failure and session behavior through the Auth Admin API.
+- Exercise the customer deletion UI in a browser.
+- Run the complete migration-history reconstruction/reconciliation before any production migration rollout.
 
 ## Rollout restrictions
 
-This is a review branch only. Do not apply the migration to production, deploy the Edge Function, or merge until the remaining disposable Edge Function/Auth/Storage tests pass and the migration history reconciliation is complete.
+This remains a review branch. Do not apply the migration to production, deploy the Edge Function to production, or merge until the remaining HTTP/Auth/Storage tests and migration-history reconciliation are complete.
