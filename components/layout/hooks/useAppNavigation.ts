@@ -73,7 +73,6 @@ export function useAppNavigation() {
       setShowPrivacySecurityState(Boolean(state[LEGAL_HISTORY_KEY]));
       if (state.__haddirApp) {
         setActiveTab(isAppTab(state.tab) ? state.tab : "home");
-        setEventResetKey((value) => value + 1);
         if (state.workspace === "gatekeeper") {
           setActiveWorkspace("gatekeeper");
           setIsGatekeeperPage(true);
