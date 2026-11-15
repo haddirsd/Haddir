@@ -1,4 +1,4 @@
-name: Supabase PostgREST anonymous HTTP checks
+name: Supabase PostgREST anonymous HTTP checks (grant verified)
 
 on:
   push:
