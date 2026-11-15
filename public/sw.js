@@ -1,4 +1,4 @@
-const CACHE_NAME = "haddir-static-v18";
+const CACHE_NAME = "haddir-static-v19";
 const PRECACHE_URLS = [
   "/icons/icon-192-brand.svg",
   "/icons/icon-192.png",
@@ -15,8 +15,8 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
       await Promise.allSettled(PRECACHE_URLS.map((url) => cache.add(url)));
-      // Activate immediately so installed PWAs do not keep an older worker waiting.
-      await self.skipWaiting();
+      // Keep an update waiting until the user chooses "Update now".
+      // The first installation activates normally because no older worker controls the page.
     })
   );
 });
@@ -76,7 +76,6 @@ self.addEventListener("fetch", (event) => {
   );
 });
 
-
 self.addEventListener("push", (event) => {
   event.waitUntil((async () => {
     let payload = {};
@@ -103,7 +102,6 @@ self.addEventListener("push", (event) => {
 
     const options = {
       body,
-      // PNG assets are more consistently supported by Android notification UI.
       icon: "/icons/icon-192.png",
       badge: "/icons/icon-192.png",
       tag,
@@ -121,7 +119,6 @@ self.addEventListener("push", (event) => {
       console.info("[Haddir SW] Push notification displayed", { tag });
     } catch (error) {
       console.error("[Haddir SW] Notification display failed", error);
-      // Retry without optional visual fields if the platform rejects them.
       await self.registration.showNotification(title, {
         body,
         tag,
