@@ -1,0 +1,107 @@
+name: Supabase Auth + RLS + PostgREST HTTP probe
+
+on:
+  push:
+    branches:
+      - test/supabase-auth-postgrest-http
+    paths:
+      - .github/workflows/supabase-auth-postgrest-http.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  http-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Run isolated Supabase HTTP checks
+        env:
+          SUPABASE_URL: https://adbpeojpscwnsombisif.supabase.co
+          SUPABASE_PUBLISHABLE_KEY: sb_publishable_g8_pvfmHtWiEffpuFwme8A_6pnJsk8_
+        run: |
+          node --input-type=module <<'NODE'
+          const base = process.env.SUPABASE_URL;
+          const key = process.env.SUPABASE_PUBLISHABLE_KEY;
+          const checks = [];
+          const check = (name, ok, detail = '') => {
+            checks.push({ name, ok, detail });
+            console.log(`${ok ? 'PASS' : 'FAIL'} ${name}${detail ? ': ' + detail : ''}`);
+          };
+          const req = async (path, options = {}) => {
+            const response = await fetch(base + path, {
+              ...options,
+              headers: {
+                apikey: key,
+                'content-type': 'application/json',
+                ...(options.headers || {}),
+              },
+            });
+            const text = await response.text();
+            let body;
+            try { body = text ? JSON.parse(text) : null; } catch { body = text; }
+            return { response, body };
+          };
+          try {
+            const health = await req('/auth/v1/health');
+            check('Auth HTTPS health', health.response.ok, `HTTP ${health.response.status}`);
+            if (!health.response.ok) throw new Error('Auth health endpoint unavailable');
+
+            const signup = async () => {
+              const result = await req('/auth/v1/signup', {
+                method: 'POST',
+                body: JSON.stringify({}),
+              });
+              if (!result.response.ok || !result.body?.access_token || !result.body?.user?.id) {
+                throw new Error(`Anonymous sign-in unavailable (HTTP ${result.response.status}); ${JSON.stringify(result.body).slice(0, 300)}`);
+              }
+              return { token: result.body.access_token, id: result.body.user.id };
+            };
+            const a = await signup();
+            const b = await signup();
+            check('Auth creates two independent sessions', a.id !== b.id && !!a.token && !!b.token);
+
+            const api = async (user, method = 'GET', query = '?select=id,owner_id,payload', body) =>
+              req('/rest/v1/rls_auth_probe' + query, {
+                method,
+                headers: {
+                  Authorization: user ? `Bearer ${user.token}` : `Bearer ${key}`,
+                  ...(body ? { Prefer: 'return=representation' } : {}),
+                },
+                ...(body ? { body: JSON.stringify(body) } : {}),
+              });
+
+            const inserted = await api(a, 'POST', '', { owner_id: a.id, payload: 'http-probe-a' });
+            const insertedRows = Array.isArray(inserted.body) ? inserted.body : [];
+            check('Authenticated insert own row', inserted.response.ok && insertedRows.length === 1 && insertedRows[0].owner_id === a.id, `HTTP ${inserted.response.status}`);
+            if (!insertedRows.length) throw new Error('Could not insert the owner fixture row');
+
+            const own = await api(a);
+            check('User A reads own row', own.response.ok && Array.isArray(own.body) && own.body.some(x => x.owner_id === a.id));
+
+            const crossRead = await api(b);
+            check('User B cannot read User A row', crossRead.response.ok && Array.isArray(crossRead.body) && !crossRead.body.some(x => x.owner_id === a.id));
+
+            const crossUpdate = await api(b, 'PATCH', `?id=eq.${insertedRows[0].id}&select=id`, { payload: 'forbidden' });
+            check('User B cannot update User A row', crossUpdate.response.ok && Array.isArray(crossUpdate.body) && crossUpdate.body.length === 0, `HTTP ${crossUpdate.response.status}`);
+
+            const ownUpdate = await api(a, 'PATCH', `?id=eq.${insertedRows[0].id}&select=id,payload`, { payload: 'http-probe-updated' });
+            check('User A can update own row', ownUpdate.response.ok && Array.isArray(ownUpdate.body) && ownUpdate.body.length === 1 && ownUpdate.body[0].payload === 'http-probe-updated', `HTTP ${ownUpdate.response.status}`);
+
+            const anon = await api(null);
+            check('Anonymous REST sees no protected rows', anon.response.ok && Array.isArray(anon.body) && anon.body.length === 0, `HTTP ${anon.response.status}`);
+
+            const invalid = await req('/rest/v1/rls_auth_probe?select=id', {
+              headers: { Authorization: 'Bearer definitely-not-a-jwt' },
+            });
+            check('Invalid JWT is rejected', [401, 403].includes(invalid.response.status), `HTTP ${invalid.response.status}`);
+          } catch (error) {
+            console.error('PROBE ABORTED:', error.message);
+            process.exitCode = 1;
+          } finally {
+            const failed = checks.filter(x => !x.ok);
+            console.log(`RESULT: ${checks.length - failed.length}/${checks.length} checks passed`);
+            if (failed.length) process.exitCode = 1;
+          }
+          NODE
