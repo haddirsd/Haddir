@@ -108,7 +108,7 @@ export function ProfileWorkspace({
    </div>
   </> : <>
    <div className="legal-accordion-list">
-    <details className="legal-accordion" open><summary>مشاركة البيانات</summary><div className="legal-accordion-content">
+    <details className="legal-accordion"><summary>مشاركة البيانات</summary><div className="legal-accordion-content">
      <h3>لا نبيع بياناتك ولا نستخدمها للإعلانات</h3><p>لا يبيع حاضر بيانات المستخدمين ولا يشاركها مع جهات خارجية لأغراض إعلانية. وقد يطلع المنظم على بيانات المشترين بالقدر اللازم لتنفيذ الفعالية والتواصل بشأنها، ويلتزم بعدم استخدامها للتسويق أو لأي غرض آخر دون موافقة المستخدم أو مسوغ قانوني. كما نستعين بمزوّدي خدمات تقنية لتشغيل التطبيق، وقد تتم معالجة البيانات الضرورية لديهم، مثل الاستضافة وقاعدة البيانات وتسجيل الدخول.</p>
      <p className="privacy-note">قد يشمل ذلك خدمات Supabase وVercel، وخدمة Google عند اختيار تسجيل الدخول باستخدام Google.</p>
     </div></details>
