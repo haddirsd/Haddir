@@ -117,6 +117,7 @@ export function EventDetails({
             )}
             <div className="detail-cover-shade" />
             <div className="detail-cover-title">
+              {event.status && <span className="detail-cover-status">{event.status}</span>}
               <h1>{event.title}</h1>
             </div>
             {!event.coverImageUrl && <span className="cover-symbol">✦</span>}
@@ -133,15 +134,26 @@ export function EventDetails({
                     <span>{event.time || "يحدد لاحقاً"}</span>
                   </div>
                 </div>
-                <a className="quick-info-row quick-location-row" href={event.map || "#"} target="_blank" rel="noreferrer">
-                  <span className="quick-info-icon location-icon"><MapPin size={21} /></span>
-                  <div>
-                    <small>المكان والموقع</small>
-                    <strong>{event.venue || event.place || "يحدد لاحقاً"}</strong>
-                    <span>{event.place || "عرض الاتجاهات على الخريطة"} · اضغط لعرض الموقع</span>
+                {event.map ? (
+                  <a className="quick-info-row quick-location-row" href={event.map} target="_blank" rel="noreferrer">
+                    <span className="quick-info-icon location-icon"><MapPin size={21} /></span>
+                    <div>
+                      <small>المكان والموقع</small>
+                      <strong>{event.venue || event.place || "يحدد لاحقاً"}</strong>
+                      <span>{event.place || "عرض الاتجاهات على الخريطة"} · اضغط لعرض الموقع</span>
+                    </div>
+                    <ExternalLink size={16} />
+                  </a>
+                ) : (
+                  <div className="quick-info-row quick-location-row">
+                    <span className="quick-info-icon location-icon"><MapPin size={21} /></span>
+                    <div>
+                      <small>المكان والموقع</small>
+                      <strong>{event.venue || event.place || "يحدد لاحقاً"}</strong>
+                      <span>{event.place || "لم يحدد المنظم رابط الموقع بعد"}</span>
+                    </div>
                   </div>
-                  <ExternalLink size={16} />
-                </a>
+                )}
               </section>
 
               <section className="detail-section detail-about">
