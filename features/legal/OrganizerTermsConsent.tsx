@@ -1,5 +1,7 @@
 "use client";
 
+// One-time consent gate shown before organizer permissions are activated.
+
 import { useState } from "react";
 import { ShieldCheck, FileText } from "lucide-react";
 
