@@ -7,7 +7,8 @@ export type AdminSection =
   | "payments"
   | "users"
   | "reports"
-  | "activity";
+  | "activity"
+  | "notifications";
 
 export const ADMIN_SECTION_LABELS: Record<AdminSection, string> = {
   overview: "نظرة عامة",
@@ -17,6 +18,7 @@ export const ADMIN_SECTION_LABELS: Record<AdminSection, string> = {
   users: "المستخدمون",
   reports: "الإحصائيات",
   activity: "سجل الإجراءات",
+  notifications: "إشعارات",
 };
 
 export const ADMIN_ROLE_LABELS: Record<AdminRole, string> = {
@@ -28,5 +30,5 @@ export const ADMIN_ROLE_LABELS: Record<AdminRole, string> = {
 export function getAdminNavigationSections(role: AdminRole): AdminSection[] {
   return role === "supervisor"
     ? ["overview", "bookings", "payments"]
-    : ["overview", "events", "bookings", "payments", "users", "reports", "activity"];
+    : ["overview", "events", "bookings", "payments", "users", "reports", "activity", "notifications"];
 }
