@@ -7,8 +7,9 @@ import AdminPaymentsWorkspace from "../../booking/admin/AdminPaymentsWorkspace";
 import AdminUsersWorkspace from "../../users/admin/AdminUsersWorkspace";
 import AdminActivityWorkspace from "../activity/AdminActivityWorkspace";
 import AdminReportsWorkspace from "../reports/AdminReportsWorkspace";
+import AdminBroadcastNotifications from "./AdminBroadcastNotifications";
 import AdminOverviewWorkspace from "../overview/AdminOverviewWorkspace";
-import { Activity, BadgeCheck, Banknote, CalendarDays, ClipboardCheck, LayoutDashboard, LogOut, Shield, Ticket, Users } from "lucide-react";
+import { Activity, BadgeCheck, Banknote, CalendarDays, ClipboardCheck, LayoutDashboard, LogOut, Megaphone, Shield, Ticket, Users } from "lucide-react";
 import { HaddirDialog } from "../../../components/ui/HaddirDialog";
 import { ADMIN_ROLE_LABELS, ADMIN_SECTION_LABELS } from "../types";
 import { useAdminAccess } from "../hooks/useAdminAccess";
@@ -40,7 +41,7 @@ export default function AdminPage() {
     <aside className="admin-sidebar">
       <button className="admin-brand" onClick={() => router.push("/")}><img src={darkMode?"/dark.svg":"/light.svg"} alt="حاضر"/><small>الإدارة</small></button>
       <div className="admin-side-caption">مساحة العمل</div>
-      <nav aria-label="تبويبات لوحة الإدارة">{nav.map(item=><button key={item} className={section===item?"active":""} onClick={()=>setAdminSection(item)}><span>{item==="overview"?<LayoutDashboard/>:item==="events"?<CalendarDays/>:item==="bookings"?<Ticket/>:item==="payments"?<Banknote/>:item==="users"?<Users/>:<Activity/>}</span>{ADMIN_SECTION_LABELS[item]}</button>)}</nav>
+      <nav aria-label="تبويبات لوحة الإدارة">{nav.map(item=><button key={item} className={section===item?"active":""} onClick={()=>setAdminSection(item)}><span>{item==="overview"?<LayoutDashboard/>:item==="events"?<CalendarDays/>:item==="bookings"?<Ticket/>:item==="payments"?<Banknote/>:item==="users"?<Users/>:item==="notifications"?<Megaphone/>:<Activity/>}</span>{ADMIN_SECTION_LABELS[item]}</button>)}</nav>
       <div className="admin-side-bottom"><div className="admin-mini-profile"><span className="admin-mini-avatar">{avatarUrl?<img src={avatarUrl} alt="صورة الحساب"/>:role==="owner"?<Shield/>:role==="admin"?<BadgeCheck/>:<ClipboardCheck/>}</span><div><b>{name}</b><small>{roleLabel}</small></div></div><button className="admin-logout" onClick={requestSignOut}><LogOut size={17}/> تسجيل الخروج</button></div>
     </aside>
     <section className="admin-main">
@@ -50,6 +51,7 @@ export default function AdminPage() {
         {error&&<div className="admin-notice" role="status">{error}</div>}
         <div key={section} className="admin-section-transition">
           {section==="overview"&&<AdminOverviewWorkspace role={role} onNavigate={setAdminSection}/>}
+          {section==="notifications"&&<AdminBroadcastNotifications/>}
           {section==="events"?<AdminEventsWorkspace role={role}/>:section==="bookings"?<AdminBookingsWorkspace/>:section==="payments"?<AdminPaymentsWorkspace/>:section==="users"?<AdminUsersWorkspace role={role} searchTerm={userSearchTerm} onSearchTermChange={setUserSearchTerm}/>:section==="activity"?<AdminActivityWorkspace/>:section==="reports"?<AdminReportsWorkspace/>:null}
         </div>
         <footer className="admin-footer">حاضر · نظام إدارة الفعاليات والتذاكر <span>{roleLabel}</span></footer>
