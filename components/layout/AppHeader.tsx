@@ -37,7 +37,7 @@ export function AppHeader({
         <button type="button" className="privacy-back-button" onClick={onBackFromPrivacy}>
           <ChevronLeft size={18} /> رجوع
         </button>
-        <strong>الخصوصية والأمان</strong>
+        <strong>الوثائق القانونية</strong>
         <span className="screen-icon"><ShieldCheck /></span>
       </header>
     );
