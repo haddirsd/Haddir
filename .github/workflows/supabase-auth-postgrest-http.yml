@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - test/supabase-auth-postgrest-http
-    paths:
-      - .github/workflows/supabase-auth-postgrest-http.yml
-  workflow_dispatch:
 
 permissions:
   contents: read
