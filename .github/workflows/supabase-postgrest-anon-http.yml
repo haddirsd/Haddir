@@ -1,0 +1,39 @@
+name: Supabase PostgREST anonymous HTTP checks
+
+on:
+  push:
+    branches:
+      - test/supabase-auth-postgrest-http
+
+permissions:
+  contents: read
+
+jobs:
+  postgrest-anon:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Verify anonymous PostgREST and invalid JWT behavior
+        env:
+          SUPABASE_URL: https://adbpeojpscwnsombisif.supabase.co
+          SUPABASE_PUBLISHABLE_KEY: sb_publishable_g8_pvfmHtWiEffpuFwme8A_6pnJsk8_
+        run: |
+          node --input-type=module <<'NODE'
+          const base = process.env.SUPABASE_URL;
+          const key = process.env.SUPABASE_PUBLISHABLE_KEY;
+          const results = [];
+          const run = async (name, headers) => {
+            const r = await fetch(base + '/rest/v1/rls_auth_probe?select=id,owner_id,payload', {
+              headers: { apikey: key, ...headers }
+            });
+            const body = await r.text();
+            let parsed; try { parsed = JSON.parse(body); } catch { parsed = body; }
+            const ok = name === 'anonymous role' ? r.ok && Array.isArray(parsed) && parsed.length === 0 : [401,403].includes(r.status);
+            results.push(ok);
+            console.log(`${ok ? 'PASS' : 'FAIL'} ${name}: HTTP ${r.status}; ${typeof parsed === 'string' ? parsed.slice(0,160) : JSON.stringify(parsed).slice(0,160)}`);
+          };
+          await run('anonymous role', {});
+          await run('invalid JWT', { Authorization: 'Bearer definitely-not-a-jwt' });
+          console.log(`RESULT: ${results.filter(Boolean).length}/${results.length} passed`);
+          if (results.some(x => !x)) process.exit(1);
+          NODE
