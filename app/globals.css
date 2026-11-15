@@ -10886,3 +10886,19 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 .legal-consent-actions{display:flex;gap:10px;flex-wrap:wrap}
 .legal-consent-actions .btn{flex:1}
 .legal-consent-actions .btn:disabled{opacity:.45;cursor:not-allowed}
+
+
+/* Legal documents: compact accordion layout */
+.legal-accordion-list{display:grid;gap:12px;margin:20px 0 24px}
+.legal-accordion{overflow:hidden;border:1px solid var(--line);border-radius:16px;background:var(--card,#fff)}
+.legal-accordion summary{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:62px;padding:17px 19px;cursor:pointer;list-style:none;color:var(--fg);font-size:14px;font-weight:800}
+.legal-accordion summary::-webkit-details-marker{display:none}
+.legal-accordion summary:after{content:"＋";display:grid;place-items:center;flex:none;width:28px;height:28px;border-radius:9px;background:#eaf7fa;color:var(--green);font-size:17px;transition:transform .2s ease}
+.legal-accordion[open] summary:after{content:"−"}
+.legal-accordion-content{padding:0 19px 18px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;line-height:2.05}
+.legal-accordion-content p{margin:13px 0 0}
+.legal-accordion-content h3{margin:16px 0 0;color:var(--fg);font-size:13px}
+.privacy-delete-card{margin-top:22px;border:1px solid #f0d8d6}
+.privacy-delete-card .privacy-danger-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;margin-top:12px;padding:0 18px;border:0;border-radius:12px;background:#b93832;color:#fff;font:inherit;font-size:12px;font-weight:800}
+.privacy-delete-card .privacy-danger-button:disabled{opacity:.55;cursor:wait}
+@media(prefers-reduced-motion:reduce){.legal-accordion summary:after{transition:none}}
