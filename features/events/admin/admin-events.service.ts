@@ -48,8 +48,9 @@ export async function deleteOrCancelAdminEvent(eventId: string): Promise<{ messa
     return { message: "", error: "تعذر تجهيز الحذف الآمن: " + (prepareError?.message || "لم تصل استجابة من قاعدة البيانات.") };
   }
 
-  const receiptPaths = Array.isArray(prepared.receipt_paths) ? prepared.receipt_paths as string[] : [];
-  const coverPaths = Array.isArray(prepared.cover_paths) ? prepared.cover_paths as string[] : [];
+  const preparedPayload = prepared as { receipt_paths?: unknown; cover_paths?: unknown };
+  const receiptPaths = Array.isArray(preparedPayload.receipt_paths) ? preparedPayload.receipt_paths as string[] : [];
+  const coverPaths = Array.isArray(preparedPayload.cover_paths) ? preparedPayload.cover_paths as string[] : [];
 
   if (receiptPaths.length) {
     const { error } = await supabase.storage.from("payment-receipts").remove(receiptPaths);
@@ -64,7 +65,8 @@ export async function deleteOrCancelAdminEvent(eventId: string): Promise<{ messa
     p_event_id: eventId,
     p_settlement_confirmed: true,
   });
-  if (finalizeError || !finalized?.success) {
+  const finalizedPayload = finalized as { success?: boolean } | null;
+  if (finalizeError || finalizedPayload?.success !== true) {
     return { message: "", error: "تم تجهيز الإحصائيات وإزالة الملفات، لكن لم تكتمل إزالة سجلات الفعالية: " + (finalizeError?.message || "تعذر تأكيد الحذف النهائي.") };
   }
 
