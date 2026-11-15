@@ -85,7 +85,9 @@ export function useEventNavigation({
     url.searchParams.delete("checkout");
     url.searchParams.delete("tier");
     url.searchParams.delete("qty");
-    window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+    const historyState = { ...(window.history.state ?? {}) };
+    delete historyState.haddirPage;
+    window.history.replaceState(historyState, "", url.pathname + url.search + url.hash);
   }, []);
 
   const openEvent = useCallback((eventId: string) => {
