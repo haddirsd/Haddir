@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type Dispatch, type SetStateAction } from "react";
-import { CheckCircle2, UserRound, ChevronLeft, ShieldCheck, ClipboardList, ScanLine, Pencil, Trash2 } from "lucide-react";
+import { CheckCircle2, UserRound, ChevronLeft, ShieldCheck, ClipboardList, ScanLine, Pencil, Trash2, Scale, LockKeyhole, Info, FileText } from "lucide-react";
 import AdvertiserWorkspace from "../../advertiser/components/AdvertiserWorkspace";
 
 type AuthUser = { id: string; email?: string } | null;
@@ -61,18 +61,33 @@ export function ProfileWorkspace({
   {userRole==="advertiser"&&<AdvertiserWorkspace authUser={authUser} userRole={userRole}/>}
 
  </section>}
- <button type="button" className="role-workspace-button privacy-entry-button" onClick={()=>{setLegalPage("terms");setShowPrivacySecurity(true);window.scrollTo({top:0,behavior:"auto"});}}><span className="role-workspace-icon"><ClipboardList size={21}/></span><span><strong>الشروط والأحكام</strong><small>شروط استخدام حاضر وحقوق والتزامات المستخدم والمنظم</small></span><ChevronLeft size={18}/></button>
- <button type="button" className="role-workspace-button privacy-entry-button" onClick={()=>{setLegalPage("privacy");setShowPrivacySecurity(true);window.scrollTo({top:0,behavior:"auto"});}}><span className="role-workspace-icon"><ShieldCheck size={21}/></span><span><strong>سياسة الخصوصية</strong><small>كيف نجمع بياناتك ونستخدمها ونحميها</small></span><ChevronLeft size={18}/></button>
+ <section className="profile-legal-group" aria-labelledby="profile-legal-title">
+  <div className="profile-legal-heading"><div><strong id="profile-legal-title">الوثائق والسياسات</strong><p>اطّلع على حقوقك والتزاماتك وكيفية التعامل مع بياناتك.</p></div><span>حاضِر</span></div>
+  <button type="button" className="role-workspace-button privacy-entry-button" onClick={()=>{setLegalPage("terms");setShowPrivacySecurity(true);window.scrollTo({top:0,behavior:"auto"});}}>
+   <span className="profile-legal-icon terms"><Scale size={21}/></span><span><strong>الشروط والأحكام</strong><small>قواعد استخدام المنصة وحقوق المستخدم والمنظم</small></span><span className="profile-legal-action">قراءة الوثيقة <ChevronLeft size={16}/></span>
+  </button>
+  <button type="button" className="role-workspace-button privacy-entry-button" onClick={()=>{setLegalPage("privacy");setShowPrivacySecurity(true);window.scrollTo({top:0,behavior:"auto"});}}>
+   <span className="profile-legal-icon privacy"><LockKeyhole size={21}/></span><span><strong>سياسة الخصوصية</strong><small>البيانات التي نتعامل معها وطرق حمايتها</small></span><span className="profile-legal-action">قراءة الوثيقة <ChevronLeft size={16}/></span>
+  </button>
+ </section>
  <div className="profile-settings-panel"><div><strong>إعدادات العرض</strong><p>غيّر مظهر التطبيق في كل الصفحات.</p></div><button className="btn btn-outline" type="button" onClick={()=>setDarkMode(v=>!v)}>{darkMode?"☀ الوضع النهاري":"☾ الوضع الليلي"}</button></div>
  {authUser&&<button className="btn profile-logout-button role-logout-button" type="button" onClick={signOut}>تسجيل الخروج</button>}
  </section>}
 
  
 {showPrivacySecurity&&<section className="screen container privacy-screen" id="legal-documents">
-  <div className="privacy-intro"><span className="privacy-eyebrow">حاضر • الوثائق القانونية</span><h1>{legalPage==="terms"?"الشروط والأحكام":"سياسة الخصوصية"}</h1><p>{legalPage==="terms"?"توضح هذه الوثيقة شروط استخدام منصة حاضر وحقوق والتزامات المستخدمين والمنظمين.":"نوضح ليك هنا أنواع المعلومات التي قد يجمعها تطبيق حاضر، وكيفية استخدامها وحمايتها."}</p></div>
+  <div className={`legal-page-hero ${legalPage==="terms"?"legal-page-terms":"legal-page-privacy"}`}>
+   <div className="legal-page-kicker"><span>حاضِر</span><span>الوثائق والسياسات</span></div>
+   <div className="legal-page-heading">
+    <span className="legal-page-symbol">{legalPage==="terms"?<FileText size={25}/>:<ShieldCheck size={25}/>}</span>
+    <div><h1>{legalPage==="terms"?"الشروط والأحكام":"سياسة الخصوصية"}</h1><p>{legalPage==="terms"?"القواعد التي تنظّم استخدام منصة حاضر وتوضح حقوق والتزامات جميع الأطراف.":"كيف نتعامل مع بياناتك، ولماذا نحتاجها، وما الضوابط التي تحكم استخدامها."}</p></div>
+   </div>
+   <div className="legal-page-note"><Info size={17}/><span>{legalPage==="terms"?"يرجى قراءة البنود الخاصة بالمستخدم والمنظم قبل استخدام خدمات المنصة.":"نلتزم باستخدام البيانات في حدود تشغيل حاضر وإدارة الحسابات والحجوزات."}</span></div>
+  </div>
+  <div className="legal-content-heading"><div><strong>{legalPage==="terms"?"بنود الشروط والأحكام":"بنود سياسة الخصوصية"}</strong><small>اضغط على أي بند لعرض تفاصيله</small></div><span>{legalPage==="terms"?"03 بنود":"03 بنود"}</span></div>
   {legalPage==="terms" ? <>
    <div className="legal-accordion-list">
-    <details className="legal-accordion" open><summary>شروط وأحكام المستخدم</summary><div className="legal-accordion-content">
+    <details className="legal-accordion"><summary>شروط وأحكام المستخدم</summary><div className="legal-accordion-content">
      <p>تتيح حاضِر تصفح الفعاليات المنشورة وحجز التذاكر وتسهيل الوصول إليها. يلتزم المستخدم بصحة بياناته والمحافظة على حسابه واستخدام التذكرة وفق بياناتها وعدم تزويرها أو إعادة استخدامها.</p>
      <p>لا يُعد رفع إثبات التحويل تأكيداً نهائياً للحجز قبل مراجعته واعتماده. ويكون سعر التذكرة والبيانات المعروضة قبل الدفع هي المرجع للحجز.</p>
      <p>لا يحق طلب استرداد قيمة التذكرة بعد إتمام الحجز والدفع، إلا عند إلغاء الفعالية أو في الحالات الاستثنائية التي تقرر فيها حاضِر إتاحة الاسترداد. وعند التأجيل، تحدث حاضِر التاريخ والوقت المعلنين، ويتولى المنظم التواصل مع المشترين بشأن الترتيبات.</p>
