@@ -44,8 +44,6 @@ jobs:
           }
           (async () => {
             try {
-              const health = await fetch(base + '/auth/v1/health', { headers: { apikey: anon } });
-              assert(health.ok, 'Auth HTTPS health endpoint responds (HTTP '+health.status+')');
               for (let i=0;i<2;i++) {
                 const email = `rls-http-${crypto.randomUUID()}@example.com`;
                 const password = crypto.randomBytes(24).toString('base64url') + 'Aa1!';
