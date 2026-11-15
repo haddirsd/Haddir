@@ -7,7 +7,7 @@
 - Removes Storage objects only after the DB transaction succeeds.
 - Keeps the queue if Storage removal fails so a retry can finish without losing the paths.
 - Keeps the durable cleanup marker until the Auth Admin API confirms hard deletion.
-- If final queue cleanup fails after Auth deletion, the account remains deleted and only a harmless internal cleanup marker remains.
+- After Auth deletion, the cleanup row is converted into an empty-path tombstone. It blocks writes from stale access JWTs; it is intentionally retained.
 - Uses the same transaction advisory lock as booking creation; booking/payment triggers enforce the pending-deletion write barrier.
 - Restricts cleanup RPCs to service_role; anon and authenticated cannot execute them.
 - Rechecks staff/event assignments and upcoming confirmed bookings inside the database transaction.
@@ -24,7 +24,7 @@ Checks that passed:
 - New booking writes were rejected while deletion was pending.
 - New payment submission writes were rejected while deletion was pending.
 - Cleanup queue remained present after the database cleanup.
-- Final cleanup RPC removed the queue after the simulated Auth deletion boundary.
+- Final cleanup RPC cleared receipt paths but retained an empty-path tombstone to block stale access JWTs.
 - Admin-role account was rejected.
 - Customer with a confirmed upcoming event was rejected; its booking remained linked.
 - Function ACL assertions: anon=false, authenticated=false, service_role=true for both cleanup RPCs.
