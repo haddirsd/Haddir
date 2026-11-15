@@ -18,6 +18,7 @@ type Props = {
   onEdit: (event: AdminEventRow) => void;
   onDelete: (event: AdminEventRow) => void;
   onPublish: (eventId: string) => void;
+  onComplete: (event: AdminEventRow) => void;
 };
 
 export default function AdminEventCards({
@@ -27,6 +28,7 @@ export default function AdminEventCards({
   onEdit,
   onDelete,
   onPublish,
+  onComplete,
 }: Props) {
   const canManage = role === "owner" || role === "admin";
 
@@ -55,6 +57,7 @@ export default function AdminEventCards({
             <div className="admin-event-card-actions">
               <button className="admin-event-edit" type="button" disabled={loading} onClick={() => onEdit(event)}>تعديل</button>
               <button className="admin-event-delete" type="button" disabled={loading} onClick={() => onDelete(event)}>حذف</button>
+              {event.status === "published" ? <button className="admin-event-edit" type="button" disabled={loading} onClick={() => onComplete(event)}>إنهاء الفعالية</button> : null}
               {event.status === "draft" ? (
                 <button className="admin-create-button" type="button" disabled={loading} onClick={() => onPublish(event.id)}>نشر الفعالية</button>
               ) : null}
