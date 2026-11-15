@@ -66,7 +66,7 @@ export function ProfileWorkspace({
  </section>}
 
  
-{showPrivacySecurity&&<section className="screen container privacy-screen">
+{showPrivacySecurity&&<section className="screen container privacy-screen" id="legal-documents">
   <div className="privacy-intro"><span className="privacy-eyebrow">حاضر • الخصوصية والأمان</span><h1>أمان البيانات</h1><p>نوضح ليك هنا أنواع المعلومات التي قد يجمعها تطبيق حاضر، وكيفية استخدامها وحمايتها. قد تختلف بعض الممارسات حسب طريقة استخدامك للتطبيق والميزات التي تستعملها.</p></div>
 
   <article className="privacy-section-card legal-document-card" id="user-terms">
