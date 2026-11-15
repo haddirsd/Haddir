@@ -11052,3 +11052,10 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
     width:160px;height:160px;right:-72px;bottom:-98px;
   }
 }
+
+
+/* Fix ticket status badge positioning without affecting shared card decoration. */
+.app-shell .tickets-screen .ticket-preview-card > .ticket-preview-status {
+  position: absolute !important;
+  z-index: 3 !important;
+}
