@@ -5,10 +5,9 @@ import { ShieldCheck, FileText } from "lucide-react";
 
 type Props = {
   onAccept: () => Promise<{ error: string | null }>;
-  onReadDocuments: () => void;
 };
 
-export function OrganizerTermsConsent({ onAccept, onReadDocuments }: Props) {
+export function OrganizerTermsConsent({ onAccept }: Props) {
   const [checked, setChecked] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -41,7 +40,7 @@ export function OrganizerTermsConsent({ onAccept, onReadDocuments }: Props) {
           <section><h3>الإلغاء والتأجيل والاسترداد</h3><p>عند التأجيل، تحدث حاضِر التاريخ والوقت، وتتولى أنت التواصل مع المشترين. وعند الإلغاء، تتعاون مع حاضِر لإعادة المبالغ المستحقة. وإذا كانت الأموال قد حُولت إليك مباشرة، تتابعك حاضِر وتطالبك بإعادتها دون أن تلتزم بالدفع من أموالها الخاصة نيابة عنك.</p></section>
           <section><h3>الشكاوى وبيانات المشترين</h3><p>تتحمل معالجة الشكاوى المتعلقة بالتنظيم والتنفيذ الميداني. وتلتزم بسرية بيانات المشترين، ولا تستخدمها للتسويق أو لأي غرض خارج تنفيذ الفعالية إلا بموافقتهم أو بمسوغ قانوني.</p></section>
           <section><h3>سياسات المنصة والخصوصية</h3><p>يجوز لحاضِر رفض نشر الفعالية أو تعليقها أو إزالتها عند مخالفة القانون أو سياسات المنصة أو نشر معلومات مضللة، مع مراعاة الحجوزات القائمة وحقوق المشترين. وتوضح سياسة الخصوصية كيفية التعامل مع البيانات.</p></section>
-          <button type="button" className="btn btn-outline" onClick={onReadDocuments}><FileText size={16}/> قراءة الوثائق كاملة</button>
+          <a className="btn btn-outline" href="/?tab=profile&legal=1#legal-documents" target="_blank" rel="noreferrer"><FileText size={16}/> قراءة الوثائق كاملة</a>
         </div>
         <footer className="legal-consent-footer">
           <label className="legal-consent-check"><input type="checkbox" checked={checked} onChange={event => setChecked(event.target.checked)}/><span>قرأت ووافقت على شروط وأحكام المنظم والأحكام العامة وسياسة الخصوصية.</span></label>
