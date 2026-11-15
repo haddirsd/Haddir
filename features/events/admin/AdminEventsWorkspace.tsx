@@ -27,7 +27,7 @@ export default function AdminEventsWorkspace({ role }: { role: AdminEventRole })
 
     const deleteEvent = async (r: AdminEventRow) => {
       if (!role || !["owner","admin"].includes(role)) return;
-      setPendingAction({title:"حذف الفعالية؟",description:"حذف «"+r.title+"». إذا كانت مرتبطة بحجوزات أو تذاكر صادرة فسيتم إلغاؤها وإخفاؤها مع الاحتفاظ بالسجلات المالية والتذاكر السابقة.",label:"حذف الفعالية",tone:"danger",run:async()=>{
+      setPendingAction({title:"تأكيد المحاسبة قبل حذف الفعالية",description:"هل حاسبت صاحب الفعالية واستلم كل طرف حقه، وتأكدت من عدم وجود حجوزات أو مدفوعات أو استردادات معلّقة للفعالية «"+r.title+"»؟ لا تتابع إلا بعد إتمام التسوية ومراجعة التقرير.",label:"نعم، تمت المحاسبة وأؤكد الحذف",tone:"danger",run:async()=>{
         setEventMessage("");
         const result = await deleteOrCancelAdminEvent(r.id);
         if (result.error) { setEventMessage(result.error); return; }
