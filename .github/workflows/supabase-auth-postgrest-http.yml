@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 10
     env:
       SUPABASE_URL: https://adbpeojpscwnsombisif.supabase.co
-      SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkYnBlb2pwc2N3bnNvbWJpc2lmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ2OTQyNzcsImV4cCI6MjExMDI3MDI3N30.CHUq7S-WVQeA
+      SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkYnBlb2pwc2N3bnNvbWJpc2lmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ2OTQyNzcsImV4cCI6MjExMDI3MDI3N30.CHuXq2d-lQJptehVXPUmt4yHQcSeQyHqo7uS-WVQeA
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
     steps:
       - name: Run real HTTPS Auth, JWT, PostgREST and RLS tests
