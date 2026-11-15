@@ -40,7 +40,7 @@ jobs:
           const rowIds = [];
           async function cleanup() {
             for (const id of rowIds) await req('/rest/v1/rls_auth_probe?id=eq.'+id, service, {method:'DELETE'});
-            for (const id of users) await req('/auth/v1/admin/users/'+id, service, {method:'DELETE'});
+            for (const user of users) await req('/auth/v1/admin/users/'+user.id, service, {method:'DELETE'});
           }
           (async () => {
             try {
@@ -51,10 +51,10 @@ jobs:
                 const password = crypto.randomBytes(24).toString('base64url') + 'Aa1!';
                 const created = await req('/auth/v1/admin/users', service, {method:'POST', body:JSON.stringify({email,password,email_confirm:true})});
                 assert(created.status===200 || created.status===201, 'Admin API creates confirmed disposable user '+(i+1));
-                users.push(created.data.id);
+                users.push({id:created.data.id, token:null});
                 const login = await req('/auth/v1/token?grant_type=password', anon, {method:'POST', body:JSON.stringify({email,password})});
                 assert(login.status===200 && !!login.data.access_token, 'Password login issues real JWT for user '+(i+1));
-                users[i] = {id:created.data.id, token:login.data.access_token};
+                users[i].token = login.data.access_token;
               }
               const [a,b] = users;
               const insert = await req('/rest/v1/rls_auth_probe', anon, {method:'POST', headers:{Authorization:'Bearer '+a.token, Prefer:'return=representation'}, body:JSON.stringify({owner_id:a.id,payload:'owned-by-a'})});
