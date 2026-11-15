@@ -7,6 +7,7 @@ export type AdminUserRow = {
   role: string;
   created_at: string;
   assignment_event_id?: string;
+  assignment_event_ids?: string[];
 };
 export type AdminUserEventOption = { id: string; title: string; status: string };
 export type AdminUsersResult = {
