@@ -99,7 +99,7 @@ returns void
 language plpgsql
 security definer
 set search_path = ''
-as $
+as $complete$
 declare
   v_rows integer;
 begin
@@ -118,7 +118,7 @@ begin
     raise exception 'سجل حذف الحساب غير موجود';
   end if;
 end;
-$;
+$complete$;
 
 -- A pending cleanup row is also a write barrier. The advisory lock serializes
 -- the barrier with create_booking and submit_payment transactions.
