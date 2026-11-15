@@ -69,19 +69,26 @@ export function useAppNavigation() {
     }
 
     if (initialUrl.searchParams.has("event")) {
+      const eventDetailUrl = new URL(initialUrl);
+      eventDetailUrl.searchParams.delete("legal");
+      eventDetailUrl.searchParams.delete("checkout");
       window.history.pushState(
-        {
-          __haddirApp: true,
-          tab: initialTab,
-          haddirPage: initialUrl.searchParams.get("checkout") === "1" ? "event-payment" : "event-detail",
-        } satisfies HaddirHistoryState,
+        { __haddirApp: true, tab: initialTab, haddirPage: "event-detail" } satisfies HaddirHistoryState,
         "",
-        (() => {
-          const url = new URL(initialUrl);
-          url.searchParams.delete("legal");
-          return url.pathname + url.search + url.hash;
-        })(),
+        eventDetailUrl.pathname + eventDetailUrl.search + eventDetailUrl.hash,
       );
+
+      if (initialUrl.searchParams.get("checkout") === "1") {
+        window.history.pushState(
+          { __haddirApp: true, tab: initialTab, haddirPage: "event-payment" } satisfies HaddirHistoryState,
+          "",
+          (() => {
+            const url = new URL(initialUrl);
+            url.searchParams.delete("legal");
+            return url.pathname + url.search + url.hash;
+          })(),
+        );
+      }
     }
     if (workspace === "gatekeeper") {
       setActiveWorkspace("gatekeeper");
