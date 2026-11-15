@@ -112,7 +112,7 @@ end $$;
 
 -- Simulates the post-Auth-delete bookkeeping call; no real Auth/Storage API is exercised here.
 select public.complete_customer_account_deletion('10000000-0000-4000-8000-000000000001');
-do $
+do $assert$
 begin
   if not exists(
     select 1 from private.customer_account_deletion_cleanup
@@ -121,4 +121,4 @@ begin
   ) then
     raise exception 'FAIL: completed deletion tombstone missing or still has receipt paths';
   end if;
-end $;
+end $assert$;
