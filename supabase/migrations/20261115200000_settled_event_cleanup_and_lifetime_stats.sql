@@ -169,8 +169,8 @@ begin
   paid as (
     select tt.currency,
            count(distinct b.id)::integer as booking_count,
-           coalesce(sum(bi.quantity),0)::integer as ticket_count,
-           coalesce(sum(bi.line_total),0)::numeric(14,2) as gross_amount
+           coalesce(sum(case when b.id is not null then bi.quantity else 0 end),0)::integer as ticket_count,
+           coalesce(sum(case when b.id is not null then bi.line_total else 0 end),0)::numeric(14,2) as gross_amount
     from public.ticket_types tt
     left join public.booking_items bi on bi.ticket_type_id = tt.id
     left join public.bookings b on b.id = bi.booking_id
@@ -205,11 +205,13 @@ begin
   left join used u on u.currency = c.currency
   on conflict (event_id,currency) do nothing;
 
-  select coalesce(array_agg(distinct ps.receipt_path), '{}'::text[])
+  select coalesce(array_agg(distinct o.name), '{}'::text[])
     into v_receipt_paths
-    from public.payment_submissions ps
-    join public.bookings b on b.id = ps.booking_id
-   where b.event_id = p_event_id and ps.receipt_path is not null;
+    from storage.objects o
+   where o.bucket_id = 'payment-receipts'
+     and (storage.foldername(o.name))[2] in (
+       select b.id::text from public.bookings b where b.event_id = p_event_id
+     );
 
   select coalesce(array_agg(distinct o.name), '{}'::text[])
     into v_cover_paths
@@ -274,9 +276,10 @@ begin
 
   if exists (
     select 1 from storage.objects o
-    join public.payment_submissions ps on ps.receipt_path = o.name
-    join public.bookings b on b.id = ps.booking_id
-    where o.bucket_id = 'payment-receipts' and b.event_id = p_event_id
+    where o.bucket_id = 'payment-receipts'
+      and (storage.foldername(o.name))[2] in (
+        select b.id::text from public.bookings b where b.event_id = p_event_id
+      )
   ) or exists (
     select 1 from storage.objects o
     where o.bucket_id = 'event-covers'
