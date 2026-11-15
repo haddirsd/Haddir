@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 
 export type AppTab = "home" | "tickets" | "notifications" | "profile";
 type AppWorkspace = "customer" | "organizer" | "gatekeeper" | "advertiser" | "admin" | "owner" | null;
-type HaddirHistoryState = { __haddirApp?: boolean; __haddirLegal?: boolean; tab?: AppTab; workspace?: string };
+type HaddirHistoryState = { __haddirApp?: boolean; __haddirLegal?: boolean; tab?: AppTab; workspace?: string; haddirPage?: string };
 
 const LEGAL_HISTORY_KEY = "__haddirLegal";
 
@@ -40,9 +40,41 @@ export function useAppNavigation() {
       homeUrl.pathname + homeUrl.search + homeUrl.hash,
     );
 
-    if (initialTab !== "home" || workspace) {
+    const tabUrl = new URL(initialUrl);
+    tabUrl.searchParams.delete("legal");
+    tabUrl.searchParams.delete("workspace");
+    tabUrl.searchParams.delete("event");
+    tabUrl.searchParams.delete("checkout");
+    tabUrl.searchParams.delete("tier");
+    tabUrl.searchParams.delete("qty");
+
+    if (initialTab !== "home") {
       window.history.pushState(
-        { __haddirApp: true, tab: initialTab, workspace: workspace ?? undefined } satisfies HaddirHistoryState,
+        { __haddirApp: true, tab: initialTab } satisfies HaddirHistoryState,
+        "",
+        tabUrl.pathname + tabUrl.search + tabUrl.hash,
+      );
+    }
+
+    if (workspace) {
+      window.history.pushState(
+        { __haddirApp: true, tab: initialTab, workspace } satisfies HaddirHistoryState,
+        "",
+        (() => {
+          const url = new URL(tabUrl);
+          url.searchParams.set("workspace", workspace);
+          return url.pathname + url.search + url.hash;
+        })(),
+      );
+    }
+
+    if (initialUrl.searchParams.has("event")) {
+      window.history.pushState(
+        {
+          __haddirApp: true,
+          tab: initialTab,
+          haddirPage: initialUrl.searchParams.get("checkout") === "1" ? "event-payment" : "event-detail",
+        } satisfies HaddirHistoryState,
         "",
         (() => {
           const url = new URL(initialUrl);
@@ -51,7 +83,6 @@ export function useAppNavigation() {
         })(),
       );
     }
-
     if (workspace === "gatekeeper") {
       setActiveWorkspace("gatekeeper");
       setIsGatekeeperPage(true);
@@ -146,6 +177,10 @@ export function useAppNavigation() {
   };
 
   const closeGatekeeper = () => {
+    if ((window.history.state as HaddirHistoryState | null)?.workspace === "gatekeeper") {
+      window.history.back();
+      return;
+    }
     const url = new URL(window.location.href);
     url.searchParams.delete("workspace");
     url.searchParams.set("tab", "profile");
