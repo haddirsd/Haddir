@@ -19,6 +19,8 @@ export async function listAdminUsers(searchTerm: string, roleFilter = "all"): Pr
   if (assignmentError || eventError) return { rows: [], eventOptions: [], total: count || 0, error: (assignmentError || eventError)?.message || "تعذر تحميل ربط الأدوار بالفعاليات." };
   const byUser = new Map<string, string[]>();
   for (const assignment of assignments || []) {
+    const user = (userRows || []).find((row: any) => row.id === assignment.user_id);
+    if (!user || assignment.assignment_role !== user.role) continue;
     const current = byUser.get(assignment.user_id) || [];
     if (!current.includes(assignment.event_id)) current.push(assignment.event_id);
     byUser.set(assignment.user_id, current);
