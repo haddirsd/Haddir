@@ -10868,3 +10868,21 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
   .app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket-qr svg{width:176px!important;height:176px!important}
   .app-shell .tickets-screen .ticket-expanded-panel .haddir-ticket-footer{margin:9px -15px 0}
 }
+
+/* Public legal documents and one-time organizer consent */
+.legal-document-card{scroll-margin-top:88px}
+.legal-consent-backdrop{position:fixed;inset:0;z-index:1200;display:grid;place-items:center;padding:18px;background:rgba(8,20,24,.72);backdrop-filter:blur(5px)}
+.legal-consent-dialog{width:min(620px,100%);max-height:min(88vh,820px);display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--line);border-radius:22px;background:var(--bg);color:var(--fg);box-shadow:0 24px 90px #0005}
+.legal-consent-head{padding:22px 22px 14px;border-bottom:1px solid var(--line)}
+.legal-consent-head h2{margin:0 0 7px;font-size:21px}
+.legal-consent-head p{margin:0;color:var(--muted);font-size:13px;line-height:1.8}
+.legal-consent-content{overflow:auto;padding:18px 22px;display:grid;gap:14px}
+.legal-consent-content section{padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
+.legal-consent-content h3{margin:0 0 7px;font-size:15px}
+.legal-consent-content p{margin:0;color:var(--muted);font-size:12px;line-height:1.9}
+.legal-consent-footer{padding:16px 22px calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--line);display:grid;gap:12px}
+.legal-consent-check{display:flex;align-items:flex-start;gap:9px;font-size:12px;line-height:1.8}
+.legal-consent-check input{margin-top:5px;accent-color:var(--green);width:17px;height:17px;flex:0 0 auto}
+.legal-consent-actions{display:flex;gap:10px;flex-wrap:wrap}
+.legal-consent-actions .btn{flex:1}
+.legal-consent-actions .btn:disabled{opacity:.45;cursor:not-allowed}
