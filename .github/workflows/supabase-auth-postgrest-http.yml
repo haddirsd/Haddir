@@ -52,7 +52,8 @@ jobs:
                 console.log('PASS: Admin API creates confirmed disposable user '+(i+1));
                 users.push({id:created.data.id, token:null});
                 const login = await req('/auth/v1/token?grant_type=password', anon, {method:'POST', body:JSON.stringify({email,password})});
-                assert(login.status===200 && !!login.data.access_token, 'Password login issues real JWT for user '+(i+1));
+                if (!(login.status===200 && !!login.data.access_token)) throw new Error('Password login failed for user '+(i+1)+': HTTP '+login.status+'; response='+JSON.stringify(login.data).slice(0,1000));
+                console.log('PASS: Password login issues real JWT for user '+(i+1));
                 users[i].token = login.data.access_token;
               }
               const [a,b] = users;
