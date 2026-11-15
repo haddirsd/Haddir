@@ -10991,3 +10991,64 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
  .app-shell .profile-legal-action{font-size:0;gap:0}
  .app-shell .profile-legal-action svg{width:17px;height:17px}
 }
+
+
+/* Shared circular halo motif — inspired by the legal document hero. */
+.app-shell .event-detail-layout:not(.payment-sheet) .detail-about,
+.app-shell .home-discovery .event-list-card,
+.app-shell .tickets-screen .ticket-preview-card{
+  position:relative!important;
+  isolation:isolate;
+  overflow:hidden!important;
+}
+.app-shell .event-detail-layout:not(.payment-sheet) .detail-about:after,
+.app-shell .home-discovery .event-list-card:before,
+.app-shell .tickets-screen .ticket-preview-card:before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  width:190px;
+  height:190px;
+  right:-78px;
+  bottom:-112px;
+  border:1px solid rgba(91,46,255,.12);
+  border-radius:50%;
+  box-shadow:0 0 0 18px rgba(91,46,255,.035),0 0 0 38px rgba(91,46,255,.025),0 0 0 60px rgba(11,127,108,.018);
+  background:radial-gradient(circle,rgba(91,46,255,.055),rgba(11,127,108,.025) 48%,transparent 72%);
+  pointer-events:none;
+}
+.app-shell .event-detail-layout:not(.payment-sheet) .detail-about>*,
+.app-shell .home-discovery .event-list-card>*,
+.app-shell .tickets-screen .ticket-preview-card>*{
+  position:relative;
+  z-index:1;
+}
+.app-shell .home-discovery .event-list-card:before{
+  right:-92px;
+  bottom:-128px;
+}
+.app-shell .tickets-screen .ticket-preview-card:before{
+  right:-78px;
+  bottom:-122px;
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-about:after,
+.app-shell.theme-dark .home-discovery .event-list-card:before,
+.app-shell.theme-dark .tickets-screen .ticket-preview-card:before{
+  border-color:rgba(185,168,255,.22);
+  box-shadow:0 0 0 18px rgba(185,168,255,.055),0 0 0 38px rgba(145,119,255,.045),0 0 0 60px rgba(90,208,184,.025);
+  background:radial-gradient(circle,rgba(145,119,255,.13),rgba(90,208,184,.055) 48%,transparent 72%);
+}
+.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-about{
+  background:#1A1633!important;
+}
+.app-shell.theme-dark .home-discovery .event-list-card,
+.app-shell.theme-dark .tickets-screen .ticket-preview-card{
+  background:var(--surface)!important;
+}
+@media(max-width:520px){
+  .app-shell .event-detail-layout:not(.payment-sheet) .detail-about:after,
+  .app-shell .home-discovery .event-list-card:before,
+  .app-shell .tickets-screen .ticket-preview-card:before{
+    width:160px;height:160px;right:-72px;bottom:-98px;
+  }
+}
