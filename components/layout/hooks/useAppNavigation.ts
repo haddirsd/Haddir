@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export type AppTab = "home" | "tickets" | "notifications" | "profile";
 type AppWorkspace = "customer" | "organizer" | "gatekeeper" | "advertiser" | "admin" | "owner" | null;
 
+const LEGAL_HISTORY_KEY = "__haddirLegalView";
+
 export function useAppNavigation() {
   const [activeTab, setActiveTab] = useState<AppTab>("home");
-  const [showPrivacySecurity, setShowPrivacySecurity] = useState(false);
+  const [showPrivacySecurity, setShowPrivacySecurityState] = useState(false);
   const [eventResetKey, setEventResetKey] = useState(0);
   const [activeWorkspace, setActiveWorkspace] = useState<AppWorkspace>(null);
   const [isGatekeeperPage, setIsGatekeeperPage] = useState(false);
@@ -18,15 +20,46 @@ export function useAppNavigation() {
     if (tab === "tickets" || tab === "notifications" || tab === "profile") {
       setActiveTab(tab);
     }
-    if (params.get("legal") === "1") setShowPrivacySecurity(true);
+    if (params.get("legal") === "1") {
+      window.history.pushState({ ...(window.history.state ?? {}), [LEGAL_HISTORY_KEY]: true }, "", window.location.href);
+      setShowPrivacySecurityState(true);
+    }
     if (params.get("workspace") === "gatekeeper") {
       setActiveWorkspace("gatekeeper");
       setIsGatekeeperPage(true);
     }
   }, []);
 
+  useEffect(() => {
+    const handlePopState = () => {
+      if (showPrivacySecurity) setShowPrivacySecurityState(false);
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [showPrivacySecurity]);
+
+  const setShowPrivacySecurity = useCallback((visible: boolean) => {
+    if (visible) {
+      if (!showPrivacySecurity) {
+        window.history.pushState(
+          { ...(window.history.state ?? {}), [LEGAL_HISTORY_KEY]: true },
+          "",
+          window.location.href,
+        );
+      }
+      setShowPrivacySecurityState(true);
+      return;
+    }
+
+    if (window.history.state?.[LEGAL_HISTORY_KEY]) {
+      window.history.back();
+    } else {
+      setShowPrivacySecurityState(false);
+    }
+  }, [showPrivacySecurity]);
+
   const go = (tab: AppTab) => {
-    setShowPrivacySecurity(false);
+    setShowPrivacySecurityState(false);
     setEventResetKey((value) => value + 1);
     setActiveTab(tab);
 
