@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getSupabaseBrowserClient } from "../../../lib/supabase";
+import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import { listAdminUsers, removeAdminUserEventAssignment, updateAdminUserRole as saveAdminUserRole } from "./admin-users.service";
 import type { AdminUserEventOption, AdminUserRow, AdminUsersRole } from "./admin-users.types";
 
