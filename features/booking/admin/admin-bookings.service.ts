@@ -1,4 +1,4 @@
-import { getSupabaseBrowserClient } from "../../../lib/supabase";
+import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import type { AdminBookingRow, AdminBookingsResult } from "./admin-bookings.types";
 
 export async function listAdminBookings(searchTerm = ""): Promise<AdminBookingsResult> {
