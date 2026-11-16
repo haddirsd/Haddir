@@ -1,4 +1,4 @@
-import { getSupabaseBrowserClient } from "../../../lib/supabase";
+import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import type { AdvertiserStatistics } from "../types";
 
 export async function getAdvertiserEventStatistics(): Promise<{ data: AdvertiserStatistics | null; error: string | null }> {
