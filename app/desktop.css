@@ -1,338 +1,244 @@
 /* ==========================================================================
-   Haddir — Desktop layer (min-width: 768px)
-   Aligned with the actual React class names in the current application.
-   Loaded after globals.css and responsive-nav.css.
+   Haddir — Desktop layer (min-width: 768px), v2
+   Same tokens as globals.css (--bg, --fg, --muted, --green, --line,
+   --surface, --haddir-accent, --haddir-glass-shadow). Light/dark inherited.
+   Import order in app/layout.tsx:
+     globals.css -> responsive-nav.css -> desktop.css
    ========================================================================== */
 
 :root {
   --surface: #ffffff;
   --surface-soft: #f3fafb;
   --haddir-glass-shadow: 0 10px 30px rgba(21, 42, 46, 0.06);
+  --desk-max: 1160px;
+  --desk-gutter: 28px;
+  --desk-radius: 18px;
 }
 
 @media (min-width: 768px) {
-  /* ---------- Shell and the existing responsive navigation ---------- */
-  .app-shell { padding-bottom: 48px !important; }
-  body { padding-bottom: 0 !important; }
-  .app-shell .app-content,
-  .app-shell .screen,
-  .app-shell .home-discovery > .container {
-    width: min(1160px, calc(100% - 56px));
-    max-width: 1160px;
-    margin-inline: auto;
-  }
-  .app-shell .app-content { min-height: calc(100vh - 66px); }
-  .app-shell .screen { min-height: calc(100vh - 66px); padding-top: 38px; }
 
-  /* BottomNav is the only navigation component in the current TSX.
-     On desktop it becomes the top navigation; do not hide it. */
+  /* ---------- 1. Shell ---------- */
+  body {
+    padding-bottom: 0;
+  }
+  .app-shell {
+    padding-bottom: 56px;
+  }
   .app-shell .bottom-nav {
-    position: sticky !important;
-    inset: auto !important;
-    top: 0 !important;
-    z-index: 49 !important;
-    transform: none !important;
-    display: flex !important;
-    align-items: stretch !important;
-    justify-content: center !important;
-    gap: clamp(22px, 4vw, 58px) !important;
-    width: 100% !important;
-    height: 66px !important;
-    min-height: 66px !important;
-    margin: 0 !important;
-    padding: 0 max(28px, calc((100vw - 1160px) / 2)) !important;
-    border: 0 !important;
-    border-bottom: 1px solid var(--line) !important;
-    border-radius: 0 !important;
-    background: color-mix(in srgb, var(--surface) 88%, transparent) !important;
-    box-shadow: var(--haddir-glass-shadow) !important;
-    -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
-    backdrop-filter: blur(14px) saturate(140%) !important;
+    display: none !important;
   }
-  .app-shell .bottom-nav button {
-    min-height: 66px !important;
-    height: 66px !important;
-    padding: 0 4px !important;
-    border-bottom: 2px solid transparent !important;
-    color: var(--muted) !important;
-    font-size: 14px !important;
-    font-weight: 600 !important;
+  .app-content {
+    width: min(var(--desk-max), calc(100% - var(--desk-gutter) * 2));
+    margin-inline: auto;
+    min-height: calc(100vh - 66px);
   }
-  .app-shell .bottom-nav button:hover { color: var(--green) !important; }
-  .app-shell .bottom-nav button.selected {
-    color: var(--haddir-accent, var(--green)) !important;
-    border-bottom-color: var(--haddir-accent, var(--green)) !important;
-    font-weight: 800 !important;
-  }
-  .app-shell .bottom-nav .nav-label { font-size: 14px !important; }
 
-  /* ---------- Headings and cards ---------- */
+  /* ---------- 2. Top navigation (DesktopNav) ---------- */
+  .desktop-nav {
+    position: sticky;
+    top: 0;
+    z-index: 49;
+    background: color-mix(in srgb, var(--surface) 90%, transparent);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-bottom: 1px solid var(--line);
+    box-shadow: var(--haddir-glass-shadow);
+  }
+  .desktop-nav-inner {
+    width: min(var(--desk-max), calc(100% - var(--desk-gutter) * 2));
+    min-height: 66px;
+    margin-inline: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(22px, 4vw, 52px);
+  }
+  .desktop-nav button {
+    min-height: 66px;
+    padding: 0 4px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+    transition: color 0.18s, border-color 0.18s;
+  }
+  .desktop-nav button:hover {
+    color: var(--green);
+  }
+  .desktop-nav button.selected {
+    color: var(--haddir-accent, var(--green));
+    border-bottom-color: var(--haddir-accent, var(--green));
+    font-weight: 800;
+  }
+  .desktop-nav .desktop-nav-badge {
+    background: #f04462;
+    color: #fff;
+  }
+
+  /* ---------- 3. Typography scale ---------- */
   .app-shell h1 { font-size: 32px; line-height: 1.25; letter-spacing: -0.01em; }
-  .app-shell h2 { font-size: 22px; }
-  .app-shell h3 { font-size: 17px; }
+  .app-shell h2 { font-size: 22px; line-height: 1.35; }
+  .app-shell h3 { font-size: 17px; line-height: 1.4; }
+  .app-shell p  { line-height: 1.7; }
 
-  .app-shell .event-list-card,
-  .app-shell .tier-card,
-  .app-shell .admin-panel,
-  .app-shell .admin-broadcast-panel,
-  .app-shell .detail-sheet {
-    border-radius: 18px;
+  /* ---------- 4. Shared cards ---------- */
+  .event-card,
+  .event-list-card,
+  .trending-card,
+  .tier-card,
+  .admin-panel,
+  .admin-broadcast-panel {
     border: 1px solid var(--line);
+    border-radius: var(--desk-radius);
     background: var(--surface);
     box-shadow: var(--haddir-glass-shadow);
   }
-  .app-shell .event-list-card,
-  .app-shell .trending-card {
-    transition: transform .2s ease, box-shadow .2s ease;
-  }
-  .app-shell .event-list-card:hover,
-  .app-shell .trending-card:hover {
+  .event-card:hover,
+  .event-list-card:hover,
+  .trending-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 16px 36px rgba(21, 42, 46, 0.1);
   }
-
-  /* ---------- Home: actual event-list and trending-carousel elements ---------- */
-  .app-shell .home-discovery { display: block; padding-top: 24px; }
-  .app-shell .event-list {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    align-items: stretch;
-    gap: 20px;
-  }
-  .app-shell .event-list-card {
-    display: flex;
-    min-width: 0;
-    flex-direction: column;
-  }
-  .app-shell .event-list-main { display: flex; min-width: 0; flex-direction: column; gap: 12px; }
-  .app-shell .event-list-thumb {
+  .event-list-thumb img,
+  .event-cover-image {
     width: 100%;
-    height: auto;
     aspect-ratio: 16 / 9;
-    overflow: hidden;
-  }
-  .app-shell .event-list-thumb img,
-  .app-shell .event-cover-image {
-    display: block;
-    width: 100%;
-    height: 100%;
+    height: auto;
     object-fit: cover;
   }
-  .app-shell .event-list-info { width: 100%; }
-  .app-shell .ticket-card-perforation { display: none; }
-  .app-shell .ticket-card-footer {
-    margin-top: auto;
-    padding-top: 12px;
-    border-top: 1px solid var(--line);
+
+  /* ---------- 5. Home ----------
+     .home-discovery is a <section> that also contains the filters, so the
+     grid is applied only to the element that directly holds the event cards. */
+  .home-discovery .container {
+    display: block;
   }
-  .app-shell .trending-carousel {
+  .home-discovery div:has(> .event-list-card) {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 20px;
-    overflow-x: auto;
   }
-  .app-shell .trending-carousel .trending-card {
-    flex: 0 0 calc((100% - 40px) / 3);
-    width: calc((100% - 40px) / 3);
-    max-width: calc((100% - 40px) / 3);
-    border-radius: 18px;
+  .trending-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    overflow: visible;
   }
 
-  /* ---------- Event details: layout follows the real nested DOM ---------- */
-  .app-shell .event-detail-page {
-    width: min(1200px, calc(100% - 56px));
-    max-width: 1200px;
-    margin: 24px auto 48px;
+  /* ---------- 6. Event detail ----------
+     .event-detail-layout is the single sheet that holds the sticky controls,
+     the content and the booking dock. It becomes one centered column. */
+  .event-detail-layout {
+    max-width: 1000px;
+    margin-inline: auto;
   }
-  .app-shell .event-detail-layout:not(.payment-sheet) {
-    display: block;
-    width: 100%;
-    height: auto;
-    max-height: none;
-    overflow: visible;
-    border: 1px solid var(--line);
-    border-radius: 24px;
-    background: var(--surface);
-    box-shadow: var(--haddir-glass-shadow);
-  }
-  .app-shell .event-detail-layout:not(.payment-sheet) .detail-cover {
-    width: 100%;
-    height: clamp(300px, 34vw, 420px);
-    min-height: 0;
-    aspect-ratio: auto;
-    border-radius: 23px 23px 0 0;
+  .detail-cover {
+    border-radius: var(--desk-radius);
     overflow: hidden;
+    aspect-ratio: 21 / 9;
   }
-  .app-shell .event-detail-layout:not(.payment-sheet) .detail-content {
-    width: 100%;
-    max-width: none;
-    margin: 0;
-    padding: 28px 32px 36px;
-  }
-  .app-shell .event-detail-layout:not(.payment-sheet) .detail-main {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
-    grid-template-rows: auto auto auto auto;
-    align-items: start;
-    gap: 18px 28px;
-    width: 100%;
-    max-width: none;
-    margin: 0;
-  }
-  .app-shell .event-detail-layout:not(.payment-sheet) .detail-quick-info,
-  .app-shell .event-detail-layout:not(.payment-sheet) .detail-about,
-  .app-shell .event-detail-layout:not(.payment-sheet) .detail-ticket-section,
-  .app-shell .event-detail-layout:not(.payment-sheet) .detail-quantity {
-    grid-column: 1;
-    min-width: 0;
-    margin: 0;
-  }
-  .app-shell .event-detail-layout:not(.payment-sheet) .detail-quick-info {
+  .detail-facts {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
   }
-  .app-shell .event-detail-layout:not(.payment-sheet) .detail-booking-dock {
-    position: sticky;
-    top: 88px;
-    z-index: 4;
-    grid-column: 2;
-    grid-row: 1 / span 4;
-    display: flex;
-    width: auto;
-    min-width: 0;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-start;
-    gap: 18px;
-    margin: 0;
-    padding: 22px;
+  /* Booking dock: a bottom bar kept inside the content width, not full-screen */
+  .detail-booking-dock {
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(960px, calc(100% - var(--desk-gutter) * 2));
+    bottom: 24px;
+    border-radius: var(--desk-radius);
     border: 1px solid var(--line);
-    border-radius: 18px;
     background: var(--surface);
-    box-shadow: var(--haddir-glass-shadow);
-  }
-  .app-shell .event-detail-layout:not(.payment-sheet) .detail-dock-summary {
-    display: grid;
-    gap: 6px;
-  }
-  .app-shell .event-detail-layout:not(.payment-sheet) .detail-dock-summary strong { font-size: 22px; }
-  .app-shell .event-detail-layout:not(.payment-sheet) .detail-booking-dock .pay-button {
-    width: 100%;
-    min-width: 0;
-    margin: 0;
-  }
-  .app-shell .event-detail-layout:not(.payment-sheet) .detail-cover-title h1 {
-    font-size: clamp(28px, 3vw, 42px);
+    box-shadow: 0 18px 40px rgba(21, 42, 46, 0.14);
   }
 
-  /* ---------- Tickets and checkout ---------- */
-  .app-shell .tickets-screen { max-width: 920px; margin-inline: auto; }
-  .app-shell .ticket-list,
-  .app-shell .tier-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
+  /* ---------- 7. Tickets ---------- */
+  .tickets-screen {
+    max-width: 920px;
+    margin-inline: auto;
   }
-  .app-shell .tier-card { min-height: 116px; padding: 20px; }
-  .app-shell .tier-card.tier-selected {
+  .booking-steps {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+  }
+  .tier-card {
+    padding: 20px;
+  }
+  .tier-card.tier-selected {
     border-color: var(--haddir-accent, var(--green));
-    box-shadow: 0 0 0 3px var(--haddir-accent-soft, rgba(2, 132, 199, 0.15));
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
   }
-  .app-shell .event-detail-layout.payment-sheet {
-    display: block;
-    width: min(900px, 100%);
-    min-height: 0;
-    height: auto;
-    max-height: none;
-    margin: 0 auto;
-    padding: 26px 32px 38px;
-    border: 1px solid var(--line);
-    border-radius: 24px;
-    background: var(--surface);
-    box-shadow: var(--haddir-glass-shadow);
-  }
-  .app-shell .event-detail-layout.payment-sheet .payment-screen {
-    width: 100%;
-    max-width: 760px;
-    margin: 20px auto 0;
-    padding: 0;
-  }
-  .app-shell .event-detail-layout.payment-sheet .checkout-form {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px 20px;
-    width: 100%;
+
+  /* ---------- 8. Checkout ----------
+     .checkout-form holds a heading and paragraph, so it stays a column.
+     Only the field rows inside it become two columns. */
+  .checkout-form {
     max-width: 760px;
     margin-inline: auto;
   }
-  .app-shell .event-detail-layout.payment-sheet .checkout-form > .section-kicker,
-  .app-shell .event-detail-layout.payment-sheet .checkout-form > h1,
-  .app-shell .event-detail-layout.payment-sheet .checkout-form > p {
-    grid-column: 1 / -1;
+  .checkout-form > h1,
+  .checkout-form > p,
+  .checkout-form > span {
+    display: block;
+  }
+  .checkout-form > div:has(input) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 20px;
+  }
+  .event-detail-layout.payment-sheet .payment-screen {
+    max-width: 560px;
+    margin: 48px auto;
+    border-radius: var(--desk-radius);
   }
 
-  /* ---------- Admin: sidebar and content ---------- */
+  /* ---------- 9. Admin ----------
+     AdminWorkspace renders <main class="admin-shell"> with an <aside class="admin-sidebar">
+     followed by the content. Flex keeps the sidebar fixed width and lets the
+     rest of the children stack normally. */
   .admin-shell {
-    display: grid;
-    grid-template-columns: 240px minmax(0, 1fr);
-    align-items: start;
+    display: flex;
+    align-items: stretch;
     min-height: 100vh;
   }
   .admin-sidebar {
+    flex: 0 0 240px;
     position: sticky;
     top: 0;
     height: 100vh;
-    min-height: 100vh;
-    overflow-y: auto;
     padding: 24px 16px;
     border-inline-end: 1px solid var(--line);
     background: var(--surface);
+    overflow-y: auto;
   }
-  .admin-main { min-width: 0; }
-  .admin-content {
-    width: 100%;
-    max-width: none;
+  .admin-shell > :not(.admin-sidebar) {
+    flex: 1 1 auto;
     min-width: 0;
-    padding: 28px 32px;
-  }
-  .admin-table-wrap,
-  .admin-users-table-wrap {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: auto;
   }
   .admin-data-table,
-  .admin-users-table { width: 100%; min-width: 760px; }
+  .admin-users-table,
+  .advertiser-ticket-table {
+    width: 100%;
+  }
 
-  /* ---------- Overlays: actual HaddirDialog and gatekeeper modal ---------- */
-  .haddir-dialog-root .haddir-dialog,
+  /* ---------- 10. Dialogs ---------- */
+  .haddir-dialog-root .detail-sheet,
   .gatekeeper-result-modal {
     width: min(560px, calc(100% - 48px));
-    max-height: min(88vh, 760px);
     margin: auto;
-    border-radius: 18px;
+    border-radius: var(--desk-radius);
   }
 
-  /* ---------- Dark mode ---------- */
-  html[data-theme="dark"] .app-shell .bottom-nav {
-    background: color-mix(in srgb, var(--surface) 90%, transparent) !important;
+  /* ---------- 11. Dark mode ---------- */
+  html[data-theme="dark"] .desktop-nav {
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
   }
-}
-
-@media (min-width: 768px) and (max-width: 1050px) {
-  .app-shell .event-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .app-shell .trending-carousel .trending-card {
-    flex-basis: calc((100% - 20px) / 2);
-    width: calc((100% - 20px) / 2);
-    max-width: calc((100% - 20px) / 2);
+  html[data-theme="dark"] .detail-booking-dock {
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
   }
-  .app-shell .event-detail-layout:not(.payment-sheet) .detail-main {
-    grid-template-columns: minmax(0, 1fr) 300px;
-    gap: 16px 20px;
-  }
-  .admin-shell { grid-template-columns: 230px minmax(0, 1fr); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .app-shell .event-list-card,
-  .app-shell .trending-card { transition: none; }
 }
