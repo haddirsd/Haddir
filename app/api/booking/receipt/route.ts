@@ -56,7 +56,7 @@ export async function POST(request: Request) {
 
     if (uploadError) {
       console.error("Receipt upload failed:", uploadError.message, uploadError.statusCode);
-      return NextResponse.json({ error: uploadError.message || "رفضت خدمة التخزين رفع الإيصال." }, { status:  uploadError.statusCode === "403" ? 403 : 502 });
+      return NextResponse.json({ error: "تعذر رفع الإيصال. حاول مرة أخرى." }, { status: String(uploadError.statusCode) === "403" ? 403 : 502 });
     }
 
     return NextResponse.json({ path });
