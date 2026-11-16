@@ -8018,11 +8018,7 @@ html[data-theme="dark"]{
 .admin-stat-hint,.admin-user-email,.admin-sidebar nav button:not(.active)){
   color:#A9A3C9!important;
 }
-.admin-shell.theme-dark :is(input,textarea,select){
-  background:#0E0B1F!important;
-  color:#F4F2FF!important;
-  border-color:var(--line)!important;
-}
+
 
 
 /* Keep brand actions purple; reserve gold only for the main booking/payment action. */
