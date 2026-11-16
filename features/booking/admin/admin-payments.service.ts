@@ -1,4 +1,4 @@
-import { getSupabaseBrowserClient } from "../../../lib/supabase";
+import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import type { AdminPaymentDecision, AdminPaymentReviewResult, AdminPaymentRow } from "./admin-payments.types";
 
 export async function listAdminPayments(): Promise<{ rows: AdminPaymentRow[]; error: string | null }> {
