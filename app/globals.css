@@ -5181,10 +5181,6 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
     padding:9px 10px 8px;
     gap:5px;
   }
-  .app-shell .home-discovery .event-list-info h3{font-size:12px;line-height:1.4}
-  .app-shell .home-discovery .event-list-info .event-category-chip{font-size:8px;padding:3px 8px}
-  .app-shell .home-discovery .event-list-info p{font-size:8.5px;gap:5px}
-  .app-shell .home-discovery .event-list-info p svg{width:11px;height:11px}
   .app-shell .home-discovery .event-list-info .event-list-price{font-size:11px}
   .app-shell .home-discovery .ticket-perforation{margin-inline:11px}
   .app-shell .home-discovery .ticket-card-footer{height:46px;min-height:46px;flex-basis:46px;padding:5px 11px}
@@ -5205,7 +5201,6 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
   border-radius:21px;
   padding:0;
 }
-.app-shell .home-discovery .event-list-main{display:contents}
 .app-shell .home-discovery .event-list-thumb{
   grid-column:1;
   grid-row:1 / 3;
@@ -5712,7 +5707,6 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
   overflow:hidden;
   border-radius:20px;
 }
-.app-shell .home-discovery .event-list-main{display:contents}
 .app-shell .home-discovery .event-list-thumb{
   grid-column:1;
   grid-row:1;
@@ -5796,26 +5790,6 @@ html[data-theme="dark"] .app-shell .home-discovery .ticket-book-link{background:
   width:100%;
   min-width:0;
   margin:auto 0 0;
-}
-.app-shell .home-discovery .event-list-info .event-list-meta p{
-  display:flex;
-  flex-direction:row;
-  align-items:center;
-  justify-content:flex-start;
-  gap:6px;
-  width:100%;
-  min-width:0;
-  margin:0;
-  color:var(--muted);
-  font-size:10px;
-  line-height:1.35;
-}
-.app-shell .home-discovery .event-list-info .event-list-meta p svg{
-  display:block;
-  flex:none;
-  width:12px;
-  height:12px;
-  color:#168bb5;
 }
 .app-shell .home-discovery .event-list-info .event-list-meta p span{
   display:block;
