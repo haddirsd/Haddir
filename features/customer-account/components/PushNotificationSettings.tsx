@@ -1,7 +1,7 @@
 "use client";
 import {useCallback,useEffect,useState} from "react";
 import {BellRing,BellOff,LoaderCircle} from "lucide-react";
-import {getSupabaseBrowserClient} from "../../../lib/supabase";
+import {getSupabaseBrowserClient} from "../../../lib/supabase/browser";
 
 const VAPID_PUBLIC_KEY="BPfWEKhFdIhfUyMd4e6KYa68jkwKkuKRrXruLMkwCPx-izQCx8uyzISAUDGJ5XG8nhLQPmb3JSUaZ_KYbphQVIU";
 
