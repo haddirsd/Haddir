@@ -54,7 +54,6 @@ export default function Home(){
  });
 
  return <AppShell darkMode={darkMode}>
- <>
  <AppHeader
   activeTab={activeTab}
   darkMode={darkMode}
@@ -78,7 +77,6 @@ export default function Home(){
   phone={phone}
   onRequireLogin={()=>setBookingGate("login")}
   onRequirePhone={()=>setBookingGate("phone")}
-  onBookingSuccess={()=>{}}
   onGoNotifications={()=>go("notifications")}
  />
  {!isGatekeeperPage&&activeTab==="tickets"&&<TicketWorkspace
@@ -154,7 +152,5 @@ export default function Home(){
   onCloseBookingGate={()=>setBookingGate(null)}
  />
  {!isGatekeeperPage&&!isEventDetailOpen&&<BottomNav activeTab={activeTab} unreadCount={notificationView.unreadCount} onNavigate={go}/>}
- </>
- 
  </AppShell>;
 }
