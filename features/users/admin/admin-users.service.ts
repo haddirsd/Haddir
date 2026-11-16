@@ -1,4 +1,4 @@
-import { getSupabaseBrowserClient } from "../../../lib/supabase";
+import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import type { AdminUserEventOption, AdminUserRow, AdminUsersResult } from "./admin-users.types";
 
 const EVENT_SCOPED_ROLES = ["supervisor", "gatekeeper", "advertiser"];
