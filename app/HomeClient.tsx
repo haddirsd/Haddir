@@ -4,7 +4,7 @@ import { WelcomeSplash } from "../components/layout/WelcomeSplash";
 import { AppShell } from "../components/layout/AppShell";
 import { AppHeader } from "../components/layout/AppHeader";
 import { AppOverlays } from "../components/layout/AppOverlays";
-import { BottomNav, DesktopNav } from "../components/layout/BottomNav";
+import { BottomNav } from "../components/layout/BottomNav";
 import { formatEventDate } from "../features/events/events.formatters";
 import { ProfileWorkspace } from "../features/customer-account/components/ProfileWorkspace";
 import { EventsWorkspace } from "../features/events/components/EventsWorkspace";
