@@ -188,10 +188,15 @@
   }
   .event-detail-layout:not(.payment-sheet) .detail-booking-dock {
     position: sticky !important;
+    inset-inline: auto !important;
     top: 90px !important;
+    bottom: auto !important;
+    z-index: 4 !important;
     grid-column: 2 !important;
     grid-row: 1 / span 4 !important;
     display: flex !important;
+    width: auto !important;
+    grid-template-columns: none !important;
     flex-direction: column !important;
     align-items: stretch !important;
     justify-content: flex-start !important;
