@@ -50,7 +50,7 @@
 .checkout-form>h1{margin:0}
 .checkout-form>p{margin:0;color:var(--muted);font-size:12px;line-height:1.9}
 .checkout-event{display:flex;align-items:center;gap:13px;padding:12px;border:1px solid var(--line);border-radius:15px;background:#fff}
-.checkout-thumb{width:66px;height:62px;min-width:66px;height:62px;border-radius:11px;padding:8px}
+.checkout-thumb{width:66px;height:62px;min-width:66px;border-radius:11px;padding:8px}
 .checkout-event>div{display:grid;gap:6px}
 .checkout-event strong{font-size:12px}
 .checkout-event small{color:var(--muted);font-size:10px}
