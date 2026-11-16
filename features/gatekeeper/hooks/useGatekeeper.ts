@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BrowserQRCodeReader } from "@zxing/browser";
-import { getSupabaseBrowserClient } from "../../../lib/supabase";
+import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import { getGatekeeperScanHistory, getGatekeeperScanStats, submitGatekeeperTicketAction } from "../services/gatekeeper.service";
 import type { GatekeeperScanHistoryItem, GatekeeperScanStats, GatekeeperTicketActionResult, GatekeeperEntryMethod } from "../types";
 
