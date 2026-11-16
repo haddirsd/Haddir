@@ -44,14 +44,14 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
           }>;
           const event = rows[0];
           if (event) {
-            const title = `${event.title} | حاضِر`;
+            const title = `${event.title} | حاضر`;
             const description = [
               event.description?.trim(),
               event.venue || event.city,
               event.starts_at
                 ? new Intl.DateTimeFormat("ar-SD", { dateStyle: "medium", timeStyle: "short" }).format(new Date(event.starts_at))
                 : "",
-            ].filter(Boolean).join(" · ").slice(0, 300) || "اكتشف الفعالية واحجز تذكرتك عبر حاضِر.";
+            ].filter(Boolean).join(" · ").slice(0, 300) || "اكتشف الفعالية واحجز تذكرتك عبر حاضر.";
             const image = event.cover_image_url || defaultImage;
             const url = new URL(`/?event=${encodeURIComponent(event.id)}`, metadataBase);
 
@@ -63,7 +63,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
               openGraph: {
                 type: "website",
                 locale: "ar_SD",
-                siteName: "حاضِر | Haddir",
+                siteName: "حاضر | Haddir",
                 title,
                 description,
                 url,
@@ -84,7 +84,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
     }
   }
 
-  const title = "حاضِر | فعاليات السودان في مكان واحد";
+  const title = "حاضر | فعاليات السودان في مكان واحد";
   const description = "اكتشف الفعاليات القادمة واحجز تذكرتك بسهولة مع حاضر.";
   return {
     metadataBase,
@@ -93,11 +93,11 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
     openGraph: {
       type: "website",
       locale: "ar_SD",
-      siteName: "حاضِر | Haddir",
+      siteName: "حاضر | Haddir",
       title,
       description,
       url: metadataBase,
-      images: [{ url: defaultImage, width: 512, height: 512, alt: "حاضِر | Haddir" }],
+      images: [{ url: defaultImage, width: 512, height: 512, alt: "حاضر | Haddir" }],
     },
     twitter: {
       card: "summary_large_image",
