@@ -1,4 +1,4 @@
-import { getSupabaseBrowserClient } from "../../../lib/supabase";
+import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import type { AdminReportData, AdminReportRow } from "./admin-reports.types";
 
 async function fetchAll(table: string, columns: string, sort: string): Promise<{ data: AdminReportRow[] | null; error: any }> {
