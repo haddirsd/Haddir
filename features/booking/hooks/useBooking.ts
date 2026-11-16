@@ -6,9 +6,9 @@ import { useBookingSubmission } from "./useBookingSubmission";
 
 type BookingUser = { id: string } | null;
 type BookingEvent = { id: string; tiers: Array<{ id: string }> } | null;
-type UseBookingOptions = { authUser: BookingUser; selected: BookingEvent; selectedTier: number; ticketCount: number; onSuccess?: () => void };
+type UseBookingOptions = { authUser: BookingUser; selected: BookingEvent; selectedTier: number; ticketCount: number };
 
-export function useBooking({ authUser, selected, selectedTier, ticketCount, onSuccess }: UseBookingOptions) {
+export function useBooking({ authUser, selected, selectedTier, ticketCount }: UseBookingOptions) {
   const [receipt, setReceipt] = useState<File | null>(null);
   const [bookingDone, setBookingDone] = useState(false);
   const [bookingId, setBookingId] = useState<string | null>(null);
@@ -45,7 +45,6 @@ export function useBooking({ authUser, selected, selectedTier, ticketCount, onSu
     setBookingDone,
     setBookingError,
     setBookingSubmitting,
-    onSuccess,
   });
 
   const resetBooking = useCallback(() => {
