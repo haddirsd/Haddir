@@ -66,7 +66,7 @@ export default function Home(){
   onBackFromGatekeeper={backFromGatekeeper}
  />
  {pendingLegalRole === "advertiser" && <OrganizerTermsConsent onAccept={acceptOrganizerTerms} />}
- {!isGatekeeperPage&&!showPrivacySecurity&&<DesktopNav activeTab={activeTab} unreadCount={notificationView.unreadCount} onNavigate={go}/>}
+ {!isGatekeeperPage&&(!showPrivacySecurity||!isEventDetailOpen)&&<BottomNav activeTab={activeTab} unreadCount={notificationView.unreadCount} onNavigate={go} className={`${showPrivacySecurity?"hide-desktop ":""}${isEventDetailOpen?"hide-mobile":""}`}/>}
  <div className="app-content">
  <WelcomeSplash />
  <EventsWorkspace
@@ -151,6 +151,6 @@ export default function Home(){
   }}
   onCloseBookingGate={()=>setBookingGate(null)}
  />
- {!isGatekeeperPage&&!isEventDetailOpen&&<BottomNav activeTab={activeTab} unreadCount={notificationView.unreadCount} onNavigate={go}/>}
+
  </AppShell>;
 }
