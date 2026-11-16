@@ -1,4 +1,4 @@
-import { getSupabaseBrowserClient } from "../../../lib/supabase";
+import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import type { AdminActivityRow } from "./admin-activity.types";
 
 export async function listAdminActivity(): Promise<{ rows: AdminActivityRow[]; error: string | null }> {
