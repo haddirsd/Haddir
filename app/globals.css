@@ -1331,7 +1331,7 @@ body{font-size:16px}
     text-align: center;
     scroll-snap-align: start;
   }
-  .admin-sidebar nav button > span { width: auto; }
+  
   .admin-sidebar nav svg { width: 18px; height: 18px; }
   .admin-topbar { min-height: 66px; height: auto; padding: 10px 15px; }
   .admin-topbar h1 { font-size: 17px; }
