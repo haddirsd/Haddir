@@ -8,6 +8,7 @@ type NavProps = {
   activeTab: Tab;
   unreadCount?: number;
   onNavigate: (tab: Tab) => void;
+  className?: string;
 };
 
 const items: { id: Tab; label: string; icon: LucideIcon }[] = [
@@ -17,37 +18,9 @@ const items: { id: Tab; label: string; icon: LucideIcon }[] = [
   { id: "profile", label: "الملف الشخصي", icon: UserRound },
 ];
 
-export function DesktopNav({ activeTab, unreadCount = 0, onNavigate }: NavProps) {
+export function BottomNav({ activeTab, unreadCount = 0, onNavigate, className = "" }: NavProps) {
   return (
-    <nav className="desktop-nav" aria-label="التنقل الرئيسي للشاشات الكبيرة">
-      <div className="desktop-nav-inner">
-        {items.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            type="button"
-            aria-current={activeTab === id ? "page" : undefined}
-            className={activeTab === id ? "selected" : ""}
-            onClick={() => onNavigate(id)}
-          >
-            <span className="desktop-nav-icon">
-              <Icon aria-hidden="true" />
-              {id === "notifications" && unreadCount > 0 && (
-                <span className="desktop-nav-badge" aria-label={`${unreadCount} إشعارات غير مقروءة`}>
-                  {unreadCount > 9 ? "9+" : unreadCount}
-                </span>
-              )}
-            </span>
-            <span>{label}</span>
-          </button>
-        ))}
-      </div>
-    </nav>
-  );
-}
-
-export function BottomNav({ activeTab, unreadCount = 0, onNavigate }: NavProps) {
-  return (
-    <nav className="bottom-nav" aria-label="التنقل الرئيسي">
+    <nav className={["bottom-nav", className].filter(Boolean).join(" ")} aria-label="التنقل الرئيسي">
       {items.map(({ id, label, icon: Icon }) => (
         <button
           key={id}
