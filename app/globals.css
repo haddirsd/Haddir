@@ -3011,11 +3011,7 @@ input:focus,textarea:focus,select:focus{
 }
 .detail-sheet{background:var(--bg);color:var(--fg)}
 .detail-cover{box-shadow:0 24px 65px rgba(2,45,60,.18)}
-.map-link{
-  background:color-mix(in srgb,var(--green) 7%,var(--surface))!important;
-  border-color:var(--line)!important;
-  color:var(--green)!important;
-}
+
 .tier-card.tier-selected{
   border-color:var(--green)!important;
   background:color-mix(in srgb,var(--green) 9%,var(--surface))!important;
