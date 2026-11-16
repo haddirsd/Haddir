@@ -13,7 +13,6 @@ type UseEventWorkspaceOptions = {
   phone: string;
   onRequireLogin: () => void;
   onRequirePhone: () => void;
-  onBookingSuccess?: () => void;
 };
 
 /** Composes event URL/navigation state with the booking flow so the page only hosts the workspace. */
@@ -23,7 +22,6 @@ export function useEventWorkspace({
   phone,
   onRequireLogin,
   onRequirePhone,
-  onBookingSuccess,
 }: UseEventWorkspaceOptions) {
   const navigation = useEventNavigation({ events, authUser, phone, onRequireLogin, onRequirePhone });
   const booking = useBooking({
@@ -31,7 +29,6 @@ export function useEventWorkspace({
     selected: navigation.selectedEvent,
     selectedTier: navigation.selectedTier,
     ticketCount: navigation.ticketCount,
-    onSuccess: onBookingSuccess,
   });
 
   const loadedAccountsFor = useRef<string | null>(null);
