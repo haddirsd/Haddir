@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getSupabaseBrowserClient } from "../../../lib/supabase";
+import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import { getAdminNavigationSections, type AdminRole, type AdminSection } from "../types";
 
 export function useAdminWorkspaceNavigation(role: AdminRole | null) {
