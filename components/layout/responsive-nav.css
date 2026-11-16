@@ -10,7 +10,7 @@
   .desktop-nav button.selected svg{stroke-width:2.3}
   .desktop-nav .desktop-nav-icon{position:relative;display:inline-flex;align-items:center}
   .desktop-nav .desktop-nav-badge{position:absolute;top:-7px;right:-9px;min-width:15px;height:15px;padding:0 4px;display:grid;place-items:center;border:1.5px solid var(--surface,#fff);border-radius:99px;background:#F04462;color:#fff;font-size:9px;font-weight:800;line-height:1}
-  .bottom-nav{display:none!important}
+  .app-shell .bottom-nav{display:none!important}
   body{padding-bottom:0!important}
   .app-shell{padding-bottom:24px!important}
 }
