@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getSupabaseBrowserClient } from "../../../lib/supabase";
+import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import { getAdminOverviewStats } from "./admin-overview.service";
 import type { AdminOverviewRole, AdminOverviewStats } from "./admin-overview.types";
 
