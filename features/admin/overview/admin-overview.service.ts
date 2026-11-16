@@ -1,4 +1,4 @@
-import { getSupabaseBrowserClient } from "../../../lib/supabase";
+import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import type { AdminOverviewRole, AdminOverviewStats } from "./admin-overview.types";
 
 export async function getAdminOverviewStats(role: AdminOverviewRole): Promise<{ data: AdminOverviewStats | null; error: string | null }> {
