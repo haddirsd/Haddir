@@ -70,7 +70,7 @@ export async function deleteOrCancelAdminEvent(eventId: string): Promise<{ messa
     return { message: "", error: "تم تجهيز الإحصائيات وإزالة الملفات، لكن لم تكتمل إزالة سجلات الفعالية: " + (finalizeError?.message || "تعذر تأكيد الحذف النهائي.") };
   }
 
-  return { message: "تم حذف الفعالية وبياناتها التشغيلية وإيصالاتها، مع الاحتفاظ بإحصائيات حاضِر الإجمالية.", error: null };
+  return { message: "تم حذف الفعالية وبياناتها التشغيلية وإيصالاتها، مع الاحتفاظ بإحصائيات حاضر الإجمالية.", error: null };
 }
 
 export async function markAdminEventCompleted(eventId: string): Promise<{ error: string | null }> {
