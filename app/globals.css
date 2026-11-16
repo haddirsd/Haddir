@@ -10380,7 +10380,7 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 .haddir-select-menu-portal{position:fixed!important;z-index:2147483001!important;overflow-y:auto;overscroll-behavior:contain;isolation:isolate}
 
 .haddir-select-menu-portal.theme-dark{background:#1A1633!important;border-color:rgba(185,168,255,.24)!important;color:#F4F2FF!important}
-.haddir-select-menu-portal.theme-dark .haddir-select-option{color:#F4F2FF!important}
+
 .haddir-select-menu-portal.theme-dark .haddir-select-option:hover,.haddir-select-menu-portal.theme-dark .haddir-select-option.is-selected{background:rgba(185,168,255,.13)!important;color:#B9A8FF!important}
 
 
