@@ -1,4 +1,4 @@
-import { getSupabaseBrowserClient } from "../../../lib/supabase";
+import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import type { GatekeeperScanHistoryItem, GatekeeperScanStats, GatekeeperEntryMethod } from "../types";
 
 type ServiceError = { message?: string } | null;
