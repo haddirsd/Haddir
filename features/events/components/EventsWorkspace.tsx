@@ -14,7 +14,6 @@ type EventsWorkspaceProps = {
   phone: string;
   onRequireLogin: () => void;
   onRequirePhone: () => void;
-  onBookingSuccess: () => void;
   onGoNotifications: () => void;
 };
 
@@ -27,7 +26,6 @@ export function EventsWorkspace({
   phone,
   onRequireLogin,
   onRequirePhone,
-  onBookingSuccess,
   onGoNotifications,
 }: EventsWorkspaceProps) {
   const { events, eventsLoading, eventsError, ticketTypesError, refreshEvents } = useEvents();
@@ -37,7 +35,6 @@ export function EventsWorkspace({
     phone,
     onRequireLogin,
     onRequirePhone,
-    onBookingSuccess,
   });
   const {
     selectedEvent,
