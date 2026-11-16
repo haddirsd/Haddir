@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getSupabaseBrowserClient } from "../../../lib/supabase";
+import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import { listAdminPayments } from "./admin-payments.service";
 import type { AdminPaymentRow } from "./admin-payments.types";
 
