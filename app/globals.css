@@ -3510,8 +3510,6 @@ input:focus,textarea:focus,select:focus{
 .theme-dark.app-shell .bottom-nav button.selected{color:#b8f3fb!important}
 .app-shell .bottom-nav button svg{width:23px;height:23px}
 .app-shell{padding-bottom:110px!important}
-@media(min-width:801px){.app-shell .bottom-nav{bottom:18px!important}}
-@media(max-width:520px){.app-shell .bottom-nav{height:68px!important;width:calc(100% - 24px)!important}.app-shell{padding-bottom:100px!important}}
 
 /* Event details and booking: translucent sheets, glow and compact controls */
 .event-detail-page{padding:0 0 26px}
