@@ -32,7 +32,6 @@ type UseBookingSubmissionOptions = {
   setBookingDone: Dispatch<SetStateAction<boolean>>;
   setBookingError: Dispatch<SetStateAction<string>>;
   setBookingSubmitting: Dispatch<SetStateAction<boolean>>;
-  onSuccess?: () => void;
 };
 
 export function useBookingSubmission({
@@ -51,7 +50,6 @@ export function useBookingSubmission({
   setBookingDone,
   setBookingError,
   setBookingSubmitting,
-  onSuccess,
 }: UseBookingSubmissionOptions) {
   const submissionLock = useRef(false);
   const pendingReceiptUpload = useRef<PendingReceiptUpload | null>(null);
@@ -96,7 +94,6 @@ export function useBookingSubmission({
       if (existing) {
         setBookingDone(true);
         pendingReceiptUpload.current = null;
-        onSuccess?.();
         return;
       }
 
@@ -117,7 +114,7 @@ export function useBookingSubmission({
         // Never remove a receipt on an ambiguous network error; the server may have committed it.
         const { data: recovered, error: recoveryError } = await getBookingPaymentSubmission(activeBookingId);
         if (!recoveryError && recovered) {
-          setBookingDone(true); pendingReceiptUpload.current = null; onSuccess?.(); return;
+          setBookingDone(true); pendingReceiptUpload.current = null; return;
         }
         setBookingError(recoveryError
           ? "تعذر التأكد هل وصل إثبات الدفع أم لا. احتفظنا بالإيصال؛ أعد المحاولة بعد التحقق من الاتصال."
@@ -127,7 +124,6 @@ export function useBookingSubmission({
 
       pendingReceiptUpload.current = null;
       setBookingDone(true);
-      onSuccess?.();
     } catch (error) {
       console.error("Booking submission failed", error);
       setBookingError(error instanceof Error && error.message ? error.message : "حصل خطأ غير متوقع أثناء إرسال الحجز. احتفظنا بالإيصال لتتمكن من إعادة المحاولة.");
@@ -135,7 +131,7 @@ export function useBookingSubmission({
       submissionLock.current = false;
       setBookingSubmitting(false);
     }
-  }, [authUser, selected, selectedTier, ticketCount, receipt, eventPaymentAccounts, paymentMethod, bookingId, bookingContext, onSuccess, setBookingError, setBookingSubmitting, setBookingId, setBookingNumber, setBookingContext, setBookingDone]);
+  }, [authUser, selected, selectedTier, ticketCount, receipt, eventPaymentAccounts, paymentMethod, bookingId, bookingContext, setBookingError, setBookingSubmitting, setBookingId, setBookingNumber, setBookingContext, setBookingDone]);
 
   const resetSubmission = useCallback(() => {
     pendingReceiptUpload.current = null;
