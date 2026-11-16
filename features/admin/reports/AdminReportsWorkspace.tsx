@@ -81,7 +81,7 @@ export default function AdminReportsWorkspace() {
                 <div className="admin-selected-event"><div><small>الفعالية المحددة</small><h3>{event.title}</h3><span>{statusLabels[event.status]||event.status} · عمولة المنصة {Number(event.platform_fee_percent||0)}%</span></div><button className="admin-print-button" type="button" onClick={()=>window.print()}>تحميل تقرير الفعالية PDF</button></div>
                 <div className="admin-event-report" dir="rtl">
                   <section className="admin-report-page admin-report-cover">
-                    <div className="admin-report-topline"><img src="/ticket.svg" alt="ختم حاضر" /><span>حاضِر · منصة الفعاليات</span><small>تقرير فعالية تفصيلي</small></div>
+                    <div className="admin-report-topline"><img src="/ticket.svg" alt="ختم حاضر" /><span>حاضر · منصة الفعاليات</span><small>تقرير فعالية تفصيلي</small></div>
                     {event.cover_image_url&&<img className="admin-report-cover-image" src={event.cover_image_url} alt="" />}
                     <div className="admin-report-cover-content">
                       <span className="admin-report-kicker">تقرير الأداء والتشغيل</span>
@@ -122,7 +122,7 @@ export default function AdminReportsWorkspace() {
                       <div><span>إجمالي الكمية المحجوزة قيد المراجعة</span><b>{fmtCount(sum(eventTicketRows,"reserved"))}</b></div>
                     </div>
                     <p className="admin-report-note">تُحتسب المبيعات من الحجوزات المؤكدة فقط. صافي المنظم هو المبيعات المعتمدة بعد خصم عمولة المنصة، ولا يشمل المصروفات التشغيلية أو التسويات الخارجية.</p>
-                    <div className="admin-report-footer"><span>حاضِر · تقرير الفعالية</span><b>02</b></div>
+                    <div className="admin-report-footer"><span>حاضر · تقرير الفعالية</span><b>02</b></div>
                   </section>
 
                   <section className="admin-report-page">
@@ -134,7 +134,7 @@ export default function AdminReportsWorkspace() {
                       <div><small>دخل المنصة</small><b>{moneyLines(eventCommissionRows,"value")}</b></div>
                       <div><small>صافي المنظم</small><b>{moneyLines(eventNetRows,"value")}</b></div>
                     </div>
-                    <div className="admin-report-footer"><span>حاضِر · تقرير الفعالية</span><b>03</b></div>
+                    <div className="admin-report-footer"><span>حاضر · تقرير الفعالية</span><b>03</b></div>
                   </section>
 
                   <section className="admin-report-page admin-report-register">
@@ -147,7 +147,7 @@ export default function AdminReportsWorkspace() {
                     <div className="admin-report-section-head"><span>04 / سجل الدخول</span><h2>التذاكر والتحقق عند البوابة</h2><p>حالة رموز الدخول ووقت استخدامها عند التحقق.</p></div>
                     <div className="admin-report-table-wrap"><table><thead><tr><th>كود التذكرة</th><th>اسم حامل التذكرة</th><th>الفئة</th><th>الحالة</th><th>وقت الدخول</th></tr></thead><tbody>{eventTickets.map((t:Row)=><tr key={t.id}><td dir="ltr">{t.ticket_code||"—"}</td><td>{t.attendee_name||"—"}</td><td>{eventTicketRows.find((x: Row)=>x.id===t.ticket_type_id)?.name||"—"}</td><td>{t.status==="used"?"تم الدخول":t.status==="valid"?"صالحة":"غير صالحة"}</td><td>{t.used_at?new Date(t.used_at).toLocaleString("ar-SD-u-nu-latn"):"—"}</td></tr>)}</tbody></table></div>
                     <div className="admin-report-note">هذا السجل يعرض بيانات التذاكر المتاحة في النظام وقت إصدار التقرير. أي دخول يتم بعد ذلك لن يظهر إلا في تقرير جديد.</div>
-                    <div className="admin-report-footer"><span>حاضِر · نهاية التقرير</span><b>05</b></div>
+                    <div className="admin-report-footer"><span>حاضر · نهاية التقرير</span><b>05</b></div>
                   </section>
                 </div>
               </>}
