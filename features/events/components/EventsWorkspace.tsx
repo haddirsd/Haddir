@@ -8,6 +8,8 @@ import { EventDetails } from "./EventDetails";
 
 type EventsWorkspaceProps = {
   showHome: boolean;
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
   resetKey: number;
   onEventOpenChange: (open: boolean) => void;
   authUser: { id: string; email?: string; user_metadata?: Record<string, unknown> } | null;
@@ -20,6 +22,8 @@ type EventsWorkspaceProps = {
 /** Owns the complete public event experience: data, URLs, details and booking. */
 export function EventsWorkspace({
   showHome,
+  searchQuery,
+  onSearchChange,
   resetKey,
   onEventOpenChange,
   authUser,
@@ -89,6 +93,8 @@ export function EventsWorkspace({
       {showHome && !selectedEvent && (
         <HomeEventsWorkspace
           events={events}
+          searchQuery={searchQuery}
+          onSearchChange={onSearchChange}
           loading={eventsLoading}
           error={eventsError}
           onOpenEvent={openEvent}
