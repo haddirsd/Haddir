@@ -2431,3 +2431,71 @@
     white-space: nowrap !important;
   }
 }
+
+
+/* Desktop event detail: place category and share controls on the cover image.
+   The controls are removed from the page header flow to reclaim the top space. */
+@media (min-width: 1024px) {
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) {
+    position: relative !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-sticky-controls {
+    position: absolute !important;
+    z-index: 5 !important;
+    top: 40px !important;
+    inset-inline: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    pointer-events: none !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-sticky-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    pointer-events: auto !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-sticky-category {
+    display: inline-flex !important;
+    align-items: center !important;
+    min-height: 36px !important;
+    padding: 7px 14px !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 999px !important;
+    background: color-mix(in srgb, var(--surface) 90%, transparent) !important;
+    color: var(--fg) !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 1.4 !important;
+    backdrop-filter: blur(10px) !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-sticky-share {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    padding: 0 !important;
+    border: 1px solid rgba(255, 255, 255, .55) !important;
+    border-radius: 50% !important;
+    background: rgba(20, 24, 30, .62) !important;
+    color: #fff !important;
+    cursor: pointer !important;
+    backdrop-filter: blur(10px) !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-topbar {
+    display: none !important;
+  }
+}
