@@ -2105,3 +2105,55 @@
     min-height: 120px !important;
   }
 }
+
+
+/* Desktop event details: keep the information column content-led.
+   This prevents the cover image height from pushing the description downward. */
+@media (min-width: 1024px) {
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-content {
+    display: grid !important;
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto auto auto auto auto !important;
+    align-content: start !important;
+    align-self: start !important;
+    gap: 14px !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-main {
+    display: contents !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-quick-info {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    grid-template-rows: auto auto !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-about {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    margin: 0 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-ticket-section {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-quantity {
+    grid-column: 1 !important;
+    grid-row: 4 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer {
+    grid-column: 1 !important;
+    grid-row: 5 !important;
+  }
+}
