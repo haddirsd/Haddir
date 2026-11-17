@@ -2433,24 +2433,38 @@
 }
 
 /* Desktop-only event detail and checkout header adjustments.
-   Mobile markup and presentation remain unchanged. */
+   The controls overlay the cover as a compact glass group; mobile remains untouched. */
 @media (min-width: 1024px) {
   .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-sticky-controls {
     grid-column: 1 !important;
     grid-row: 2 !important;
-    z-index: 6 !important;
+    position: relative !important;
+    z-index: 8 !important;
     align-self: start !important;
     justify-self: stretch !important;
     display: flex !important;
     align-items: flex-start !important;
     justify-content: flex-end !important;
+    width: auto !important;
+    min-width: 0 !important;
     min-height: 0 !important;
+    height: auto !important;
     margin: 16px 18px 0 !important;
     padding: 0 !important;
     border: 0 !important;
     border-radius: 0 !important;
     background: transparent !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
     pointer-events: none !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-cover {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    position: relative !important;
+    z-index: 0 !important;
   }
 
   .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-sticky-controls .detail-sticky-back {
@@ -2461,39 +2475,51 @@
     display: flex !important;
     align-items: center !important;
     justify-content: flex-end !important;
-    gap: 10px !important;
+    gap: 8px !important;
+    min-width: 0 !important;
     pointer-events: auto !important;
   }
 
   .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-sticky-category {
     display: inline-flex !important;
     align-items: center !important;
-    min-height: 34px !important;
-    padding: 6px 12px !important;
-    border: 1px solid rgba(255, 255, 255, .48) !important;
+    justify-content: center !important;
+    min-height: 36px !important;
+    max-width: min(240px, 32vw) !important;
+    padding: 7px 13px !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(255, 255, 255, .42) !important;
     border-radius: 999px !important;
-    background: rgba(24, 27, 34, .58) !important;
+    background: rgba(15, 23, 30, .58) !important;
     color: #fff !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .16), inset 0 1px 0 rgba(255, 255, 255, .12) !important;
     font-size: 12px !important;
     font-weight: 700 !important;
-    line-height: 1.4 !important;
-    backdrop-filter: blur(10px) !important;
+    line-height: 1.35 !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    -webkit-backdrop-filter: blur(12px) saturate(150%) !important;
+    backdrop-filter: blur(12px) saturate(150%) !important;
   }
 
   .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-sticky-share {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
+    flex: 0 0 36px !important;
     width: 36px !important;
     height: 36px !important;
     min-width: 36px !important;
+    min-height: 36px !important;
     padding: 0 !important;
-    border: 1px solid rgba(255, 255, 255, .55) !important;
+    border: 1px solid rgba(255, 255, 255, .48) !important;
     border-radius: 50% !important;
-    background: rgba(24, 27, 34, .62) !important;
+    background: rgba(15, 23, 30, .62) !important;
     color: #fff !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .12) !important;
     cursor: pointer !important;
-    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(150%) !important;
+    backdrop-filter: blur(12px) saturate(150%) !important;
   }
 
   .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-topbar {
@@ -2504,4 +2530,3 @@
     display: none !important;
   }
 }
-
