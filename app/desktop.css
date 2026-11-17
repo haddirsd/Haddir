@@ -2157,3 +2157,248 @@
     grid-row: 5 !important;
   }
 }
+
+
+/* Desktop checkout: balanced two-column layout with theme-aware surfaces.
+   Scoped to the payment sheet so mobile checkout remains unchanged. */
+@media (min-width: 1024px) {
+  .app-content .event-detail-page .event-detail-layout.payment-sheet {
+    width: min(1120px, calc(100% - 56px)) !important;
+    max-width: 1120px !important;
+    margin-inline: auto !important;
+    padding: 24px !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 22px !important;
+    background: var(--bg) !important;
+    color: var(--fg) !important;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, .09) !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-topbar {
+    margin: 0 0 18px !important;
+    color: var(--fg) !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.1fr) minmax(300px, .9fr) !important;
+    grid-template-rows: auto auto auto auto auto auto auto auto !important;
+    align-items: start !important;
+    gap: 14px 18px !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .section-kicker,
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > h1,
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > p:first-of-type {
+    grid-column: 1 / -1 !important;
+    margin: 0 !important;
+    color: var(--fg) !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .section-kicker {
+    color: var(--muted) !important;
+    font-size: 11px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > h1 {
+    font-size: clamp(25px, 2vw, 30px) !important;
+    line-height: 1.35 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > p:first-of-type {
+    color: var(--muted) !important;
+    font-size: 13px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-event,
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-total,
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-section {
+    min-width: 0 !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 16px !important;
+    background: var(--surface, #fff) !important;
+    color: var(--fg) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .045) !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-event {
+    grid-column: 2 !important;
+    grid-row: 4 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 14px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-thumb {
+    flex: 0 0 76px !important;
+    width: 76px !important;
+    height: 68px !important;
+    border-radius: 11px !important;
+    overflow: hidden !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-thumb .event-cover-image {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    aspect-ratio: auto !important;
+    object-fit: cover !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-event > div {
+    display: grid !important;
+    gap: 5px !important;
+    min-width: 0 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-event strong {
+    color: var(--fg) !important;
+    font-size: 13px !important;
+    line-height: 1.6 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-event small {
+    color: var(--muted) !important;
+    font-size: 11px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-total {
+    grid-column: 2 !important;
+    grid-row: 5 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding: 15px 16px !important;
+    font-size: 13px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-total span {
+    color: var(--muted) !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-total strong {
+    color: var(--green, var(--haddir-accent)) !important;
+    font-size: 21px !important;
+    font-weight: 800 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .checkout-section {
+    grid-column: 1 !important;
+    padding: 18px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .checkout-section:has(.account-details) {
+    grid-row: 4 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .checkout-section:has(.receipt-upload),
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .checkout-section.receipt-locked {
+    grid-row: 5 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-section h2 {
+    margin: 0 0 12px !important;
+    color: var(--fg) !important;
+    font-size: 16px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-section p,
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-label,
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .account-details,
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .account-note,
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-footnote {
+    color: var(--muted) !important;
+    font-size: 12px !important;
+    line-height: 1.8 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .account-number-card {
+    padding: 13px !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 12px !important;
+    background: var(--bg) !important;
+    color: var(--fg) !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .account-number-card strong,
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .account-details strong {
+    color: var(--fg) !important;
+    font-size: 13px !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .copy-account-button {
+    min-height: 36px !important;
+    padding: 7px 11px !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 10px !important;
+    background: var(--surface, #fff) !important;
+    color: var(--fg) !important;
+    font-size: 11px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .receipt-upload {
+    min-height: 150px !important;
+    padding: 18px !important;
+    border: 1px dashed color-mix(in srgb, var(--green, #2c8da0) 48%, var(--line)) !important;
+    border-radius: 14px !important;
+    background: color-mix(in srgb, var(--green, #2c8da0) 5%, var(--surface, #fff)) !important;
+    color: var(--fg) !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .receipt-upload strong {
+    color: var(--fg) !important;
+    font-size: 13px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .receipt-upload small,
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .receipt-upload .upload-action {
+    color: var(--muted) !important;
+    font-size: 11px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .checkout-footnote {
+    grid-column: 1 / -1 !important;
+    margin: 0 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-submit-dock {
+    grid-column: 1 / -1 !important;
+    grid-row: 8 !important;
+    justify-self: center !important;
+    width: min(440px, 100%) !important;
+    margin: 2px 0 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-submit-dock .pay-button {
+    width: 100% !important;
+    min-height: 48px !important;
+    border: 1px solid var(--haddir-accent, var(--green)) !important;
+    border-radius: 12px !important;
+    background: var(--haddir-accent, var(--green)) !important;
+    color: #fff !important;
+    box-shadow: none !important;
+    font-size: 13px !important;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1200px) {
+  .app-content .event-detail-page .event-detail-layout.payment-sheet {
+    width: calc(100% - 36px) !important;
+    padding: 18px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, .88fr) !important;
+    gap: 12px 14px !important;
+  }
+}
