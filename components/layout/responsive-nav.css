@@ -1,35 +1,11 @@
-/* Separate navigation components for mobile and desktop */
-.desktop-nav{display:none!important}
-
-@media (min-width:768px){
-  .app-shell .bottom-nav{display:none!important}
-  .app-shell .desktop-nav{
-    position:sticky!important;top:0!important;left:auto!important;right:auto!important;bottom:auto!important;
-    z-index:49!important;transform:none!important;display:flex!important;align-items:stretch!important;justify-content:center!important;
-    gap:clamp(22px,4vw,58px)!important;width:100%!important;height:66px!important;min-height:66px!important;
-    margin:0!important;padding:0 max(28px,calc((100vw - 1160px)/2))!important;
-    border:0!important;border-bottom:1px solid var(--line)!important;border-radius:0!important;
-    overflow:visible!important;background:var(--surface-strong)!important;box-shadow:0 5px 18px rgba(25,15,75,.035)!important;
-    -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+/* Mobile navigation visibility only.
+   Desktop navigation layout is owned by app/desktop.css. */
+@media (max-width: 767px) {
+  .app-shell .desktop-nav {
+    display: none !important;
   }
-  .app-shell .desktop-nav button{
-    position:relative!important;display:inline-flex!important;flex:0 0 auto!important;align-items:center!important;justify-content:center!important;
-    flex-direction:row!important;gap:9px!important;width:auto!important;min-width:0!important;height:66px!important;min-height:66px!important;
-    padding:0 3px!important;border:0!important;border-bottom:2px solid transparent!important;border-radius:0!important;
-    background:transparent!important;color:var(--muted)!important;font-size:13px!important;font-weight:600!important;white-space:nowrap!important;
-    box-shadow:none!important;overflow:visible!important;
-  }
-  .app-shell .desktop-nav button.selected{flex:0 0 auto!important;min-width:0!important;padding:0 3px!important;border-bottom-color:var(--green)!important;background:transparent!important;color:var(--green)!important;box-shadow:none!important}
-  .app-shell .desktop-nav button svg{width:18px!important;height:18px!important}
-  .app-shell .desktop-nav .nav-label{display:inline!important;max-width:none!important;overflow:visible!important;opacity:1!important;color:inherit!important;font-size:13px!important;font-weight:inherit!important}
-  .app-shell .desktop-nav .nav-icon-wrap{display:inline-flex!important;position:relative!important;align-items:center!important}
-  .app-shell .desktop-nav .nav-notification-dot{top:-4px!important;right:-5px!important}
-  .app-shell .desktop-nav.hide-desktop{display:none!important}
-  .app-shell{padding-bottom:24px!important}
-  body{padding-bottom:0!important}
-}
 
-@media (max-width:767px){
-  .app-shell .desktop-nav{display:none!important}
-  .app-shell .bottom-nav.hide-mobile{display:none!important}
+  .app-shell .bottom-nav.hide-mobile {
+    display: none !important;
+  }
 }
