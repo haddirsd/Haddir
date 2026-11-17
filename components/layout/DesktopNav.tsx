@@ -8,6 +8,8 @@ type Tab = "home" | "tickets" | "notifications" | "profile";
 type DesktopNavProps = {
   activeTab: Tab;
   unreadCount?: number;
+  ticketCount?: number;
+  darkMode: boolean;
   onNavigate: (tab: Tab) => void;
   className?: string;
 };
@@ -22,6 +24,8 @@ const items: { id: Tab; label: string; icon: LucideIcon }[] = [
 export function DesktopNav({
   activeTab,
   unreadCount = 0,
+  ticketCount = 0,
+  darkMode,
   onNavigate,
   className = "",
 }: DesktopNavProps) {
@@ -30,31 +34,33 @@ export function DesktopNav({
       className={["desktop-nav", className].filter(Boolean).join(" ")}
       aria-label="التنقل الرئيسي"
     >
-      {items.map(({ id, label, icon: Icon }) => (
-        <button
-          key={id}
-          type="button"
-          aria-current={activeTab === id ? "page" : undefined}
-          aria-label={label}
-          className={activeTab === id ? "selected" : ""}
-          onClick={() => onNavigate(id)}
-        >
-          {id === "notifications" ? (
-            <span className="nav-icon-wrap">
-              <Icon size={21} />
-              {unreadCount > 0 && (
-                <i
-                  className="nav-notification-dot"
-                  aria-label={`${unreadCount} إشعارات غير مقروءة`}
-                />
-              )}
-            </span>
-          ) : (
-            <Icon size={21} />
-          )}
-          <span className="nav-label">{label}</span>
+      <div className="desktop-nav-brand">
+        <button type="button" onClick={() => onNavigate("home")} aria-label="حاضر - الرئيسية">
+          <img src={darkMode ? "/dark.svg" : "/light.svg"} alt="حاضر" />
         </button>
-      ))}
+      </div>
+
+      <div className="desktop-nav-items">
+        {items.map(({ id, label, icon: Icon }) => {
+          const count = id === "tickets" ? ticketCount : id === "notifications" ? unreadCount : 0;
+          return (
+            <button
+              key={id}
+              type="button"
+              aria-current={activeTab === id ? "page" : undefined}
+              aria-label={label}
+              className={activeTab === id ? "selected" : ""}
+              onClick={() => onNavigate(id)}
+            >
+              <Icon size={18} aria-hidden="true" />
+              <span className="nav-label">{label}</span>
+              {count > 0 && <span className="nav-count">{count > 99 ? "99+" : count}</span>}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="desktop-nav-footer">من السودان، لكل لحظة تستاهل الحضور.</div>
     </nav>
   );
 }
