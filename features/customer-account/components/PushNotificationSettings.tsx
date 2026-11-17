@@ -126,7 +126,7 @@ export function PushNotificationSettings({userId}:{userId:string|null}){
   </div>
   {!supported?<span style={{fontSize:11,opacity:.7}}>غير مدعوم في هذا المتصفح</span>:<div style={{display:"flex",alignItems:"center",gap:9,flex:"0 0 auto"}}>
    <span aria-live="polite" style={{fontSize:11,fontWeight:800,whiteSpace:"nowrap"}}>{isBusy?<><LoaderCircle size={14} style={{display:"inline",verticalAlign:"middle",marginInlineEnd:5}}/>{checking?"جارٍ التحقق...":"جاري التنفيذ"}</>:enabled?"مفعّلة":"متوقفة"}</span>
-   <button type="button" role="switch" aria-label="الإشعارات الخارجية" aria-checked={enabled} disabled={isBusy||!userId} onClick={()=>void(enabled?disable():enable())} style={{width:52,height:30,flex:"0 0 52px",display:"flex",alignItems:"center",justifyContent:enabled?"flex-start":"flex-end",padding:3,border:0,borderRadius:999,background:enabled?"#5B2EFF":"rgba(120,120,120,.3)",cursor:isBusy||!userId?"not-allowed":"pointer",opacity:isBusy||!userId?.65:1,transition:"background .2s ease"}}>
+   <button type="button" role="switch" aria-label="الإشعارات الخارجية" aria-checked={enabled} disabled={isBusy||!userId} onClick={()=>void(enabled?disable():enable())} style={{width:52,height:30,flex:"0 0 52px",display:"flex",alignItems:"center",justifyContent:enabled?"flex-start":"flex-end",padding:3,border:0,borderRadius:999,background:enabled?"#5B2EFF":"rgba(120,120,120,.3)",cursor:isBusy||!userId?"not-allowed":"pointer",opacity:(isBusy||!userId)?0.65:1,transition:"background .2s ease"}}>
     <span aria-hidden="true" style={{display:"block",width:24,height:24,borderRadius:"50%",background:"#fff",boxShadow:"0 1px 3px rgba(0,0,0,.2)"}}/>
    </button>
   </div>}
