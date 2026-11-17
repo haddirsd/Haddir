@@ -11275,3 +11275,97 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
     flex: 0 1 auto;
   }
 }
+
+
+/* Mobile ticket card: keep the perforation decorative and the content in a two-column grid. */
+@media (max-width: 700px) {
+  .app-shell .tickets-screen .ticket-preview-card {
+    display: grid !important;
+    grid-template-columns: minmax(104px, 36%) minmax(0, 1fr) !important;
+    grid-template-rows: minmax(116px, auto) !important;
+    align-items: stretch !important;
+    min-height: 116px !important;
+  }
+
+  .app-shell .tickets-screen .ticket-preview-image {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 116px !important;
+  }
+
+  .app-shell .tickets-screen .ticket-preview-image img,
+  .app-shell .tickets-screen .ticket-preview-fallback {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 116px !important;
+    object-fit: cover !important;
+  }
+
+  .app-shell .tickets-screen .ticket-preview-image::after {
+    display: none !important;
+  }
+
+  .app-shell .tickets-screen .ticket-preview-perforation {
+    position: absolute !important;
+    z-index: 2 !important;
+    inset-block: 0 !important;
+    inset-inline-start: 36% !important;
+    width: 0 !important;
+    border-inline-start: 1px dashed color-mix(in srgb, var(--green) 42%, var(--line)) !important;
+    pointer-events: none !important;
+  }
+
+  .app-shell .tickets-screen .ticket-preview-perforation::before,
+  .app-shell .tickets-screen .ticket-preview-perforation::after {
+    content: "" !important;
+    position: absolute !important;
+    inset-inline-start: -6px !important;
+    width: 11px !important;
+    height: 11px !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 50% !important;
+    background: var(--bg) !important;
+  }
+
+  .app-shell .tickets-screen .ticket-preview-perforation::before {
+    inset-block-start: 14px !important;
+  }
+
+  .app-shell .tickets-screen .ticket-preview-perforation::after {
+    inset-block-end: 14px !important;
+  }
+
+  .app-shell .tickets-screen .ticket-preview-copy {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    display: flex !important;
+    min-width: 0 !important;
+    padding: 11px 12px !important;
+    gap: 6px !important;
+    justify-content: center !important;
+  }
+
+  .app-shell .tickets-screen .ticket-preview-copy > strong {
+    font-size: 13px !important;
+    line-height: 1.45 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .app-shell .tickets-screen .ticket-preview-copy > span {
+    min-width: 0 !important;
+    font-size: 10px !important;
+    line-height: 1.45 !important;
+    white-space: normal !important;
+  }
+
+  .app-shell .tickets-screen .ticket-preview-status {
+    z-index: 3 !important;
+    top: 7px !important;
+    left: 7px !important;
+    right: auto !important;
+    padding: 3px 7px !important;
+    font-size: 8px !important;
+  }
+}
