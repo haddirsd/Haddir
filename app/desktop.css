@@ -68,10 +68,10 @@
   .home-discovery .container {
     display: block;
   }
-  .home-discovery .more-events .event-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
+  .app-shell .home-discovery .more-events.redesigned-more .event-list {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 20px !important;
   }
   .trending-row {
     display: grid;
