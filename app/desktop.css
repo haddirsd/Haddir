@@ -950,6 +950,15 @@
     padding-bottom: 0 !important;
   }
 
+  /* Desktop navigation visibility and layout are controlled here only. */
+  .app-shell > .bottom-nav {
+    display: none !important;
+  }
+
+  .app-shell .desktop-nav.hide-desktop {
+    display: none !important;
+  }
+
   .app-shell > .topbar,
   .app-shell > .screen-topbar:not(.privacy-screen-topbar):not(.gatekeeper-page-topbar) {
     display: none !important;
