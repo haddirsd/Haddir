@@ -117,15 +117,18 @@ export function PushNotificationSettings({userId}:{userId:string|null}){
  },[userId,busy]);
 
  const isBusy=busy||checking;
- return <section aria-label="الإشعارات الخارجية" style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap",margin:"0 0 18px",padding:"14px 15px",borderRadius:16,border:"1px solid var(--border,rgba(91,46,255,.2))",background:"var(--surface,#fff)",color:"var(--fg,#1A1533)"}}>
+ return <section aria-label="الإشعارات الخارجية" style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap",margin:"14px 0 0",padding:"14px 15px",borderRadius:16,border:"1px solid var(--border,rgba(91,46,255,.2))",background:"var(--surface,#fff)",color:"var(--fg,#1A1533)"}}>
   <span aria-hidden="true" style={{width:42,height:42,flex:"0 0 42px",display:"grid",placeItems:"center",borderRadius:13,background:"rgba(91,46,255,.12)",color:"#5B2EFF"}}>{enabled?<BellRing size={21}/>:<BellOff size={21}/>}</span>
   <div style={{flex:"1 1 160px",minWidth:0}}>
    <strong style={{display:"block",fontSize:13}}>الإشعارات الخارجية</strong>
    <span style={{display:"block",marginTop:4,fontSize:11,lineHeight:1.7,opacity:.72}}>تصلك تحديثات حجوزاتك حتى لو حاضر مقفول.</span>
    {message&&<span role="status" aria-live="polite" style={{display:"block",marginTop:6,fontSize:11,lineHeight:1.7}}>{message}</span>}
   </div>
-  {!supported?<span style={{fontSize:11,opacity:.7}}>غير مدعوم في هذا المتصفح</span>:<button type="button" disabled={isBusy||!userId} onClick={()=>void(enabled?disable():enable())} style={{minHeight:40,border:0,borderRadius:11,padding:"0 14px",background:enabled?"rgba(91,46,255,.12)":"#5B2EFF",color:enabled?"var(--fg,#1A1533)":"#fff",font:"inherit",fontSize:11,fontWeight:800,cursor:isBusy?"wait":"pointer",opacity:isBusy?.65:1}}>
-   {isBusy?<><LoaderCircle size={14} style={{display:"inline",verticalAlign:"middle",marginInlineEnd:5}}/> {checking?"جارٍ التحقق...":"جاري التنفيذ"}</>:enabled?"إيقاف الإشعارات":"تفعيل الإشعارات"}
-  </button>}
+  {!supported?<span style={{fontSize:11,opacity:.7}}>غير مدعوم في هذا المتصفح</span>:<div style={{display:"flex",alignItems:"center",gap:9,flex:"0 0 auto"}}>
+   <span aria-live="polite" style={{fontSize:11,fontWeight:800,whiteSpace:"nowrap"}}>{isBusy?<><LoaderCircle size={14} style={{display:"inline",verticalAlign:"middle",marginInlineEnd:5}}/>{checking?"جارٍ التحقق...":"جاري التنفيذ"}</>:enabled?"مفعّلة":"متوقفة"}</span>
+   <button type="button" role="switch" aria-label="الإشعارات الخارجية" aria-checked={enabled} disabled={isBusy||!userId} onClick={()=>void(enabled?disable():enable())} style={{width:52,height:30,flex:"0 0 52px",display:"flex",alignItems:"center",justifyContent:enabled?"flex-start":"flex-end",padding:3,border:0,borderRadius:999,background:enabled?"#5B2EFF":"rgba(120,120,120,.3)",cursor:isBusy||!userId?"not-allowed":"pointer",opacity:isBusy||!userId?.65:1,transition:"background .2s ease"}}>
+    <span aria-hidden="true" style={{display:"block",width:24,height:24,borderRadius:"50%",background:"#fff",boxShadow:"0 1px 3px rgba(0,0,0,.2)"}}/>
+   </button>
+  </div>}
  </section>;
 }
