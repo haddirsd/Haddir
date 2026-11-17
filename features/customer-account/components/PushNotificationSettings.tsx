@@ -117,7 +117,7 @@ export function PushNotificationSettings({userId}:{userId:string|null}){
  },[userId,busy]);
 
  const isBusy=busy||checking;
- return <section aria-label="الإشعارات الخارجية" style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap",margin:"14px 0 0",padding:"14px 15px",borderRadius:16,border:"1px solid var(--border,rgba(91,46,255,.2))",background:"var(--surface,#fff)",color:"var(--fg,#1A1533)"}}>
+ return <section className="profile-push-setting" aria-label="الإشعارات الخارجية" style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap",margin:"14px 0 0",padding:"14px 15px",borderRadius:16,border:"1px solid var(--border,rgba(91,46,255,.2))",background:"var(--surface,#fff)",color:"var(--fg,#1A1533)"}}>
   <span aria-hidden="true" style={{width:42,height:42,flex:"0 0 42px",display:"grid",placeItems:"center",borderRadius:13,background:"rgba(91,46,255,.12)",color:"#5B2EFF"}}>{enabled?<BellRing size={21}/>:<BellOff size={21}/>}</span>
   <div style={{flex:"1 1 160px",minWidth:0}}>
    <strong style={{display:"block",fontSize:13}}>الإشعارات الخارجية</strong>
