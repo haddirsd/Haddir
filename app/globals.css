@@ -11517,3 +11517,47 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
     padding: 10px !important;
   }
 }
+
+
+/* Mobile profile theme switch visibility fix. */
+@media (max-width: 700px) {
+  .app-shell .profile-setting-switch {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    overflow: hidden !important;
+    border: 1px solid #aebfc4 !important;
+    background: #cbd8dc !important;
+    cursor: pointer !important;
+    transition: background-color .18s ease, border-color .18s ease !important;
+  }
+
+  .app-shell .profile-setting-switch.is-on {
+    border-color: #17606f !important;
+    background: #17606f !important;
+  }
+
+  .app-shell .profile-setting-switch > span {
+    position: absolute !important;
+    top: 2px !important;
+    inset-inline-start: 2px !important;
+    display: block !important;
+    border-radius: 50% !important;
+    background: #ffffff !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .22) !important;
+    transition: inset-inline-start .18s ease, inset-inline-end .18s ease !important;
+  }
+
+  .app-shell .profile-setting-switch.is-on > span {
+    inset-inline-start: auto !important;
+    inset-inline-end: 2px !important;
+  }
+
+  .app-shell .profile-setting-switch:focus-visible {
+    outline: 2px solid #328494 !important;
+    outline-offset: 3px !important;
+  }
+}
