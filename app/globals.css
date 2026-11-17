@@ -11218,3 +11218,60 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
   .admin-report-meta-grid > div,
   .admin-report-finance-grid > div { print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important; }
 }
+
+
+/* Event statistics report — complete cover image and balanced page composition */
+.admin-event-report .admin-report-page {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 610px;
+}
+.admin-event-report .admin-report-cover-image {
+  display: block;
+  width: 100%;
+  height: auto !important;
+  max-height: 250px;
+  object-fit: contain !important;
+  object-position: center;
+  border-radius: 14px;
+  background: #f7f5fc;
+}
+.admin-event-report .admin-report-footer {
+  margin-top: auto;
+  padding-top: 14px;
+}
+.admin-event-report .admin-report-section-head {
+  flex: 0 0 auto;
+}
+@media (max-width: 700px) {
+  .admin-event-report .admin-report-page {
+    min-height: 0;
+  }
+  .admin-event-report .admin-report-cover-image {
+    max-height: 180px;
+  }
+  .admin-event-report .admin-report-footer {
+    padding-top: 10px;
+  }
+}
+@media print {
+  .admin-event-report .admin-report-page {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 277mm !important;
+  }
+  .admin-event-report .admin-report-cover-image {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 68mm !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    background: #f7f5fc !important;
+  }
+  .admin-event-report .admin-report-footer {
+    margin-top: auto !important;
+  }
+  .admin-event-report .admin-report-table-wrap {
+    flex: 0 1 auto;
+  }
+}
