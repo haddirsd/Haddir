@@ -1006,17 +1006,47 @@
     height: 17px;
   }
 
+  .app-shell .desktop-search-field {
+    box-sizing: border-box;
+    outline: none;
+    box-shadow: none;
+  }
+
+  .app-shell .desktop-search-field:focus-within {
+    outline: 2px solid color-mix(in srgb, var(--haddir-accent, #5B2EFF) 38%, transparent);
+    outline-offset: 3px;
+  }
+
   .app-shell .desktop-search-field input {
     width: 100%;
     min-width: 0;
     height: 100%;
     padding: 0;
-    border: 0;
-    outline: 0;
+    border: 0 !important;
+    outline: 0 !important;
+    outline-offset: 0 !important;
+    box-shadow: none !important;
+    appearance: none;
+    -webkit-appearance: none;
     background: transparent;
     color: var(--fg);
     font: inherit;
     font-size: 12px;
+  }
+
+  .app-shell .desktop-search-field input:focus,
+  .app-shell .desktop-search-field input:focus-visible {
+    border: 0 !important;
+    outline: 0 !important;
+    outline-offset: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .app-shell .desktop-search-field input::-webkit-search-decoration,
+  .app-shell .desktop-search-field input::-webkit-search-cancel-button,
+  .app-shell .desktop-search-field input::-webkit-search-results-button,
+  .app-shell .desktop-search-field input::-webkit-search-results-decoration {
+    display: none;
   }
 
   .app-shell .desktop-search-field input::placeholder {
