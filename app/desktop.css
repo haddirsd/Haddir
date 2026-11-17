@@ -567,3 +567,205 @@
     grid-template-columns: minmax(0, 1fr) minmax(250px, .58fr);
   }
 }
+
+
+/* Desktop detail/checkout cascade correction:
+   globals.css has later-in-file !important layout declarations. These
+   desktop-only overrides intentionally match their importance and scope. */
+@media (min-width: 1024px) {
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.05fr) minmax(420px, .95fr) !important;
+    grid-template-rows: auto minmax(620px, auto) !important;
+    align-items: stretch !important;
+    gap: 22px !important;
+    width: min(1200px, calc(100% - 56px)) !important;
+    max-width: 1200px !important;
+    padding: 22px !important;
+    margin-inline: auto !important;
+    overflow: visible !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-cover {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 650px !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    border-radius: 22px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-cover .event-cover-image {
+    height: 100% !important;
+    min-height: 650px !important;
+    max-height: none !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-content {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 0 90px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-main {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 18px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-quick-info {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+    padding: 18px !important;
+    border: 1px solid #eadcc9 !important;
+    border-radius: 20px !important;
+    background: linear-gradient(145deg, #fffaf3, #f4e9dc) !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .quick-info-row {
+    border: 0 !important;
+    background: transparent !important;
+    color: #30243c !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-about,
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-ticket-section,
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-quantity {
+    padding: 22px !important;
+    border: 1px solid #eadcc9 !important;
+    border-radius: 20px !important;
+    background: linear-gradient(145deg, #fffaf3, #f4e9dc) !important;
+    color: #251b32 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer {
+    position: static !important;
+    inset: auto !important;
+    grid-column: 2 !important;
+    grid-row: 3 !important;
+    display: flex !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 18px 20px !important;
+    border: 1px solid rgba(220, 178, 116, .4) !important;
+    border-radius: 18px !important;
+    background: linear-gradient(110deg, #f7dfbd, #d6a65e) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .2) !important;
+    transform: none !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet {
+    display: block !important;
+    width: min(1200px, calc(100% - 56px)) !important;
+    max-width: 1200px !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin-inline: auto !important;
+    padding: 26px !important;
+    border: 1px solid rgba(206, 165, 104, .28) !important;
+    border-radius: 28px !important;
+    background: linear-gradient(145deg, #171225 0%, #21182d 55%, #15111f 100%) !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-topbar {
+    width: 100% !important;
+    margin: 0 0 20px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .payment-screen {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, .62fr) !important;
+    grid-template-rows: auto auto auto auto auto auto !important;
+    align-items: start !important;
+    gap: 16px 22px !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .section-kicker,
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > h1,
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > p:first-of-type {
+    grid-column: 1 / -1 !important;
+    color: #f6ecdf !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .checkout-event,
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .checkout-total {
+    grid-column: 2 !important;
+    background: linear-gradient(145deg, #fffaf3, #f2e6d8) !important;
+    color: #281d35 !important;
+    border: 1px solid #eadbc7 !important;
+    border-radius: 18px !important;
+    padding: 18px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .checkout-event {
+    grid-row: 4 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .checkout-total {
+    grid-row: 5 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .checkout-section {
+    grid-column: 1 !important;
+    background: linear-gradient(145deg, #fffaf3, #f2e6d8) !important;
+    color: #281d35 !important;
+    border: 1px solid #eadbc7 !important;
+    border-radius: 18px !important;
+    padding: 22px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .checkout-section:nth-of-type(4) {
+    grid-row: 4 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .checkout-section:nth-of-type(5) {
+    grid-row: 5 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .checkout-footnote {
+    grid-column: 1 !important;
+    color: #d2c3d6 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .checkout-submit-dock {
+    grid-column: 1 !important;
+    grid-row: 7 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-submit-dock .pay-button {
+    width: 100% !important;
+    min-height: 54px !important;
+    border: 1px solid #b98749 !important;
+    background: linear-gradient(110deg, #f0cc91, #bd8743) !important;
+    color: #241a2c !important;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1200px) {
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) {
+    grid-template-columns: minmax(0, .9fr) minmax(390px, 1.1fr) !important;
+  }
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form {
+    grid-template-columns: minmax(0, 1fr) minmax(250px, .58fr) !important;
+  }
+}
