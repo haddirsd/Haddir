@@ -1035,11 +1035,25 @@
   }
 
   .app-shell .desktop-search-field input:focus,
-  .app-shell .desktop-search-field input:focus-visible {
+  .app-shell .desktop-search-field input:focus-visible,
+  .app-shell.theme-dark .desktop-search-field input:focus,
+  .app-shell.theme-dark .desktop-search-field input:focus-visible {
     border: 0 !important;
     outline: 0 !important;
     outline-offset: 0 !important;
     box-shadow: none !important;
+  }
+
+  /* Keep the desktop search focus ring on its wrapper in both themes. */
+  .app-shell.theme-dark .desktop-search-field {
+    border: 1px solid var(--line) !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  .app-shell.theme-dark .desktop-search-field:focus-within {
+    outline: 2px solid color-mix(in srgb, var(--haddir-accent, #B9A8FF) 38%, transparent) !important;
+    outline-offset: 3px !important;
   }
 
   .app-shell .desktop-search-field input::-webkit-search-decoration,
