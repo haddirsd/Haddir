@@ -1,13 +1,39 @@
 import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import type { AdminEventEditorData, AdminEventFormValues, AdminEventRow, AdminTicketForm, AdminEventAccountForm } from "./admin-events.types";
 
+const ADMIN_EVENTS_PAGE_SIZE = 100;
+const COVER_IMAGE_EXTENSIONS: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+};
+
+const parseDateTime = (value: string): Date | null => {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
 export async function listAdminEvents(): Promise<{ data: AdminEventRow[]; error: string | null }> {
   const supabase = getSupabaseBrowserClient();
   if (!supabase) return { data: [], error: "تعذر الاتصال بقاعدة البيانات." };
-  const { data, error } = await supabase.from("events")
-    .select("id,title,category,city,venue,starts_at,ends_at,is_continuous,status,created_at,is_trending,description,address,location_url,cover_image_url,platform_fee_percent")
-    .order("created_at", { ascending: false }).limit(100);
-  return { data: (data || []) as AdminEventRow[], error: error?.message || null };
+
+  const rows: AdminEventRow[] = [];
+  for (let offset = 0; ; offset += ADMIN_EVENTS_PAGE_SIZE) {
+    const { data, error } = await supabase.from("events")
+      .select("id,title,category,city,venue,starts_at,ends_at,is_continuous,status,created_at,is_trending,description,address,location_url,cover_image_url,platform_fee_percent")
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: false })
+      .range(offset, offset + ADMIN_EVENTS_PAGE_SIZE - 1);
+
+    if (error) return { data: [], error: error.message };
+
+    const page = (data || []) as AdminEventRow[];
+    rows.push(...page);
+    if (page.length < ADMIN_EVENTS_PAGE_SIZE) break;
+  }
+
+  return { data: rows, error: null };
 }
 
 const toLocalInput = (value: string | null) => value
@@ -83,8 +109,14 @@ export async function markAdminEventCompleted(eventId: string): Promise<{ error:
 export async function publishDraftAdminEvent(eventId: string): Promise<{ error: string | null }> {
   const supabase = getSupabaseBrowserClient();
   if (!supabase) return { error: "تعذر الاتصال بقاعدة البيانات." };
-  const { error } = await supabase.from("events").update({ status: "published" }).eq("id", eventId).eq("status", "draft");
-  return { error: error?.message ? "تعذر نشر الفعالية: " + error.message : null };
+  const { data, error } = await supabase.from("events")
+    .update({ status: "published" })
+    .eq("id", eventId)
+    .eq("status", "draft")
+    .select("id");
+  if (error) return { error: "تعذر نشر الفعالية: " + error.message };
+  if (!data?.length) return { error: "لم يتم نشر الفعالية: المسودة غير موجودة أو لا تملك صلاحية نشرها." };
+  return { error: null };
 }
 
 
@@ -103,28 +135,41 @@ export async function saveAdminEvent(input: SaveAdminEventInput): Promise<{ mess
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { message: null, error: "انتهت الجلسة، سجل الدخول مرة أخرى." };
 
-  if (!eventForm.title.trim() || !eventForm.city.trim() || !eventForm.venue.trim() || (!eventForm.is_continuous && !eventForm.starts_at))
-    return { message: null, error: "أكمل اسم الفعالية والمدينة والمكان وموعد البداية، أو فعّل خيار التذكرة المستمرة." };
-  if (!eventForm.is_continuous && eventForm.ends_at && new Date(eventForm.ends_at) <= new Date(eventForm.starts_at))
+  const startsAt = eventForm.is_continuous ? null : parseDateTime(eventForm.starts_at);
+  const endsAt = eventForm.is_continuous || !eventForm.ends_at ? null : parseDateTime(eventForm.ends_at);
+
+  if (!eventForm.title.trim() || !eventForm.city.trim() || !eventForm.venue.trim() || (!eventForm.is_continuous && !startsAt))
+    return { message: null, error: "أكمل اسم الفعالية والمدينة والمكان وموعد بداية صالح، أو فعّل خيار التذكرة المستمرة." };
+  if (!eventForm.is_continuous && eventForm.ends_at && !endsAt)
+    return { message: null, error: "أدخل تاريخاً ووقتاً صالحين لنهاية الفعالية." };
+  if (startsAt && endsAt && endsAt.getTime() <= startsAt.getTime())
     return { message: null, error: "موعد نهاية الفعالية لازم يكون بعد موعد البداية." };
   if (eventAccountForms.some(account => !account.account_name.trim() || !account.account_number.trim() || !account.beneficiary.trim()))
     return { message: null, error: "أكمل اسم ورقم كل حساب أو أزله من القائمة." };
-  if (!ticketForms.length || ticketForms.some(ticket =>
+  const hasInvalidTicketDates = ticketForms.some(ticket => {
+    const salesStartAt = parseDateTime(ticket.sales_start_at);
+    const salesEndAt = parseDateTime(ticket.sales_end_at);
+    return (!!ticket.sales_start_at && !salesStartAt)
+      || (!!ticket.sales_end_at && !salesEndAt)
+      || (!!salesStartAt && !!salesEndAt && salesEndAt.getTime() <= salesStartAt.getTime());
+  });
+
+  if (!ticketForms.length || hasInvalidTicketDates || ticketForms.some(ticket =>
     !ticket.name.trim() || ticket.price === "" ||
     !Number.isFinite(Number(ticket.price)) || Number(ticket.price) < 0 ||
-    (ticket.quantity_total.trim() !== "" && (!Number.isInteger(Number(ticket.quantity_total)) || Number(ticket.quantity_total) < Math.max(1, ticket.quantity_sold))) ||
-    (ticket.sales_start_at && ticket.sales_end_at && new Date(ticket.sales_end_at) <= new Date(ticket.sales_start_at))
-  )) return { message: null, error: "راجع فئات التذاكر: اسم التذكرة والسعر مطلوبان، والكمية الاختيارية لا تقل عن الكمية المباعة، ونهاية البيع بعد بدايته." };
+    (ticket.quantity_total.trim() !== "" && (!Number.isInteger(Number(ticket.quantity_total)) || Number(ticket.quantity_total) < Math.max(1, ticket.quantity_sold)))
+  )) return { message: null, error: "راجع فئات التذاكر: اسم التذكرة والسعر مطلوبان، والكمية الاختيارية لا تقل عن الكمية المباعة، وتواريخ البيع صالحة ونهايته بعد بدايته." };
 
   let coverUrl = eventForm.cover_image_url.trim() || null;
   let uploadedCoverPath: string | null = null;
   if (coverFile) {
-    if (!coverFile.type.startsWith("image/")) return { message: null, error: "الملف المختار ليس صورة." };
+    const coverMimeType = coverFile.type.toLowerCase();
+    const extension = COVER_IMAGE_EXTENSIONS[coverMimeType];
+    if (!extension) return { message: null, error: "الصيغ المدعومة: JPG أو PNG أو WebP." };
     if (coverFile.size > 10 * 1024 * 1024) return { message: null, error: "حجم الصورة أكبر من 10 ميجابايت." };
-    const extension = (coverFile.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
     uploadedCoverPath = user.id + "/" + crypto.randomUUID() + "." + extension;
     const { error } = await supabase.storage.from("event-covers").upload(uploadedCoverPath, coverFile, {
-      contentType: coverFile.type, upsert: false, cacheControl: "31536000",
+      contentType: coverMimeType, upsert: false, cacheControl: "31536000",
     });
     if (error) return { message: null, error: "تعذر رفع صورة الغلاف: " + error.message };
     coverUrl = supabase.storage.from("event-covers").getPublicUrl(uploadedCoverPath).data.publicUrl;
@@ -135,8 +180,8 @@ export async function saveAdminEvent(input: SaveAdminEventInput): Promise<{ mess
     category: eventForm.category.trim() || null, city: eventForm.city.trim() || null,
     venue: eventForm.venue.trim() || null, address: eventForm.address.trim() || null,
     location_url: eventForm.location_url.trim() || null,
-    starts_at: eventForm.is_continuous ? null : new Date(eventForm.starts_at).toISOString(),
-    ends_at: eventForm.is_continuous || !eventForm.ends_at ? null : new Date(eventForm.ends_at).toISOString(),
+    starts_at: startsAt?.toISOString() ?? null,
+    ends_at: endsAt?.toISOString() ?? null,
     is_continuous: eventForm.is_continuous,
     cover_image_url: coverUrl, is_trending: eventForm.is_trending,
     platform_fee_percent: Math.min(100, Math.max(0, Number(eventForm.platform_fee_percent) || 0)),
@@ -144,7 +189,7 @@ export async function saveAdminEvent(input: SaveAdminEventInput): Promise<{ mess
 
   if (!editingEventId) {
     const slug = eventForm.title.trim().toLowerCase().normalize("NFKD")
-      .replace(/[\\u0300-\\u036f]/g, "").replace(/[^a-z0-9\\u0600-\\u06ff]+/g, "-")
+      .replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9\u0600-\u06ff]+/g, "-")
       .replace(/^-|-$/g, "") + "-" + Math.random().toString(36).slice(2, 7);
     eventPayload.slug = slug;
   }
@@ -154,8 +199,8 @@ export async function saveAdminEvent(input: SaveAdminEventInput): Promise<{ mess
     name: ticket.name.trim(), description: ticket.description.trim() || null,
     price: Number(ticket.price), currency: ticket.currency,
     quantity_total: ticket.quantity_total.trim() === "" ? null : Number(ticket.quantity_total),
-    sales_start_at: ticket.sales_start_at ? new Date(ticket.sales_start_at).toISOString() : null,
-    sales_end_at: ticket.sales_end_at ? new Date(ticket.sales_end_at).toISOString() : null,
+    sales_start_at: parseDateTime(ticket.sales_start_at)?.toISOString() ?? null,
+    sales_end_at: parseDateTime(ticket.sales_end_at)?.toISOString() ?? null,
     is_active: ticket.is_active,
   }));
   const accountPayload = eventAccountForms.map((account, index) => ({
