@@ -770,3 +770,88 @@
     grid-template-columns: minmax(0, 1fr) minmax(250px, .58fr) !important;
   }
 }
+
+
+/* Approved desktop event-details layout: image left, location/time right;
+   About right below, ticket tiers left. Mobile styles remain untouched. */
+@media (min-width: 1024px) {
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    grid-template-rows: auto minmax(460px, auto) auto auto auto !important;
+    align-items: start !important;
+    gap: 20px 24px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-sticky-controls {
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-cover {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    min-height: 460px !important;
+    height: 100% !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-cover .event-cover-image {
+    min-height: 460px !important;
+    height: 100% !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-content,
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-main {
+    display: contents !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-quick-info {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+    align-self: stretch !important;
+    gap: 16px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .quick-info-row {
+    display: flex !important;
+    align-items: center !important;
+    min-height: 0 !important;
+    padding: 24px !important;
+    border: 1px solid #eadcc9 !important;
+    border-radius: 20px !important;
+    background: linear-gradient(145deg, #fffaf3, #f4e9dc) !important;
+    color: #30243c !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .12) !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-about {
+    grid-column: 2 !important;
+    grid-row: 3 / span 3 !important;
+    align-self: stretch !important;
+    min-height: 300px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-ticket-section {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+    align-self: start !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-quantity {
+    grid-column: 1 !important;
+    grid-row: 4 !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer {
+    grid-column: 1 !important;
+    grid-row: 5 !important;
+    margin: 0 !important;
+  }
+}
