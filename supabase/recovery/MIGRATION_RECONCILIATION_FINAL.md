@@ -1,42 +1,55 @@
 # Haddir — final migration reconciliation
 
-**Status:** ledger/file reconciliation classified and evidence archived. Original Git history for the early migrations is not fully recoverable. **No production migration, DDL, data, or migration-ledger row was changed.**
+**Current inventory snapshot:** 2026-11-17  
+**Status:** Every production migration version currently recorded in the production ledger has a corresponding active file by version. One active file has a migration-name label mismatch and differs from its production SQL payload only by one trailing newline. One additional local-only seed migration remains intentionally unapplied.
 
 - Repository: `haddirsd/Haddir`
-- Reconciliation branch: `chore/close-migration-reconciliation`
+- Reconciliation branch: `chore/align-migrations`
 - Production Supabase project: `puhmvcekxkcxfdvgygpk`
-- Inventory: 2026-11-15
-- Production latest applied migration: `20261114101634_sync_haddir_push_subscription`
+- Latest production ledger version at this snapshot: `20261117104547`
 
-## 1. Current inventory
+## 1. Current production and repository inventory
+
+The production inventory was read using the Supabase migration-list read operation. The active-file inventory was read from `supabase/migrations/` on `chore/align-migrations`.
 
 | Measure | Verified count |
 |---|---:|
-| Production migration-ledger rows | 64 |
-| SQL files in `main/supabase/migrations/` | 51 |
-| Exact version + name matches | 21 |
-| Same migration name, different timestamp | 21 |
-| Historical repository files with no same-name production ledger row | 8 |
-| New forward migration not yet applied to production | 1 |
-| Production entries with no same-name active migration file | 22 |
+| Production migration-ledger rows | 77 |
+| Active SQL files in `supabase/migrations/` | 78 |
+| Production versions represented by an active file | 77 / 77 |
+| Exact version + migration-name matches | 76 |
+| Production versions without an active file | 0 |
+| Local-only versions not recorded in production | 1 |
 
-The 51st active file is `20261115120000_atomic_customer_account_deletion.sql`. It was introduced by the customer-account-deletion repair and is a new forward migration. It is not one of the missing historical files and is not recorded as applied in production. The 50-file historical comparison therefore remains 21 exact matches + 21 timestamp mismatches + 8 historical unmatched files.
+### One existing filename / SQL-payload discrepancy
 
-## 2. Timestamp mismatches — all 21 classified
+Production records version `20261115134406` as:
 
-The 21 same-name pairs are individually mapped in [MIGRATION_VERSION_MISMATCH_REVIEW.md](baseline/MIGRATION_VERSION_MISMATCH_REVIEW.md).
+`harden_payment_review_and_internal_function_execution_grants`
 
-- 13/21 SQL payloads are byte-for-byte identical to the corresponding production-ledger SQL.
-- 8/21 differ only in comments and/or insignificant whitespace; after normalization they compare equal.
-- No executable SQL difference was observed in this defined set.
+The active file is currently named:
 
-**Disposition:** preserve production ledger versions as the applied versions. Do not rename active files, edit historical timestamps, or replay these migrations merely to make timestamps match.
+`20261115134406_harden_payment_review_and_internal_function_grants.sql`
 
-## 3. Production entries missing by name — 22 classified
+The version is present, so this is not a missing production version. The SQL text was compared directly with `statements[1]` from the production ledger. The only content difference is that the repository file has one additional final line-feed character (production: 4,669 characters; repository file: 4,670 characters). The production SHA-256 is:
 
-### 15 exact SQL payloads recovered from the production ledger
+`6dac1f7fe3b9c990ea5da7bf6c3ed62acc3dd809f6271fbc3d891612d7abe1f2`
 
-The following entries were extracted from `supabase_migrations.schema_migrations.statements[1]`, archived under `recovery/production-ledger-sql/`, and re-read from production for exact comparison with the archive: **15/15 exact matches**.
+This discrepancy is disclosed rather than silently described as an exact byte-for-byte match. No SQL edit was made to this existing file during reconciliation.
+
+### One local-only migration
+
+`20261116120000_seed_sahel_payment_method.sql`
+
+This version is present in the repository but absent from the production ledger. Its insert uses `ON CONFLICT (id) DO NOTHING` and sets the seeded payment method to inactive. It remains in the repository and has not been applied to production.
+
+## 2. Production SQL recovered into the active migration directory
+
+Nineteen active migration files were restored from production-ledger SQL evidence:
+
+### 15 early migrations recovered from the archive
+
+These files were copied from `supabase/recovery/production-ledger-sql/` into `supabase/migrations/`. Their archived SQL was previously compared against the corresponding production `statements[1]` values: **15/15 exact matches**.
 
 ```text
 20261102190001_initial_haddir_ticketing_schema
@@ -56,44 +69,50 @@ The following entries were extracted from `supabase_migrations.schema_migrations
 20261103201140_add_event_payment_account_beneficiary
 ```
 
-This recovers the SQL text retained by the production ledger. It does **not** recreate the original Git blobs, original commits, or prove what the original workstation files contained beyond the ledger payload.
+### Four additional migrations recovered directly from production
 
-### 7 historical GitHub candidates
+The following files were created using the exact SQL text stored in the production ledger. Their production SHA-256 values were checked against the extracted payloads, and the resulting GitHub files were re-read and compared character-for-character.
 
-Seven files were recovered verbatim from identified GitHub commits and archived under `recovery/historical-sql/`. Their commit provenance is recorded in [historical-sql/README.md](historical-sql/README.md).
+| Version | Migration | Production SHA-256 |
+|---|---|---|
+| 20261105070931 | `event_role_assignments_and_scoped_roles` | `6b1e5e9f731282a8313b700d6d93897b7e24d9ccb2dccfeb827804cf18a3c078` |
+| 20261105073706 | `drop_legacy_admin_update_profile_role_overload` | `4dca32491de4efcdbaac016c2f0453d5442d95c7e9ca88d0bb4f5351d76c106b` |
+| 20261108124015 | `issue_one_ticket_per_attendee_on_payment_approval` | `b1a9b524a94fd95fc175adfca8cec3a692b0caa1ccafb4b384e46caffc2821db` |
+| 20261110123134 | `haddir_admin_user_role_filter` | `bed397b486b96367f7877d85b470e86f768b7cc6a749fe28662151d0d346cee6` |
 
-These are candidate correspondences by commit history, migration intent, and subsequent production-object review. They are **not all proven byte-for-byte copies** of the exact SQL applied in production. The role-assignment history is split across multiple production migrations and includes later hardening. The earlier per-attendee ticket migration is an intermediate revision; the later group-ticket semantics are the final recorded implementation.
+The two historical candidates below are not substitutes for the production versions `20261105070931` and `20261105073706`.
 
-## 4. Eight historical repository files without same-name ledger entries
+## 3. Superseded historical candidates retained outside the active directory
 
-The eight files were individually reviewed in [UNMATCHED_REPOSITORY_MIGRATIONS_REVIEW.md](baseline/UNMATCHED_REPOSITORY_MIGRATIONS_REVIEW.md):
+These four files remain under `supabase/superseded/` and were not deleted or rewritten:
 
-| Classification | Count | Handling |
-|---|---:|---|
-| Exact SQL match under another production version/name | 2 | Keep current filenames; mapping documented |
-| Normalized SQL match under another production version/name | 2 | Keep current filenames; mapping documented |
-| Composed/superseded by multiple recorded migrations | 1 | Do not claim the candidate ran as one migration |
-| Live effects present but exact migration provenance unresolved | 2 | Preserve as unresolved historical provenance |
-| Later private routine supersedes candidate; public wrapper provenance unresolved | 1 | Do not label candidate as applied verbatim |
+- `20261103170000_payment_methods_and_receipts.sql`
+- `20261105120000_event_role_assignments.sql`
+- `20261105150000_drop_legacy_admin_update_profile_role.sql`
+- `20261105170000_advertiser_statistics_rpc.sql`
 
-The two unresolved-effect cases are the legacy `payment_methods` DDL and `events.platform_fee_percent` column/check DDL: the live effects exist, but the inspected ledger does not establish which migration or manual action introduced them. The advertiser-statistics candidate is superseded by a later recorded private routine; the public wrapper's provenance remains unresolved.
+In particular, the two role-related candidates have different timestamps from the corresponding production ledger entries and are not treated as replacements for them.
 
-## 5. Non-recoverable historical gaps
+## 4. Historical provenance and supporting evidence
 
-The inspected GitHub migration-path history did not contain original Git migration files for the 15 early entries dated 2026-11-02 and early 2026-11-03. Their SQL was recovered from the production ledger, but the original Git commit IDs/blobs and original file bytes are unavailable from the inspected sources.
+The archive and review documents remain available:
 
-The seven candidate files have identifiable GitHub source commits, but candidate mapping is not proof of exact production-applied SQL. No source located so far establishes the complete original chronological migration sequence for every DDL/data change.
+- Exact production-ledger SQL archive: `supabase/recovery/production-ledger-sql/`
+- GitHub historical candidate archive: `supabase/recovery/historical-sql/`
+- Timestamp-pair review: `supabase/recovery/baseline/MIGRATION_VERSION_MISMATCH_REVIEW.md`
+- Unmatched repository migrations review: `supabase/recovery/baseline/UNMATCHED_REPOSITORY_MIGRATIONS_REVIEW.md`
+- Missing-migrations register: `supabase/recovery/baseline/MISSING_MIGRATIONS_REGISTER.md`
 
-These are the remaining provenance gaps. They must stay explicit; do not invent SQL, timestamps, commit history, or migration mappings.
+Ledger-recovered SQL establishes the SQL text retained by production. It does not recreate missing original Git blobs, original workstation files, or original commit history. Historical candidate mappings remain evidence classifications, not proof that each candidate file was applied verbatim.
 
-## 6. Files and safety boundaries
+## 5. Verification limits and safety boundaries
 
-- Exact ledger SQL archive: `recovery/production-ledger-sql/`
-- GitHub historical candidate archive: `recovery/historical-sql/`
-- Timestamp-pair review: `recovery/baseline/MIGRATION_VERSION_MISMATCH_REVIEW.md`
-- Eight-file review: `recovery/baseline/UNMATCHED_REPOSITORY_MIGRATIONS_REVIEW.md`
-- Missing-entry register: `recovery/baseline/MISSING_MIGRATIONS_REGISTER.md`
+- Production-ledger reads used `SELECT` only.
+- No production migration, DDL, data, or migration-ledger row was changed.
+- No SQL body was edited as part of this reconciliation.
+- No migration was executed.
+- `supabase db push` was not run.
+- The production migration-list inventory is not a substitute for running the local Supabase CLI `supabase migration list` against the checked-out repository. That local/remote comparison must be confirmed clean before any future `db push`.
+- Do not replay archived SQL or use `db push` as a method of repairing migration history.
 
-All recovered SQL is stored outside `supabase/migrations/`; Supabase tooling will not treat it as active migration history. None of the archived SQL was executed.
-
-**Final disposition:** the production ledger and repository files are now reconciled by evidence and classification. The historical Git provenance gaps described above are not recoverable from the inspected sources. Keep production untouched until a separately reviewed forward-only rollout is approved. Do not run `supabase db push` or replay the archives as a way to reconcile history.
+**Final disposition:** all 77 production migration versions have active files by version; one version/name and trailing-newline discrepancy is explicitly recorded above, and the only repository-only version is the inactive Sahel seed. Production remains untouched.
