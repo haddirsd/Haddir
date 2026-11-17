@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { HaddirDialog } from "../../../components/ui/HaddirDialog";
-import { CalendarDays, ExternalLink, MapPin, Share2, Wallet } from "lucide-react";
+import { CalendarDays, ExternalLink, MapPin, Share2 } from "lucide-react";
 import type { EventItem } from "../types";
 import type { EventPaymentAccount } from "../../booking/types";
 import { PaymentCheckout } from "../../booking/components/PaymentCheckout";
@@ -53,12 +53,10 @@ export function EventDetails({
   bookingError,
   bookingSubmitting,
   accountCopied,
-  onClose,
   onSelectTier,
   onQuantityChange,
   onContinueToPayment,
   onRetryTicketTypes,
-  onBackToDetails,
   onPaymentMethodChange,
   onCopyAccount,
   onReceiptChange,
