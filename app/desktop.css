@@ -24,57 +24,10 @@
   .app-shell {
     padding-bottom: 56px;
   }
-  .app-shell .bottom-nav {
-    display: none !important;
-  }
   .app-content {
     width: min(var(--desk-max), calc(100% - var(--desk-gutter) * 2));
     margin-inline: auto;
     min-height: calc(100vh - 66px);
-  }
-
-  /* ---------- 2. Top navigation (DesktopNav) ---------- */
-  .desktop-nav {
-    position: sticky;
-    top: 0;
-    z-index: 49;
-    background: color-mix(in srgb, var(--surface) 90%, transparent);
-    -webkit-backdrop-filter: blur(14px) saturate(140%);
-    backdrop-filter: blur(14px) saturate(140%);
-    border-bottom: 1px solid var(--line);
-    box-shadow: var(--haddir-glass-shadow);
-  }
-  .desktop-nav-inner {
-    width: min(var(--desk-max), calc(100% - var(--desk-gutter) * 2));
-    min-height: 66px;
-    margin-inline: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: clamp(22px, 4vw, 52px);
-  }
-  .desktop-nav button {
-    min-height: 66px;
-    padding: 0 4px;
-    border: 0;
-    border-bottom: 2px solid transparent;
-    background: transparent;
-    color: var(--muted);
-    font-size: 14px;
-    font-weight: 600;
-    transition: color 0.18s, border-color 0.18s;
-  }
-  .desktop-nav button:hover {
-    color: var(--green);
-  }
-  .desktop-nav button.selected {
-    color: var(--haddir-accent, var(--green));
-    border-bottom-color: var(--haddir-accent, var(--green));
-    font-weight: 800;
-  }
-  .desktop-nav .desktop-nav-badge {
-    background: #f04462;
-    color: #fff;
   }
 
   /* ---------- 3. Typography scale ---------- */
@@ -235,9 +188,6 @@
   }
 
   /* ---------- 11. Dark mode ---------- */
-  html[data-theme="dark"] .desktop-nav {
-    background: color-mix(in srgb, var(--surface) 92%, transparent);
-  }
   html[data-theme="dark"] .detail-booking-dock {
     box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
   }
