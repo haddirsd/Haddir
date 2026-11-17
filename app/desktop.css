@@ -1247,16 +1247,18 @@
   }
 
   .app-shell .home-discovery .trending-carousel .trending-card {
-    flex: 0 0 calc((100% - 32px) / 3) !important;
-    width: calc((100% - 32px) / 3) !important;
+    flex: 0 0 calc((100% - 48px) / 4) !important;
+    width: calc((100% - 48px) / 4) !important;
     max-width: none !important;
-    height: 228px !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
     min-width: 0 !important;
   }
 
   .app-shell .home-discovery .trending-card-media {
     width: 100% !important;
-    height: 228px !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
     border-radius: 15px !important;
   }
 
@@ -1806,8 +1808,8 @@
   }
 
   .app-shell .home-discovery .trending-carousel .trending-card {
-    flex-basis: calc((100% - 24px) / 3) !important;
-    width: calc((100% - 24px) / 3) !important;
+    flex-basis: calc((100% - 48px) / 4) !important;
+    width: calc((100% - 48px) / 4) !important;
   }
 
   .app-shell .home-discovery .event-list-thumb {
