@@ -1,11 +1,22 @@
 name: Customer account deletion safety check
 
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "supabase/migrations/20261115120000_atomic_customer_account_deletion.sql"
+      - "supabase/migrations/20261115141925_atomic_customer_account_deletion.sql"
+      - "supabase/functions/delete-customer-account/**"
+      - "supabase/recovery/test-harness/customer-account-deletion.sql"
+      - ".github/workflows/customer-account-deletion-check.yml"
   push:
     branches:
       - fix/customer-account-deletion-safety
+      - main
     paths:
       - "supabase/migrations/20261115120000_atomic_customer_account_deletion.sql"
+      - "supabase/migrations/20261115141925_atomic_customer_account_deletion.sql"
       - "supabase/functions/delete-customer-account/**"
       - "supabase/recovery/test-harness/customer-account-deletion.sql"
       - ".github/workflows/customer-account-deletion-check.yml"
