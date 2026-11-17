@@ -53,6 +53,7 @@ export function TicketWorkspace({
               <span className="ticket-preview-image">
                 {ticket.events?.cover_image_url ? <img src={ticket.events.cover_image_url} alt={ticket.events?.title || "صورة الفعالية"} loading="lazy" /> : <span className="ticket-preview-fallback"><Ticket size={25} /></span>}
               </span>
+              <span className="ticket-preview-perforation" aria-hidden="true" />
               <span className="ticket-preview-copy">
                 <strong>{ticket.events?.title || "فعالية"}</strong>
                 <span><CalendarDays size={13} />{ticket.events?.is_continuous ? "تذكرة مستمرة" : ticket.events?.starts_at ? formatEventDate(ticket.events.starts_at) : "التاريخ غير محدد"}</span>
