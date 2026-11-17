@@ -23,6 +23,7 @@ import { GatekeeperPage } from "../features/gatekeeper/GatekeeperPage";
 import { OrganizerTermsConsent } from "../features/legal/OrganizerTermsConsent";
 export default function Home(){
  const [deletingAccount,setDeletingAccount]=useState(false);
+ const [searchQuery,setSearchQuery]=useState("");
  const { darkMode, setDarkMode } = useAppTheme();
  const [accountDialog,setAccountDialog]=useState<AccountDialog>(null),[deleteEmailInput,setDeleteEmailInput]=useState(""),[uiNotice,setUiNotice]=useState("");
  const [bookingGate,setBookingGate]=useState<"login"|"phone"|null>(null);
@@ -58,6 +59,8 @@ export default function Home(){
  <AppHeader
   activeTab={activeTab}
   darkMode={darkMode}
+  searchValue={searchQuery}
+  onSearchChange={setSearchQuery}
   isEventDetailOpen={isEventDetailOpen}
   isGatekeeperPage={isGatekeeperPage}
   showPrivacySecurity={showPrivacySecurity}
@@ -68,13 +71,15 @@ export default function Home(){
  />
  {pendingLegalRole === "advertiser" && <OrganizerTermsConsent onAccept={acceptOrganizerTerms} />}
  {!isGatekeeperPage&&(!showPrivacySecurity||!isEventDetailOpen)&&<>
-  <DesktopNav activeTab={activeTab} unreadCount={notificationView.unreadCount} onNavigate={go} className={showPrivacySecurity?"hide-desktop":""}/>
+  <DesktopNav activeTab={activeTab} unreadCount={notificationView.unreadCount} ticketCount={myTickets.length} darkMode={darkMode} onNavigate={go} className={showPrivacySecurity?"hide-desktop":""}/>
   <BottomNav activeTab={activeTab} unreadCount={notificationView.unreadCount} onNavigate={go} className={isEventDetailOpen?"hide-mobile":""}/>
  </>}
  <div className="app-content">
  <WelcomeSplash />
  <EventsWorkspace
   showHome={!isGatekeeperPage&&activeTab==="home"}
+  searchQuery={searchQuery}
+  onSearchChange={setSearchQuery}
   resetKey={eventResetKey}
   authUser={authUser}
   onEventOpenChange={setIsEventDetailOpen}
