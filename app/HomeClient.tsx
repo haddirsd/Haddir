@@ -5,6 +5,7 @@ import { AppShell } from "../components/layout/AppShell";
 import { AppHeader } from "../components/layout/AppHeader";
 import { AppOverlays } from "../components/layout/AppOverlays";
 import { BottomNav } from "../components/layout/BottomNav";
+import { DesktopNav } from "../components/layout/DesktopNav";
 import { formatEventDate } from "../features/events/events.formatters";
 import { ProfileWorkspace } from "../features/customer-account/components/ProfileWorkspace";
 import { EventsWorkspace } from "../features/events/components/EventsWorkspace";
@@ -66,7 +67,10 @@ export default function Home(){
   onBackFromGatekeeper={backFromGatekeeper}
  />
  {pendingLegalRole === "advertiser" && <OrganizerTermsConsent onAccept={acceptOrganizerTerms} />}
- {!isGatekeeperPage&&(!showPrivacySecurity||!isEventDetailOpen)&&<BottomNav activeTab={activeTab} unreadCount={notificationView.unreadCount} onNavigate={go} className={`${showPrivacySecurity?"hide-desktop ":""}${isEventDetailOpen?"hide-mobile":""}`}/>}
+ {!isGatekeeperPage&&(!showPrivacySecurity||!isEventDetailOpen)&&<>
+  <DesktopNav activeTab={activeTab} unreadCount={notificationView.unreadCount} onNavigate={go} className={showPrivacySecurity?"hide-desktop":""}/>
+  <BottomNav activeTab={activeTab} unreadCount={notificationView.unreadCount} onNavigate={go} className={isEventDetailOpen?"hide-mobile":""}/>
+ </>}
  <div className="app-content">
  <WelcomeSplash />
  <EventsWorkspace
