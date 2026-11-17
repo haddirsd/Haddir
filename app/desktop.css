@@ -1056,6 +1056,12 @@
     outline-offset: 3px !important;
   }
 
+  /* Keep the search input transparent so only its outer wrapper has a surface. */
+  .app-shell.theme-dark .desktop-search-field input {
+    background: transparent !important;
+    border-color: transparent !important;
+  }
+
   .app-shell .desktop-search-field input::-webkit-search-decoration,
   .app-shell .desktop-search-field input::-webkit-search-cancel-button,
   .app-shell .desktop-search-field input::-webkit-search-results-button,
