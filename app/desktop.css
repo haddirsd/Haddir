@@ -2402,3 +2402,32 @@
     gap: 12px 14px !important;
   }
 }
+
+
+/* Desktop checkout summary: use the summary rail height deliberately instead
+   of leaving the event and total cards as small islands in tall grid rows. */
+@media (min-width: 1024px) {
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form {
+    align-items: stretch !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-event {
+    align-self: stretch !important;
+    min-height: 132px !important;
+    padding: 18px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-total {
+    align-self: stretch !important;
+    min-height: 104px !important;
+    padding: 18px !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-event > div {
+    align-content: center !important;
+  }
+
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-total strong {
+    white-space: nowrap !important;
+  }
+}
