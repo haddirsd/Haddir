@@ -3,11 +3,13 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
 import { CheckCircle2, UserRound, ChevronLeft, ShieldCheck, ClipboardList, ScanLine, Pencil, Trash2, Scale, LockKeyhole, Info, FileText } from "lucide-react";
 import AdvertiserWorkspace from "../../advertiser/components/AdvertiserWorkspace";
+import { PushNotificationSettings } from "./PushNotificationSettings";
 
 type AuthUser = { id: string; email?: string } | null;
 
 type ProfileWorkspaceProps = {
   authUser: AuthUser;
+  userId: string | null;
   userRole: string;
   fullName: string;
   setFullName: (value: string) => void;
@@ -34,7 +36,7 @@ type ProfileWorkspaceProps = {
 };
 
 export function ProfileWorkspace({
-  authUser, userRole, fullName, setFullName, email, phone, setPhone, avatarUrl,
+  authUser, userId, userRole, fullName, setFullName, email, phone, setPhone, avatarUrl,
   profileEditing, setProfileEditing, saved, setSaved, authMessage,
   setAuthMessage, profileSaving, deletingAccount, darkMode, setDarkMode,
   showPrivacySecurity, setShowPrivacySecurity, saveProfile,
@@ -70,7 +72,7 @@ export function ProfileWorkspace({
    <span className="profile-legal-icon privacy"><LockKeyhole size={21}/></span><span><strong>سياسة الخصوصية</strong><small>البيانات التي نتعامل معها وطرق حمايتها</small></span><span className="profile-legal-action">قراءة الوثيقة <ChevronLeft size={16}/></span>
   </button>
  </section>
- <div className="profile-settings-panel"><div><strong>إعدادات العرض</strong><p>غيّر مظهر التطبيق في كل الصفحات.</p></div><button className="btn btn-outline" type="button" onClick={()=>setDarkMode(v=>!v)}>{darkMode?"☀ الوضع النهاري":"☾ الوضع الليلي"}</button></div>
+ <div className="profile-settings-panel"><div style={{width:"100%"}}><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}><div><strong>الإعدادات</strong><p>تحكم في مظهر التطبيق والإشعارات الخارجية.</p></div><button className="btn btn-outline" type="button" onClick={()=>setDarkMode(v=>!v)}>{darkMode?"☀ الوضع النهاري":"☾ الوضع الليلي"}</button></div>{authUser&&<PushNotificationSettings userId={userId}/>}</div></div>
  {authUser&&<button className="btn profile-logout-button role-logout-button" type="button" onClick={signOut}>تسجيل الخروج</button>}
  </section>}
 
