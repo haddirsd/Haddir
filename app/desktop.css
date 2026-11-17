@@ -966,7 +966,7 @@
     width: calc(100% - var(--desk-sidebar-width)) !important;
     height: var(--desk-topbar-height) !important;
     min-height: var(--desk-topbar-height) !important;
-    margin: 0 0 0 var(--desk-sidebar-width) !important;
+    margin: 0 var(--desk-sidebar-width) 0 0 !important;
     padding: 0 var(--desk-page-gutter) !important;
     border: 0 !important;
     border-bottom: 1px solid var(--line) !important;
@@ -1189,7 +1189,7 @@
     width: calc(100% - var(--desk-sidebar-width)) !important;
     max-width: none !important;
     min-height: calc(100vh - var(--desk-topbar-height)) !important;
-    margin: 0 0 0 var(--desk-sidebar-width) !important;
+    margin: 0 var(--desk-sidebar-width) 0 0 !important;
     padding: 0 var(--desk-page-gutter) 28px !important;
     box-sizing: border-box !important;
   }
@@ -1684,8 +1684,13 @@
     border-radius: 10px !important;
   }
 
-  .app-shell .profile-push-setting > div {
-    flex-basis: 90px !important;
+  .app-shell .profile-push-setting > div:nth-child(2) {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  .app-shell .profile-push-setting > div:nth-child(3) {
+    flex: 0 0 auto !important;
   }
 
   .app-shell .profile-push-setting button[role="switch"] {
