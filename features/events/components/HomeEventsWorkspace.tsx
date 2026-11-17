@@ -1,20 +1,21 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { EventCard } from "./EventCard";
 import { EventFilters } from "./EventFilters";
 import type { EventItem } from "../types";
 
 type HomeEventsWorkspaceProps = {
   events: EventItem[];
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
   loading: boolean;
   error: string;
   onOpenEvent: (eventId: string) => void;
   onRetry: () => void;
 };
 
-export function HomeEventsWorkspace({ events, loading, error, onOpenEvent, onRetry }: HomeEventsWorkspaceProps) {
-  const [searchQuery, setSearchQuery] = useState("");
+export function HomeEventsWorkspace({ events, searchQuery, onSearchChange, loading, error, onOpenEvent, onRetry }: HomeEventsWorkspaceProps) {
   const normalizedQuery = searchQuery.trim().toLocaleLowerCase("ar");
   const filteredEvents = useMemo(() => {
     if (!normalizedQuery) return events;
@@ -88,14 +89,14 @@ export function HomeEventsWorkspace({ events, loading, error, onOpenEvent, onRet
   return (
     <section className="home-discovery redesigned-home" id="events">
       <div className="container">
-        <EventFilters value={searchQuery} onChange={setSearchQuery} />
+        <EventFilters value={searchQuery} onChange={onSearchChange} />
 
         {loading ? (
           <div className="empty-state" role="status"><span className="home-loading-mark" aria-hidden="true" /><strong>جاري تحميل الفعاليات...</strong></div>
         ) : error ? (
           <div className="empty-state" role="alert"><strong>ما قدرنا نحمّل الفعاليات</strong><p>{error}</p><button className="btn btn-outline" onClick={onRetry}>إعادة المحاولة</button></div>
         ) : normalizedQuery && filteredEvents.length === 0 ? (
-          <div className="empty-state"><strong>ما لقينا فعاليات مطابقة</strong><p>جرّب كلمة بحث مختلفة أو امسح البحث لعرض كل الفعاليات.</p><button className="btn btn-outline" onClick={() => setSearchQuery("")}>عرض كل الفعاليات</button></div>
+          <div className="empty-state"><strong>ما لقينا فعاليات مطابقة</strong><p>جرّب كلمة بحث مختلفة أو امسح البحث لعرض كل الفعاليات.</p><button className="btn btn-outline" onClick={() => onSearchChange("")}>عرض كل الفعاليات</button></div>
         ) : (
           <>
             {!normalizedQuery && <section className="trending-section">
