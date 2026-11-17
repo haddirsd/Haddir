@@ -56,6 +56,7 @@ export function ProfileWorkspace({
     {!authUser&&<div className="auth-card" style={{marginTop:18}}><h2>سجّل الدخول إلى حاضر</h2><p>تصفح الفعاليات متاح للجميع. سجّل الدخول لحفظ بياناتك ومتابعة حجوزاتك.</p><button className="btn btn-primary pay-button" type="button" onClick={signInWithGoogle}><span aria-hidden="true" className="google-mark">G</span> المتابعة باستخدام Google</button></div>}
     {saved&&<div className="profile-save-success" role="status" aria-live="polite"><span className="profile-save-success-icon"><CheckCircle2 size={17}/></span><span><strong>تم الحفظ بنجاح</strong><small>اتحدّثت بيانات ملفك الشخصي.</small></span></div>}{authMessage&&<p className={authMessage.startsWith("تم تسجيل الخروج")?"profile-save-success":"profile-save-error"} role={authMessage.startsWith("تم تسجيل الخروج")?"status":"alert"} aria-live="polite">{authMessage}</p>}
    </div>
+ <div className="profile-settings-panel"><div style={{width:"100%"}}><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}><div><strong>الإعدادات</strong><p>تحكم في مظهر التطبيق والإشعارات الخارجية.</p></div><button className="btn btn-outline" type="button" onClick={()=>setDarkMode(v=>!v)}>{darkMode?"☀ الوضع النهاري":"☾ الوضع الليلي"}</button></div>{authUser&&<PushNotificationSettings userId={userId}/>}</div></div>
 {authUser&&<section className="role-workspace-section" aria-label="واجهات العمل">
   {(userRole==="owner"||userRole==="admin")&&<button type="button" className="role-workspace-button" onClick={()=>window.location.assign("/admin")}><span className="role-workspace-icon"><ShieldCheck size={21}/></span><span><strong>لوحة الإدارة</strong><small>إدارة المنصة والموظفين والفعاليات والحجوزات</small></span><ChevronLeft size={18}/></button>}
   {userRole==="supervisor"&&<button type="button" className="role-workspace-button" onClick={()=>window.location.assign("/admin")}><span className="role-workspace-icon"><ClipboardList size={21}/></span><span><strong>لوحة الإشراف</strong><small>مراجعة الحجوزات وإثباتات الدفع واتخاذ قرار القبول أو الرفض</small></span><ChevronLeft size={18}/></button>}
@@ -65,14 +66,16 @@ export function ProfileWorkspace({
  </section>}
  <section className="profile-legal-group" aria-labelledby="profile-legal-title">
   <div className="profile-legal-heading"><div><strong id="profile-legal-title">الوثائق والسياسات</strong><p>اطّلع على حقوقك والتزاماتك وكيفية التعامل مع بياناتك.</p></div><span>حاضر</span></div>
-  <button type="button" className="role-workspace-button privacy-entry-button" onClick={()=>{setLegalPage("terms");setShowPrivacySecurity(true);window.scrollTo({top:0,behavior:"auto"});}}>
+  <div className="profile-legal-actions" style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gap:12}}>
+  <button type="button" className="role-workspace-button privacy-entry-button" style={{minWidth:0,width:"100%",padding:"14px 12px",gap:8}} onClick={()=>{setLegalPage("terms");setShowPrivacySecurity(true);window.scrollTo({top:0,behavior:"auto"});}}>
    <span className="profile-legal-icon terms"><Scale size={21}/></span><span><strong>الشروط والأحكام</strong><small>قواعد استخدام المنصة وحقوق المستخدم والمنظم</small></span><span className="profile-legal-action">قراءة الوثيقة <ChevronLeft size={16}/></span>
   </button>
-  <button type="button" className="role-workspace-button privacy-entry-button" onClick={()=>{setLegalPage("privacy");setShowPrivacySecurity(true);window.scrollTo({top:0,behavior:"auto"});}}>
+  <button type="button" className="role-workspace-button privacy-entry-button" style={{minWidth:0,width:"100%",padding:"14px 12px",gap:8}} onClick={()=>{setLegalPage("privacy");setShowPrivacySecurity(true);window.scrollTo({top:0,behavior:"auto"});}}>
    <span className="profile-legal-icon privacy"><LockKeyhole size={21}/></span><span><strong>سياسة الخصوصية</strong><small>البيانات التي نتعامل معها وطرق حمايتها</small></span><span className="profile-legal-action">قراءة الوثيقة <ChevronLeft size={16}/></span>
   </button>
+  </div>
  </section>
- <div className="profile-settings-panel"><div style={{width:"100%"}}><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}><div><strong>الإعدادات</strong><p>تحكم في مظهر التطبيق والإشعارات الخارجية.</p></div><button className="btn btn-outline" type="button" onClick={()=>setDarkMode(v=>!v)}>{darkMode?"☀ الوضع النهاري":"☾ الوضع الليلي"}</button></div>{authUser&&<PushNotificationSettings userId={userId}/>}</div></div>
+
  {authUser&&<button className="btn profile-logout-button role-logout-button" type="button" onClick={signOut}>تسجيل الخروج</button>}
  </section>}
 
