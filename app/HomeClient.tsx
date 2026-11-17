@@ -95,7 +95,6 @@ export default function Home(){
   formatEventDate={formatEventDate}
  />}
  {!isGatekeeperPage&&activeTab==="notifications"&&<NotificationsWorkspace
-  userId={authUser?.id ?? null}
   loading={accountDataLoading}
   error={accountDataError}
   notifications={myNotifications}
@@ -108,7 +107,7 @@ export default function Home(){
   onToggleRead={(notification)=>void notificationView.markOneRead(notification)}
  />}
  {!isGatekeeperPage&&activeTab==="profile"&&<ProfileWorkspace
-  authUser={authUser} userRole={userRole} fullName={fullName} setFullName={setFullName} email={email}
+  userId={authUser?.id ?? null} authUser={authUser} userRole={userRole} fullName={fullName} setFullName={setFullName} email={email}
   phone={phone} setPhone={setPhone} avatarUrl={avatarUrl}
   profileEditing={profileEditing} setProfileEditing={setProfileEditing}
   saved={saved} setSaved={setSaved} authMessage={authMessage} setAuthMessage={setAuthMessage}
