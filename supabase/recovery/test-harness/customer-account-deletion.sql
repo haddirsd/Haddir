@@ -33,7 +33,7 @@ create table public.email_outbox(recipient_user_id uuid);
 create table public.notifications(user_id uuid);
 create table public.push_subscriptions(user_id uuid);
 
-\i supabase/migrations/20261115120000_atomic_customer_account_deletion.sql
+\i supabase/migrations/20261115141925_atomic_customer_account_deletion.sql
 
 insert into public.profiles(id,role) values
  ('10000000-0000-4000-8000-000000000001','customer'),
