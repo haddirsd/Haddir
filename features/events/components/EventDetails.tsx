@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { HaddirDialog } from "../../../components/ui/HaddirDialog";
-import { CalendarDays, ExternalLink, MapPin, Share2 } from "lucide-react";
+import { ArrowLeft, CalendarDays, ExternalLink, MapPin, Share2, Wallet } from "lucide-react";
 import type { EventItem } from "../types";
 import type { EventPaymentAccount } from "../../booking/types";
 import { PaymentCheckout } from "../../booking/components/PaymentCheckout";
@@ -53,10 +53,12 @@ export function EventDetails({
   bookingError,
   bookingSubmitting,
   accountCopied,
+  onClose,
   onSelectTier,
   onQuantityChange,
   onContinueToPayment,
   onRetryTicketTypes,
+  onBackToDetails,
   onPaymentMethodChange,
   onCopyAccount,
   onReceiptChange,
@@ -75,38 +77,41 @@ export function EventDetails({
     <section className="event-detail-page" aria-label={"تفاصيل " + event.title}>
       {!showPayment ? (
         <div className="detail-sheet event-detail-layout" aria-label={"تفاصيل " + event.title}>
-          <div className={"detail-cover event-cover " + event.cover}>
-            <div className="detail-sticky-controls" aria-label="أدوات تفاصيل الفعالية">
-              <div className="detail-sticky-actions">
-                <span className="detail-sticky-category">{event.category || "فعالية"}</span>
-                <button
-                  className="detail-sticky-share"
-                  aria-label="مشاركة الفعالية"
-                  onClick={async () => {
-                    const eventUrl = new URL(window.location.pathname, window.location.origin);
-                    eventUrl.searchParams.set("event", String(event.id));
-                    try {
-                      if (navigator.share) {
-                        await navigator.share({
-                          title: event.title,
-                          text: "شوف الفعالية دي على حاضر",
-                          url: eventUrl.toString(),
-                        });
-                      } else {
-                        await navigator.clipboard.writeText(eventUrl.toString());
-                        setShareNotice("تم نسخ رابط الفعالية.");
-                      }
-                    } catch (error) {
-                      if (error instanceof Error && error.name !== "AbortError") {
-                        setShareNotice("تعذر مشاركة الفعالية حالياً.");
-                      }
+          <div className="detail-sticky-controls" aria-label="أدوات تفاصيل الفعالية">
+            <button className="detail-sticky-back" aria-label="الرجوع من تفاصيل الفعالية" onClick={onClose}>
+              <ArrowLeft size={20} />
+            </button>
+            <div className="detail-sticky-actions">
+              <span className="detail-sticky-category">{event.category || "فعالية"}</span>
+              <button
+                className="detail-sticky-share"
+                aria-label="مشاركة الفعالية"
+                onClick={async () => {
+                  const eventUrl = new URL(window.location.pathname, window.location.origin);
+                  eventUrl.searchParams.set("event", String(event.id));
+                  try {
+                    if (navigator.share) {
+                      await navigator.share({
+                        title: event.title,
+                        text: "شوف الفعالية دي على حاضر",
+                        url: eventUrl.toString(),
+                      });
+                    } else {
+                      await navigator.clipboard.writeText(eventUrl.toString());
+                      setShareNotice("تم نسخ رابط الفعالية.");
                     }
-                  }}
-                >
-                  <Share2 size={18} />
-                </button>
-              </div>
+                  } catch (error) {
+                    if (error instanceof Error && error.name !== "AbortError") {
+                      setShareNotice("تعذر مشاركة الفعالية حالياً.");
+                    }
+                  }
+                }}
+              >
+                <Share2 size={18} />
+              </button>
             </div>
+          </div>
+          <div className={"detail-cover event-cover " + event.cover}>
             {event.coverImageUrl && (
               <img className="event-cover-image" src={event.coverImageUrl} alt={event.title} decoding="async" />
             )}
@@ -174,11 +179,22 @@ export function EventDetails({
         </div>
       ) : (
         <div className="detail-sheet event-detail-layout payment-sheet">
+          <div className="checkout-topbar">
+            <div className="checkout-back-group">
+              <button type="button" className="detail-glass-button checkout-back-icon" aria-label="العودة للتفاصيل" onClick={onBackToDetails}>
+                <ArrowLeft size={20} />
+              </button>
+              <span>العودة للتفاصيل</span>
+            </div>
+            <span className="checkout-wallet-icon" aria-label="المحفظة"><Wallet size={23} /></span>
+          </div>
+
           <div className="payment-screen">
             {!tier ? (
               <div className="empty-state" role="alert">
                 <strong>فئة التذكرة المحددة غير متاحة.</strong>
                 <p>ارجع لتفاصيل الفعالية واختر فئة متاحة قبل إكمال الدفع.</p>
+                <button type="button" className="btn btn-outline" onClick={onBackToDetails}>العودة للتفاصيل</button>
               </div>
             ) : !bookingDone ? (
               <PaymentCheckout
