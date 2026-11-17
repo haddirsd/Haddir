@@ -734,11 +734,12 @@
     padding: 22px !important;
   }
 
-  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .checkout-section:nth-of-type(4) {
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .checkout-section:has(.account-details) {
     grid-row: 4 !important;
   }
 
-  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .checkout-section:nth-of-type(5) {
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .checkout-section:has(.receipt-upload),
+  .app-content .event-detail-page .event-detail-layout.payment-sheet .checkout-form > .checkout-section.receipt-locked {
     grid-row: 5 !important;
   }
 
