@@ -12024,3 +12024,170 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
     padding: 12px;
   }
 }
+
+
+/* Mobile admin users: readable profile rows and touch-sized role controls. */
+@media (max-width: 700px) {
+  .admin-shell .admin-users-table-wrap {
+    width: 100%;
+    min-width: 0;
+    overflow: visible;
+  }
+
+  .admin-shell .admin-users-table tbody {
+    gap: 12px;
+  }
+
+  .admin-shell .admin-users-table tbody tr {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 12px 14px;
+    min-width: 0;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface, #fff);
+    box-shadow: none;
+  }
+
+  .admin-shell .admin-users-table td {
+    min-width: 0;
+    gap: 5px;
+    color: var(--fg);
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-shell .admin-users-table td::before {
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.5;
+  }
+
+  .admin-shell .admin-users-table td:first-child,
+  .admin-shell .admin-users-table td:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .admin-shell .admin-users-table td:last-child {
+    gap: 10px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+
+  .admin-shell .admin-user-email {
+    max-width: 100%;
+    font-size: 10px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-shell .admin-user-role {
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.5;
+  }
+
+  .admin-shell .admin-user-role-editor {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .admin-shell .admin-user-role-editor .haddir-select,
+  .admin-shell .admin-user-role-editor .haddir-select-trigger,
+  .admin-shell .admin-user-role-editor .admin-user-save-role {
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+  }
+
+  .admin-shell .admin-user-role-editor .haddir-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface, #fff);
+    color: var(--fg);
+    font-size: 11px;
+    line-height: 1.45;
+    text-align: right;
+  }
+
+  .admin-shell .admin-user-role-editor .haddir-select-trigger > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-shell .admin-user-role-editor .admin-user-save-role {
+    padding: 9px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .admin-shell .admin-user-event-assignments {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 7px;
+    width: 100%;
+    min-width: 0;
+    margin-top: 2px;
+  }
+
+  .admin-shell .admin-user-event-assignment {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    min-width: 0;
+    padding: 6px 9px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: var(--surface, #fff);
+    color: var(--fg);
+    font-size: 10px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-shell .admin-user-event-assignment button {
+    display: inline-grid;
+    flex: 0 0 26px;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    min-height: 26px;
+    padding: 0;
+    border-radius: 7px;
+  }
+
+  .admin-shell .admin-user-saving {
+    font-size: 10px;
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 380px) {
+  .admin-shell .admin-users-table tbody tr {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .admin-shell .admin-users-table td:first-child,
+  .admin-shell .admin-users-table td:last-child {
+    grid-column: 1;
+  }
+
+  .admin-shell .admin-users-table td:last-child {
+    padding-top: 10px;
+  }
+}
