@@ -6,10 +6,19 @@ import { Activity, CalendarDays, RefreshCw, Search, SlidersHorizontal, UserRound
 import { useAdminActivity } from "./useAdminActivity";
 import type { AdminActivityRow } from "./admin-activity.types";
 
-const actionNames:Record<string,string>={"events.created":"أضاف فعالية","events.updated":"عدّل بيانات فعالية","events.deleted":"حذف فعالية","event.cancelled":"ألغى فعالية / أخفاها","event.published":"نشر فعالية","profiles.created":"أضاف عميلاً / مستخدماً","user.role_changed":"غيّر دور مستخدم","bookings.created":"أنشأ حجزاً","booking.confirmed":"وافق على الحجز","booking.rejected":"رفض الحجز","payment.approved":"اعتمد إثبات الدفع","payment.rejected":"رفض إثبات الدفع","ticket.checked_in":"أكد دخول التذكرة","tickets.deleted":"حذف تذكرة","ticket.checkin_reversed":"ألغى تأكيد دخول التذكرة","ticket.status_changed":"عدّل حالة التذكرة","ticket_types.created":"أضاف فئة تذاكر","ticket_types.updated":"عدّل فئة تذاكر","ticket_types.deleted":"حذف فئة تذاكر","event_payment_accounts.created":"أضاف حساب دفع","event_payment_accounts.updated":"عدّل حساب دفع","event_payment_accounts.deleted":"حذف حساب دفع"};
+const actionNames:Record<string,string>={"events.created":"أنشأ فعالية","events.updated":"عدّل بيانات فعالية","events.deleted":"حذف فعالية","event.cancelled":"ألغى فعالية / أخفاها","event.published":"نشر فعالية","profiles.created":"أنشأ حساب مستخدم","profiles.updated":"عدّل بيانات مستخدم","profiles.deleted":"حذف حساب مستخدم","user.role_changed":"غيّر دور مستخدم","bookings.created":"أنشأ حجزاً","bookings.updated":"عدّل بيانات الحجز","bookings.deleted":"حذف حجز","booking.confirmed":"وافق على الحجز","booking.rejected":"رفض الحجز","booking.pending":"أعاد الحجز إلى الانتظار","payment.approved":"اعتمد إثبات الدفع","payment.rejected":"رفض إثبات الدفع","payment.pending":"أعاد إثبات الدفع للمراجعة","payment_submissions.created":"سجّل إثبات دفع","payment_submissions.updated":"عدّل بيانات إثبات الدفع","payment_submissions.deleted":"حذف إثبات دفع","tickets.created":"أصدر تذكرة","tickets.updated":"عدّل بيانات تذكرة","tickets.deleted":"حذف تذكرة","ticket.checked_in":"أكد دخول التذكرة","ticket.checkin_reversed":"ألغى تأكيد دخول التذكرة","ticket.status_changed":"عدّل حالة التذكرة","ticket_types.created":"أضاف فئة تذاكر","ticket_types.updated":"عدّل فئة تذاكر","ticket_types.deleted":"حذف فئة تذاكر","event_payment_accounts.created":"أضاف حساب دفع","event_payment_accounts.updated":"عدّل حساب دفع","event_payment_accounts.deleted":"حذف حساب دفع"};
 const roleNames:Record<string,string>={owner:"مالك المنصة",admin:"مشرف",supervisor:"موظف حاضر",gatekeeper:"بواب",organizer:"بواب",advertiser:"معلن",customer:"عميل",unknown:"غير معروف"};
 const fieldNames:Record<string,string>={title:"اسم الفعالية",status:"الحالة",description:"الوصف",venue:"المكان",city:"المدينة",starts_at:"موعد البداية",ends_at:"موعد النهاية",platform_fee_percent:"نسبة العمولة",role:"الدور",full_name:"الاسم",is_trending:"رائج الآن",price:"السعر",quantity_total:"الكمية",name:"الاسم",is_active:"التفعيل",account_name:"طريقة الدفع",account_number:"رقم الحساب",beneficiary:"المستفيد"};
 const actionGroup=(action:string)=>action.split(".")[0]||"other";
+const actionLabel=(action:string)=>{
+  const known=actionNames[action];
+  if(known)return known;
+  const [entity,operation]=action.split(".");
+  const entityLabels:Record<string,string>={events:"الفعالية",event:"الفعالية",profiles:"حساب المستخدم",user:"المستخدم",bookings:"الحجز",booking:"الحجز",payment:"إثبات الدفع",payment_submissions:"إثبات الدفع",tickets:"التذكرة",ticket:"التذكرة",ticket_types:"فئة التذاكر",event_payment_accounts:"حساب الدفع"};
+  const subject=entityLabels[entity]||"عنصر";
+  const operations:Record<string,string>={created:`أنشأ ${subject}`,updated:`عدّل ${subject}`,deleted:`حذف ${subject}`,approved:`اعتمد ${subject}`,rejected:`رفض ${subject}`,cancelled:`ألغى ${subject}`,published:`نشر ${subject}`,pending:`أعاد ${subject} إلى الانتظار`,used:`أكد استخدام ${subject}`,status_changed:`غيّر حالة ${subject}`};
+  return operations[operation]||"سجّل إجراءً إدارياً";
+};
 const groupNames:Record<string,string>={events:"الفعاليات",event:"الفعاليات",profiles:"المستخدمون",user:"المستخدمون",bookings:"الحجوزات",booking:"الحجوزات",payment:"المدفوعات",ticket:"التذاكر",tickets:"التذاكر",ticket_types:"فئات التذاكر",event_payment_accounts:"حسابات الدفع"};
 const pretty=(value:unknown)=>{if(value===null||value===undefined||value==="")return "—";if(typeof value==="boolean")return value?"مفعّل":"غير مفعّل";if(typeof value==="object")return JSON.stringify(value);return String(value);};
 const detailText=(details:Record<string,unknown>|null)=>Object.entries(details||{}).map(([key,value])=>{
@@ -68,7 +77,7 @@ export default function AdminActivityWorkspace() {
         <div className="admin-activity-item-rail"><span><Activity size={16}/></span></div>
         <div className="admin-activity-item-body">
           <div className="admin-activity-item-top"><div className="admin-activity-actor"><strong>{row.actor_name||"مستخدم غير معروف"}</strong><span>{roleNames[row.actor_role||"unknown"]||row.actor_role||"دور غير محدد"}</span></div><time dateTime={row.created_at}>{dateLabel(row.created_at)}</time></div>
-          <div className="admin-activity-action"><b>{actionNames[row.action]||row.action}</b><span>{groupNames[group]||row.entity_type||"إجراء إداري"}</span></div>
+          <div className="admin-activity-action"><b>{actionLabel(row.action)}</b><span>{groupNames[group]||row.entity_type||"إجراء إداري"}</span></div>
           <div className="admin-activity-entity"><small>العنصر المرتبط</small><strong>{row.entity_label||row.events?.title||row.entity_type||"—"}</strong>{row.events?.title&&row.entity_label&&<span>{row.events.title}</span>}</div>
           {details.length>0&&<div className="admin-activity-changes"><small>تفاصيل التغيير</small><div>{details.map((item,i)=><span key={i}><b>{item.label}</b><em>{item.value}</em></span>)}</div></div>}
         </div>
