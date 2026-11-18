@@ -11896,3 +11896,131 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
     padding-inline: 10px;
   }
 }
+
+
+/* Mobile admin event, booking, and payment cards. */
+@media (max-width: 679px) {
+  .admin-shell .admin-event-cards,
+  .admin-shell .admin-booking-cards,
+  .admin-shell .admin-payment-cards {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding-top: 10px;
+  }
+
+  .admin-shell .admin-event-card,
+  .admin-shell .admin-booking-card,
+  .admin-shell .admin-payment-card {
+    min-width: 0;
+    padding: 14px;
+    border-radius: 14px;
+    gap: 13px;
+    box-shadow: none;
+  }
+
+  .admin-shell .admin-event-card-title,
+  .admin-shell .admin-booking-card-head,
+  .admin-shell .admin-payment-card-head {
+    gap: 9px;
+  }
+
+  .admin-shell .admin-event-card-title h4,
+  .admin-shell .admin-booking-card-head h4,
+  .admin-shell .admin-payment-card-head h4 {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .admin-shell .admin-event-status {
+    padding: 4px 8px;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
+  .admin-shell .admin-event-card-meta,
+  .admin-shell .admin-booking-card-grid,
+  .admin-shell .admin-payment-card-grid {
+    gap: 10px 12px;
+    min-width: 0;
+  }
+
+  .admin-shell .admin-event-card-meta span,
+  .admin-shell .admin-booking-card-grid > div,
+  .admin-shell .admin-payment-card-grid > div {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-shell .admin-event-card-meta,
+  .admin-shell .admin-booking-card-grid strong,
+  .admin-shell .admin-payment-card-grid strong {
+    font-size: 11px;
+    line-height: 1.65;
+  }
+
+  .admin-shell .admin-event-card-meta b,
+  .admin-shell .admin-booking-card-grid strong,
+  .admin-shell .admin-payment-card-grid strong {
+    font-size: 12px;
+  }
+
+  .admin-shell .admin-event-card-actions {
+    gap: 7px;
+    padding-top: 11px;
+  }
+
+  .admin-shell .admin-event-card-actions button {
+    flex: 1 1 110px;
+    min-width: 0;
+    min-height: 38px;
+    padding: 7px 10px;
+  }
+
+  .admin-shell .admin-booking-card-event,
+  .admin-shell .admin-payment-card-event {
+    min-width: 0;
+    margin: 10px 0;
+    padding: 9px 10px;
+    border-radius: 10px;
+  }
+
+  .admin-shell .admin-booking-card-event strong,
+  .admin-shell .admin-payment-card-event strong {
+    min-width: 0;
+    font-size: 12px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-shell .admin-payment-actions {
+    gap: 9px;
+    padding-top: 11px;
+  }
+
+  .admin-shell .admin-payment-approve,
+  .admin-shell .admin-payment-reject {
+    min-height: 40px;
+    padding: 8px 12px;
+  }
+
+  .admin-shell .admin-payment-reject-box textarea {
+    min-height: 76px;
+  }
+}
+
+@media (min-width: 680px) and (max-width: 767px) {
+  .admin-shell .admin-event-cards,
+  .admin-shell .admin-booking-cards,
+  .admin-shell .admin-payment-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .admin-shell .admin-event-card,
+  .admin-shell .admin-booking-card,
+  .admin-shell .admin-payment-card {
+    padding: 12px;
+  }
+}
