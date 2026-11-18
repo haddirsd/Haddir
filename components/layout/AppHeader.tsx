@@ -96,6 +96,7 @@ export function AppHeader({
     <PageHeader
       title={titles[activeTab]}
       icon={activeTab === "tickets" ? <Ticket /> : activeTab === "notifications" ? <Bell /> : <UserRound />}
+      className={activeTab === "notifications" ? "notifications-page-topbar" : ""}
     />
   );
 
