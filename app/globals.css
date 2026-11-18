@@ -11800,3 +11800,99 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
     outline-offset: -2px !important;
   }
 }
+
+
+/* Mobile admin controls: one restrained type, spacing, and button scale. */
+@media (max-width: 767px) {
+  .admin-shell {
+    font-size: 13px;
+  }
+
+  .admin-shell .admin-content {
+    padding: 16px 14px 24px;
+  }
+
+  .admin-shell .admin-panel {
+    padding: 16px;
+  }
+
+  .admin-shell .admin-panel-head h3 {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .admin-shell .admin-panel-head p,
+  .admin-shell .admin-form-hint,
+  .admin-shell .admin-form-message,
+  .admin-shell .admin-event-form label {
+    font-size: 11px;
+    line-height: 1.65;
+  }
+
+  .admin-shell :is(button, input, textarea, select) {
+    font-family: inherit;
+  }
+
+  .admin-shell button:not(.admin-mobile-tabs button) {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .admin-shell .admin-panel-actions button,
+  .admin-shell .admin-create-button,
+  .admin-shell .admin-event-card-actions button,
+  .admin-shell .admin-payment-approve,
+  .admin-shell .admin-payment-reject,
+  .admin-shell .admin-user-save-role {
+    min-height: 38px;
+    padding: 8px 12px;
+    border-radius: 10px;
+  }
+
+  .admin-shell :is(input, textarea, select) {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .admin-shell :is(input, select) {
+    min-height: 40px;
+  }
+
+  .admin-shell textarea {
+    min-height: 84px;
+  }
+
+  .admin-shell .admin-panel-actions {
+    gap: 8px;
+  }
+
+  .admin-shell .admin-event-form {
+    gap: 12px;
+    padding: 15px;
+  }
+
+  .admin-shell .admin-event-form input,
+  .admin-shell .admin-event-form textarea {
+    padding: 9px 11px;
+  }
+
+  .admin-shell .admin-mobile-tabs > button {
+    min-height: 56px;
+    font-size: 10px;
+    line-height: 1.3;
+  }
+}
+
+@media (max-width: 390px) {
+  .admin-shell .admin-content {
+    padding-inline: 12px;
+  }
+
+  .admin-shell .admin-panel {
+    padding: 14px;
+  }
+
+  .admin-shell .admin-panel-actions button {
+    padding-inline: 10px;
+  }
+}
