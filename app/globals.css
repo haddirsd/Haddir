@@ -11702,3 +11702,45 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
   }
 }
 
+
+/* Mobile admin page heading: avoid repeating the active section title. */
+@media (max-width: 767px) {
+  .admin-shell .admin-welcome:not(.admin-welcome-section-overview) {
+    display: none !important;
+  }
+
+  .admin-shell .admin-topbar {
+    min-height: 62px;
+    height: auto;
+    gap: 10px;
+    padding: 9px 14px;
+  }
+
+  .admin-shell .admin-topbar > div:first-child {
+    min-width: 0;
+  }
+
+  .admin-shell .admin-topbar > div:first-child > span {
+    display: block;
+    font-size: 10px;
+    line-height: 1.35;
+  }
+
+  .admin-shell .admin-topbar h1 {
+    margin: 3px 0 0;
+    font-size: 16px !important;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-shell .admin-top-user {
+    flex: 0 0 auto;
+    gap: 0;
+  }
+
+  .admin-shell .admin-avatar {
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+  }
+}
