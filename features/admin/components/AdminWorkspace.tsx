@@ -47,7 +47,7 @@ export default function AdminPage() {
     <section className="admin-main">
       <header className="admin-topbar"><div><span>حاضر / لوحة الإدارة</span><h1>{ADMIN_SECTION_LABELS[section]}</h1></div><div className="admin-top-user"><span>{roleLabel}</span><span className="admin-avatar">{avatarUrl?<img src={avatarUrl} alt="صورة حساب Google"/>:name.slice(0,1)}</span></div></header>
       <div className="admin-content">
-        <div className="admin-welcome"><div><span className="admin-eyebrow">لوحة التحكم</span><h2>مرحباً، {name}</h2><p>{supervisor?"راجع حجوزات وإثباتات الدفع للفعاليات المكلّف بها فقط.":"تابع أداء منصة حاضر وأدر عملياتها من مكان واحد."}</p></div><div className="admin-welcome-mark"><LayoutDashboard size={30}/></div></div>
+        <div className={`admin-welcome admin-welcome-section-${section}`}><div><span className="admin-eyebrow">لوحة التحكم</span><h2>مرحباً، {name}</h2><p>{supervisor?"راجع حجوزات وإثباتات الدفع للفعاليات المكلّف بها فقط.":"تابع أداء منصة حاضر وأدر عملياتها من مكان واحد."}</p></div><div className="admin-welcome-mark"><LayoutDashboard size={30}/></div></div>
         {error&&<div className="admin-notice" role="status">{error}</div>}
         <div key={section} className="admin-section-transition">
           {section==="overview"&&<AdminOverviewWorkspace role={role} onNavigate={setAdminSection}/>}
