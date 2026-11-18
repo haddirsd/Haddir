@@ -11561,3 +11561,39 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
     outline-offset: 3px !important;
   }
 }
+/* Notifications page header: correct RTL order on mobile only. */
+@media (max-width: 700px) {
+  .app-shell > .screen-topbar.notifications-page-topbar {
+    display: flex !important;
+    flex-direction: row !important;
+    direction: rtl !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    gap: 12px !important;
+    min-height: calc(64px + env(safe-area-inset-top)) !important;
+    padding-inline: 18px !important;
+    padding-bottom: 8px !important;
+  }
+  .app-shell > .screen-topbar.notifications-page-topbar > .screen-topbar-spacer {
+    display: none !important;
+  }
+  .app-shell > .screen-topbar.notifications-page-topbar > strong {
+    flex: 0 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    text-align: right !important;
+    justify-self: auto !important;
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+  }
+  .app-shell > .screen-topbar.notifications-page-topbar > .screen-icon {
+    display: grid !important;
+    flex: 0 0 42px !important;
+    width: 42px !important;
+    height: 42px !important;
+    justify-self: auto !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
