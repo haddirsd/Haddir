@@ -11597,3 +11597,108 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
     justify-content: center !important;
   }
 }
+
+/* Notifications summary and filters: compact, ordered mobile layout. */
+@media (max-width: 700px) {
+  .app-shell .notifications-screen .notifications-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    direction: rtl !important;
+  }
+
+  .app-shell .notifications-screen .notifications-summary-card {
+    position: static !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-areas:
+      "label count"
+      "caption total"
+      "action action" !important;
+    align-items: center !important;
+    column-gap: 12px !important;
+    row-gap: 6px !important;
+    min-width: 0 !important;
+    padding: 12px 14px !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 14px !important;
+    background: var(--surface, var(--card-bg, #fff)) !important;
+  }
+
+  .app-shell .notifications-screen .notifications-summary-label {
+    grid-area: label !important;
+    min-width: 0 !important;
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+    font-weight: 700 !important;
+    color: var(--fg) !important;
+  }
+
+  .app-shell .notifications-screen .notifications-summary-count {
+    grid-area: count !important;
+    justify-self: end !important;
+    font-size: 22px !important;
+    line-height: 1.2 !important;
+    color: var(--fg) !important;
+  }
+
+  .app-shell .notifications-screen .notifications-summary-caption {
+    grid-area: caption !important;
+    min-width: 0 !important;
+    font-size: 10px !important;
+    line-height: 1.5 !important;
+    color: var(--muted) !important;
+  }
+
+  .app-shell .notifications-screen .notifications-summary-total {
+    grid-area: total !important;
+    justify-self: end !important;
+    font-size: 10px !important;
+    line-height: 1.5 !important;
+    white-space: nowrap !important;
+    color: var(--muted) !important;
+  }
+
+  .app-shell .notifications-screen .notifications-summary-card .notification-mark-all {
+    grid-area: action !important;
+    justify-self: stretch !important;
+    width: 100% !important;
+    min-height: 36px !important;
+    margin: 4px 0 0 !important;
+    padding: 7px 12px !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 10px !important;
+    font-size: 11px !important;
+    line-height: 1.4 !important;
+  }
+
+  .app-shell .notifications-screen .notifications-feed {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .app-shell .notifications-screen .notification-filters {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+    margin: 0 0 10px !important;
+    padding: 0 0 4px !important;
+    overflow: visible !important;
+    direction: rtl !important;
+  }
+
+  .app-shell .notifications-screen .notification-filters button {
+    flex: 0 0 auto !important;
+    min-height: 36px !important;
+    padding: 7px 12px !important;
+    font-size: 11px !important;
+    line-height: 1.4 !important;
+    white-space: nowrap !important;
+  }
+}
+
