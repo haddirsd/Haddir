@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
 import AdminEventsWorkspace from "../../events/admin/AdminEventsWorkspace";
 import AdminBookingsWorkspace from "../../booking/admin/AdminBookingsWorkspace";
 import AdminPaymentsWorkspace from "../../booking/admin/AdminPaymentsWorkspace";
@@ -31,6 +32,12 @@ export default function AdminPage() {
     cancelSignOut,
     confirmSignOut,
   } = useAdminWorkspaceNavigation(role);
+  const mobileNavRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const activeTab = mobileNavRef.current?.querySelector<HTMLElement>("button.active");
+    activeTab?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+  }, [section]);
 
   if (loading) return <main className={"admin-loading"+(darkMode?" theme-dark":"")} dir="rtl"><div className="admin-spinner"/><p>جاري التحقق من صلاحياتك...</p></main>;
   if (!role) return <main className={"admin-denied"+(darkMode?" theme-dark":"")} dir="rtl"><Shield size={34}/><h1>الوصول غير متاح</h1><p>{error || "هذه الصفحة مخصصة لفريق إدارة حاضر."}</p><button onClick={() => router.replace("/")}>العودة للرئيسية</button></main>;
@@ -41,7 +48,7 @@ export default function AdminPage() {
     <aside className="admin-sidebar">
       <button className="admin-brand" onClick={() => router.push("/")}><img src={darkMode?"/dark.svg":"/light.svg"} alt="حاضر"/><small>الإدارة</small></button>
       <div className="admin-side-caption">مساحة العمل</div>
-      <nav aria-label="تبويبات لوحة الإدارة">{nav.map(item=><button key={item} className={section===item?"active":""} onClick={()=>setAdminSection(item)}><span>{item==="overview"?<LayoutDashboard/>:item==="events"?<CalendarDays/>:item==="bookings"?<Ticket/>:item==="payments"?<Banknote/>:item==="users"?<Users/>:item==="notifications"?<Megaphone/>:<Activity/>}</span>{ADMIN_SECTION_LABELS[item]}</button>)}</nav>
+      <nav ref={mobileNavRef} className="admin-mobile-tabs" aria-label="تبويبات لوحة الإدارة">{nav.map(item=><button key={item} className={section===item?"active":""} onClick={()=>setAdminSection(item)}><span>{item==="overview"?<LayoutDashboard/>:item==="events"?<CalendarDays/>:item==="bookings"?<Ticket/>:item==="payments"?<Banknote/>:item==="users"?<Users/>:item==="notifications"?<Megaphone/>:<Activity/>}</span>{ADMIN_SECTION_LABELS[item]}</button>)}</nav>
       <div className="admin-side-bottom"><div className="admin-mini-profile"><span className="admin-mini-avatar">{avatarUrl?<img src={avatarUrl} alt="صورة الحساب"/>:role==="owner"?<Shield/>:role==="admin"?<BadgeCheck/>:<ClipboardCheck/>}</span><div><b>{name}</b><small>{roleLabel}</small></div></div><button className="admin-logout" onClick={requestSignOut}><LogOut size={17}/> تسجيل الخروج</button></div>
     </aside>
     <section className="admin-main">
