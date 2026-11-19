@@ -1,6 +1,9 @@
 -- Payment submissions must reference an active account belonging to their booking's event.
 -- Keep the beneficiary alongside the other account details as an immutable payment snapshot.
 alter table public.payment_submissions
+  add column if not exists payment_account_id text,
+  add column if not exists payment_account_name text,
+  add column if not exists payment_account_number text,
   add column if not exists payment_account_beneficiary text;
 
 update public.payment_submissions ps
