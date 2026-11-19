@@ -5,21 +5,22 @@ import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import { listAdminPayments } from "./admin-payments.service";
 import type { AdminPaymentRow } from "./admin-payments.types";
 
-export function useAdminPayments() {
+export function useAdminPayments(page: number) {
   const [rows, setRows] = useState<AdminPaymentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [totalCount, setTotalCount] = useState(0);
   const latestRequest = useRef(0);
 
   const refresh = useCallback(async () => {
     const requestId = ++latestRequest.current;
     setLoading(true);
-    const result = await listAdminPayments();
+    const result = await listAdminPayments(page);
     if (requestId !== latestRequest.current) return;
     if (result.error) setError(result.error);
-    else { setRows(result.rows); setError(""); }
+    else { setRows(result.rows); setTotalCount(result.totalCount); setError(""); }
     setLoading(false);
-  }, []);
+  }, [page]);
 
   useEffect(() => {
     void refresh();
@@ -39,5 +40,5 @@ export function useAdminPayments() {
     return () => { latestRequest.current += 1; void supabase.removeChannel(channel); };
   }, [refresh]);
 
-  return { rows, loading, error, refresh };
+  return { rows, totalCount, loading, error, refresh };
 }
