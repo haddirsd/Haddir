@@ -5,21 +5,22 @@ import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import { listAdminBookings } from "./admin-bookings.service";
 import type { AdminBookingRow } from "./admin-bookings.types";
 
-export function useAdminBookings(searchTerm: string) {
+export function useAdminBookings(searchTerm: string, page: number) {
   const [rows, setRows] = useState<AdminBookingRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [totalCount, setTotalCount] = useState(0);
   const latestRequest = useRef(0);
 
   const refresh = useCallback(async () => {
     const requestId = ++latestRequest.current;
     setLoading(true);
-    const result = await listAdminBookings(searchTerm);
+    const result = await listAdminBookings(searchTerm, page);
     if (requestId !== latestRequest.current) return;
     if (result.error) setError(result.error);
-    else { setRows(result.rows); setError(""); }
+    else { setRows(result.rows); setTotalCount(result.totalCount); setError(""); }
     setLoading(false);
-  }, [searchTerm]);
+  }, [searchTerm, page]);
 
   useEffect(() => {
     void refresh();
@@ -42,5 +43,5 @@ export function useAdminBookings(searchTerm: string) {
     };
   }, [refresh]);
 
-  return { rows, loading, error, refresh };
+  return { rows, totalCount, loading, error, refresh };
 }
