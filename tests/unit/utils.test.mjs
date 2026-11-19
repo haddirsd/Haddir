@@ -5,13 +5,13 @@ import {
   normalizePhone,
   normalizeSudanesePhone,
   isValidSudanesePhone,
-} from "../lib/utils/phone.ts";
+} from "../../lib/utils/phone.ts";
 
 import {
   isValidDate,
   formatDate,
   formatDateTime,
-} from "../lib/utils/dates.ts";
+} from "../../lib/utils/dates.ts";
 
 test("normalizePhone converts Arabic-Indic digits to ASCII", () => {
   assert.equal(normalizePhone("٠٩١٢٣٤٥٦٧٨"), "0912345678");
