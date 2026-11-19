@@ -6,12 +6,14 @@ on:
       - main
     paths:
       - "supabase/**"
+      - "tests/integration/**"
       - ".github/workflows/supabase-local-migration-check.yml"
   push:
     branches:
       - main
     paths:
       - "supabase/**"
+      - "tests/integration/**"
       - ".github/workflows/supabase-local-migration-check.yml"
   workflow_dispatch:
 
