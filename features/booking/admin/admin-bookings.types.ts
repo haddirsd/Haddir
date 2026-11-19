@@ -24,4 +24,4 @@ export type AdminBookingRow = {
     created_at: string;
   }>;
 };
-export type AdminBookingsResult = { rows: AdminBookingRow[]; error: string | null };
+export type AdminBookingsResult = { rows: AdminBookingRow[]; totalCount: number; error: string | null };
