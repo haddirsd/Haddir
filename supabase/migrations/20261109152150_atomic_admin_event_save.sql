@@ -164,8 +164,7 @@ begin
   end loop;
   return v_event_id;
 end;
-$function$
-
+$function$;
 
 create or replace function public.save_admin_event(
   p_event_id uuid, p_event jsonb, p_tickets jsonb, p_accounts jsonb
