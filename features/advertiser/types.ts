@@ -23,11 +23,11 @@ export type AdvertiserTicketLine = {
   id: string;
   name: string;
   currency: string;
-  quantity_total: number;
+  quantity_total: number | null;
   confirmed_quantity: number;
   reserved_quantity: number;
   rejected_quantity: number;
-  remaining_quantity: number;
+  remaining_quantity: number | null;
   sales: number | string;
 };
 export type AdvertiserStatistics = {
