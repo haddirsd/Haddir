@@ -36,7 +36,9 @@ try {
       email_confirm: true,
       user_metadata: { full_name: `Concurrency Customer ${index}` },
     });
-    const user = requireNoError(created, "Create isolated test user");
+    const createdData = requireNoError(created, "Create isolated test user");
+    const user = createdData.user;
+    assert.ok(user?.id, "Auth must return the created test user");
     users.push({ id: user.id, email });
 
     await requireNoError(
