@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RefreshCw, Ticket } from "lucide-react";
 import { useAdminBookings } from "./useAdminBookings";
 import type { AdminBookingRow } from "./admin-bookings.types";
@@ -12,16 +12,20 @@ const statusLabels: Record<string, string> = {
 };
 const fmt = (value: unknown) => value == null || value === "" ? "—" : String(value);
 const money = (value: unknown, currency = "SDG") => value == null ? "—" : `${Number(value).toLocaleString("ar-SD-u-nu-latn")} ${currency}`;
+const PAGE_SIZE = 100;
 
 export default function AdminBookingsWorkspace() {
   const [searchTerm, setSearchTerm] = useState("");
-  const { rows, loading, error, refresh } = useAdminBookings(searchTerm);
+  const [page, setPage] = useState(0);
+  const { rows, totalCount, loading, error, refresh } = useAdminBookings(searchTerm, page);
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  useEffect(() => { if (totalPages > 0 && page >= totalPages) setPage(totalPages - 1); }, [page, totalPages]);
 
   return <section className="admin-panel">
     <div className="admin-panel-head">
       <div><h3>الحجوزات</h3><p>متابعة الحجوزات وحالاتها وإثباتات الدفع المرتبطة بها</p></div>
       <div className="admin-panel-actions">
-        <label className="admin-search-box"><span>بحث برقم الحجز أو بريد العميل</span><input type="search" value={searchTerm} onChange={event => setSearchTerm(event.target.value)} placeholder="رقم الحجز أو بريد العميل"/></label>
+        <label className="admin-search-box"><span>بحث برقم الحجز أو بريد العميل</span><input type="search" value={searchTerm} onChange={event => { setSearchTerm(event.target.value); setPage(0); }} placeholder="رقم الحجز أو بريد العميل"/></label>
         <button className="admin-refresh" type="button" onClick={() => void refresh()} disabled={loading}><RefreshCw size={16}/> تحديث</button>
       </div>
     </div>
@@ -53,6 +57,14 @@ export default function AdminBookingsWorkspace() {
           </div>
         </article>;
       })}
+    </div>}
+    {!loading && totalCount > 0 && <div className="admin-pagination" aria-label="صفحات الحجوزات">
+      <span>عرض {Math.min(page * PAGE_SIZE + 1, totalCount).toLocaleString("ar-SD-u-nu-latn")}–{Math.min((page + 1) * PAGE_SIZE, totalCount).toLocaleString("ar-SD-u-nu-latn")} من {totalCount.toLocaleString("ar-SD-u-nu-latn")} حجز</span>
+      <div className="admin-pagination-controls">
+        <button type="button" onClick={() => setPage(current => Math.max(0, current - 1))} disabled={page === 0}>السابق</button>
+        <span>صفحة {(page + 1).toLocaleString("ar-SD-u-nu-latn")} من {totalPages.toLocaleString("ar-SD-u-nu-latn")}</span>
+        <button type="button" onClick={() => setPage(current => Math.min(totalPages - 1, current + 1))} disabled={page + 1 >= totalPages}>التالي</button>
+      </div>
     </div>}
   </section>;
 }
