@@ -7,6 +7,8 @@ on:
     paths:
       - "supabase/**"
       - "tests/integration/**"
+      - "package.json"
+      - "package-lock.json"
       - ".github/workflows/supabase-local-migration-check.yml"
   push:
     branches:
@@ -14,6 +16,8 @@ on:
     paths:
       - "supabase/**"
       - "tests/integration/**"
+      - "package.json"
+      - "package-lock.json"
       - ".github/workflows/supabase-local-migration-check.yml"
   workflow_dispatch:
 
@@ -32,6 +36,15 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: npm
+
+      - name: Install project dependencies
+        run: npm ci
 
       - name: Install pinned Supabase CLI
         uses: supabase/setup-cli@v3
