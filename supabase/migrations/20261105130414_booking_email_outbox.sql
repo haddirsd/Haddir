@@ -1,3 +1,40 @@
+-- The notifications table exists in production but was missing from the tracked migration chain.
+-- Recreate its core schema before adding the email outbox foreign key.
+create table if not exists public.notifications (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  booking_id uuid references public.bookings(id) on delete set null,
+  title text not null,
+  message text not null,
+  type text not null check (type in (
+    'ticket_approved',
+    'payment_rejected',
+    'general',
+    'booking_expired',
+    'event_reminder_3d',
+    'event_reminder_24h',
+    'event_reminder_6h',
+    'ticket_checked_in',
+    'broadcast',
+    'event_started'
+  )),
+  is_read boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+alter table public.notifications enable row level security;
+
+drop policy if exists "Users read own notifications" on public.notifications;
+create policy "Users read own notifications"
+  on public.notifications for select to authenticated
+  using (user_id = (select auth.uid()));
+
+drop policy if exists "Users update own notifications" on public.notifications;
+create policy "Users update own notifications"
+  on public.notifications for update to authenticated
+  using (user_id = (select auth.uid()))
+  with check (user_id = (select auth.uid()));
+
 create table if not exists public.email_outbox (
   id uuid primary key default gen_random_uuid(),
   notification_id uuid not null unique references public.notifications(id) on delete cascade,
