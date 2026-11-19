@@ -37,7 +37,8 @@ try {
       user_metadata: { full_name: `Concurrency Customer ${index}` },
     });
     const createdData = requireNoError(created, "Create isolated test user");
-    const user = createdData.user;
+    // Supabase Auth versions may expose the created user as data.user or data itself.
+    const user = createdData?.user ?? createdData;
     assert.ok(user?.id, "Auth must return the created test user");
     users.push({ id: user.id, email });
 
