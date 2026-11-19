@@ -50,6 +50,9 @@ jobs:
       - name: Verify the complete migration chain
         run: supabase db reset
 
+      - name: Run isolated database integration tests
+        run: supabase test db
+
       - name: Confirm local stack is healthy
         run: supabase status
 
