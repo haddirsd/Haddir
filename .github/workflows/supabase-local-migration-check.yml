@@ -1,0 +1,58 @@
+name: Supabase local migration check
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "supabase/**"
+      - ".github/workflows/supabase-local-migration-check.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "supabase/**"
+      - ".github/workflows/supabase-local-migration-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-local-migration-check-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  migration-replay:
+    name: Replay all migrations on isolated local Supabase
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install pinned Supabase CLI
+        uses: supabase/setup-cli@v3
+        with:
+          version: 3.2.0
+
+      - name: Initialize local Supabase configuration
+        run: |
+          if [ ! -f supabase/config.toml ]; then
+            supabase init
+          fi
+          supabase --version
+          test -f supabase/config.toml
+
+      - name: Start isolated local Supabase stack
+        run: supabase start -x studio,imgproxy,logflare,vector
+
+      - name: Verify the complete migration chain
+        run: supabase db reset
+
+      - name: Confirm local stack is healthy
+        run: supabase status
+
+      - name: Stop local Supabase stack
+        if: always()
+        run: supabase stop --no-backup
