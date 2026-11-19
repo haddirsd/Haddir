@@ -6,9 +6,9 @@ const ADMIN_PAYMENTS_PAGE_SIZE = 100;
 
 export async function listAdminPayments(page = 0): Promise<{ rows: AdminPaymentRow[]; totalCount: number; error: string | null }> {
   const supabase = getSupabaseBrowserClient();
-  if (!supabase) return { rows: [], error: "تعذر الاتصال بقاعدة البيانات." };
+  if (!supabase) return { rows: [], totalCount: 0, error: "تعذر الاتصال بقاعدة البيانات." };
   const scope = await getAdminEventScope(supabase);
-  if (scope.error) return { rows: [], error: scope.error };
+  if (scope.error) return { rows: [], totalCount: 0, error: scope.error };
   if (scope.eventIds !== null && scope.eventIds.length === 0) return { rows: [], totalCount: 0, error: null };
   const safePage = Math.max(0, Math.floor(page));
   const from = safePage * ADMIN_PAYMENTS_PAGE_SIZE;
@@ -17,7 +17,7 @@ export async function listAdminPayments(page = 0): Promise<{ rows: AdminPaymentR
     { count: "exact" }
   ).eq("status", "submitted").order("created_at", { ascending: false }).order("id", { ascending: false }).range(from, from + ADMIN_PAYMENTS_PAGE_SIZE - 1);
   if (scope.eventIds !== null) query = query.in("bookings.event_id", scope.eventIds);
-  const { data, error } = await query;
+  const { data, count, error } = await query;
   if (error) return { rows: [], totalCount: 0, error: error.message || "تعذر تحميل إثباتات الدفع." };
   const rows = await Promise.all((data || []).map(async (row: any) => {
     if (!row.receipt_path) return { ...row, receipt_url: null };
