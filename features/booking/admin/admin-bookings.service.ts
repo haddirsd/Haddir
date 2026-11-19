@@ -6,9 +6,9 @@ const ADMIN_BOOKINGS_PAGE_SIZE = 100;
 
 export async function listAdminBookings(searchTerm = "", page = 0): Promise<AdminBookingsResult> {
   const supabase = getSupabaseBrowserClient();
-  if (!supabase) return { rows: [], error: "تعذر الاتصال بقاعدة البيانات." };
+  if (!supabase) return { rows: [], totalCount: 0, error: "تعذر الاتصال بقاعدة البيانات." };
   const scope = await getAdminEventScope(supabase);
-  if (scope.error) return { rows: [], error: scope.error };
+  if (scope.error) return { rows: [], totalCount: 0, error: scope.error };
   if (scope.eventIds !== null && scope.eventIds.length === 0) return { rows: [], totalCount: 0, error: null };
   const safePage = Math.max(0, Math.floor(page));
   const from = safePage * ADMIN_BOOKINGS_PAGE_SIZE;
