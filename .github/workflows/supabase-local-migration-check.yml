@@ -53,6 +53,14 @@ jobs:
       - name: Run isolated database integration tests
         run: supabase test db
 
+      - name: Run concurrent booking inventory test
+        run: |
+          eval "$(supabase status -o env)"
+          export SUPABASE_URL="$API_URL"
+          export SUPABASE_ANON_KEY="$ANON_KEY"
+          export SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"
+          node tests/integration/booking-concurrency.mjs
+
       - name: Confirm local stack is healthy
         run: supabase status
 
