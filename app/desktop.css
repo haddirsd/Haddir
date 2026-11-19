@@ -3039,3 +3039,51 @@
     justify-self: start;
   }
 }
+
+
+/* Pagination controls for admin booking and payment lists. */
+.admin-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--admin-border, #e5e7eb);
+  border-radius: 12px;
+  color: var(--admin-muted, #64748b);
+  font-size: 12px;
+}
+.admin-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.admin-pagination-controls button {
+  min-height: 34px;
+  padding: 6px 12px;
+  border: 1px solid var(--admin-border, #dbe1e8);
+  border-radius: 8px;
+  background: var(--admin-card, #fff);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.admin-pagination-controls button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+.admin-pagination-controls span {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 640px) {
+  .admin-pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .admin-pagination-controls {
+    justify-content: space-between;
+  }
+}
