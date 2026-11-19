@@ -68,15 +68,17 @@ export function useAuth({ onSignedOut }: UseAuthOptions = {}) {
         setPendingLegalRole(null);
         setUserRole(profileRole);
       }
-      const { data: assignmentRows } = await supabase
+      const { data: assignment, error: assignmentError } = await supabase
         .from("event_role_assignments")
         .select("event_id,assignment_role,events(id,title,venue,city,starts_at,status)")
         .eq("user_id", user.id)
-        .in("assignment_role", ["gatekeeper", "organizer", "advertiser"])
-        .limit(1);
+        .eq("assignment_role", profileRole)
+        .maybeSingle();
       if (!alive) return;
-
-      const assignment = assignmentRows?.[0];
+      if (assignmentError) {
+        setAssignedEvent(null);
+        setAuthMessage("تعذر تحميل تكليف الفعالية: " + assignmentError.message);
+      }
       const relatedEvent = Array.isArray(assignment?.events)
         ? assignment.events[0]
         : assignment?.events;
