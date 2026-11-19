@@ -19,6 +19,15 @@ insert into auth.users (
   '{"full_name":""}', now(), now(), null
 );
 
+-- Keep the booking fixture explicit and independent of auth trigger defaults.
+insert into public.profiles (id, full_name, phone)
+values
+  ('10000000-0000-4000-8000-000000000001', 'Booking Test Customer', '0912345678'),
+  ('10000000-0000-4000-8000-000000000002', '', null)
+on conflict (id) do update
+set full_name = excluded.full_name,
+    phone = excluded.phone;
+
 insert into public.events (
   id, title, slug, starts_at, ends_at, status, created_by
 ) values
