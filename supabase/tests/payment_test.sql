@@ -1,6 +1,6 @@
 begin;
 
-select plan(20);
+select plan(23);
 
 insert into auth.users (
   id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -288,13 +288,6 @@ select throws_ok(
   'Customer cannot submit payment after the booking payment deadline'
 );
 
-select set_config(
-  'request.jwt.claims',
-  '{"sub":"11000000-0000-4000-8000-000000000003","role":"authenticated"}',
-  true
-);
-select set_config('request.jwt.claim.sub', '11000000-0000-4000-8000-000000000003', true);
-
 select lives_ok(
   format(
     'update payment_test_ids set rejection_submission_id = public.submit_payment(%L, %L, %L, %L)',
@@ -303,9 +296,9 @@ select lives_ok(
     '11000000-0000-4000-8000-000000000001/' ||
       (select rejection_booking_id::text from payment_test_ids) ||
       '/receipt-rejection.png',
-    'TEST-ADMIN-CREATE'
+    'TEST-REJECTION'
   ),
-  'Admin-context setup can submit the rejection fixture through the payment RPC'
+  'Customer can submit a valid payment receipt for the rejection fixture'
 );
 
 select throws_ok(
