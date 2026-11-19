@@ -20,7 +20,7 @@ type NotificationsWorkspaceProps = {
 
 function notificationKind(type: string) {
   if (type === "ticket_approved" || type === "ticket_checked_in" || type === "payment_rejected" || type === "booking_expired") return "booking";
-  if (String(type || "").startsWith("event_reminder_")) return "event";
+  if (type === "event_started" || String(type || "").startsWith("event_reminder_")) return "event";
   return "system";
 }
 
