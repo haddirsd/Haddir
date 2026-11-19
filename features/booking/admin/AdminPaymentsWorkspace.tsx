@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Ticket, RefreshCw } from "lucide-react";
 import { HaddirDialog } from "../../../components/ui/HaddirDialog";
 import { reviewAdminPayment } from "./admin-payments.service";
@@ -10,9 +10,13 @@ import type { AdminPaymentDecision, AdminPaymentRow } from "./admin-payments.typ
 const statusLabels: Record<string,string> = { submitted:"بانتظار المراجعة", approved:"مقبول", rejected:"مرفوض" };
 const fmt = (value: unknown) => value == null || value === "" ? "—" : String(value);
 const money = (value: unknown, currency = "SDG") => value == null ? "—" : `${Number(value).toLocaleString("ar-SD-u-nu-latn")} ${currency}`;
+const PAGE_SIZE = 100;
 
 export default function AdminPaymentsWorkspace() {
-  const { rows, loading, error, refresh } = useAdminPayments();
+  const [page, setPage] = useState(0);
+  const { rows, totalCount, loading, error, refresh } = useAdminPayments(page);
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  useEffect(() => { if (totalPages > 0 && page >= totalPages) setPage(totalPages - 1); }, [page, totalPages]);
   const [rejectionReasons, setRejectionReasons] = useState<Record<string,string>>({});
   const [actionMessage, setActionMessage] = useState("");
   const [actionError, setActionError] = useState("");
@@ -80,6 +84,14 @@ export default function AdminPaymentsWorkspace() {
           </div>}
         </article>;
       })}
+    </div>}
+    {!loading && totalCount > 0 && <div className="admin-pagination" aria-label="صفحات المدفوعات">
+      <span>عرض {Math.min(page * PAGE_SIZE + 1, totalCount).toLocaleString("ar-SD-u-nu-latn")}–{Math.min((page + 1) * PAGE_SIZE, totalCount).toLocaleString("ar-SD-u-nu-latn")} من {totalCount.toLocaleString("ar-SD-u-nu-latn")} إثبات دفع</span>
+      <div className="admin-pagination-controls">
+        <button type="button" onClick={() => setPage(current => Math.max(0, current - 1))} disabled={page === 0}>السابق</button>
+        <span>صفحة {(page + 1).toLocaleString("ar-SD-u-nu-latn")} من {totalPages.toLocaleString("ar-SD-u-nu-latn")}</span>
+        <button type="button" onClick={() => setPage(current => Math.min(totalPages - 1, current + 1))} disabled={page + 1 >= totalPages}>التالي</button>
+      </div>
     </div>}
     {rejectionTarget&&<HaddirDialog open title="تأكيد رفض إثبات الدفع؟" description={"سيتم رفض الإيصال وإرسال سبب الرفض للعميل: "+(rejectionReasons[rejectionTarget.id]||"")} confirmLabel="تأكيد الرفض" tone="danger" busy={reviewing} onCancel={()=>setRejectionTarget(null)} onConfirm={async()=>{const row=rejectionTarget;setRejectionTarget(null);await reviewPayment(row,"reject");}}/>}
     {approvalTarget&&<HaddirDialog open title="اعتماد الدفع وإصدار التذاكر؟" description="سيتم اعتماد إثبات التحويل وإصدار تذاكر برموز دخول من 10 أرقام وإرسال إشعار للعميل." confirmLabel="اعتماد الدفع" tone="success" busy={reviewing} onCancel={()=>setApprovalTarget(null)} onConfirm={async()=>{const row=approvalTarget;setApprovalTarget(null);await reviewPayment(row,"approve");}}/>}
