@@ -74,9 +74,10 @@ export async function getPublishedEvents(): Promise<PublicEventsResult> {
       });
 
     const eventStartsAt = event.starts_at ? new Date(event.starts_at).getTime() : Infinity;
-    const eventEndsAt = event.ends_at ? new Date(event.ends_at).getTime() : eventStartsAt;
+    const eventEndsAt = event.ends_at ? new Date(event.ends_at).getTime() : Infinity;
     const eventStarted = !event.is_continuous && eventStartsAt <= now;
-    const eventEnded = !event.is_continuous && eventEndsAt <= now;
+    const eventEnded =
+      !event.is_continuous && !!event.ends_at && eventEndsAt <= now;
     const status = eventEnded
       ? "انتهت"
       : eventStarted
