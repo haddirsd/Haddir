@@ -108,8 +108,8 @@ begin
       or (q.status = 'processing' and q.locked_until < now())
     )
     order by q.next_attempt_at, q.id
-    for update of q skip locked
     limit greatest(1, least(coalesce(p_limit, 50), 100))
+    for update of q skip locked
   ),
   claimed as (
     update private.haddir_web_push_delivery_queue q
