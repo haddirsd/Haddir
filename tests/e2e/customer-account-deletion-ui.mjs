@@ -163,6 +163,9 @@ try {
     booking_id: customerBookingId,
     submitted_by: customer.id,
     receipt_path: receiptPath,
+    amount: 100,
+    currency: "SDG",
+    status: "submitted",
   }), "Create payment submission linked to receipt");
 
   browser = await chromium.launch({ headless: true });
