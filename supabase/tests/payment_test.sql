@@ -78,28 +78,36 @@ select set_config(
 );
 select set_config('request.jwt.claim.sub', '11000000-0000-4000-8000-000000000001', true);
 
-insert into payment_test_ids (approval_booking_id)
-select booking_id
-from public.create_booking(
-  '21000000-0000-4000-8000-000000000001',
-  '31000000-0000-4000-8000-000000000001',
-  2
+insert into payment_test_ids default values;
+
+update payment_test_ids
+set approval_booking_id = (
+  select booking_id
+  from public.create_booking(
+    '21000000-0000-4000-8000-000000000001',
+    '31000000-0000-4000-8000-000000000001',
+    2
+  )
 );
 
-insert into payment_test_ids (rejection_booking_id)
-select booking_id
-from public.create_booking(
-  '21000000-0000-4000-8000-000000000001',
-  '31000000-0000-4000-8000-000000000001',
-  1
+update payment_test_ids
+set rejection_booking_id = (
+  select booking_id
+  from public.create_booking(
+    '21000000-0000-4000-8000-000000000001',
+    '31000000-0000-4000-8000-000000000001',
+    1
+  )
 );
 
-insert into payment_test_ids (expired_booking_id)
-select booking_id
-from public.create_booking(
-  '21000000-0000-4000-8000-000000000001',
-  '31000000-0000-4000-8000-000000000001',
-  1
+update payment_test_ids
+set expired_booking_id = (
+  select booking_id
+  from public.create_booking(
+    '21000000-0000-4000-8000-000000000001',
+    '31000000-0000-4000-8000-000000000001',
+    1
+  )
 );
 
 reset role;
