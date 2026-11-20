@@ -31,6 +31,7 @@ type ProfileWorkspaceProps = {
   setShowPrivacySecurity: (value: boolean) => void;
   saveProfile: () => void;
   signInWithGoogle: () => void;
+  signInWithEmail: (email: string, password: string) => Promise<{ error: string | null }>;
   deleteAccount: () => void;
   signOut: () => void;
 };
