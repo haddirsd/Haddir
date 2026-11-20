@@ -36,7 +36,7 @@ async function createIdentity(label, role) {
     email_confirm: true,
     user_metadata: { full_name: `Haddir E2E ${label}` },
   });
-  const user = (await dataOrThrow(created, `Create ${label} identity")).user;
+  const user = (await dataOrThrow(created, `Create ${label} identity`)).user;
   assert.ok(user?.id, `Supabase Auth must create the ${label} identity`);
   users.push({ id: user.id, email });
 
