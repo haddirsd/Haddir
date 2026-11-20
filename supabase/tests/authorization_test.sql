@@ -1,6 +1,6 @@
 begin;
 
-select plan(32);
+select plan(37);
 
 -- Isolated identities for every platform role.
 insert into auth.users (
@@ -117,8 +117,32 @@ select is((select count(*)::integer from public.payment_submissions),0,'Gatekeep
 select is((select count(*)::integer from public.tickets where event_id='23000000-0000-4000-8000-000000000001'),1,'Gatekeeper can read tickets for the assigned event');
 select is((select count(*)::integer from public.tickets where event_id='23000000-0000-4000-8000-000000000002'),0,'Gatekeeper cannot read tickets from an unassigned event');
 select throws_ok(
-  $$insert into public.checkins(ticket_id,event_id,checked_in_by) values ('73000000-0000-4000-8000-000000000002','23000000-0000-4000-8000-000000000002','13000000-0000-4000-8000-000000000004')$$,
+  $insert into public.checkins(ticket_id,event_id,checked_in_by) values ('73000000-0000-4000-8000-000000000002','23000000-0000-4000-8000-000000000002','13000000-0000-4000-8000-000000000004')$,
   '42501',null,'Gatekeeper cannot bypass event assignment with a direct check-in insert'
+);
+
+select throws_ok(
+  $insert into public.checkins(ticket_id,event_id,checked_in_by) values ('73000000-0000-4000-8000-000000000001','23000000-0000-4000-8000-000000000001','13000000-0000-4000-8000-000000000004')$,
+  '42501',null,'Gatekeeper cannot write check-ins directly even for the assigned event'
+);
+select lives_ok(
+  $select public.gatekeeper_ticket_action('8130000001',true)$,
+  'Gatekeeper can confirm a valid ticket within the assigned event'
+);
+select is(
+  (select count(*)::integer from public.checkins where ticket_id='73000000-0000-4000-8000-000000000001'),
+  1,
+  'Successful ticket confirmation creates exactly one check-in record'
+);
+select is(
+  (select event_id from public.checkins where ticket_id='73000000-0000-4000-8000-000000000001'),
+  '23000000-0000-4000-8000-000000000001'::uuid,
+  'Check-in record retains the ticket assigned event'
+);
+select is(
+  (select checked_in_by from public.checkins where ticket_id='73000000-0000-4000-8000-000000000001'),
+  '13000000-0000-4000-8000-000000000004'::uuid,
+  'Check-in record identifies the authenticated gatekeeper'
 );
 select throws_ok(
   $$select public.gatekeeper_ticket_action('8130000002',false)$$,
