@@ -26,6 +26,7 @@ const otherBookingId = randomUUID();
 const users = [];
 const pageErrors = [];
 const consoleErrors = [];
+const httpErrors = [];
 let browser;
 let assignedEventCreated = false;
 let otherEventCreated = false;
@@ -231,6 +232,9 @@ try {
   );
   const page = await context.newPage();
   page.on("pageerror", (error) => pageErrors.push(error.stack || error.message));
+  page.on("response", (response) => {
+    if (response.status() >= 400) httpErrors.push({ status: response.status(), url: response.url() });
+  });
   page.on("console", (message) => {
     if (message.type() === "error") consoleErrors.push(message.text());
   });
@@ -322,7 +326,7 @@ try {
   await scanHistory.getByText("كود غير موجود", { exact: true }).waitFor();
 
   assert.deepEqual(pageErrors, [], `Gatekeeper browser page must not throw runtime errors: ${pageErrors.join("; ")}`);
-  assert.deepEqual(consoleErrors, [], `Gatekeeper browser page must not emit console errors: ${consoleErrors.join("; ")}`);
+  assert.deepEqual(consoleErrors, [], `Gatekeeper browser page must not emit console errors: ${consoleErrors.join("; ")}; HTTP errors: ${JSON.stringify(httpErrors)}`);
 
   console.log("PASS: assigned gatekeeper Chromium UI loads only its assigned event, opens the QR camera surface, validates numeric ticket codes, checks in a valid ticket once, rejects repeat and forged codes, blocks another event's ticket, and persists scan history.");
 } finally {
