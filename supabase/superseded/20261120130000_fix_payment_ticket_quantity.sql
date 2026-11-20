@@ -1,0 +1,4 @@
+-- Superseded: the corrected one-ticket-per-booking-item behavior and
+-- payment-review authorization are already implemented by
+-- 20261119172147_scope_booking_locks_by_event_and_customer.sql.
+-- This later draft replaced that hardened function with an older definition.
