@@ -73,7 +73,7 @@ async function createEventThroughUi(user, label) {
   await form.getByLabel("السعر *").fill("125");
   await form.getByLabel("الكمية المتاحة (اختياري)").fill("12");
   await form.getByRole("button", { name: "حفظ الفعالية" }).click();
-  await page.getByText("تم حفظ الفعالية بنجاح.", { exact: true }).waitFor({ timeout: 20000 });
+  await page.getByText("تم إنشاء الفعالية والتذاكر وحسابات الدفع كمسودة في عملية واحدة.", { exact: true }).waitFor({ timeout: 20000 });
   const row = await data(await service.from("events").select("id,title,status,created_by").eq("title", title).single(), `Verify ${label} event persisted`);
   assert.equal(row.created_by, user.id);
   assert.equal(row.status, "draft");
@@ -83,7 +83,7 @@ async function createEventThroughUi(user, label) {
   await card.getByRole("button", { name: "تعديل" }).click();
   await form.getByLabel("اسم الفعالية *").fill(`${title} Edited`);
   await form.getByRole("button", { name: "حفظ التعديلات" }).click();
-  await page.getByText("تم حفظ الفعالية بنجاح.", { exact: true }).waitFor({ timeout: 20000 });
+  await page.getByText("تم تحديث الفعالية والتذاكر وحسابات الدفع معاً بنجاح.", { exact: true }).waitFor({ timeout: 20000 });
   const edited = await data(await service.from("events").select("title,status").eq("id", row.id).single(), `Verify ${label} event edit persisted`);
   assert.equal(edited.title, `${title} Edited`);
   assert.equal(edited.status, "draft");
