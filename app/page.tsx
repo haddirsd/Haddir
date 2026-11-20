@@ -18,6 +18,7 @@ function logSocialMetadataMetrics(metrics: {
   console.info(JSON.stringify({
     event: "performance.social_metadata",
     result: metrics.result,
+    function_region: process.env.VERCEL_REGION ?? null,
     duration_ms: Number((performance.now() - metrics.startedAt).toFixed(1)),
     data_query_ms: metrics.queryMs,
     rest_request_count: metrics.requestCount,
