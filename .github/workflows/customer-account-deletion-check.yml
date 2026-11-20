@@ -9,6 +9,8 @@ on:
       - "supabase/migrations/20261115141925_atomic_customer_account_deletion.sql"
       - "supabase/functions/delete-customer-account/**"
       - "supabase/recovery/test-harness/customer-account-deletion.sql"
+      - "features/customer-account/hooks/useCustomerAccountActions.ts"
+      - "tests/e2e/customer-account-deletion-ui.mjs"
       - ".github/workflows/customer-account-deletion-check.yml"
   push:
     branches:
@@ -19,6 +21,8 @@ on:
       - "supabase/migrations/20261115141925_atomic_customer_account_deletion.sql"
       - "supabase/functions/delete-customer-account/**"
       - "supabase/recovery/test-harness/customer-account-deletion.sql"
+      - "features/customer-account/hooks/useCustomerAccountActions.ts"
+      - "tests/e2e/customer-account-deletion-ui.mjs"
       - ".github/workflows/customer-account-deletion-check.yml"
 
 permissions:
