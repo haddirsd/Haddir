@@ -1,18 +1,16 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
-import { POST } from "../../app/api/booking/receipt/route.ts";
 
 const url = process.env.SUPABASE_URL;
 const anonKey = process.env.SUPABASE_ANON_KEY;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const testBaseUrl = process.env.TEST_BASE_URL || "http://127.0.0.1:3000";
 
 for (const [name, value] of Object.entries({ url, anonKey, serviceRoleKey })) {
   assert.ok(value, `Missing required environment variable: ${name}`);
 }
 
-process.env.NEXT_PUBLIC_SUPABASE_URL = url;
-process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = anonKey;
 
 const admin = createClient(url, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
@@ -87,12 +85,11 @@ async function callUpload(token, bookingId, file) {
   const headers = {};
   if (token !== null) headers.authorization = token ? `Bearer ${token}` : "";
 
-  const request = new Request("http://localhost/api/booking/receipt", {
+  const response = await fetch(`${testBaseUrl}/api/booking/receipt`, {
     method: "POST",
     headers,
     body: form,
   });
-  const response = await POST(request);
   return { response, body: await response.json() };
 }
 
