@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import { normalizeSudanesePhone, isValidSudanesePhone } from "../../../lib/utils/phone";
-import { signInWithGoogle as startGoogleSignIn, updateCustomerProfile } from "../../auth/services/auth.service";
+import { signInWithEmailPassword, signInWithGoogle as startGoogleSignIn, updateCustomerProfile } from "../../auth/services/auth.service";
 import type { AuthUser } from "../../auth/types";
 import { requestCustomerAccountDeletion } from "../services/customer-account.service";
 import type { AccountDialog } from "../components/AccountDialogs";
