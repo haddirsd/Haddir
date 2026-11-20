@@ -114,7 +114,13 @@ export function useCustomerAccountActions({
     }
 
     const supabase = getSupabaseBrowserClient();
-    if (supabase) await supabase.auth.signOut();
+    if (supabase) {
+      const { error: signOutError } = await supabase.auth.signOut({ scope: "local" });
+      if (signOutError) {
+        setAuthMessage("تم حذف الحساب، لكن تعذر مسح جلسة المتصفح. أغلق الصفحة وافتحها مجدداً.");
+        return;
+      }
+    }
     window.location.assign("/?tab=profile");
   }, [authUser?.email, deleteEmailInput, setAccountDialog, setAuthMessage, setDeletingAccount]);
 
