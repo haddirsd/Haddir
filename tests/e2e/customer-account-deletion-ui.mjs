@@ -205,17 +205,22 @@ try {
 
   // Confirm deletion through the real browser UI and local Edge Function.
   const finalDialog = await requestDelete(customerPage, customer.email);
-  await finalDialog.getByRole("button", { name: "حذف الحساب نهائياً" }).click();
   const loginHeading = customerPage.getByRole("heading", { name: "سجّل الدخول إلى حاضر" });
   const deletionError = customerPage.locator(".privacy-delete-error");
-  await Promise.race([
-    loginHeading.waitFor({ timeout: 30000 }),
-    deletionError.waitFor({ timeout: 30000 }),
-  ]);
-  if (!(await loginHeading.isVisible())) {
+  const profileRedirect = customerPage.waitForEvent("framenavigated", {
+    predicate: frame => frame === customerPage.mainFrame(),
+    timeout: 30000,
+  });
+  await finalDialog.getByRole("button", { name: "حذف الحساب نهائياً" }).click();
+  try {
+    await profileRedirect;
+  } catch {
     const message = await deletionError.last().textContent().catch(() => "No deletion error message rendered");
-    throw new Error(`Account deletion did not complete in UI: ${message}; Edge Function responses: ${JSON.stringify(deletionFunctionResponses)}`);
+    throw new Error(`Account deletion did not redirect: ${message}; Edge Function responses: ${JSON.stringify(deletionFunctionResponses)}`);
   }
+  await customerPage.getByRole("navigation", { name: "التنقل الرئيسي" })
+    .getByRole("button", { name: "الملف الشخصي" }).click();
+  await loginHeading.waitFor({ timeout: 15000 });
   const projectRef = new URL(url).hostname.split(".")[0];
   const storageKey = `sb-${projectRef}-auth-token`;
   assert.equal(await customerPage.evaluate(key => localStorage.getItem(key), storageKey), null,
