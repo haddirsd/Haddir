@@ -169,25 +169,17 @@ try {
   assert.equal(bookingItems[0].quantity, 1);
   assert.equal(Number(bookingItems[0].line_total), 250);
 
-  // Upload the transfer receipt through the actual Next.js HTTP endpoint.
-  const form = new FormData();
-  form.set("bookingId", bookingId);
-  form.set("receipt", receiptFile());
-  const uploadResponse = await fetch(`${baseUrl}/api/booking/receipt`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${customer.accessToken}` },
-    body: form,
+  // Upload the transfer receipt directly from the authenticated browser client to private Storage.
+  const receiptPath = `${customer.id}/${bookingId}/${randomUUID()}.png`;
+  const upload = await customer.client.storage.from("payment-receipts").upload(receiptPath, receiptFile(), {
+    contentType: "image/png",
+    upsert: false,
+    cacheControl: "3600",
   });
-  const uploadBody = await uploadResponse.json();
-  assert.equal(uploadResponse.status, 200, `Receipt upload must succeed: ${JSON.stringify(uploadBody)}`);
-  assert.match(
-    uploadBody.path,
-    new RegExp(`^${customer.id}/${bookingId}/[^/]+\\.png$`),
-    "Receipt storage path must be scoped to the customer and booking",
-  );
-  uploadedPaths.push(uploadBody.path);
+  assert.equal(upload.error, null, `Receipt upload must succeed: ${upload.error?.message}`);
+  uploadedPaths.push(receiptPath);
   const storedReceipt = await dataOrThrow(
-    await admin.storage.from("payment-receipts").download(uploadBody.path),
+    await admin.storage.from("payment-receipts").download(receiptPath),
     "Verify receipt persisted in private Storage",
   );
   assert.equal(storedReceipt.size, 8, "Stored receipt must preserve uploaded bytes");
@@ -197,7 +189,7 @@ try {
     await customer.client.rpc("submit_payment", {
       p_booking_id: bookingId,
       p_payment_method_id: paymentAccountId,
-      p_receipt_path: uploadBody.path,
+      p_receipt_path: receiptPath,
       p_transfer_reference: "E2E-TRANSFER-001",
     }),
     "Submit payment for review",
@@ -215,7 +207,7 @@ try {
     "Verify submitted payment and account snapshot",
   );
   assert.equal(pendingPayment.status, "submitted");
-  assert.equal(pendingPayment.receipt_path, uploadBody.path);
+  assert.equal(pendingPayment.receipt_path, receiptPath);
   assert.equal(pendingPayment.payment_account_name, "E2E Bank Transfer");
 
   // Authorized reviewer approves payment; the database issues the ticket.
@@ -281,7 +273,7 @@ try {
   );
   assert.equal(checkinNotifications.length, 1, "Successful check-in must notify the customer exactly once");
 
-  console.log("PASS: complete isolated customer journey from authentication and event discovery through booking, receipt upload, payment approval, ticket issuance, and gatekeeper check-in.");
+  console.log("PASS: complete isolated customer journey from authentication and event discovery through direct receipt upload, payment approval, ticket issuance, and gatekeeper check-in.");
 } finally {
   if (uploadedPaths.length) {
     await admin.storage.from("payment-receipts").remove(uploadedPaths);

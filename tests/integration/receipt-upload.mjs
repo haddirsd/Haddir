@@ -5,12 +5,10 @@ import { createClient } from "@supabase/supabase-js";
 const url = process.env.SUPABASE_URL;
 const anonKey = process.env.SUPABASE_ANON_KEY;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const testBaseUrl = process.env.TEST_BASE_URL || "http://127.0.0.1:3000";
 
 for (const [name, value] of Object.entries({ url, anonKey, serviceRoleKey })) {
   assert.ok(value, `Missing required environment variable: ${name}`);
 }
-
 
 const admin = createClient(url, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
@@ -58,48 +56,19 @@ async function createCustomer(index) {
     "Sign in receipt test customer",
   );
   assert.ok(signedIn.session?.access_token, "Customer session must include an access token");
-  return { id: user.id, client, token: signedIn.session.access_token };
+  return { id: user.id, client };
 }
 
-async function createBooking(customer) {
-  const result = await requireNoError(
-    await customer.client.rpc("create_booking", {
-      p_event_id: eventId,
-      p_ticket_type_id: ticketTypeId,
-      p_quantity: 1,
-    }),
-    "Create receipt test booking",
-  );
-  const bookingId = Array.isArray(result)
-    ? result[0]?.booking_id ?? result[0]?.id
-    : result?.booking_id ?? result?.id ?? result;
-  assert.match(String(bookingId), /^[0-9a-f-]{36}$/i, "Booking RPC must return a booking UUID");
-  return String(bookingId);
+function pngFile(name = "receipt.png", size = 8) {
+  return new File([new Uint8Array(size)], name, { type: "image/png" });
 }
 
-async function callUpload(token, bookingId, file) {
-  const form = new FormData();
-  if (bookingId !== undefined) form.set("bookingId", bookingId);
-  if (file !== undefined) form.set("receipt", file);
-
-  const headers = {};
-  if (token !== null) headers.authorization = token ? `Bearer ${token}` : "";
-
-  const response = await fetch(`${testBaseUrl}/api/booking/receipt`, {
-    method: "POST",
-    headers,
-    body: form,
+async function uploadAs(customer, path, file) {
+  return customer.client.storage.from("payment-receipts").upload(path, file, {
+    contentType: file.type,
+    upsert: false,
+    cacheControl: "3600",
   });
-  return { response, body: await response.json() };
-}
-
-function pngFile(name = "receipt.png") {
-  // A minimal PNG signature is sufficient for exercising the upload route and Storage transport.
-  return new File(
-    [Uint8Array.from([137, 80, 78, 71, 13, 10, 26, 10])],
-    name,
-    { type: "image/png" },
-  );
 }
 
 try {
@@ -109,7 +78,7 @@ try {
   await requireNoError(
     await admin.from("events").insert({
       id: eventId,
-      title: "Receipt Upload HTTP Integration Test",
+      title: "Receipt Upload Storage Integration Test",
       slug: `receipt-upload-${suffix}`,
       starts_at: new Date(Date.now() + 86_400_000).toISOString(),
       ends_at: new Date(Date.now() + 172_800_000).toISOString(),
@@ -134,6 +103,22 @@ try {
     "Create receipt test ticket inventory",
   );
 
+  const createBooking = async (identity) => {
+    const result = await requireNoError(
+      await identity.client.rpc("create_booking", {
+        p_event_id: eventId,
+        p_ticket_type_id: ticketTypeId,
+        p_quantity: 1,
+      }),
+      "Create receipt test booking",
+    );
+    const bookingId = Array.isArray(result)
+      ? result[0]?.booking_id ?? result[0]?.id
+      : result?.booking_id ?? result?.id ?? result;
+    assert.match(String(bookingId), /^[0-9a-f-]{36}$/i, "Booking RPC must return a booking UUID");
+    return String(bookingId);
+  };
+
   const validBookingId = await createBooking(customer);
   const expiredBookingId = await createBooking(customer);
   const reviewedBookingId = await createBooking(customer);
@@ -148,68 +133,64 @@ try {
     "Move receipt test booking out of pending_payment",
   );
 
-  // Authentication and request validation.
-  let result = await callUpload(null, validBookingId, pngFile());
-  assert.equal(result.response.status, 401, "Missing authorization must return 401");
-
-  result = await callUpload("invalid-access-token", validBookingId, pngFile());
-  assert.equal(result.response.status, 401, "Invalid access token must return 401");
-
-  result = await callUpload(customer.token, "not-a-uuid", pngFile());
-  assert.equal(result.response.status, 400, "Malformed booking ID must return 400");
-
-  result = await callUpload(customer.token, validBookingId);
-  assert.equal(result.response.status, 400, "Missing receipt must return 400");
-
-  result = await callUpload(
-    customer.token,
-    validBookingId,
-    new File(["not an image"], "receipt.pdf", { type: "application/pdf" }),
-  );
-  assert.equal(result.response.status, 400, "Unsupported MIME type must return 400");
-
-  result = await callUpload(
-    customer.token,
-    validBookingId,
-    new File([], "empty.png", { type: "image/png" }),
-  );
-  assert.equal(result.response.status, 400, "Empty receipt must return 400");
-
-  result = await callUpload(
-    customer.token,
-    validBookingId,
-    new File([new Uint8Array(5 * 1024 * 1024 + 1)], "large.png", { type: "image/png" }),
-  );
-  assert.equal(result.response.status, 400, "Receipt larger than 5 MiB must return 400");
-
-  // Storage RLS must reject ownership, expiry, and booking-state violations through the API.
-  result = await callUpload(customer.token, otherBookingId, pngFile("wrong-owner.png"));
-  assert.equal(result.response.status, 403, "Customer cannot upload against another customer's booking");
-
-  result = await callUpload(customer.token, expiredBookingId, pngFile("expired.png"));
-  assert.equal(result.response.status, 403, "Expired booking cannot accept a receipt");
-
-  result = await callUpload(customer.token, reviewedBookingId, pngFile("already-reviewed.png"));
-  assert.equal(result.response.status, 403, "Non-pending booking cannot accept a receipt");
-
-  // A valid upload must pass through the real route and persist in the private bucket.
-  result = await callUpload(customer.token, validBookingId, pngFile());
-  assert.equal(result.response.status, 200, `Valid receipt upload must succeed: ${JSON.stringify(result.body)}`);
-  assert.ok(typeof result.body.path === "string", "Successful response must return the storage path");
-  assert.match(
-    result.body.path,
-    new RegExp(`^${customer.id}/${validBookingId}/[^/]+\\.png$`),
-    "Stored path must be scoped to the authenticated customer and booking",
-  );
-  uploadedPaths.push(result.body.path);
+  const validPath = `${customer.id}/${validBookingId}/${randomUUID()}.png`;
+  const validUpload = await uploadAs(customer, validPath, pngFile());
+  assert.equal(validUpload.error, null, `Customer must upload a receipt directly to private Storage: ${validUpload.error?.message}`);
+  uploadedPaths.push(validPath);
 
   const storedFile = await requireNoError(
-    await admin.storage.from("payment-receipts").download(result.body.path),
+    await admin.storage.from("payment-receipts").download(validPath),
     "Verify uploaded receipt exists in private Storage",
   );
   assert.equal(storedFile.size, 8, "Stored receipt must contain the uploaded file bytes");
 
-  console.log("PASS: receipt upload API authentication, validation, Storage authorization, and real file persistence.");
+  const maxSizePath = `${customer.id}/${validBookingId}/${randomUUID()}.png`;
+  const maxSizeUpload = await uploadAs(
+    customer,
+    maxSizePath,
+    new File([new Uint8Array(5 * 1024 * 1024)], "maximum-size.png", { type: "image/png" }),
+  );
+  assert.equal(maxSizeUpload.error, null, `A receipt exactly 5 MiB must be accepted: ${maxSizeUpload.error?.message}`);
+  uploadedPaths.push(maxSizePath);
+  const maxSizeStoredFile = await requireNoError(
+    await admin.storage.from("payment-receipts").download(maxSizePath),
+    "Verify maximum-size receipt exists in private Storage",
+  );
+  assert.equal(maxSizeStoredFile.size, 5 * 1024 * 1024, "Storage must preserve the full 5 MiB receipt");
+
+  const wrongOwnerPath = `${customer.id}/${validBookingId}/${randomUUID()}.png`;
+  const wrongOwnerUpload = await uploadAs(otherCustomer, wrongOwnerPath, pngFile("wrong-owner.png"));
+  assert.ok(wrongOwnerUpload.error, "Another customer cannot upload into a different customer's folder");
+
+  const otherBookingPath = `${customer.id}/${otherBookingId}/${randomUUID()}.png`;
+  const otherBookingUpload = await uploadAs(customer, otherBookingPath, pngFile("other-booking.png"));
+  assert.ok(otherBookingUpload.error, "Customer cannot upload against another customer's booking");
+
+  const expiredPath = `${customer.id}/${expiredBookingId}/${randomUUID()}.png`;
+  const expiredUpload = await uploadAs(customer, expiredPath, pngFile("expired.png"));
+  assert.ok(expiredUpload.error, "Expired booking cannot accept a receipt");
+
+  const reviewedPath = `${customer.id}/${reviewedBookingId}/${randomUUID()}.png`;
+  const reviewedUpload = await uploadAs(customer, reviewedPath, pngFile("already-reviewed.png"));
+  assert.ok(reviewedUpload.error, "Non-pending booking cannot accept a receipt");
+
+  const unsupportedPath = `${customer.id}/${validBookingId}/${randomUUID()}.pdf`;
+  const unsupportedUpload = await uploadAs(
+    customer,
+    unsupportedPath,
+    new File(["not an image"], "receipt.pdf", { type: "application/pdf" }),
+  );
+  assert.ok(unsupportedUpload.error, "Storage must reject unsupported receipt MIME types");
+
+  const oversizedPath = `${customer.id}/${validBookingId}/${randomUUID()}.png`;
+  const oversizedUpload = await uploadAs(
+    customer,
+    oversizedPath,
+    new File([new Uint8Array(5 * 1024 * 1024 + 1)], "large.png", { type: "image/png" }),
+  );
+  assert.ok(oversizedUpload.error, "Storage must reject receipts larger than 5 MiB");
+
+  console.log("PASS: direct receipt upload, 5 MiB bucket limit, MIME restrictions, customer ownership, booking state, and private Storage persistence.");
 } finally {
   if (uploadedPaths.length) {
     await admin.storage.from("payment-receipts").remove(uploadedPaths);
