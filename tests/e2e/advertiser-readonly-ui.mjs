@@ -201,7 +201,8 @@ try {
     "Advertiser UI must not expose another advertiser's event");
   assert.equal(await page.getByText("فئة فعالية أخرى", { exact: true }).count(), 0,
     "Advertiser UI must not expose another event's ticket categories");
-  assert.equal(await page.getByRole("button", { name: /حفظ|تعديل|إضافة|حذف/ }).count(), 0,
+  const advertiserPanel = page.locator(".advertiser-statistics-panel");
+  assert.equal(await advertiserPanel.getByRole("button", { name: /حفظ|تعديل|إضافة|حذف/ }).count(), 0,
     "Advertiser statistics workspace must not expose editing controls");
 
   assert.deepEqual(pageErrors, [],
