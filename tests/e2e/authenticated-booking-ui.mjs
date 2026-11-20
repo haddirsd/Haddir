@@ -81,7 +81,7 @@ try {
       is_continuous: false,
       description: "فعالية مؤقتة لاختبار جلسة العميل والدفع ورفع الإيصال من المتصفح.",
       status: "published",
-      is_trending: true,
+      is_trending: false,
       created_by: userId,
     }),
     "Create isolated published event",
