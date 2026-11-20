@@ -1,6 +1,6 @@
 begin;
 
-select plan(20);
+select plan(21);
 
 insert into auth.users (
   id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -74,12 +74,6 @@ insert into public.payment_submissions(id,booking_id,submitted_by,amount,currenc
 ('46000000-0000-4000-8000-000000000002','44000000-0000-4000-8000-000000000002',
  '41000000-0000-4000-8000-000000000001',100,'SDG','submitted');
 
-create temporary table ticket_lifecycle_ids (
-  first_ticket_code text,
-  second_ticket_code text
-);
-grant all on ticket_lifecycle_ids to authenticated;
-
 set local role authenticated;
 select set_config('request.jwt.claims',
   '{"sub":"41000000-0000-4000-8000-000000000002","role":"authenticated"}',true);
@@ -109,9 +103,21 @@ select lives_ok(
   'A second independent booking can issue its own ticket'
 );
 
-update ticket_lifecycle_ids
-set first_ticket_code=(select ticket_code from public.tickets where booking_id='44000000-0000-4000-8000-000000000001'),
-    second_ticket_code=(select ticket_code from public.tickets where booking_id='44000000-0000-4000-8000-000000000002');
+select set_config(
+  'test.first_ticket_code',
+  (select ticket_code from public.tickets where booking_id='44000000-0000-4000-8000-000000000001'),
+  true
+);
+select set_config(
+  'test.second_ticket_code',
+  (select ticket_code from public.tickets where booking_id='44000000-0000-4000-8000-000000000002'),
+  true
+);
+select ok(
+  nullif(current_setting('test.first_ticket_code',true),'') is not null
+  and nullif(current_setting('test.second_ticket_code',true),'') is not null,
+  'Issued ticket codes are captured before switching authentication identities'
+);
 
 reset role;
 set local role authenticated;
@@ -138,7 +144,7 @@ select is(
 );
 select throws_ok(
   format('select public.gatekeeper_ticket_action(%L,true)',
-    (select first_ticket_code from ticket_lifecycle_ids)),
+    current_setting('test.first_ticket_code',true)),
   'P0001','هذه الخدمة مخصصة للبواب فقط',
   'Customer role cannot validate or consume a ticket'
 );
@@ -151,13 +157,13 @@ select set_config('request.jwt.claim.sub','41000000-0000-4000-8000-000000000003'
 
 select is(
   (public.gatekeeper_ticket_action(
-    (select first_ticket_code from ticket_lifecycle_ids),false
+    current_setting('test.first_ticket_code',true),false
   )->>'status'),
   'valid','Assigned gatekeeper can validate a valid ticket without consuming it'
 );
 select is(
   (public.gatekeeper_ticket_action(
-    (select first_ticket_code from ticket_lifecycle_ids),true
+    current_setting('test.first_ticket_code',true),true
   )->>'status'),
   'checked_in','QR confirmation checks the ticket in'
 );
@@ -167,13 +173,13 @@ select is(
 );
 select is(
   (public.gatekeeper_ticket_action(
-    (select first_ticket_code from ticket_lifecycle_ids),true
+    current_setting('test.first_ticket_code',true),true
   )->>'status'),
   'used','A second QR confirmation is rejected as already used'
 );
 select is(
   (public.gatekeeper_manual_ticket_action(
-    (select second_ticket_code from ticket_lifecycle_ids),true
+    current_setting('test.second_ticket_code',true),true
   )->>'status'),
   'checked_in','Manual numeric entry can confirm a valid ticket'
 );
@@ -210,13 +216,13 @@ select set_config('request.jwt.claim.sub','41000000-0000-4000-8000-000000000004'
 
 select throws_ok(
   format('select public.gatekeeper_ticket_action(%L,true)',
-    (select first_ticket_code from ticket_lifecycle_ids)),
+    current_setting('test.first_ticket_code',true)),
   'P0001','هذه التذكرة لا تخص الفعالية المصرح لك بها',
   'Gatekeeper assigned to another event cannot validate this ticket'
 );
 select throws_ok(
   format('select public.gatekeeper_manual_ticket_action(%L,true)',
-    (select first_ticket_code from ticket_lifecycle_ids)),
+    current_setting('test.first_ticket_code',true)),
   'P0001','هذه التذكرة لا تخص الفعالية المصرح لك بها',
   'Manual entry also enforces the event assignment boundary'
 );
