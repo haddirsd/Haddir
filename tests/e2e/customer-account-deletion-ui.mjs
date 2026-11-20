@@ -220,11 +220,15 @@ try {
   }
   await customerPage.getByRole("navigation", { name: "التنقل الرئيسي" })
     .getByRole("button", { name: "الملف الشخصي" }).click();
-  await loginHeading.waitFor({ timeout: 15000 });
   const projectRef = new URL(url).hostname.split(".")[0];
   const storageKey = `sb-${projectRef}-auth-token`;
-  assert.equal(await customerPage.evaluate(key => localStorage.getItem(key), storageKey), null,
-    "Successful account deletion must clear the browser session");
+  const storedSessionAfterDelete = await customerPage.evaluate(key => localStorage.getItem(key), storageKey);
+  if (!(await loginHeading.isVisible().catch(() => false))) {
+    const profileText = await customerPage.locator(".profile-screen").innerText().catch(() => "Profile workspace not rendered");
+    const alerts = await customerPage.getByRole("alert").allTextContents().catch(() => []);
+    throw new Error(`Deleted account did not return to signed-out profile. Session persisted: ${Boolean(storedSessionAfterDelete)}; profile: ${profileText}; alerts: ${JSON.stringify(alerts)}; Edge Function responses: ${JSON.stringify(deletionFunctionResponses)}`);
+  }
+  assert.equal(storedSessionAfterDelete, null, "Successful account deletion must clear the browser session");
 
   const deletedAuth = await admin.auth.admin.getUserById(customer.id);
   assert.ok(deletedAuth.error, "Deleted customer must no longer exist in Supabase Auth");
