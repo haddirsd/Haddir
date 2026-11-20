@@ -62,6 +62,7 @@ export function EventsWorkspace({
     bookingError,
     setBookingError,
     bookingSubmitting,
+    receiptUploading,
     accountCopied,
     setAccountCopied,
     copyAccount,
@@ -116,6 +117,7 @@ export function EventsWorkspace({
           bookingNumber={bookingNumber}
           bookingError={bookingError}
           bookingSubmitting={bookingSubmitting}
+          receiptUploading={receiptUploading}
           accountCopied={accountCopied}
           onClose={closeEvent}
           onSelectTier={selectTier}
