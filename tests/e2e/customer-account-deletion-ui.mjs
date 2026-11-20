@@ -23,6 +23,7 @@ const receiptPaths = [];
 const pageErrors = [];
 const consoleErrors = [];
 const failedResponses = [];
+const deletionFunctionResponses = [];
 let browser;
 
 async function data(result, action) {
@@ -111,8 +112,14 @@ async function openDeletionPage(user) {
   }, { key: `sb-${projectRef}-auth-token`, session: user.session });
   const page = await context.newPage();
   page.on("pageerror", error => pageErrors.push(error.stack || error.message));
-  page.on("response", response => {
+  page.on("response", async response => {
     if (response.status() >= 400) failedResponses.push({ status: response.status(), url: response.url() });
+    if (response.url().includes("/functions/v1/delete-customer-account")) {
+      deletionFunctionResponses.push({
+        status: response.status(),
+        body: await response.text().catch(() => ""),
+      });
+    }
   });
   page.on("console", message => {
     if (message.type() === "error" && !message.text().includes("Failed to load resource:")) {
@@ -199,7 +206,16 @@ try {
   // Confirm deletion through the real browser UI and local Edge Function.
   const finalDialog = await requestDelete(customerPage, customer.email);
   await finalDialog.getByRole("button", { name: "حذف الحساب نهائياً" }).click();
-  await customerPage.getByRole("heading", { name: "سجّل الدخول إلى حاضر" }).waitFor({ timeout: 30000 });
+  const loginHeading = customerPage.getByRole("heading", { name: "سجّل الدخول إلى حاضر" });
+  const deletionError = customerPage.locator(".privacy-delete-error");
+  await Promise.race([
+    loginHeading.waitFor({ timeout: 30000 }),
+    deletionError.waitFor({ timeout: 30000 }),
+  ]);
+  if (!(await loginHeading.isVisible())) {
+    const message = await deletionError.last().textContent().catch(() => "No deletion error message rendered");
+    throw new Error(`Account deletion did not complete in UI: ${message}; Edge Function responses: ${JSON.stringify(deletionFunctionResponses)}`);
+  }
   const projectRef = new URL(url).hostname.split(".")[0];
   const storageKey = `sb-${projectRef}-auth-token`;
   assert.equal(await customerPage.evaluate(key => localStorage.getItem(key), storageKey), null,
