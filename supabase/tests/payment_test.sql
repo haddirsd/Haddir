@@ -323,6 +323,14 @@ select throws_ok(
 
 reset role;
 
+-- Switch the simulated session to the authorized admin before review tests.
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"11000000-0000-4000-8000-000000000003","role":"authenticated"}',
+  true
+);
+select set_config('request.jwt.claim.sub', '11000000-0000-4000-8000-000000000003', true);
+
 select throws_ok(
   format(
     'select public.review_payment_submission(%L, %L, %L)',
