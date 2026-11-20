@@ -22,6 +22,7 @@ const email = `haddir-auth-session-${suffix}@example.test`;
 const password = `Haddir-Auth-Session-${randomUUID()}-Aa1!`;
 const errors = [];
 const consoleErrors = [];
+const failedResponses = [];
 let browser;
 let userId;
 
@@ -81,8 +82,13 @@ try {
 
   const page = await context.newPage();
   page.on("pageerror", error => errors.push(error.stack || error.message));
+  page.on("response", response => {
+    if (response.status() >= 400) failedResponses.push({ status: response.status(), url: response.url() });
+  });
   page.on("console", message => {
-    if (message.type() === "error") consoleErrors.push(message.text());
+    if (message.type() === "error" && !message.text().includes("Failed to load resource:")) {
+      consoleErrors.push(message.text());
+    }
   });
 
   const homeResponse = await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
@@ -155,6 +161,10 @@ try {
 
   assert.deepEqual(errors, [], `Auth browser runtime errors: ${errors.join("; ")}`);
   assert.deepEqual(consoleErrors, [], `Auth browser console errors: ${consoleErrors.join("; ")}`);
+  assert.equal(failedResponses.length, 1, "Only the deliberate invalid-password request may return an HTTP error");
+  assert.equal(failedResponses[0].status, 400);
+  assert.ok(failedResponses[0].url.includes("/auth/v1/token"),
+    "The expected 400 response must come from Supabase password authentication");
   console.log("PASS: email/password authentication rejects invalid credentials, creates and refreshes a real Supabase session, browser session survives reload, logout clears the session, and Google OAuth UI sends the expected provider, redirect URI, ");
 } finally {
   if (browser) await browser.close();
