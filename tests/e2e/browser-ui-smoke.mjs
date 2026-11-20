@@ -106,8 +106,12 @@ try {
   await page.getByRole("dialog", { name: "سجّل الدخول لإكمال الحجز" }).waitFor();
   await page.getByRole("button", { name: "لاحقاً" }).click();
 
-  await page.getByRole("navigation", { name: "التنقل الرئيسي" })
-    .getByRole("button", { name: "الملف الشخصي" }).click();
+  // Event details intentionally hide the mobile bottom navigation.
+  // Reload the home screen before testing the independent profile entry point.
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
+  const mainNavigation = page.getByRole("navigation", { name: "التنقل الرئيسي" });
+  await mainNavigation.waitFor({ state: "visible" });
+  await mainNavigation.getByRole("button", { name: "الملف الشخصي" }).click();
   await page.getByRole("heading", { name: "سجّل الدخول إلى حاضر" }).waitFor();
   await page.getByRole("button", { name: /المتابعة باستخدام Google/ }).waitFor();
 
