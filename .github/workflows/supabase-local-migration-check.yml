@@ -68,6 +68,14 @@ jobs:
       - name: Run isolated database integration tests
         run: supabase test db
 
+      - name: Run payment receipt upload API integration test
+        run: |
+          eval "$(supabase status -o env)"
+          export SUPABASE_URL="$API_URL"
+          export SUPABASE_ANON_KEY="$ANON_KEY"
+          export SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"
+          node --experimental-default-type=module --experimental-strip-types tests/integration/receipt-upload.mjs
+
       - name: Run concurrent booking inventory test
         run: |
           eval "$(supabase status -o env)"
