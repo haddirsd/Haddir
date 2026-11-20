@@ -109,15 +109,15 @@ select lives_ok(
   'A second independent booking can issue its own ticket'
 );
 
+update ticket_lifecycle_ids
+set first_ticket_code=(select ticket_code from public.tickets where booking_id='44000000-0000-4000-8000-000000000001'),
+    second_ticket_code=(select ticket_code from public.tickets where booking_id='44000000-0000-4000-8000-000000000002');
+
 reset role;
 set local role authenticated;
 select set_config('request.jwt.claims',
   '{"sub":"41000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
 select set_config('request.jwt.claim.sub','41000000-0000-4000-8000-000000000001',true);
-
-update ticket_lifecycle_ids
-set first_ticket_code=(select ticket_code from public.tickets where booking_id='44000000-0000-4000-8000-000000000001'),
-    second_ticket_code=(select ticket_code from public.tickets where booking_id='44000000-0000-4000-8000-000000000002');
 
 select is(
   (select count(*)::integer from public.notifications
