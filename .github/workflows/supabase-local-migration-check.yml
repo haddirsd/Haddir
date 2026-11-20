@@ -7,6 +7,7 @@ on:
     paths:
       - "supabase/**"
       - "tests/integration/**"
+      - "tests/e2e/**"
       - "package.json"
       - "package-lock.json"
       - ".github/workflows/supabase-local-migration-check.yml"
@@ -16,6 +17,7 @@ on:
     paths:
       - "supabase/**"
       - "tests/integration/**"
+      - "tests/e2e/**"
       - "package.json"
       - "package-lock.json"
       - ".github/workflows/supabase-local-migration-check.yml"
@@ -104,6 +106,43 @@ jobs:
           fi
 
           node --experimental-default-type=module --experimental-strip-types tests/integration/receipt-upload.mjs
+
+      - name: Run complete customer booking lifecycle E2E test
+        run: |
+          eval "$(supabase status -o env)"
+          export SUPABASE_URL="$API_URL"
+          export SUPABASE_ANON_KEY="$ANON_KEY"
+          export SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"
+          export NEXT_PUBLIC_SUPABASE_URL="$API_URL"
+          export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="$ANON_KEY"
+          export TEST_BASE_URL="http://127.0.0.1:3001"
+
+          npm run dev -- --hostname 127.0.0.1 --port 3001 > /tmp/haddir-e2e-next-dev.log 2>&1 &
+          NEXT_SERVER_PID=$!
+          trap 'kill "$NEXT_SERVER_PID" 2>/dev/null || true' EXIT
+
+          READY=0
+          for attempt in $(seq 1 60); do
+            HTTP_STATUS=$(curl --silent --output /dev/null --write-out "%{http_code}" \
+              --request POST "$TEST_BASE_URL/api/booking/receipt" || true)
+            if [ "$HTTP_STATUS" = "401" ]; then
+              READY=1
+              break
+            fi
+            if ! kill -0 "$NEXT_SERVER_PID" 2>/dev/null; then
+              cat /tmp/haddir-e2e-next-dev.log
+              exit 1
+            fi
+            sleep 2
+          done
+
+          if [ "$READY" -ne 1 ]; then
+            cat /tmp/haddir-e2e-next-dev.log
+            echo "Next.js E2E server did not become ready."
+            exit 1
+          fi
+
+          npm run test:e2e
 
       - name: Run concurrent booking inventory test
         run: |
