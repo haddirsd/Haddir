@@ -11,6 +11,9 @@ on:
       - "package.json"
       - "package-lock.json"
       - "app/layout.tsx"
+      - "app/HomeClient.tsx"
+      - "features/auth/**"
+      - "features/customer-account/**"
       - ".github/workflows/supabase-local-migration-check.yml"
   push:
     branches:
@@ -22,6 +25,9 @@ on:
       - "package.json"
       - "package-lock.json"
       - "app/layout.tsx"
+      - "app/HomeClient.tsx"
+      - "features/auth/**"
+      - "features/customer-account/**"
       - ".github/workflows/supabase-local-migration-check.yml"
   workflow_dispatch:
 
