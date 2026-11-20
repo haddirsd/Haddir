@@ -1,0 +1,4 @@
+-- Superseded: the event-scoped payment-review authorization is already
+-- implemented by 20261119172147_scope_booking_locks_by_event_and_customer.sql.
+-- The missing ticket/check-in policies are recreated in the consolidated
+-- active migration 20261120170000_reconcile_payment_and_staff_migrations.sql.
