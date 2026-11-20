@@ -124,7 +124,7 @@ jobs:
 
           npm run dev -- --hostname 127.0.0.1 --port 3002 > /tmp/haddir-browser-next-dev.log 2>&1 &
           NEXT_SERVER_PID=$!
-          trap 'kill "$NEXT_SERVER_PID" 2>/dev/null || true' EXIT
+          trap 'status=$?; kill "$NEXT_SERVER_PID" 2>/dev/null || true; if [ "$status" -ne 0 ]; then echo "===== Next.js browser server log ====="; tail -n 200 /tmp/haddir-browser-next-dev.log; fi; exit "$status"' EXIT
 
           READY=0
           for attempt in $(seq 1 60); do
