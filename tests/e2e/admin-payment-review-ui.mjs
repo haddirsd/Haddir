@@ -268,10 +268,10 @@ try {
 
   const response = await page.goto(`${baseUrl}/admin`, { waitUntil: "domcontentloaded" });
   assert.equal(response?.status(), 200, "Admin workspace must return HTTP 200");
-  await page.getByRole("heading", { name: "مراجعة المدفوعات" }).waitFor({ timeout: 15000 });
-
   const adminNavigation = page.getByRole("navigation", { name: "تبويبات لوحة الإدارة" });
+  await adminNavigation.waitFor({ state: "visible", timeout: 15000 });
   await adminNavigation.getByRole("button", { name: "مراجعة المدفوعات" }).click();
+  await page.getByRole("heading", { name: "مراجعة المدفوعات" }).waitFor({ timeout: 15000 });
 
   const cards = page.locator("article.admin-payment-card");
   await page.getByText(approval.booking_number, { exact: true }).waitFor({ timeout: 15000 });
