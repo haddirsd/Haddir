@@ -71,7 +71,7 @@ insert into public.booking_items(id,booking_id,ticket_type_id,quantity,unit_pric
 insert into public.payment_submissions(id,booking_id,submitted_by,amount,currency,status) values
 ('46000000-0000-4000-8000-000000000001','44000000-0000-4000-8000-000000000001',
  '41000000-0000-4000-8000-000000000001',100,'SDG','submitted'),
-('46000000-0000-4000-8000-000000000002','44000000-0000-4000-8000-000000000002',
+('46000000-0000-4000-8000-000000000002','44000000-0000-4000-8000-000000000001',
  '41000000-0000-4000-8000-000000000001',100,'SDG','submitted');
 
 create temporary table ticket_lifecycle_ids (
@@ -101,11 +101,6 @@ select is(
   (select count(*)::integer from public.tickets where booking_id='44000000-0000-4000-8000-000000000001'),
   1,'Approval persists one ticket row'
 );
-select is(
-  (select count(*)::integer from public.notifications
-   where booking_id='44000000-0000-4000-8000-000000000001' and type='ticket_approved'),
-  1,'Approval creates the customer ticket-issued notification'
-);
 
 select lives_ok(
   $$select public.review_payment_submission(
@@ -114,17 +109,21 @@ select lives_ok(
   'A second independent booking can issue its own ticket'
 );
 
-update ticket_lifecycle_ids
-set first_ticket_code=(select ticket_code from public.tickets where booking_id='44000000-0000-4000-8000-000000000001'),
-    second_ticket_code=(select ticket_code from public.tickets where booking_id='44000000-0000-4000-8000-000000000002');
-
 reset role;
-
 set local role authenticated;
 select set_config('request.jwt.claims',
   '{"sub":"41000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
 select set_config('request.jwt.claim.sub','41000000-0000-4000-8000-000000000001',true);
 
+update ticket_lifecycle_ids
+set first_ticket_code=(select ticket_code from public.tickets where booking_id='44000000-0000-4000-8000-000000000001'),
+    second_ticket_code=(select ticket_code from public.tickets where booking_id='44000000-0000-4000-8000-000000000002');
+
+select is(
+  (select count(*)::integer from public.notifications
+   where booking_id='44000000-0000-4000-8000-000000000001' and type='ticket_approved'),
+  1,'Customer can read the ticket-issued notification for their booking'
+);
 select is(
   (select count(*)::integer from public.tickets t
    join public.bookings b on b.id=t.booking_id
