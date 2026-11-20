@@ -128,11 +128,43 @@ jobs:
           export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="$ANON_KEY"
           export TEST_BASE_URL="http://127.0.0.1:3002"
 
+          cat > /tmp/haddir-delete-account.env <<EOF
+          SUPABASE_URL=$API_URL
+          SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY
+          EOF
+          supabase functions serve delete-customer-account --env-file /tmp/haddir-delete-account.env > /tmp/haddir-delete-account-function.log 2>&1 &
+          EDGE_FUNCTION_PID=$!
+
+          FUNCTION_READY=0
+          for attempt in $(seq 1 60); do
+            FUNCTION_STATUS=$(curl --silent --output /dev/null --write-out "%{http_code}" \
+              --request POST "http://127.0.0.1:54321/functions/v1/delete-customer-account" \
+              --header "apikey: $ANON_KEY" \
+              --header "Authorization: Bearer $ANON_KEY" \
+              --header "Content-Type: application/json" \
+              --data '{}' || true)
+            if [ "$FUNCTION_STATUS" = "401" ] || [ "$FUNCTION_STATUS" = "405" ]; then
+              FUNCTION_READY=1
+              break
+            fi
+            if ! kill -0 "$EDGE_FUNCTION_PID" 2>/dev/null; then
+              cat /tmp/haddir-delete-account-function.log
+              exit 1
+            fi
+            sleep 2
+          done
+
+          if [ "$FUNCTION_READY" -ne 1 ]; then
+            cat /tmp/haddir-delete-account-function.log
+            echo "Local customer deletion Edge Function did not become ready."
+            exit 1
+          fi
+
           npm run build
 
           npm run start -- --hostname 127.0.0.1 --port 3002 > /tmp/haddir-browser-next-start.log 2>&1 &
           NEXT_SERVER_PID=$!
-          trap 'status=$?; kill "$NEXT_SERVER_PID" 2>/dev/null || true; if [ "$status" -ne 0 ]; then echo "===== Next.js production browser server log ====="; tail -n 200 /tmp/haddir-browser-next-start.log; fi; exit "$status"' EXIT
+          trap 'status=$?; kill "$NEXT_SERVER_PID" 2>/dev/null || true; kill "$EDGE_FUNCTION_PID" 2>/dev/null || true; if [ "$status" -ne 0 ]; then echo "===== Next.js production browser server log ====="; tail -n 200 /tmp/haddir-browser-next-start.log; echo "===== Local deletion Edge Function log ====="; tail -n 200 /tmp/haddir-delete-account-function.log; fi; exit "$status"' EXIT
 
           READY=0
           for attempt in $(seq 1 60); do
