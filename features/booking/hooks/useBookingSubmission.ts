@@ -32,6 +32,7 @@ type UseBookingSubmissionOptions = {
   setBookingDone: Dispatch<SetStateAction<boolean>>;
   setBookingError: Dispatch<SetStateAction<string>>;
   setBookingSubmitting: Dispatch<SetStateAction<boolean>>;
+  setReceiptUploading: Dispatch<SetStateAction<boolean>>;
 };
 
 export function useBookingSubmission({
@@ -50,6 +51,7 @@ export function useBookingSubmission({
   setBookingDone,
   setBookingError,
   setBookingSubmitting,
+  setReceiptUploading,
 }: UseBookingSubmissionOptions) {
   const submissionLock = useRef(false);
   const pendingReceiptUpload = useRef<PendingReceiptUpload | null>(null);
@@ -100,7 +102,14 @@ export function useBookingSubmission({
       let receiptPath = pendingReceiptUpload.current?.bookingId === activeBookingId && pendingReceiptUpload.current.file === receipt
         ? pendingReceiptUpload.current.path : null;
       if (!receiptPath) {
-        const { path, error: uploadError } = await uploadPaymentReceipt(authUser.id, activeBookingId, receipt);
+        setReceiptUploading(true);
+        let uploadResult;
+        try {
+          uploadResult = await uploadPaymentReceipt(authUser.id, activeBookingId, receipt);
+        } finally {
+          setReceiptUploading(false);
+        }
+        const { path, error: uploadError } = uploadResult;
         if (uploadError || !path) {
           setBookingError("تم حفظ الحجز لكن تعذر رفع الإيصال: " + (uploadError?.message || "تعذر تحديد مسار الإيصال") + ". يمكنك المحاولة مرة أخرى.");
           return;
@@ -130,8 +139,9 @@ export function useBookingSubmission({
     } finally {
       submissionLock.current = false;
       setBookingSubmitting(false);
+      setReceiptUploading(false);
     }
-  }, [authUser, selected, selectedTier, ticketCount, receipt, eventPaymentAccounts, paymentMethod, bookingId, bookingContext, setBookingError, setBookingSubmitting, setBookingId, setBookingNumber, setBookingContext, setBookingDone]);
+  }, [authUser, selected, selectedTier, ticketCount, receipt, eventPaymentAccounts, paymentMethod, bookingId, bookingContext, setBookingError, setBookingSubmitting, setReceiptUploading, setBookingId, setBookingNumber, setBookingContext, setBookingDone]);
 
   const resetSubmission = useCallback(() => {
     pendingReceiptUpload.current = null;
