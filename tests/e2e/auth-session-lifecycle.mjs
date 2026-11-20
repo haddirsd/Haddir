@@ -110,6 +110,31 @@ try {
   const cleared = await page.evaluate(key => localStorage.getItem(key), storageKey);
   assert.equal(cleared, null, "Sign out must clear the persisted Supabase session");
 
+  // Exercise the actual email/password form, including invalid credentials and recovery.
+  await page.getByLabel("البريد الإلكتروني").fill(email);
+  await page.getByLabel("كلمة المرور").fill("Wrong-password-123!");
+  await page.getByRole("button", { name: "تسجيل الدخول بالبريد الإلكتروني" }).click();
+  await page.getByText("البريد الإلكتروني أو كلمة المرور غير صحيحة.").waitFor({ timeout: 15000 });
+  assert.equal(await page.evaluate(key => localStorage.getItem(key), storageKey), null,
+    "Rejected email credentials must not persist a session");
+
+  await page.getByLabel("كلمة المرور").fill(password);
+  await page.getByRole("button", { name: "تسجيل الدخول بالبريد الإلكتروني" }).click();
+  await page.getByRole("strong").filter({ hasText: email }).waitFor({ timeout: 15000 });
+  const emailLoginSession = await page.evaluate(key => {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch { return null; }
+  }, storageKey);
+  assert.equal(emailLoginSession?.user?.id, userId,
+    "Successful UI email login must persist the authenticated user session");
+
+  await page.getByRole("button", { name: "تسجيل الخروج" }).click();
+  const secondLogoutDialog = page.getByRole("dialog", { name: "تسجيل الخروج؟" });
+  await secondLogoutDialog.waitFor();
+  await secondLogoutDialog.getByRole("button", { name: "تسجيل الخروج" }).click();
+  await page.getByRole("heading", { name: "سجّل الدخول إلى حاضر" }).waitFor({ timeout: 15000 });
+
   // Verify the actual UI starts a Google OAuth authorization request.
   // The local test intercepts the provider endpoint; it does not claim to authenticate
   // against Google's external identity service or validate production OAuth credentials.
