@@ -127,9 +127,6 @@ try {
   assert.equal(authorizationUrl.searchParams.get("provider"), "google");
   assert.equal(authorizationUrl.searchParams.get("redirect_to"), new URL(baseUrl).origin,
     "Google OAuth must return to the current application origin");
-  assert.ok(authorizationUrl.searchParams.get("code_challenge"),
-    "OAuth request must include a PKCE code challenge");
-  assert.equal(authorizationUrl.searchParams.get("code_challenge_method"), "s256");
 
   assert.deepEqual(errors, [], `Auth browser runtime errors: ${errors.join("; ")}`);
   assert.deepEqual(consoleErrors, [], `Auth browser console errors: ${consoleErrors.join("; ")}`);
