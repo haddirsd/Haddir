@@ -1,5 +1,24 @@
 import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 
+export async function signInWithEmailPassword(email: string, password: string): Promise<string | null> {
+  const supabase = getSupabaseBrowserClient();
+  if (!supabase) return "إعدادات تسجيل الدخول غير مكتملة على الموقع.";
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email: email.trim(),
+    password,
+  });
+
+  if (!error) return null;
+  if (error.message.toLowerCase().includes("invalid login credentials")) {
+    return "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+  }
+  if (error.message.toLowerCase().includes("email not confirmed")) {
+    return "يجب تأكيد بريدك الإلكتروني قبل تسجيل الدخول.";
+  }
+  return "تعذر تسجيل الدخول حالياً. تحقق من البيانات وحاول مرة أخرى.";
+}
+
 export async function signInWithGoogle(): Promise<string | null> {
   const supabase = getSupabaseBrowserClient();
   if (!supabase) return "إعدادات تسجيل الدخول غير مكتملة على الموقع.";
