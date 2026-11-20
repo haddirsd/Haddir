@@ -165,7 +165,7 @@ try {
   assert.equal(failedResponses[0].status, 400);
   assert.ok(failedResponses[0].url.includes("/auth/v1/token"),
     "The expected 400 response must come from Supabase password authentication");
-  console.log("PASS: email/password authentication rejects invalid credentials, creates and refreshes a real Supabase session, browser session survives reload, logout clears the session, and Google OAuth UI sends the expected provider, redirect URI, ");
+  console.log("PASS: email/password authentication rejects invalid credentials, creates and refreshes a real Supabase session, browser session survives reload, logout clears the session, and Google OAuth UI sends the expected provider and redirect URI.");
 } finally {
   if (browser) await browser.close();
   if (userId) await admin.auth.admin.deleteUser(userId);
