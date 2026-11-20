@@ -147,7 +147,7 @@ try {
 
   const mainNavigation = page.getByRole("navigation", { name: "التنقل الرئيسي" });
   await mainNavigation.getByRole("button", { name: "الملف الشخصي" }).click();
-  await page.getByText(email, { exact: true }).waitFor();
+  await page.getByRole("strong").filter({ hasText: email }).waitFor();
   await page.getByText("0912345678", { exact: true }).waitFor();
 
   await mainNavigation.getByRole("button", { name: "الرئيسية" }).click();
