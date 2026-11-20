@@ -232,8 +232,14 @@ try {
   );
   const page = await context.newPage();
   page.on("pageerror", (error) => pageErrors.push(error.stack || error.message));
-  page.on("response", (response) => {
-    if (response.status() >= 400) httpErrors.push({ status: response.status(), url: response.url() });
+  page.on("response", async (response) => {
+    if (response.status() >= 400) {
+      httpErrors.push({
+        status: response.status(),
+        url: response.url(),
+        body: await response.text().catch(() => ""),
+      });
+    }
   });
   page.on("console", (message) => {
     if (message.type() === "error") consoleErrors.push(message.text());
@@ -326,7 +332,17 @@ try {
   await scanHistory.getByText("كود غير موجود", { exact: true }).waitFor();
 
   assert.deepEqual(pageErrors, [], `Gatekeeper browser page must not throw runtime errors: ${pageErrors.join("; ")}`);
-  assert.deepEqual(consoleErrors, [], `Gatekeeper browser page must not emit console errors: ${consoleErrors.join("; ")}; HTTP errors: ${JSON.stringify(httpErrors)}`);
+  const expectedScopeDenials = httpErrors.filter((entry) =>
+    entry.status === 400 &&
+    entry.url.endsWith("/rest/v1/rpc/gatekeeper_manual_ticket_action") &&
+    entry.body.includes("هذه التذكرة لا تخص الفعالية المصرح لك بها")
+  );
+  assert.equal(expectedScopeDenials.length, 1,
+    `The out-of-scope ticket must be rejected by the assigned-event guard: ${JSON.stringify(httpErrors)}`);
+  assert.equal(httpErrors.length, 1,
+    `Only the expected assigned-event rejection may return an HTTP error: ${JSON.stringify(httpErrors)}`);
+  assert.deepEqual(consoleErrors, ["Failed to load resource: the server responded with a status of 400 (Bad Request)"],
+    `The only browser console error must correspond to the verified out-of-scope rejection: ${consoleErrors.join("; ")}`);
 
   console.log("PASS: assigned gatekeeper Chromium UI loads only its assigned event, opens the QR camera surface, validates numeric ticket codes, checks in a valid ticket once, rejects repeat and forged codes, blocks another event's ticket, and persists scan history.");
 } finally {
