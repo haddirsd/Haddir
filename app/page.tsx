@@ -115,6 +115,38 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
         } else {
           dataQueryMs = Number((performance.now() - queryStartedAt).toFixed(1));
           metricResult = "rest_request_failed";
+
+          let restError: {
+            code?: string;
+            message?: string;
+            hint?: string;
+          } = {};
+          try {
+            const errorBody = await response.clone().json() as {
+              code?: unknown;
+              message?: unknown;
+              hint?: unknown;
+            };
+            if (typeof errorBody.code === "string") {
+              restError.code = errorBody.code.slice(0, 80);
+            }
+            if (typeof errorBody.message === "string") {
+              restError.message = errorBody.message.slice(0, 240);
+            }
+            if (typeof errorBody.hint === "string") {
+              restError.hint = errorBody.hint.slice(0, 240);
+            }
+          } catch {
+            // Keep the diagnostic log safe when Supabase returns a non-JSON error.
+          }
+
+          console.warn(JSON.stringify({
+            event: "performance.social_metadata_error",
+            http_status: response.status,
+            ...(restError.code ? { error_code: restError.code } : {}),
+            ...(restError.message ? { error_message: restError.message } : {}),
+            ...(restError.hint ? { error_hint: restError.hint } : {}),
+          }));
         }
       } catch {
         if (queryStartedAt !== null && dataQueryMs === null) {
