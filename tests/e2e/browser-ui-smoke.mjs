@@ -20,6 +20,7 @@ const ticketTypeId = randomUUID();
 let browser;
 let eventCreated = false;
 const pageErrors = [];
+const consoleErrors = [];
 
 async function dataOrThrow(result, action) {
   if (result.error) throw new Error(`${action}: ${result.error.message}`);
@@ -69,7 +70,10 @@ try {
     reducedMotion: "reduce",
   });
   const page = await context.newPage();
-  page.on("pageerror", (error) => pageErrors.push(error.message));
+  page.on("pageerror", (error) => pageErrors.push(error.stack || error.message));
+  page.on("console", (message) => {
+    if (message.type() === "error") consoleErrors.push(message.text());
+  });
 
   const response = await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
   assert.equal(response?.status(), 200, "Home page must return HTTP 200");
@@ -88,7 +92,17 @@ try {
   await page.getByRole("button", { name: "زيادة عدد التذاكر" }).click();
   await page.getByText("2 تذاكر", { exact: true }).waitFor();
 
-  await continueButton.click();
+  try {
+    await continueButton.click({ timeout: 7000 });
+  } catch (error) {
+    const overlay = await page.locator("nextjs-portal").innerText().catch(() => "");
+    throw new Error([
+      `Payment button interaction failed: ${error.message}`,
+      `Page errors: ${pageErrors.join(" | ") || "none"}`,
+      `Console errors: ${consoleErrors.join(" | ") || "none"}`,
+      `Next.js overlay: ${overlay || "not available"}`,
+    ].join("\\n"));
+  }
   await page.getByRole("dialog", { name: "سجّل الدخول لإكمال الحجز" }).waitFor();
   await page.getByRole("button", { name: "لاحقاً" }).click();
 
