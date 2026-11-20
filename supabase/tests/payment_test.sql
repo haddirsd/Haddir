@@ -1,6 +1,6 @@
 begin;
 
-select plan(23);
+select plan(24);
 
 insert into auth.users (
   id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -367,8 +367,14 @@ select is(
 
 select is(
   (select count(*)::integer from public.tickets where booking_id = (select approval_booking_id from payment_test_ids)),
+  1,
+  'Approving payment issues exactly one ticket per booking item'
+);
+
+select is(
+  ((select approval_result from payment_test_ids)->>'attendee_count')::integer,
   2,
-  'Approving payment issues exactly one ticket per attendee'
+  'Approval result reports the full attendee quantity separately from ticket count'
 );
 
 select throws_ok(
