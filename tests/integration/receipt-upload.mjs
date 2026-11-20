@@ -144,6 +144,20 @@ try {
   );
   assert.equal(storedFile.size, 8, "Stored receipt must contain the uploaded file bytes");
 
+  const maxSizePath = `${customer.id}/${validBookingId}/${randomUUID()}.png`;
+  const maxSizeUpload = await uploadAs(
+    customer,
+    maxSizePath,
+    new File([new Uint8Array(5 * 1024 * 1024)], "maximum-size.png", { type: "image/png" }),
+  );
+  assert.equal(maxSizeUpload.error, null, `A receipt exactly 5 MiB must be accepted: ${maxSizeUpload.error?.message}`);
+  uploadedPaths.push(maxSizePath);
+  const maxSizeStoredFile = await requireNoError(
+    await admin.storage.from("payment-receipts").download(maxSizePath),
+    "Verify maximum-size receipt exists in private Storage",
+  );
+  assert.equal(maxSizeStoredFile.size, 5 * 1024 * 1024, "Storage must preserve the full 5 MiB receipt");
+
   const wrongOwnerPath = `${customer.id}/${validBookingId}/${randomUUID()}.png`;
   const wrongOwnerUpload = await uploadAs(otherCustomer, wrongOwnerPath, pngFile("wrong-owner.png"));
   assert.ok(wrongOwnerUpload.error, "Another customer cannot upload into a different customer's folder");
