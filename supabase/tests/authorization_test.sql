@@ -29,7 +29,7 @@ on conflict (id) do update set role=excluded.role,full_name=excluded.full_name,p
 
 insert into public.events(id,title,slug,starts_at,ends_at,status,created_by,venue,city,platform_fee_percent) values
 ('23000000-0000-4000-8000-000000000001','Authorization Event One','authorization-event-one',now()+interval '5 days',now()+interval '6 days','published','13000000-0000-4000-8000-000000000001','Venue One','Khartoum',10),
-('23000000-0000-4000-8000-000000000002','Authorization Event Two','authorization-event-two',now()+interval '7 days',now()+interval '8 days','draft','13000000-0000-4000-8000-000000000002','Venue Two','Omdurman',15);
+('23000000-0000-4000-8000-000000000002','Authorization Event Two','authorization-event-two',now()+interval '7 days',now()+interval '8 days','published','13000000-0000-4000-8000-000000000002','Venue Two','Omdurman',15);
 
 insert into public.event_role_assignments(user_id,event_id,assignment_role) values
 ('13000000-0000-4000-8000-000000000003','23000000-0000-4000-8000-000000000001','supervisor'),
@@ -45,6 +45,9 @@ insert into public.bookings(id,booking_number,user_id,customer_name,customer_pho
 ('43000000-0000-4000-8000-000000000002','AUTH-BOOKING-TWO','13000000-0000-4000-8000-000000000002','Authorization Other','0913000002','23000000-0000-4000-8000-000000000002',200,'SDG','under_review'),
 ('43000000-0000-4000-8000-000000000003','AUTH-TICKET-ONE','13000000-0000-4000-8000-000000000001','Authorization Customer','0913000001','23000000-0000-4000-8000-000000000001',100,'SDG','confirmed'),
 ('43000000-0000-4000-8000-000000000004','AUTH-TICKET-TWO','13000000-0000-4000-8000-000000000002','Authorization Other','0913000002','23000000-0000-4000-8000-000000000002',200,'SDG','confirmed');
+
+-- Keep the second event unpublished during authorization checks after creating valid historical fixtures.
+update public.events set status='draft' where id='23000000-0000-4000-8000-000000000002';
 
 insert into public.booking_items(id,booking_id,ticket_type_id,quantity,unit_price,line_total) values
 ('53000000-0000-4000-8000-000000000001','43000000-0000-4000-8000-000000000001','33000000-0000-4000-8000-000000000001',1,100,100),
