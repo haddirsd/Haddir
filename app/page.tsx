@@ -8,10 +8,33 @@ type PageProps = {
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://haddir-ticket.vercel.app";
 const defaultImage = "/icons/icon-512.png";
 
+function logSocialMetadataMetrics(metrics: {
+  result: string;
+  startedAt: number;
+  queryMs: number | null;
+  requestCount: number;
+  httpStatus?: number;
+}) {
+  console.info(JSON.stringify({
+    event: "performance.social_metadata",
+    result: metrics.result,
+    duration_ms: Number((performance.now() - metrics.startedAt).toFixed(1)),
+    data_query_ms: metrics.queryMs,
+    rest_request_count: metrics.requestCount,
+    ...(metrics.httpStatus ? { http_status: metrics.httpStatus } : {}),
+  }));
+}
+
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const metadataStartedAt = performance.now();
   const params = await searchParams;
   const eventId = Array.isArray(params.event) ? params.event[0] : params.event;
   const metadataBase = new URL(siteUrl);
+  let dataQueryMs: number | null = null;
+  let restRequestCount = 0;
+  let metricResult = "default_metadata";
+  let restHttpStatus: number | undefined;
+  let queryStartedAt: number | null = null;
 
   if (eventId) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -21,17 +44,20 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
       try {
         const query = new URLSearchParams({
           select: "id,title,description,cover_image_url,starts_at,city,venue,status",
-          id: `eq.${eventId}`,
+          id: \`eq.\${eventId}\`,
           status: "eq.published",
           limit: "1",
         });
-        const response = await fetch(`${supabaseUrl}/rest/v1/events?${query.toString()}`, {
+        queryStartedAt = performance.now();
+        restRequestCount += 1;
+        const response = await fetch(\`\${supabaseUrl}/rest/v1/events?\${query.toString()}\`, {
           headers: {
             apikey: supabaseKey,
-            Authorization: `Bearer ${supabaseKey}`,
+            Authorization: \`Bearer \${supabaseKey}\`,
           },
           next: { revalidate: 60 },
         });
+        restHttpStatus = response.status;
         if (response.ok) {
           const rows = (await response.json()) as Array<{
             id: string;
@@ -42,9 +68,11 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
             city: string | null;
             venue: string | null;
           }>;
+          dataQueryMs = Number((performance.now() - queryStartedAt).toFixed(1));
           const event = rows[0];
           if (event) {
-            const title = `${event.title} | حاضر`;
+            metricResult = "event_found";
+            const title = \`\${event.title} | حاضر\`;
             const description = [
               event.description?.trim(),
               event.venue || event.city,
@@ -53,8 +81,14 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
                 : "",
             ].filter(Boolean).join(" · ").slice(0, 300) || "اكتشف الفعالية واحجز تذكرتك عبر حاضر.";
             const image = event.cover_image_url || defaultImage;
-            const url = new URL(`/?event=${encodeURIComponent(event.id)}`, metadataBase);
+            const url = new URL(\`/?event=\${encodeURIComponent(event.id)}\`, metadataBase);
 
+            logSocialMetadataMetrics({
+              result: metricResult,
+              startedAt: metadataStartedAt,
+              queryMs: dataQueryMs,
+              requestCount: restRequestCount,
+            });
             return {
               metadataBase,
               title,
@@ -77,11 +111,27 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
               },
             };
           }
+          metricResult = "event_not_found";
+        } else {
+          dataQueryMs = Number((performance.now() - queryStartedAt).toFixed(1));
+          metricResult = "rest_request_failed";
         }
-      } catch (error) {
-        console.error("Could not generate event social metadata", error);
+      } catch {
+        if (queryStartedAt !== null && dataQueryMs === null) {
+          dataQueryMs = Number((performance.now() - queryStartedAt).toFixed(1));
+        }
+        metricResult = "metadata_fetch_error";
       }
+    } else {
+      metricResult = "supabase_configuration_missing";
     }
+    logSocialMetadataMetrics({
+      result: metricResult,
+      startedAt: metadataStartedAt,
+      queryMs: dataQueryMs,
+      requestCount: restRequestCount,
+      httpStatus: restHttpStatus,
+    });
   }
 
   const title = "حاضر | فعاليات السودان في مكان واحد";
