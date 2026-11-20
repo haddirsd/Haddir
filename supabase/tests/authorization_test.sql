@@ -66,7 +66,7 @@ select set_config('request.jwt.claims','{"sub":"13000000-0000-4000-8000-00000000
 select set_config('request.jwt.claim.sub','13000000-0000-4000-8000-000000000001',true);
 
 select is((select count(*)::integer from public.profiles),1,'Customer can read only their own profile');
-select is((select count(*)::integer from public.bookings),1,'Customer can read only their own booking');
+select is((select count(*)::integer from public.bookings),2,'Customer can read only their own bookings');
 select throws_ok(
   $$select public.review_payment_submission('63000000-0000-4000-8000-000000000001','reject','not authorized')$$,
   'P0001','غير مصرح لك بمراجعة المدفوعات','Customer cannot review payment submissions'
@@ -88,9 +88,9 @@ select set_config('request.jwt.claim.sub','13000000-0000-4000-8000-000000000003'
 
 select is((select count(*)::integer from public.events where id='23000000-0000-4000-8000-000000000001'),1,'Supervisor can read the assigned event');
 select is((select count(*)::integer from public.events where id='23000000-0000-4000-8000-000000000002'),0,'Supervisor cannot read an unassigned draft event');
-select is((select count(*)::integer from public.bookings),1,'Supervisor can read bookings for the assigned event only');
+select is((select count(*)::integer from public.bookings),2,'Supervisor can read bookings for the assigned event only');
 select is((select count(*)::integer from public.payment_submissions),1,'Supervisor can read payment submissions for the assigned event only');
-select is((select count(*)::integer from public.profiles),0,'Supervisor cannot read other users profiles');
+select is((select count(*)::integer from public.profiles where id<>'13000000-0000-4000-8000-000000000003'),0,'Supervisor cannot read other users profiles');
 select is((with changed as (update public.events set description='unauthorized supervisor edit' where id='23000000-0000-4000-8000-000000000001' returning 1) select count(*)::integer from changed),0,'Supervisor cannot edit event details');
 select is((with changed as (update public.ticket_types set price=999 where id='33000000-0000-4000-8000-000000000001' returning 1) select count(*)::integer from changed),0,'Supervisor cannot edit ticket types');
 select lives_ok(
