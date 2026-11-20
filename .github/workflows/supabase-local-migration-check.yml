@@ -10,6 +10,7 @@ on:
       - "tests/e2e/**"
       - "package.json"
       - "package-lock.json"
+      - "app/layout.tsx"
       - ".github/workflows/supabase-local-migration-check.yml"
   push:
     branches:
@@ -20,6 +21,7 @@ on:
       - "tests/e2e/**"
       - "package.json"
       - "package-lock.json"
+      - "app/layout.tsx"
       - ".github/workflows/supabase-local-migration-check.yml"
   workflow_dispatch:
 
