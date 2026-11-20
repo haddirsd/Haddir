@@ -92,8 +92,10 @@ select is((select count(*)::integer from public.events where id='23000000-0000-4
 select is((select count(*)::integer from public.bookings),2,'Supervisor can read bookings for the assigned event only');
 select is((select count(*)::integer from public.payment_submissions),1,'Supervisor can read payment submissions for the assigned event only');
 select is((select count(*)::integer from public.profiles where id<>'13000000-0000-4000-8000-000000000003'),0,'Supervisor cannot read other users profiles');
-select is((with changed as (update public.events set description='unauthorized supervisor edit' where id='23000000-0000-4000-8000-000000000001' returning 1) select count(*)::integer from changed),0,'Supervisor cannot edit event details');
-select is((with changed as (update public.ticket_types set price=999 where id='33000000-0000-4000-8000-000000000001' returning 1) select count(*)::integer from changed),0,'Supervisor cannot edit ticket types');
+update public.events set description='unauthorized supervisor edit' where id='23000000-0000-4000-8000-000000000001';
+select is((select description from public.events where id='23000000-0000-4000-8000-000000000001'),null::text,'Supervisor cannot edit event details');
+update public.ticket_types set price=999 where id='33000000-0000-4000-8000-000000000001';
+select is((select price from public.ticket_types where id='33000000-0000-4000-8000-000000000001'),100::numeric,'Supervisor cannot edit ticket types');
 select lives_ok(
   $$select public.review_payment_submission('63000000-0000-4000-8000-000000000001','reject','Assigned event test rejection')$$,
   'Supervisor can review a payment for their assigned event'
@@ -145,7 +147,8 @@ select set_config('request.jwt.claim.sub','13000000-0000-4000-8000-000000000006'
 
 select is((select count(*)::integer from public.bookings),4,'Admin can read platform-wide bookings');
 select is((select count(*)::integer from public.profiles),8,'Admin can read platform user profiles');
-select is((with changed as (update public.events set description='admin authorized edit' where id='23000000-0000-4000-8000-000000000001' returning 1) select count(*)::integer from changed),1,'Admin can edit event details');
+update public.events set description='admin authorized edit' where id='23000000-0000-4000-8000-000000000001';
+select is((select description from public.events where id='23000000-0000-4000-8000-000000000001'),'admin authorized edit','Admin can edit event details');
 select throws_ok(
   $$select public.admin_update_profile_role('13000000-0000-4000-8000-000000000008','admin',null)$$,
   'P0001','تعيين المشرف الإداري من صلاحيات مالك المنصة فقط','Admin cannot promote a user to admin'
