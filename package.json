@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "node --experimental-default-type=module --test",
-    "test:db": "supabase test db"
+    "test:db": "supabase test db",
+    "test:e2e": "node --experimental-default-type=module --experimental-strip-types tests/e2e/booking-lifecycle.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
