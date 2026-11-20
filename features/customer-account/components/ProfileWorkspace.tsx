@@ -41,9 +41,12 @@ export function ProfileWorkspace({
   profileEditing, setProfileEditing, saved, setSaved, authMessage,
   setAuthMessage, profileSaving, deletingAccount, darkMode, setDarkMode,
   showPrivacySecurity, setShowPrivacySecurity, saveProfile,
-  signInWithGoogle, deleteAccount, signOut,
+  signInWithGoogle, signInWithEmail, deleteAccount, signOut,
 }: ProfileWorkspaceProps) {
   const [legalPage, setLegalPage] = useState<"terms" | "privacy">("privacy");
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [emailLoginBusy, setEmailLoginBusy] = useState(false);
   return (
     <>
 {!showPrivacySecurity&&<section className="screen container profile-screen">
@@ -54,7 +57,24 @@ export function ProfileWorkspace({
     </div>
     {authUser&&<div className="profile-info-list"><div><span>الاسم</span><strong>{fullName.trim()||"غير محدد"}</strong></div><div><span>البريد الإلكتروني</span><strong dir="ltr">{authUser.email||email||"—"}</strong></div><div><span>رقم الهاتف</span><strong dir="ltr">{phone||"لم تتم إضافته بعد"}</strong></div></div>}
     {authUser&&profileEditing&&<form className="profile-form profile-form-unified" onSubmit={e=>{e.preventDefault();void saveProfile();}}><label>الاسم الكامل<input type="text" autoComplete="name" value={fullName} onChange={e=>{setFullName(e.target.value);setSaved(false);}} placeholder="اكتب اسمك الكامل" maxLength={100} required/></label><label>رقم الهاتف السوداني<input type="tel" inputMode="numeric" autoComplete="tel-national" value={phone} onChange={e=>{setPhone(e.target.value.replace(/[^0-9٠-٩]/g,"").slice(0,10));setSaved(false);}} placeholder="09XXXXXXXX" maxLength={10} dir="ltr" required/></label><p className="profile-save-note">أدخل 10 أرقام بالضبط، ويبدأ الرقم بصفر. مثال: 09XXXXXXXX</p><div className="profile-edit-actions"><button className="btn btn-primary" type="submit" disabled={profileSaving}>{profileSaving?"جاري الحفظ...":"حفظ البيانات"}</button><button className="btn btn-outline" type="button" onClick={()=>{setProfileEditing(false);setAuthMessage("");}}>إلغاء</button></div></form>}
-    {!authUser&&<div className="auth-card" style={{marginTop:18}}><h2>سجّل الدخول إلى حاضر</h2><p>تصفح الفعاليات متاح للجميع. سجّل الدخول لحفظ بياناتك ومتابعة حجوزاتك.</p><button className="btn btn-primary pay-button" type="button" onClick={signInWithGoogle}><span aria-hidden="true" className="google-mark">G</span> المتابعة باستخدام Google</button></div>}
+    {!authUser&&<div className="auth-card" style={{marginTop:18}}>
+      <h2>سجّل الدخول إلى حاضر</h2>
+      <p>تصفح الفعاليات متاح للجميع. سجّل الدخول لحفظ بياناتك ومتابعة حجوزاتك.</p>
+      <form className="profile-form auth-email-form" onSubmit={async event=>{
+        event.preventDefault();
+        if(emailLoginBusy)return;
+        setEmailLoginBusy(true);
+        const result=await signInWithEmail(loginEmail,loginPassword);
+        setEmailLoginBusy(false);
+        if(!result.error)setLoginPassword("");
+      }}>
+        <label>البريد الإلكتروني<input type="email" name="email" autoComplete="email" value={loginEmail} onChange={event=>setLoginEmail(event.target.value)} placeholder="name@example.com" required dir="ltr"/></label>
+        <label>كلمة المرور<input type="password" name="password" autoComplete="current-password" value={loginPassword} onChange={event=>setLoginPassword(event.target.value)} placeholder="أدخل كلمة المرور" required dir="ltr"/></label>
+        <button className="btn btn-primary pay-button" type="submit" disabled={emailLoginBusy||!loginEmail.trim()||!loginPassword}>{emailLoginBusy?"جارٍ تسجيل الدخول...":"تسجيل الدخول بالبريد الإلكتروني"}</button>
+      </form>
+      <div className="auth-divider" aria-hidden="true"><span>أو</span></div>
+      <button className="btn btn-outline pay-button" type="button" onClick={signInWithGoogle}><span aria-hidden="true" className="google-mark">G</span> المتابعة باستخدام Google</button>
+    </div>}
     {saved&&<div className="profile-save-success" role="status" aria-live="polite"><span className="profile-save-success-icon"><CheckCircle2 size={17}/></span><span><strong>تم الحفظ بنجاح</strong><small>اتحدّثت بيانات ملفك الشخصي.</small></span></div>}{authMessage&&<p className={authMessage.startsWith("تم تسجيل الخروج")?"profile-save-success":"profile-save-error"} role={authMessage.startsWith("تم تسجيل الخروج")?"status":"alert"} aria-live="polite">{authMessage}</p>}
    </div>
  <div className="profile-settings-panel"><div className="profile-settings-content"><div className="profile-settings-heading"><strong>الإعدادات</strong><p>تحكم في مظهر التطبيق والإشعارات الخارجية.</p></div><div className="profile-setting-row"><div className="profile-setting-copy"><strong>الوضع الليلي</strong><small>تغيير مظهر المنصة بالكامل</small></div><button className={"profile-setting-switch"+(darkMode?" is-on":"")} type="button" role="switch" aria-label="الوضع الليلي" aria-checked={darkMode} onClick={()=>setDarkMode(v=>!v)}><span aria-hidden="true"/></button></div>{authUser&&<PushNotificationSettings userId={userId}/>}</div></div>
