@@ -108,7 +108,10 @@ async function openDeletionPage(user) {
   });
   const projectRef = new URL(url).hostname.split(".")[0];
   await context.addInitScript(({ key, session }) => {
-    localStorage.setItem(key, JSON.stringify(session));
+    if (sessionStorage.getItem("haddir-deletion-session-seeded") !== "1") {
+      localStorage.setItem(key, JSON.stringify(session));
+      sessionStorage.setItem("haddir-deletion-session-seeded", "1");
+    }
   }, { key: `sb-${projectRef}-auth-token`, session: user.session });
   const page = await context.newPage();
   page.on("pageerror", error => pageErrors.push(error.stack || error.message));
