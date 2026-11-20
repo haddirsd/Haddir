@@ -78,7 +78,7 @@ jobs:
       - name: Run isolated database integration tests
         run: supabase test db
 
-      - name: Run payment receipt upload API integration test
+      - name: Run direct payment receipt Storage integration test
         run: |
           eval "$(supabase status -o env)"
           export SUPABASE_URL="$API_URL"
