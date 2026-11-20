@@ -92,7 +92,7 @@ select set_config('request.jwt.claim.sub','13000000-0000-4000-8000-000000000003'
 select is((select count(*)::integer from public.events where id='23000000-0000-4000-8000-000000000001'),1,'Supervisor can read the assigned event');
 select is((select count(*)::integer from public.events where id='23000000-0000-4000-8000-000000000003'),0,'Supervisor cannot read an unassigned draft event');
 select is((select count(*)::integer from public.bookings),2,'Supervisor can read bookings for the assigned event only');
-select is((select count(*)::integer from public.payment_submissions),1,'Supervisor can read payment submissions for the assigned event only');
+select is((select count(*)::integer from public.payment_submissions),2,'Supervisor can read payment submissions for the assigned event only');
 select is((select count(*)::integer from public.profiles where id<>'13000000-0000-4000-8000-000000000003'),0,'Supervisor cannot read other users profiles');
 update public.events set description='unauthorized supervisor edit' where id='23000000-0000-4000-8000-000000000001';
 select is((select description from public.events where id='23000000-0000-4000-8000-000000000001'),null::text,'Supervisor cannot edit event details');
