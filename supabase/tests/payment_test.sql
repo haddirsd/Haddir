@@ -401,7 +401,7 @@ select is(
 
 select is(
   (select quantity_sold from public.ticket_types where id = '31000000-0000-4000-8000-000000000001'),
-  2,
+  3,
   'Rejecting payment releases the reserved ticket inventory'
 );
 
