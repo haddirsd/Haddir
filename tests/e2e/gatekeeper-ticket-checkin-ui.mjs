@@ -316,7 +316,7 @@ try {
   assert.equal(scanLogs.some((log) => log.ticket_id === otherTicket.id), false,
     "Out-of-scope ticket attempts must not create a scan record under this gatekeeper");
 
-  await page.getByRole("heading", { name: "سجل عمليات الدخول" }).waitFor();
+  await page.getByText("سجل عمليات الدخول", { exact: true }).waitFor();
   await page.getByText("محاولة دخول مكررة", { exact: true }).waitFor();
   await page.getByText("كود غير موجود", { exact: true }).waitFor();
 
