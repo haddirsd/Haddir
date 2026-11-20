@@ -25,6 +25,7 @@ export async function POST(request: Request) {
     console.info(JSON.stringify({
       event: "performance.receipt_upload",
       outcome,
+      function_region: process.env.VERCEL_REGION ?? null,
       status,
       duration_ms: elapsedMs(requestStartedAt),
       auth_ms: timings.authMs ?? null,
