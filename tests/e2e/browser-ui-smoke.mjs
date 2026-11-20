@@ -27,6 +27,18 @@ async function dataOrThrow(result, action) {
   return result.data;
 }
 
+async function interactionDiagnostics(page, label, error) {
+  const overlay = await page.locator("nextjs-portal").innerText().catch(() => "");
+  const splash = await page.locator("#haddir-splash").count().catch(() => 0);
+  return new Error([
+    `${label}: ${error.message}`,
+    `Page errors: ${pageErrors.join(" | ") || "none"}`,
+    `Console errors: ${consoleErrors.join(" | ") || "none"}`,
+    `Next.js overlay: ${overlay || "not available"}`,
+    `Welcome splash still mounted: ${splash > 0}`,
+  ].join("\\n"));
+}
+
 try {
   await dataOrThrow(
     await admin.from("events").insert({
@@ -80,6 +92,7 @@ try {
   await page.getByRole("heading", { name: "رائج الآن" }).waitFor();
   const eventCard = page.getByRole("button", { name: `عرض تفاصيل Haddir Browser UI ${suffix.slice(0, 8)}` });
   await eventCard.waitFor({ state: "visible", timeout: 15000 });
+  await page.locator("#haddir-splash").waitFor({ state: "detached", timeout: 10000 });
   await eventCard.click();
 
   await page.getByRole("heading", { name: `Haddir Browser UI ${suffix.slice(0, 8)}`, level: 1 }).waitFor();
@@ -95,13 +108,7 @@ try {
   try {
     await continueButton.click({ timeout: 7000 });
   } catch (error) {
-    const overlay = await page.locator("nextjs-portal").innerText().catch(() => "");
-    throw new Error([
-      `Payment button interaction failed: ${error.message}`,
-      `Page errors: ${pageErrors.join(" | ") || "none"}`,
-      `Console errors: ${consoleErrors.join(" | ") || "none"}`,
-      `Next.js overlay: ${overlay || "not available"}`,
-    ].join("\\n"));
+    throw await interactionDiagnostics(page, "Payment button interaction failed", error);
   }
   await page.getByRole("dialog", { name: "سجّل الدخول لإكمال الحجز" }).waitFor();
   await page.getByRole("button", { name: "لاحقاً" }).click();
@@ -111,7 +118,13 @@ try {
   await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
   const mainNavigation = page.getByRole("navigation", { name: "التنقل الرئيسي" });
   await mainNavigation.waitFor({ state: "visible" });
-  await mainNavigation.getByRole("button", { name: "الملف الشخصي" }).click();
+  await page.locator("#haddir-splash").waitFor({ state: "detached", timeout: 10000 });
+
+  try {
+    await mainNavigation.getByRole("button", { name: "الملف الشخصي" }).click({ timeout: 7000 });
+  } catch (error) {
+    throw await interactionDiagnostics(page, "Profile navigation interaction failed", error);
+  }
   await page.getByRole("heading", { name: "سجّل الدخول إلى حاضر" }).waitFor();
   await page.getByRole("button", { name: /المتابعة باستخدام Google/ }).waitFor();
 
