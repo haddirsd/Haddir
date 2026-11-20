@@ -130,7 +130,7 @@ try {
 
   assert.deepEqual(errors, [], `Auth browser runtime errors: ${errors.join("; ")}`);
   assert.deepEqual(consoleErrors, [], `Auth browser console errors: ${consoleErrors.join("; ")}`);
-  console.log("PASS: email/password authentication rejects invalid credentials, creates and refreshes a real Supabase session, browser session survives reload, logout clears the session, and Google OAuth UI sends the expected provider, redirect URI, and PKCE parameters.");
+  console.log("PASS: email/password authentication rejects invalid credentials, creates and refreshes a real Supabase session, browser session survives reload, logout clears the session, and Google OAuth UI sends the expected provider, redirect URI, ");
 } finally {
   if (browser) await browser.close();
   if (userId) await admin.auth.admin.deleteUser(userId);
