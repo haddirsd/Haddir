@@ -92,6 +92,13 @@ async function createEvent(eventId, slug, title, createdBy) {
 try {
   const advertiser = await createIdentity("assigned");
   const otherAdvertiser = await createIdentity("other");
+  await dataOrThrow(
+    await admin.from("legal_acceptances").insert([
+      { user_id: advertiser.id, document_key: "organizer_terms_bundle", version: "2026-11-15-v1" },
+      { user_id: otherAdvertiser.id, document_key: "organizer_terms_bundle", version: "2026-11-15-v1" },
+    ]),
+    "Create required organizer legal acceptance for isolated advertiser identities",
+  );
   const ownTitle = `Haddir Advertiser Own ${suffix.slice(0, 8)}`;
   const otherTitle = `Haddir Advertiser Private ${suffix.slice(0, 8)}`;
 
