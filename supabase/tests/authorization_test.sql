@@ -1,6 +1,6 @@
 begin;
 
-select plan(39);
+select plan(42);
 
 -- Isolated identities for every platform role.
 insert into auth.users (
@@ -55,7 +55,9 @@ insert into public.booking_items(id,booking_id,ticket_type_id,quantity,unit_pric
 
 insert into public.payment_submissions(id,booking_id,submitted_by,amount,currency,status) values
 ('63000000-0000-4000-8000-000000000001','43000000-0000-4000-8000-000000000001','13000000-0000-4000-8000-000000000001',100,'SDG','submitted'),
-('63000000-0000-4000-8000-000000000002','43000000-0000-4000-8000-000000000002','13000000-0000-4000-8000-000000000002',200,'SDG','submitted');
+('63000000-0000-4000-8000-000000000002','43000000-0000-4000-8000-000000000002','13000000-0000-4000-8000-000000000002',200,'SDG','submitted'),
+-- A submitted receipt must not be reviewable after its booking became confirmed.
+('63000000-0000-4000-8000-000000000003','43000000-0000-4000-8000-000000000003','13000000-0000-4000-8000-000000000001',100,'SDG','submitted');
 
 insert into public.tickets(id,booking_item_id,booking_id,event_id,ticket_type_id,ticket_code,attendee_name,status) values
 ('73000000-0000-4000-8000-000000000001','53000000-0000-4000-8000-000000000003','43000000-0000-4000-8000-000000000003','23000000-0000-4000-8000-000000000001','33000000-0000-4000-8000-000000000001','8130000001','Authorization Customer','valid'),
@@ -97,8 +99,22 @@ select is((select description from public.events where id='23000000-0000-4000-80
 update public.ticket_types set price=999 where id='33000000-0000-4000-8000-000000000001';
 select is((select price from public.ticket_types where id='33000000-0000-4000-8000-000000000001'),100::numeric,'Supervisor cannot edit ticket types');
 select lives_ok(
-  $$select public.review_payment_submission('63000000-0000-4000-8000-000000000001','reject','Assigned event test rejection')$$,
+  $select public.review_payment_submission('63000000-0000-4000-8000-000000000001','reject','Assigned event test rejection')$,
   'Supervisor can review a payment for their assigned event'
+);
+select throws_ok(
+  $select public.review_payment_submission('63000000-0000-4000-8000-000000000003','reject','Booking is already confirmed')$,
+  'P0001','حالة الحجز لا تسمح بمراجعة إثبات الدفع','Supervisor cannot review a submitted receipt after its booking is confirmed'
+);
+select is(
+  (select status from public.payment_submissions where id='63000000-0000-4000-8000-000000000003'),
+  'submitted'::text,
+  'Rejected review attempt leaves the payment submission unchanged'
+);
+select is(
+  (select count(*)::integer from public.tickets where booking_id='43000000-0000-4000-8000-000000000003'),
+  1,
+  'Rejected review attempt does not issue duplicate tickets'
 );
 select throws_ok(
   $$select public.review_payment_submission('63000000-0000-4000-8000-000000000002','reject','Unassigned event test rejection')$$,
