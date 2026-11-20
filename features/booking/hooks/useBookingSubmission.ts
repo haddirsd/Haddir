@@ -102,13 +102,14 @@ export function useBookingSubmission({
       let receiptPath = pendingReceiptUpload.current?.bookingId === activeBookingId && pendingReceiptUpload.current.file === receipt
         ? pendingReceiptUpload.current.path : null;
       if (!receiptPath) {
-        setReceiptUploading(true);
-        let uploadResult;
-        try {
-          uploadResult = await uploadPaymentReceipt(authUser.id, activeBookingId, receipt);
-        } finally {
-          setReceiptUploading(false);
-        }
+        const uploadResult = await (async () => {
+          setReceiptUploading(true);
+          try {
+            return await uploadPaymentReceipt(authUser.id, activeBookingId, receipt);
+          } finally {
+            setReceiptUploading(false);
+          }
+        })();
         const { path, error: uploadError } = uploadResult;
         if (uploadError || !path) {
           setBookingError("تم حفظ الحجز لكن تعذر رفع الإيصال: " + (uploadError?.message || "تعذر تحديد مسار الإيصال") + ". يمكنك المحاولة مرة أخرى.");
