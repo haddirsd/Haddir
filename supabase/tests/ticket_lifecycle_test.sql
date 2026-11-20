@@ -71,7 +71,7 @@ insert into public.booking_items(id,booking_id,ticket_type_id,quantity,unit_pric
 insert into public.payment_submissions(id,booking_id,submitted_by,amount,currency,status) values
 ('46000000-0000-4000-8000-000000000001','44000000-0000-4000-8000-000000000001',
  '41000000-0000-4000-8000-000000000001',100,'SDG','submitted'),
-('46000000-0000-4000-8000-000000000002','44000000-0000-4000-8000-000000000001',
+('46000000-0000-4000-8000-000000000002','44000000-0000-4000-8000-000000000002',
  '41000000-0000-4000-8000-000000000001',100,'SDG','submitted');
 
 create temporary table ticket_lifecycle_ids (
