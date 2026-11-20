@@ -1,6 +1,6 @@
 begin;
 
-select plan(37);
+select plan(39);
 
 -- Isolated identities for every platform role.
 insert into auth.users (
@@ -145,8 +145,18 @@ select is(
   'Check-in record identifies the authenticated gatekeeper'
 );
 select throws_ok(
-  $$select public.gatekeeper_ticket_action('8130000002',false)$$,
+  $select public.gatekeeper_ticket_action('8130000002',false)$,
   'P0001','هذه التذكرة لا تخص الفعالية المصرح لك بها','Gatekeeper scanner rejects a ticket from another event'
+);
+
+select throws_ok(
+  $select public.gatekeeper_manual_ticket_action('8130000002',false)$,
+  'P0001','هذه التذكرة لا تخص الفعالية المصرح لك بها','Gatekeeper manual entry rejects a ticket from another event'
+);
+select is(
+  (select count(*)::integer from public.checkins),
+  0,
+  'Gatekeeper cannot read raw check-in records'
 );
 
 -- Advertiser: only the assigned event's aggregate statistics, not raw customer data.
