@@ -131,7 +131,7 @@ set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"13000000-0000-4000-8000-000000000005","role":"authenticated"}',true);
 select set_config('request.jwt.claim.sub','13000000-0000-4000-8000-000000000005',true);
 
-select is((private.get_advertiser_event_statistics()->'event'->>'id')::uuid,'23000000-0000-4000-8000-000000000001'::uuid,'Advertiser statistics are restricted to the assigned event');
+select is((public.get_advertiser_event_statistics()->'event'->>'id')::uuid,'23000000-0000-4000-8000-000000000001'::uuid,'Advertiser public RPC exposes only the assigned event statistics');
 select is((select count(*)::integer from public.bookings),0,'Advertiser cannot read raw booking records');
 select is((select count(*)::integer from public.payment_submissions),0,'Advertiser cannot read payment submissions');
 select throws_ok(
