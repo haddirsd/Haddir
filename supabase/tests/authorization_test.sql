@@ -1,6 +1,6 @@
 begin;
 
-select plan(36);
+select plan(32);
 
 -- Isolated identities for every platform role.
 insert into auth.users (
