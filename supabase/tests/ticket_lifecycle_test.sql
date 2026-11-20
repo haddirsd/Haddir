@@ -190,12 +190,25 @@ select is(
      and outcome='accepted'),
   2,'Successful QR and manual validations are recorded in scan history'
 );
+-- Notification reads are scoped to the notification owner, not the gatekeeper.
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claims',
+  '{"sub":"41000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
+select set_config('request.jwt.claim.sub','41000000-0000-4000-8000-000000000001',true);
+
 select is(
   (select count(*)::integer from public.notifications
    where booking_id='44000000-0000-4000-8000-000000000001'
      and type='ticket_checked_in'),
-  1,'Successful check-in notifies the customer exactly once'
-);
+  1,'Successful check-in notifies the customer exactly once');
+
+-- Continue the scan-history assertions as the assigned gatekeeper.
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claims',
+  '{"sub":"41000000-0000-4000-8000-000000000003","role":"authenticated"}',true);
+select set_config('request.jwt.claim.sub','41000000-0000-4000-8000-000000000003',true);
 
 select is(
   (public.gatekeeper_ticket_action('0000000000',true)->>'status'),
