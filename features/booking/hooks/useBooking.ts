@@ -16,6 +16,7 @@ export function useBooking({ authUser, selected, selectedTier, ticketCount }: Us
   const [bookingContext, setBookingContext] = useState<{ eventId: string; ticketTypeId: string; quantity: number; createdAt: number } | null>(null);
   const [bookingError, setBookingError] = useState("");
   const [bookingSubmitting, setBookingSubmitting] = useState(false);
+  const [receiptUploading, setReceiptUploading] = useState(false);
 
   const {
     eventPaymentAccounts,
@@ -45,6 +46,7 @@ export function useBooking({ authUser, selected, selectedTier, ticketCount }: Us
     setBookingDone,
     setBookingError,
     setBookingSubmitting,
+    setReceiptUploading,
   });
 
   const resetBooking = useCallback(() => {
@@ -52,12 +54,12 @@ export function useBooking({ authUser, selected, selectedTier, ticketCount }: Us
     resetPaymentAccounts();
     setReceipt(null); setBookingDone(false);
     setBookingId(null); setBookingNumber(""); setBookingContext(null); setBookingError("");
-    setBookingSubmitting(false); setAccountCopied(false); resetSubmission();
+    setBookingSubmitting(false); setReceiptUploading(false); setAccountCopied(false); resetSubmission();
   }, [invalidatePaymentAccountsRequest, resetPaymentAccounts, resetSubmission]);
 
   return {
     eventPaymentAccounts, paymentMethod, setPaymentMethod, receipt, setReceipt, bookingDone,
-    bookingNumber, bookingError, setBookingError, bookingSubmitting, accountCopied,
+    bookingNumber, bookingError, setBookingError, bookingSubmitting, receiptUploading, accountCopied,
     setAccountCopied, loadPaymentAccounts, copyAccount, submitBooking, resetBooking,
   };
 }
