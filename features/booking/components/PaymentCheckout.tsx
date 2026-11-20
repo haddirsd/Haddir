@@ -28,6 +28,7 @@ type PaymentCheckoutProps = {
   onReceiptChange: (file: File | null) => void;
   bookingError: string;
   bookingSubmitting: boolean;
+  receiptUploading: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 };
 
@@ -45,10 +46,20 @@ export function PaymentCheckout({
   onReceiptChange,
   bookingError,
   bookingSubmitting,
+  receiptUploading,
   onSubmit,
 }: PaymentCheckoutProps) {
   return (
     <form className="checkout-form" onSubmit={onSubmit}>
+      {receiptUploading && (
+        <div className="receipt-upload-overlay" role="status" aria-live="polite" aria-label="جارٍ رفع إيصال الدفع">
+          <div className="receipt-upload-dialog">
+            <span className="receipt-upload-spinner" aria-hidden="true" />
+            <strong>جارٍ رفع إيصال الدفع</strong>
+            <p>يرجى الانتظار، لا تغلق الصفحة حتى يكتمل رفع الإيصال.</p>
+          </div>
+        </div>
+      )}
       <span className="section-kicker">الخطوة الثالثة من الحجز</span>
       <h1>إتمام الحجز</h1>
       <p>راجع تفاصيل حجزك وأكمل بيانات الدفع.</p>
