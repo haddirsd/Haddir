@@ -155,6 +155,7 @@ jobs:
           node --experimental-default-type=module --experimental-strip-types tests/e2e/gatekeeper-ticket-checkin-ui.mjs
           node --experimental-default-type=module --experimental-strip-types tests/e2e/advertiser-readonly-ui.mjs
           node --experimental-default-type=module --experimental-strip-types tests/e2e/owner-admin-management-ui.mjs
+          node --experimental-default-type=module --experimental-strip-types tests/e2e/auth-session-lifecycle.mjs
 
       - name: Run complete customer booking lifecycle E2E test
         run: |
