@@ -95,8 +95,8 @@ jobs:
           READY=0
           for attempt in $(seq 1 60); do
             HTTP_STATUS=$(curl --silent --output /dev/null --write-out "%{http_code}" \
-              --request POST "$TEST_BASE_URL/api/booking/receipt" || true)
-            if [ "$HTTP_STATUS" = "401" ]; then
+              "$TEST_BASE_URL" || true)
+            if [ "$HTTP_STATUS" = "200" ]; then
               READY=1
               break
             fi
@@ -213,8 +213,8 @@ jobs:
           READY=0
           for attempt in $(seq 1 60); do
             HTTP_STATUS=$(curl --silent --output /dev/null --write-out "%{http_code}" \
-              --request POST "$TEST_BASE_URL/api/booking/receipt" || true)
-            if [ "$HTTP_STATUS" = "401" ]; then
+              "$TEST_BASE_URL" || true)
+            if [ "$HTTP_STATUS" = "200" ]; then
               READY=1
               break
             fi
