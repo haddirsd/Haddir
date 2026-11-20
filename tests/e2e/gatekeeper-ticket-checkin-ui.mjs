@@ -281,7 +281,7 @@ try {
   await codeInput.fill("0000000000");
   await page.getByRole("button", { name: "تحقق ودخول" }).click();
   await page.getByRole("dialog").getByText("من خارج نظام حاضر").waitFor({ timeout: 15000 });
-  await page.getByRole("dialog").getByText("0000000000").waitFor();
+  await page.getByRole("dialog").getByText("هذا الكود غير صادر من نظام حاضر").waitFor();
 
   const persistedAssignedTicket = await dataOrThrow(
     await admin.from("tickets").select("status,used_at").eq("id", assignedTicket.id).single(),
