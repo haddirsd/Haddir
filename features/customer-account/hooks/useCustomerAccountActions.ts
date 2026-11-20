@@ -45,6 +45,13 @@ export function useCustomerAccountActions({
     if (error) setAuthMessage(error);
   }, [setAuthMessage]);
 
+  const signInWithEmail = useCallback(async (email: string, password: string) => {
+    setAuthMessage("");
+    const error = await signInWithEmailPassword(email, password);
+    if (error) setAuthMessage(error);
+    return { error };
+  }, [setAuthMessage]);
+
   const saveProfile = useCallback(async () => {
     if (!authUser) {
       setAuthMessage("سجّل الدخول أولاً لحفظ بياناتك.");
@@ -126,5 +133,5 @@ export function useCustomerAccountActions({
     setAuthMessage("تم تسجيل الخروج بنجاح. يمكنك تسجيل الدخول مرة أخرى في أي وقت.");
   }, [setAccountDialog, setAuthMessage]);
 
-  return { signInWithGoogle, saveProfile, deleteAccount, executeDeleteAccount, signOut, confirmSignOut };
+  return { signInWithGoogle, signInWithEmail, saveProfile, deleteAccount, executeDeleteAccount, signOut, confirmSignOut };
 }
