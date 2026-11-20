@@ -171,7 +171,7 @@ try {
   browser = await chromium.launch({ headless: true });
 
   // A confirmed upcoming ticket must prevent deletion and preserve the account.
-  const protectedPage = await openDeletionPage(protectedCustomer);
+  const { page: protectedPage } = await openDeletionPage(protectedCustomer);
   const protectedDialog = await requestDelete(protectedPage, protectedCustomer.email);
   await protectedDialog.getByRole("button", { name: "حذف الحساب نهائياً" }).click();
   await protectedPage.getByRole("alert")
