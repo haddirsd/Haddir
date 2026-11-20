@@ -251,6 +251,12 @@ try {
   const cameraButton = page.getByRole("button", { name: "مسح بالكاميرا" });
   await cameraButton.click();
   await page.locator(".gatekeeper-camera video").waitFor({ state: "visible", timeout: 10000 });
+  // CI runners do not expose a physical camera. The scanner correctly shows its
+  // permission/device fallback; dismiss it before closing the camera surface.
+  await page.getByRole("dialog").waitFor({ state: "visible", timeout: 5000 }).catch(() => undefined);
+  if (await page.getByRole("dialog").count()) {
+    await page.getByRole("dialog").getByRole("button", { name: "موافق — فحص التذكرة التالية" }).click();
+  }
   await page.getByRole("button", { name: "إغلاق الكاميرا" }).click();
   await page.locator(".gatekeeper-camera").waitFor({ state: "detached" });
 
