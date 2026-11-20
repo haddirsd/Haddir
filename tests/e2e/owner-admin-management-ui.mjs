@@ -98,7 +98,7 @@ async function createEventThroughUi(user, label) {
   await page.close();
 }
 
-async function verifyRoleManagement(owner, adminUser, customer, secondAdmin) {
+async function verifyRoleManagement(owner, adminUser, customer, ordinaryCustomer, secondAdmin) {
   const ownerPage = await openAdmin(owner);
   const ownerNav = ownerPage.getByRole("navigation", { name: "تبويبات لوحة الإدارة" });
   await ownerNav.getByRole("button", { name: "المستخدمون" }).click();
@@ -142,8 +142,8 @@ async function verifyRoleManagement(owner, adminUser, customer, secondAdmin) {
   await protectedOwnerRow.waitFor();
   assert.equal(await protectedOwnerRow.getByRole("button", { name: /تعديل دور/ }).isDisabled(), true,
     "Administrator must not be able to edit the platform owner");
-  await adminSearch.fill(customer.email);
-  const targetRow = adminPage.locator("tr").filter({ hasText: customer.email });
+  await adminSearch.fill(ordinaryCustomer.email);
+  const targetRow = adminPage.locator("tr").filter({ hasText: ordinaryCustomer.email });
   await targetRow.waitFor();
   await targetRow.getByRole("button", { name: /تعديل دور/ }).click();
   assert.equal(await adminPage.getByRole("option", { name: "مشرف إداري" }).count(), 0,
@@ -160,6 +160,7 @@ try {
   const adminUser = await identity("administrator", "admin");
   const customer = await identity("customer", "customer");
   const secondAdmin = await identity("second-administrator", "admin");
+  const ordinaryCustomer = await identity("ordinary-customer", "customer");
   const advertiser = await identity("advertiser", "advertiser");
   const gatekeeper = await identity("gatekeeper", "gatekeeper");
   browser = await chromium.launch({ headless: true });
@@ -181,7 +182,7 @@ try {
 
   await createEventThroughUi(owner, "Owner");
   await createEventThroughUi(adminUser, "Admin");
-  await verifyRoleManagement(owner, adminUser, customer, secondAdmin);
+  await verifyRoleManagement(owner, adminUser, customer, ordinaryCustomer, secondAdmin);
 
   assert.deepEqual(errors, [], `Admin UI runtime errors: ${errors.join("; ")}`);
   assert.deepEqual(consoleErrors, [], `Admin UI console errors: ${consoleErrors.join("; ")}`);
