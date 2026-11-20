@@ -127,7 +127,7 @@ async function createPayment({ customer, eventId, ticketTypeId, paymentAccountId
     await customer.client.rpc("submit_payment", {
       p_booking_id: booking.booking_id,
       p_payment_method_id: paymentAccountId,
-      p_receipt_path: uploadBody.path,
+      p_receipt_path: receiptPath,
       p_transfer_reference: `TRANSFER-${label.toUpperCase()}-${suffix.slice(0, 8)}`,
     }),
     `Submit ${label} payment`,
