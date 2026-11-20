@@ -1,4 +1,4 @@
--- Issue one independently scannable ticket for every attendee in each booking item.
+-- Preserve the established one-active-ticket-per-booking-item model.
 -- Forward-only correction: preserve payment review authorization and state transitions.
 
 create or replace function public.review_payment_submission(
@@ -19,7 +19,6 @@ declare
   v_ticket_code text;
   v_ticket_count integer := 0;
   v_attendee_count integer := 0;
-  v_attendee_index integer;
 begin
   v_role := private.current_profile_role();
   if coalesce(v_role, '') not in ('owner', 'admin', 'supervisor') then
@@ -77,37 +76,35 @@ begin
       join public.ticket_types tt on tt.id = bi.ticket_type_id
       where bi.booking_id = v_booking.id
     loop
-      for v_attendee_index in 1..v_item.quantity loop
-        loop
-          v_ticket_code := lpad(floor(random() * 10000000000)::bigint::text, 10, '0');
-          exit when not exists (
-            select 1
-            from public.tickets
-            where ticket_code = v_ticket_code
-          );
-        end loop;
-
-        insert into public.tickets (
-          booking_item_id,
-          booking_id,
-          event_id,
-          ticket_type_id,
-          ticket_code,
-          attendee_name,
-          status
-        )
-        values (
-          v_item.id,
-          v_booking.id,
-          v_booking.event_id,
-          v_item.ticket_type_id,
-          v_ticket_code,
-          v_booking.customer_name,
-          'valid'
+      loop
+        v_ticket_code := lpad(floor(random() * 10000000000)::bigint::text, 10, '0');
+        exit when not exists (
+          select 1
+          from public.tickets
+          where ticket_code = v_ticket_code
         );
-
-        v_ticket_count := v_ticket_count + 1;
       end loop;
+
+      insert into public.tickets (
+        booking_item_id,
+        booking_id,
+        event_id,
+        ticket_type_id,
+        ticket_code,
+        attendee_name,
+        status
+      )
+      values (
+        v_item.id,
+        v_booking.id,
+        v_booking.event_id,
+        v_item.ticket_type_id,
+        v_ticket_code,
+        v_booking.customer_name,
+        'valid'
+      );
+
+      v_ticket_count := v_ticket_count + 1;
     end loop;
 
     update public.payment_submissions
