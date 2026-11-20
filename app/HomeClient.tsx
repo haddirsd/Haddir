@@ -119,7 +119,7 @@ export default function Home(){
   profileSaving={profileSaving} deletingAccount={deletingAccount} darkMode={darkMode}
   setDarkMode={setDarkMode} showPrivacySecurity={showPrivacySecurity}
   setShowPrivacySecurity={setShowPrivacySecurity} saveProfile={()=>void accountActions.saveProfile()}
-  signInWithGoogle={()=>void accountActions.signInWithGoogle()} deleteAccount={accountActions.deleteAccount} signOut={accountActions.signOut}
+  signInWithGoogle={()=>void accountActions.signInWithGoogle()} signInWithEmail={accountActions.signInWithEmail} deleteAccount={accountActions.deleteAccount} signOut={accountActions.signOut}
 />}
 {isGatekeeperPage&&<GatekeeperPage
    authUser={authUser}
