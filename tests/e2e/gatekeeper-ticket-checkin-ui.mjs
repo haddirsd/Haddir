@@ -317,8 +317,9 @@ try {
     "Out-of-scope ticket attempts must not create a scan record under this gatekeeper");
 
   await page.getByText("سجل عمليات الدخول", { exact: true }).waitFor();
-  await page.getByText("محاولة دخول مكررة", { exact: true }).waitFor();
-  await page.getByText("كود غير موجود", { exact: true }).waitFor();
+  const scanHistory = page.locator('section[aria-label="سجل عمليات الدخول"]');
+  await scanHistory.getByText("محاولة دخول مكررة", { exact: true }).waitFor();
+  await scanHistory.getByText("كود غير موجود", { exact: true }).waitFor();
 
   assert.deepEqual(pageErrors, [], `Gatekeeper browser page must not throw runtime errors: ${pageErrors.join("; ")}`);
   assert.deepEqual(consoleErrors, [], `Gatekeeper browser page must not emit console errors: ${consoleErrors.join("; ")}`);
