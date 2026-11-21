@@ -7,6 +7,10 @@ type InstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 };
 
+type InstallWindow = Window & {
+  __haddirInstallPrompt?: InstallPromptEvent | null;
+};
+
 export function PwaRegistration() {
   const [updateReady, setUpdateReady] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
@@ -33,42 +37,31 @@ export function PwaRegistration() {
       window.matchMedia("(display-mode: standalone)").matches ||
       Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
 
-    const wasInstallDismissed = () => {
-      try {
-        const until = Number(localStorage.getItem("haddir-install-dismissed-until") || 0);
-        return until > Date.now();
-      } catch {
-        return false;
-      }
-    };
-
-    const onBeforeInstallPrompt = (event: Event) => {
-      event.preventDefault();
-      if (!isStandalone() && !wasInstallDismissed()) {
-        setInstallPrompt(event as InstallPromptEvent);
+    const installWindow = window as InstallWindow;
+    const syncCapturedPrompt = () => {
+      if (!isStandalone() && installWindow.__haddirInstallPrompt) {
+        setInstallPrompt(installWindow.__haddirInstallPrompt);
       }
     };
 
     const onAppInstalled = () => {
+      installWindow.__haddirInstallPrompt = null;
       setInstallPrompt(null);
       setShowIosInstallHelp(false);
-      try {
-        localStorage.removeItem("haddir-install-dismissed-until");
-      } catch {
-        // Storage may be unavailable in private browsing.
-      }
     };
 
-    if (!isStandalone() && !wasInstallDismissed()) {
+    // The prompt event is captured in the document head, before React hydrates.
+    syncCapturedPrompt();
+    window.addEventListener("haddir:beforeinstallprompt", syncCapturedPrompt);
+    window.addEventListener("appinstalled", onAppInstalled);
+
+    if (!isStandalone()) {
       const isAppleMobile = /iphone|ipad|ipod/i.test(navigator.userAgent);
       if (isAppleMobile) setShowIosInstallHelp(true);
     }
 
-    window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
-    window.addEventListener("appinstalled", onAppInstalled);
-
     return () => {
-      window.removeEventListener("beforeinstallprompt", onBeforeInstallPrompt);
+      window.removeEventListener("haddir:beforeinstallprompt", syncCapturedPrompt);
       window.removeEventListener("appinstalled", onAppInstalled);
     };
   }, []);
@@ -144,16 +137,8 @@ export function PwaRegistration() {
   }, []);
 
   const dismissInstall = () => {
-    setInstallPrompt(null);
     setShowIosInstallHelp(false);
-    try {
-      localStorage.setItem(
-        "haddir-install-dismissed-until",
-        String(Date.now() + 14 * 24 * 60 * 60 * 1000)
-      );
-    } catch {
-      // The prompt remains dismissible for this page session.
-    }
+    setInstallPrompt(null);
   };
 
   const installApp = async () => {
@@ -164,9 +149,9 @@ export function PwaRegistration() {
     setInstallingApp(true);
     try {
       await installPrompt.prompt();
-      const choice = await installPrompt.userChoice;
+      await installPrompt.userChoice;
+      (window as InstallWindow).__haddirInstallPrompt = null;
       setInstallPrompt(null);
-      if (choice.outcome === "dismissed") dismissInstall();
     } catch (error) {
       console.warn("تعذر بدء تثبيت حاضر.", error);
     } finally {
