@@ -38,6 +38,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             __html: "(function(){try{var saved=localStorage.getItem('haddir-theme');var dark=saved?saved==='dark':!!window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.dataset.theme=dark?'dark':'light';document.documentElement.style.colorScheme=dark?'dark':'light';var meta=document.querySelector('meta[name=\"theme-color\"]');if(meta)meta.setAttribute('content','#5B2EFF');}catch(_){document.documentElement.dataset.theme='light';document.documentElement.style.colorScheme='light';}})();",
           }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "(function(){window.addEventListener('beforeinstallprompt',function(event){event.preventDefault();window.__haddirInstallPrompt=event;window.dispatchEvent(new Event('haddir:beforeinstallprompt'));});window.addEventListener('appinstalled',function(){window.__haddirInstallPrompt=null;});})();",
+          }}
+        />
       </head>
       <body>
         <PwaRegistration />
