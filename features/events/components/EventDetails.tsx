@@ -24,6 +24,7 @@ export type EventDetailsProps = {
   bookingNumber: string;
   bookingError: string;
   bookingSubmitting: boolean;
+  receiptUploading: boolean;
   accountCopied: boolean;
   onClose: () => void;
   onSelectTier: (index: number) => void;
@@ -52,6 +53,7 @@ export function EventDetails({
   bookingNumber,
   bookingError,
   bookingSubmitting,
+  receiptUploading,
   accountCopied,
   onClose,
   onSelectTier,
@@ -211,6 +213,7 @@ export function EventDetails({
                 onReceiptChange={onReceiptChange}
                 bookingError={bookingError}
                 bookingSubmitting={bookingSubmitting}
+                receiptUploading={receiptUploading}
                 onSubmit={onSubmitBooking}
               />
             ) : (
