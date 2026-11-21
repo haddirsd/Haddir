@@ -110,24 +110,20 @@ async function createPayment({ customer, eventId, ticketTypeId, paymentAccountId
     `${label}-receipt.png`,
     { type: "image/png" },
   );
-  const form = new FormData();
-  form.set("bookingId", booking.booking_id);
-  form.set("receipt", receipt);
-  const upload = await fetch(`${baseUrl}/api/booking/receipt`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${customer.session.access_token}` },
-    body: form,
+  const receiptPath = `${customer.id}/${booking.booking_id}/${randomUUID()}.png`;
+  const upload = await customer.client.storage.from("payment-receipts").upload(receiptPath, receipt, {
+    contentType: "image/png",
+    upsert: false,
+    cacheControl: "3600",
   });
-  const uploadBody = await upload.json();
-  assert.equal(upload.status, 200, `${label} receipt upload failed: ${JSON.stringify(uploadBody)}`);
-  assert.match(uploadBody.path, new RegExp(`^${customer.id}/${booking.booking_id}/[^/]+\\.png$`));
-  receiptPaths.push(uploadBody.path);
+  assert.equal(upload.error, null, `${label} receipt upload failed: ${upload.error?.message}`);
+  receiptPaths.push(receiptPath);
 
   const submissionId = await dataOrThrow(
     await customer.client.rpc("submit_payment", {
       p_booking_id: booking.booking_id,
       p_payment_method_id: paymentAccountId,
-      p_receipt_path: uploadBody.path,
+      p_receipt_path: receiptPath,
       p_transfer_reference: `TRANSFER-${label.toUpperCase()}-${suffix.slice(0, 8)}`,
     }),
     `Submit ${label} payment`,
@@ -142,7 +138,7 @@ async function createPayment({ customer, eventId, ticketTypeId, paymentAccountId
     `Verify ${label} payment submission`,
   );
   assert.equal(row.status, "submitted");
-  assert.equal(row.receipt_path, uploadBody.path);
+  assert.equal(row.receipt_path, receiptPath);
 
   const bookingRow = await dataOrThrow(
     await admin.from("bookings").select("id,booking_number,status").eq("id", booking.booking_id).single(),
