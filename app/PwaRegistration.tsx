@@ -13,6 +13,20 @@ export function PwaRegistration() {
   const [showIosInstallHelp, setShowIosInstallHelp] = useState(false);
   const [installingUpdate, setInstallingUpdate] = useState(false);
   const [installingApp, setInstallingApp] = useState(false);
+  const [pwaDiagnostic, setPwaDiagnostic] = useState<{ displayMode: string; standalone: string }>({ displayMode: "غير مفحوص", standalone: "غير مفحوص" });
+  const [showPwaDiagnostic, setShowPwaDiagnostic] = useState(false);
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("pwa-diagnostic") !== "1") return;
+    const modes = ["standalone", "minimal-ui", "fullscreen", "browser"];
+    const activeMode = modes.find((mode) => window.matchMedia(`(display-mode: ${mode})`).matches) || "غير معروف";
+    const legacyStandalone = (navigator as Navigator & { standalone?: boolean }).standalone;
+    setPwaDiagnostic({
+      displayMode: activeMode,
+      standalone: typeof legacyStandalone === "boolean" ? String(legacyStandalone) : "غير مدعوم",
+    });
+    setShowPwaDiagnostic(true);
+  }, []);
 
   useEffect(() => {
     const isStandalone = () =>
@@ -179,6 +193,22 @@ export function PwaRegistration() {
 
   return (
     <>
+      {showPwaDiagnostic && (
+        <aside dir="rtl" role="status" aria-live="polite" style={{
+          position: "fixed", zIndex: 10001, top: "calc(12px + env(safe-area-inset-top))",
+          insetInline: 12, maxWidth: 360, marginInline: "auto", padding: 12,
+          border: "1px solid #5B2EFF", borderRadius: 12, background: "#fff", color: "#171717",
+          boxShadow: "0 8px 28px rgba(0,0,0,.2)", fontFamily: "sans-serif", fontSize: 13,
+        }}>
+          <strong style={{ display: "block", marginBottom: 7 }}>فحص وضع تثبيت حاضر</strong>
+          <div>display-mode: <b>{pwaDiagnostic.displayMode}</b></div>
+          <div>navigator.standalone: <b>{pwaDiagnostic.standalone}</b></div>
+          <button type="button" onClick={() => setShowPwaDiagnostic(false)} style={{
+            marginTop: 8, border: 0, borderRadius: 7, padding: "6px 10px",
+            background: "#5B2EFF", color: "#fff", font: "inherit",
+          }}>إغلاق</button>
+        </aside>
+      )}
       {(installPrompt || showIosInstallHelp) && (
         <aside
           dir="rtl"
