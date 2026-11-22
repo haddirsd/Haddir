@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { Ticket, RefreshCw } from "lucide-react";
 import { HaddirDialog } from "../../../components/ui/HaddirDialog";
-import { reviewAdminPayment } from "./admin-payments.service";
+import { listAdminPaymentEvents, reviewAdminPayment } from "./admin-payments.service";
+import type { AdminPaymentEventFilter } from "./admin-payments.service";
 import { useAdminPayments } from "./useAdminPayments";
 import type { AdminPaymentDecision, AdminPaymentRow } from "./admin-payments.types";
 
@@ -14,7 +15,19 @@ const PAGE_SIZE = 100;
 
 export default function AdminPaymentsWorkspace() {
   const [page, setPage] = useState(0);
-  const { rows, totalCount, loading, error, refresh } = useAdminPayments(page);
+  const [selectedEventId, setSelectedEventId] = useState("");
+  const [eventFilters, setEventFilters] = useState<AdminPaymentEventFilter[]>([]);
+  const [eventFilterError, setEventFilterError] = useState("");
+  const { rows, totalCount, loading, error, refresh } = useAdminPayments(page, selectedEventId || null);
+  useEffect(() => {
+    let active = true;
+    void listAdminPaymentEvents().then(result => {
+      if (!active) return;
+      setEventFilters(result.events);
+      setEventFilterError(result.error || "");
+    });
+    return () => { active = false; };
+  }, []);
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
   useEffect(() => { if (totalPages > 0 && page >= totalPages) setPage(totalPages - 1); }, [page, totalPages]);
   const [rejectionReasons, setRejectionReasons] = useState<Record<string,string>>({});
@@ -36,6 +49,8 @@ export default function AdminPaymentsWorkspace() {
         ? "تم اعتماد الدفع وإصدار " + Number(result.data?.ticketsCreated || 0) + " تذكرة. وصل إشعار القبول للعميل داخل التطبيق."
         : "تم رفض إثبات الدفع وإرسال السبب للعميل داخل التطبيق.");
       await refresh();
+      const eventResult = await listAdminPaymentEvents();
+      if (!eventResult.error) setEventFilters(eventResult.events);
     } catch (error) {
       setActionError(error instanceof Error ? error.message : "تعذرت مراجعة إثبات الدفع.");
     } finally {
@@ -46,7 +61,15 @@ export default function AdminPaymentsWorkspace() {
   return <section className="admin-panel">
     <div className="admin-panel-head">
       <div><h3>مراجعة المدفوعات</h3><p>مراجعة إثباتات التحويل المرتبطة بالحجز والعميل والفعالية</p></div>
-      <button className="admin-refresh" type="button" onClick={() => void refresh()} disabled={loading}><RefreshCw size={16}/> تحديث</button>
+      <button className="admin-refresh" type="button" onClick={async () => { await refresh(); const result = await listAdminPaymentEvents(); if (!result.error) setEventFilters(result.events); }} disabled={loading}><RefreshCw size={16}/> تحديث</button>
+    </div>
+    <div className="admin-payment-event-filter">
+      <label htmlFor="admin-payment-event-select">تصفية حسب الفعالية</label>
+      <select id="admin-payment-event-select" value={selectedEventId} onChange={event => { setSelectedEventId(event.target.value); setPage(0); }}>
+        <option value="">كل الفعاليات ({eventFilters.reduce((sum, item) => sum + item.pendingCount, 0).toLocaleString("ar-SD-u-nu-latn")} معلّق)</option>
+        {eventFilters.map(item => <option key={item.id} value={item.id}>{item.pendingCount > 0 ? "🔴 " : ""}{item.title}{item.pendingCount > 0 ? ` (${item.pendingCount})` : ""}</option>)}
+      </select>
+      {eventFilterError && <small role="alert">{eventFilterError}</small>}
     </div>
     {error&&<div className="admin-notice" role="alert">{error}</div>}
     {actionError&&<div className="admin-notice" role="alert">{actionError}</div>}
