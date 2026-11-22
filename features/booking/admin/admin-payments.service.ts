@@ -4,7 +4,7 @@ import { getAdminEventScope } from "./admin-event-scope";
 
 const ADMIN_PAYMENTS_PAGE_SIZE = 100;
 
-export async function listAdminPayments(page = 0): Promise<{ rows: AdminPaymentRow[]; totalCount: number; error: string | null }> {
+export async function listAdminPayments(page = 0, eventId: string | null = null): Promise<{ rows: AdminPaymentRow[]; totalCount: number; error: string | null }> {
   const supabase = getSupabaseBrowserClient();
   if (!supabase) return { rows: [], totalCount: 0, error: "تعذر الاتصال بقاعدة البيانات." };
   const scope = await getAdminEventScope(supabase);
@@ -17,6 +17,7 @@ export async function listAdminPayments(page = 0): Promise<{ rows: AdminPaymentR
     { count: "exact" }
   ).eq("status", "submitted").order("created_at", { ascending: false }).order("id", { ascending: false }).range(from, from + ADMIN_PAYMENTS_PAGE_SIZE - 1);
   if (scope.eventIds !== null) query = query.in("bookings.event_id", scope.eventIds);
+  if (eventId) query = query.eq("bookings.event_id", eventId);
   const { data, count, error } = await query;
   if (error) return { rows: [], totalCount: 0, error: error.message || "تعذر تحميل إثباتات الدفع." };
   const rows = await Promise.all((data || []).map(async (row: any) => {
@@ -37,4 +38,46 @@ export async function reviewAdminPayment(
   });
   if (error) return { data: null, error: error.message || "تعذرت مراجعة إثبات الدفع." };
   return { data: { bookingId: data?.booking_id || null, ticketsCreated: Number(data?.tickets_created || 0) }, error: null };
+}
+
+
+export type AdminPaymentEventFilter = { id: string; title: string; pendingCount: number };
+
+export async function listAdminPaymentEvents(): Promise<{ events: AdminPaymentEventFilter[]; error: string | null }> {
+  const supabase = getSupabaseBrowserClient();
+  if (!supabase) return { events: [], error: "تعذر الاتصال بقاعدة البيانات." };
+  const scope = await getAdminEventScope(supabase);
+  if (scope.error) return { events: [], error: scope.error };
+  if (scope.eventIds !== null && scope.eventIds.length === 0) return { events: [], error: null };
+
+  let eventsQuery = supabase.from("events").select("id,title").order("title", { ascending: true });
+  let pendingQuery = supabase.from("payment_submissions")
+    .select("id,bookings!inner(event_id)")
+    .eq("status", "submitted");
+  if (scope.eventIds !== null) {
+    eventsQuery = eventsQuery.in("id", scope.eventIds);
+    pendingQuery = pendingQuery.in("bookings.event_id", scope.eventIds);
+  }
+
+  const [{ data: eventRows, error: eventsError }, { data: pendingRows, error: pendingError }] = await Promise.all([
+    eventsQuery,
+    pendingQuery,
+  ]);
+  if (eventsError) return { events: [], error: eventsError.message || "تعذر تحميل قائمة الفعاليات." };
+  if (pendingError) return { events: [], error: pendingError.message || "تعذر تحميل أعداد الحجوزات المعلقة." };
+
+  const counts = new Map<string, number>();
+  for (const row of pendingRows || []) {
+    const booking = Array.isArray((row as any).bookings) ? (row as any).bookings[0] : (row as any).bookings;
+    const id = booking?.event_id;
+    if (id) counts.set(id, (counts.get(id) || 0) + 1);
+  }
+  return {
+    events: (eventRows || []).map((event: any) => ({
+      id: event.id,
+      title: event.title || "فعالية بدون اسم",
+      pendingCount: counts.get(event.id) || 0,
+    })),
+    error: null,
+  };
 }
