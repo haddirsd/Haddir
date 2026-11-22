@@ -5,7 +5,7 @@ import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import { listAdminPayments } from "./admin-payments.service";
 import type { AdminPaymentRow } from "./admin-payments.types";
 
-export function useAdminPayments(page: number) {
+export function useAdminPayments(page: number, eventId: string | null = null) {
   const [rows, setRows] = useState<AdminPaymentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -15,12 +15,12 @@ export function useAdminPayments(page: number) {
   const refresh = useCallback(async () => {
     const requestId = ++latestRequest.current;
     setLoading(true);
-    const result = await listAdminPayments(page);
+    const result = await listAdminPayments(page, eventId);
     if (requestId !== latestRequest.current) return;
     if (result.error) setError(result.error);
     else { setRows(result.rows); setTotalCount(result.totalCount); setError(""); }
     setLoading(false);
-  }, [page]);
+  }, [page, eventId]);
 
   useEffect(() => {
     void refresh();
