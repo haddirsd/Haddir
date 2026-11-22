@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { PwaRegistration } from "./PwaRegistration";
+import { PushDiagnostics } from "./PushDiagnostics";
 import "./globals.css";
 import "../components/layout/responsive-nav.css";
 import "./desktop.css";
@@ -46,6 +47,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body>
         <PwaRegistration />
+        <PushDiagnostics />
         {children}
       </body>
     </html>
