@@ -63,9 +63,9 @@ export default function AdminPaymentsWorkspace() {
       <div><h3>مراجعة المدفوعات</h3><p>مراجعة إثباتات التحويل المرتبطة بالحجز والعميل والفعالية</p></div>
       <button className="admin-refresh" type="button" onClick={async () => { await refresh(); const result = await listAdminPaymentEvents(); if (!result.error) setEventFilters(result.events); }} disabled={loading}><RefreshCw size={16}/> تحديث</button>
     </div>
-    <div className="admin-payment-event-filter">
-      <label htmlFor="admin-payment-event-select">تصفية حسب الفعالية</label>
-      <select id="admin-payment-event-select" value={selectedEventId} onChange={event => { setSelectedEventId(event.target.value); setPage(0); }}>
+    <div className="admin-payment-event-filter" style={{display:"grid",gap:8,margin:"12px 0 16px"}}>
+      <label htmlFor="admin-payment-event-select" style={{fontSize:13,fontWeight:700}}>تصفية حسب الفعالية</label>
+      <select id="admin-payment-event-select" style={{width:"100%",minHeight:44,padding:"8px 12px",borderRadius:10,border:"1px solid var(--admin-border, #d8dbe3)",background:"var(--admin-card, #fff)",color:"inherit",font:"inherit"}} value={selectedEventId} onChange={event => { setSelectedEventId(event.target.value); setPage(0); }}>
         <option value="">كل الفعاليات ({eventFilters.reduce((sum, item) => sum + item.pendingCount, 0).toLocaleString("ar-SD-u-nu-latn")} معلّق)</option>
         {eventFilters.map(item => <option key={item.id} value={item.id}>{item.pendingCount > 0 ? "🔴 " : ""}{item.title}{item.pendingCount > 0 ? ` (${item.pendingCount})` : ""}</option>)}
       </select>
