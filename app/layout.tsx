@@ -14,7 +14,6 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "حاضر | فعاليات السودان في مكان واحد",
   description: "اكتشف الفعاليات القادمة واحجز تذكرتك بسهولة مع حاضر.",
-  manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     title: "حاضر",
@@ -33,9 +32,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <head>
+        <link rel="manifest" href="/manifest.webmanifest" />
         <script
           dangerouslySetInnerHTML={{
-            __html: "(function(){try{var saved=localStorage.getItem('haddir-theme');var dark=saved?saved==='dark':!!window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.dataset.theme=dark?'dark':'light';document.documentElement.style.colorScheme=dark?'dark':'light';var meta=document.querySelector('meta[name=\"theme-color\"]');if(meta)meta.setAttribute('content','#5B2EFF');}catch(_){document.documentElement.dataset.theme='light';document.documentElement.style.colorScheme='light';}})();",
+            __html: "(function(){try{var saved=localStorage.getItem('haddir-theme');var dark=saved?saved==='dark':!!window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.dataset.theme=dark?'dark':'light';document.documentElement.style.colorScheme=dark?'dark':'light';var meta=document.querySelector('meta[name=\\\"theme-color\\\"]');if(meta)meta.setAttribute('content','#5B2EFF');}catch(_){document.documentElement.dataset.theme='light';document.documentElement.style.colorScheme='light';}})();",
           }}
         />
         <script
