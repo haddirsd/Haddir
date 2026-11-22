@@ -11,6 +11,26 @@ const PRECACHE_URLS = [
   "/offline.html",
 ];
 
+
+const PUSH_DIAGNOSTICS_CACHE = "haddir-push-diagnostics-v1";
+const PUSH_DIAGNOSTICS_KEY = new URL("/__haddir_push_diagnostics__", self.location.origin).href;
+
+async function readPushDiagnostics() {
+  const cache = await caches.open(PUSH_DIAGNOSTICS_CACHE);
+  const response = await cache.match(PUSH_DIAGNOSTICS_KEY);
+  if (!response) return [];
+  try { return await response.json(); } catch { return []; }
+}
+
+async function recordPushDiagnostic(stage, details = {}) {
+  const cache = await caches.open(PUSH_DIAGNOSTICS_CACHE);
+  const entries = await readPushDiagnostics();
+  entries.push({ stage, at: new Date().toISOString(), permission: self.Notification?.permission || "unknown", ...details });
+  await cache.put(PUSH_DIAGNOSTICS_KEY, new Response(JSON.stringify(entries.slice(-20)), {
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+  }));
+}
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
@@ -23,6 +43,12 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("message", (event) => {
   if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
+  if (event.data?.type === "HADDIR_GET_PUSH_DIAGNOSTICS") {
+    event.waitUntil(readPushDiagnostics().then((entries) => event.ports?.[0]?.postMessage({ entries })));
+  }
+  if (event.data?.type === "HADDIR_CLEAR_PUSH_DIAGNOSTICS") {
+    event.waitUntil(caches.delete(PUSH_DIAGNOSTICS_CACHE).then(() => event.ports?.[0]?.postMessage({ cleared: true })));
+  }
 });
 
 self.addEventListener("activate", (event) => {
@@ -78,6 +104,7 @@ self.addEventListener("fetch", (event) => {
 
 self.addEventListener("push", (event) => {
   event.waitUntil((async () => {
+    await recordPushDiagnostic("push_event_received", { hasData: Boolean(event.data) });
     let payload = {};
     try {
       payload = event.data ? event.data.json() : {};
@@ -100,6 +127,8 @@ self.addEventListener("push", (event) => {
       ? payload.tag
       : "haddir-notification";
 
+    await recordPushDiagnostic("payload_parsed", { title, body, url });
+
     const options = {
       body,
       icon: "/icons/icon-192.png",
@@ -116,8 +145,10 @@ self.addEventListener("push", (event) => {
 
     try {
       await self.registration.showNotification(title, options);
+      await recordPushDiagnostic("show_notification_succeeded", { title, tag });
       console.info("[Haddir SW] Push notification displayed", { tag });
     } catch (error) {
+      await recordPushDiagnostic("show_notification_failed", { title, error: error instanceof Error ? error.message : String(error) });
       console.error("[Haddir SW] Notification display failed", error);
       await self.registration.showNotification(title, {
         body,
