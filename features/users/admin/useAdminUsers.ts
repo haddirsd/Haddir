@@ -22,11 +22,17 @@ export function useAdminUsers(role: AdminUsersRole, searchTerm: string, roleFilt
   const refresh = useCallback(async () => {
     const requestId = ++latestRequest.current;
     setLoading(true);
-    const result = await listAdminUsers(searchTerm, roleFilter, page, 25);
-    if (requestId !== latestRequest.current) return;
-    if (result.error) setError(result.error);
-    else { setRows(result.rows); setEventOptions(result.eventOptions); setUserTotal(result.total); setError(""); }
-    setLoading(false);
+    setError("");
+    try {
+      const result = await listAdminUsers(searchTerm, roleFilter, page, 25);
+      if (requestId !== latestRequest.current) return;
+      if (result.error) setError(result.error);
+      else { setRows(result.rows); setEventOptions(result.eventOptions); setUserTotal(result.total); }
+    } catch (error) {
+      if (requestId === latestRequest.current) setError(error instanceof Error ? error.message : "تعذر تحميل المستخدمين.");
+    } finally {
+      if (requestId === latestRequest.current) setLoading(false);
+    }
   }, [searchTerm, roleFilter, page]);
 
   useEffect(() => {
