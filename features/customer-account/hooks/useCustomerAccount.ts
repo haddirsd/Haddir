@@ -7,7 +7,12 @@ import type { CustomerNotification, CustomerTicket } from "../types";
 
 type TicketStatus = "valid" | "used";
 
-export function useCustomerAccount(userId: string | null, ticketStatus: TicketStatus, ticketPage: number) {
+export function useCustomerAccount(
+  userId: string | null,
+  ticketStatus: TicketStatus,
+  ticketPage: number,
+  setTicketPage: (page: number) => void,
+) {
   const [myTickets, setMyTickets] = useState<CustomerTicket[]>([]);
   const [myTicketCounts, setMyTicketCounts] = useState({ valid: 0, used: 0 });
   const [myNotifications, setMyNotifications] = useState<CustomerNotification[]>([]);
@@ -43,12 +48,7 @@ export function useCustomerAccount(userId: string | null, ticketStatus: TicketSt
         setMyNotifications(result.notifications);
         setAccountDataError("");
         const totalPages = Math.max(1, Math.ceil(result.ticketCounts[ticketStatus] / CUSTOMER_TICKETS_PAGE_SIZE));
-        if (ticketPage > totalPages) {
-          // If a ticket was removed while viewing the last page, return to the new last page.
-          window.queueMicrotask(() => {
-            if (alive) setRequestedPage(totalPages);
-          });
-        }
+        if (ticketPage > totalPages) setTicketPage(totalPages);
       }
       if (firstLoad) {
         setAccountDataLoading(false);
@@ -68,10 +68,7 @@ export function useCustomerAccount(userId: string | null, ticketStatus: TicketSt
       requestSequence++;
       void supabase.removeChannel(channel);
     };
-  }, [userId, ticketStatus, ticketPage]);
-
-  const [requestedPage, setRequestedPage] = useState<number | null>(null);
-  const setTicketPage = useCallback((page: number) => setRequestedPage(page), []);
+  }, [userId, ticketStatus, ticketPage, setTicketPage]);
 
   const markNotificationRead = useCallback(async (notificationId: string) => {
     if (!userId) return { error: "سجّل الدخول أولاً." };
@@ -106,7 +103,5 @@ export function useCustomerAccount(userId: string | null, ticketStatus: TicketSt
     setAccountDataError,
     markNotificationRead,
     markAllNotificationsRead,
-    requestedPage,
-    setTicketPage,
   };
 }
