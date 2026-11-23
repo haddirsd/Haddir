@@ -3,6 +3,7 @@
 import { CalendarDays, ChevronLeft, ChevronRight, Download, Ticket, UserRound } from "lucide-react";
 import { QRCodeSVG as QrCodeSVG } from "qrcode.react";
 import type { CustomerTicket } from "../types";
+import { SkeletonState } from "../../../components/ui/SkeletonState";
 
 export type { CustomerTicket } from "../types";
 
@@ -43,7 +44,7 @@ export function TicketWorkspace({
 
   return (
     <section className="screen container tickets-screen">
-      {loading ? <div className="empty-state motion-loading" role="status"><span className="haddir-loading-indicator" aria-hidden="true"/><span>جاري تحميل تذاكرك...</span></div> : error ? <div className="empty-state" role="alert">{error}</div> : <>
+      {loading ? <SkeletonState variant="tickets" count={3} label="جاري تحميل تذاكرك..." /> : error ? <div className="empty-state" role="alert">{error}</div> : <>
         <div className="ticket-tabs" role="tablist" aria-label="حالة التذاكر">
           <button type="button" role="tab" aria-selected={filter === "new"} className={filter === "new" ? "active" : ""} onClick={() => onFilterChange("new")}>
             تذاكر جديدة <span>{ticketCounts.valid}</span>
