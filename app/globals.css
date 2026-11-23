@@ -12600,3 +12600,23 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 @keyframes haddir-skeleton-shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
 @media(max-width:700px){.haddir-skeleton-dashboard .haddir-skeleton-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.haddir-skeleton-media{flex-basis:88px}.haddir-skeleton-table-head,.haddir-skeleton-table-row{grid-template-columns:repeat(3,minmax(0,1fr))}.haddir-skeleton-table-head i:last-child,.haddir-skeleton-table-row i:last-child{display:none}}
 @media(prefers-reduced-motion:reduce){.haddir-skeleton-copy b,.haddir-skeleton-copy i,.haddir-skeleton-chip,.haddir-skeleton-metric i,.haddir-skeleton-metric b,.haddir-skeleton-metric span,.haddir-skeleton-table i{animation:none}}
+
+
+/* Loading UX: keep page content stationary; skeleton shimmer remains the only ambient loading motion. */
+.app-content > .screen,
+.app-content > .profile-screen,
+.app-content > .gatekeeper-page-screen,
+.app-content > .event-detail-layout,
+.app-content > .home-discovery,
+.app-content > .gatekeeper-screen,
+.app-content .event-detail-page,
+.app-content .event-detail-page .payment-sheet .payment-screen,
+.app-content .screen-topbar,
+.app-shell .screen-topbar,
+.app-shell .topbar,
+.admin-section-transition {
+  animation: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  will-change: auto !important;
+}
