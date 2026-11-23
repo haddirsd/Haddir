@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { RefreshCw, Ticket } from "lucide-react";
 import { useAdminBookings } from "./useAdminBookings";
 import type { AdminBookingRow } from "./admin-bookings.types";
+import { SkeletonState } from "../../../components/ui/SkeletonState";
 
 const statusLabels: Record<string, string> = {
   pending_payment: "بانتظار الدفع", under_review: "قيد المراجعة", confirmed: "مؤكد",
@@ -30,7 +31,7 @@ export default function AdminBookingsWorkspace() {
       </div>
     </div>
     {error&&<p className="admin-form-message" role="alert">{error}</p>}
-    {loading?<div className="admin-no-data motion-loading" role="status"><span className="haddir-loading-indicator" aria-hidden="true"/><span>جاري تحميل الحجوزات...</span></div>:<div className="admin-booking-cards">
+    {loading?<SkeletonState variant="admin-cards" count={4} label="جاري تحميل الحجوزات..." />:<div className="admin-booking-cards">
       {rows.length===0?<p className="admin-no-data">لا توجد حجوزات حتى الآن.</p>:rows.map((r:AdminBookingRow,i:number)=>{
         const items=(r.booking_items||[]).map(item=>`${item.ticket_types?.name||"تذكرة"} × ${item.quantity}`).join("، ")||"—";
         const payment=[...(r.payment_submissions||[])].sort((a,b)=>new Date(b.created_at||0).getTime()-new Date(a.created_at||0).getTime())[0];
