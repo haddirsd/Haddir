@@ -1,4 +1,5 @@
 import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
+import { optimizeImageToWebp } from "../../../lib/images/optimize-image";
 
 type ServiceError = { message?: string } | null;
 
@@ -28,14 +29,27 @@ export async function uploadPaymentReceipt(userId: string, bookingId: string, re
     return { path: null, error: { message: "لا تملك صلاحية رفع إيصال لهذا الحساب." } };
   }
 
-  const extension = receipt.type === "image/png" ? "png" : receipt.type === "image/webp" ? "webp" : "jpg";
-  const path = `${userId}/${bookingId}/${crypto.randomUUID()}.${extension}`;
+  let optimizedReceipt: File;
+  try {
+    optimizedReceipt = await optimizeImageToWebp(receipt, {
+      maxDimension: 2400,
+      quality: 0.9,
+      maxOutputBytes: MAX_RECEIPT_SIZE,
+    });
+  } catch (error) {
+    return {
+      path: null,
+      error: { message: error instanceof Error ? error.message : "تعذر تحسين صورة الإيصال." },
+    };
+  }
+
+  const path = `${userId}/${bookingId}/${crypto.randomUUID()}.webp`;
 
   try {
     const { error } = await supabase.storage
       .from("payment-receipts")
-      .upload(path, receipt, {
-        contentType: receipt.type,
+      .upload(path, optimizedReceipt, {
+        contentType: "image/webp",
         upsert: false,
         cacheControl: "3600",
       });
