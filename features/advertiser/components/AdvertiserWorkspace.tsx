@@ -3,6 +3,7 @@
 import { ChevronLeft, Ticket } from "lucide-react";
 import { formatEventDate, formatMoney } from "../../events/events.formatters";
 import { useAdvertiserStatistics } from "../hooks/useAdvertiserStatistics";
+import { SkeletonState } from "../../../components/ui/SkeletonState";
 
 type AuthUser = { id: string; email?: string } | null;
 
@@ -20,7 +21,7 @@ export default function AdvertiserWorkspace({
     </button>
     {show&&<div className="advertiser-statistics-panel">
       <div className="advertiser-stats-heading"><div><small>لوحة المعلن</small><h2>إحصائيات فعاليتك</h2></div><button type="button" className="btn btn-outline" onClick={close}>إغلاق</button></div>
-      {loading?<div className="empty-state">جاري تحميل الإحصائيات...</div>:error?<div className="empty-state" role="alert">{error}</div>:statistics&&<>
+      {loading?<SkeletonState variant="dashboard" count={5} label="جاري تحميل إحصائيات الفعالية..." />:error?<div className="empty-state" role="alert">{error}<button type="button" className="btn btn-outline" onClick={()=>void open()}>إعادة المحاولة</button></div>:statistics&&<>
         <article className="advertiser-event-summary"><small>الفعالية المرتبطة بحسابك فقط</small><h3>{statistics.event.title}</h3><p>{statistics.event.venue||statistics.event.city||"الموقع غير محدد"} · {statistics.event.starts_at?formatEventDate(statistics.event.starts_at):"—"}</p></article>
         <div className="advertiser-metric-grid">
           <article><small>الحاجزون المعتمدون</small><strong>{Number(statistics.totals?.bookers||0).toLocaleString("ar-SD-u-nu-latn")}</strong></article>
