@@ -12569,3 +12569,34 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 .receipt-upload-dialog p{margin:0;color:var(--muted);font-size:12px;line-height:1.9}
 @keyframes receipt-upload-spin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.receipt-upload-spinner{animation-duration:2s}}
+
+
+/* Layout-matched skeleton loading states */
+.haddir-skeleton{display:block;width:100%;padding:8px 0;direction:rtl}
+.haddir-skeleton-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.haddir-skeleton-list{display:grid;gap:12px}
+.haddir-skeleton-item,.haddir-skeleton-metric,.haddir-skeleton-table{background:var(--card,#fff);border:1px solid var(--border,rgba(120,130,150,.14));border-radius:16px;padding:14px;overflow:hidden}
+.haddir-skeleton-item{display:flex;align-items:center;gap:12px;min-height:104px}
+.haddir-skeleton-media{display:block;flex:0 0 112px;aspect-ratio:1.25;border-radius:11px}
+.haddir-skeleton-avatar{display:block;flex:0 0 42px;width:42px;height:42px;border-radius:50%}
+.haddir-skeleton-copy{display:grid;flex:1;gap:10px;min-width:0}
+.haddir-skeleton-copy b,.haddir-skeleton-copy i,.haddir-skeleton-chip,.haddir-skeleton-metric i,.haddir-skeleton-metric b,.haddir-skeleton-metric span,.haddir-skeleton-table i{display:block;border-radius:7px;height:11px;background:linear-gradient(90deg,rgba(130,140,155,.10),rgba(130,140,155,.22),rgba(130,140,155,.10));background-size:200% 100%;animation:haddir-skeleton-shimmer 1.35s ease-in-out infinite}
+.haddir-skeleton-copy b{height:14px;width:62%}
+.haddir-skeleton-copy i:nth-child(2){width:88%}
+.haddir-skeleton-copy i:nth-child(3){width:48%}
+.haddir-skeleton-chip{width:58px;height:22px;flex:0 0 58px}
+.haddir-skeleton-dashboard .haddir-skeleton-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.haddir-skeleton-metric{display:grid;gap:13px;min-height:108px}
+.haddir-skeleton-metric i{width:32px;height:32px;border-radius:10px}
+.haddir-skeleton-metric b{width:54%;height:20px}
+.haddir-skeleton-metric span{width:78%}
+.haddir-skeleton-table{display:grid;gap:0}
+.haddir-skeleton-table-head,.haddir-skeleton-table-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:14px 4px;border-bottom:1px solid var(--border,rgba(120,130,150,.12))}
+.haddir-skeleton-table-head i{height:13px}
+.haddir-skeleton-table-row i{height:12px}
+.haddir-skeleton-events .haddir-skeleton-item{min-height:132px}
+.haddir-skeleton-tickets .haddir-skeleton-media{flex-basis:96px;aspect-ratio:.8}
+.haddir-skeleton-notifications .haddir-skeleton-item{min-height:88px}
+@keyframes haddir-skeleton-shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+@media(max-width:700px){.haddir-skeleton-dashboard .haddir-skeleton-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.haddir-skeleton-media{flex-basis:88px}.haddir-skeleton-table-head,.haddir-skeleton-table-row{grid-template-columns:repeat(3,minmax(0,1fr))}.haddir-skeleton-table-head i:last-child,.haddir-skeleton-table-row i:last-child{display:none}}
+@media(prefers-reduced-motion:reduce){.haddir-skeleton-copy b,.haddir-skeleton-copy i,.haddir-skeleton-chip,.haddir-skeleton-metric i,.haddir-skeleton-metric b,.haddir-skeleton-metric span,.haddir-skeleton-table i{animation:none}}
