@@ -61,7 +61,7 @@ export function TicketWorkspace({
           {visibleTickets.map((ticket) => <div className="ticket-card-wrap" key={ticket.id} data-ticket-id={ticket.id}>
             <button type="button" className="ticket-preview-card" aria-expanded={expandedTicketId === ticket.id} onClick={() => onToggleTicket(ticket.id)}>
               <span className="ticket-preview-image">
-                {ticket.events?.cover_image_url ? <img src={ticket.events.cover_image_url} alt={ticket.events?.title || "صورة الفعالية"} loading="lazy" /> : <span className="ticket-preview-fallback"><Ticket size={25} /></span>}
+                {ticket.events?.cover_image_url ? <img src={ticket.events.cover_image_url} alt={ticket.events?.title || "صورة الفعالية"} width={480} height={560} loading="lazy" decoding="async" /> : <span className="ticket-preview-fallback"><Ticket size={25} /></span>}
               </span>
               <span className="ticket-preview-perforation" aria-hidden="true" />
               <span className="ticket-preview-copy">
