@@ -7,7 +7,7 @@ import type { AdminUserEventOption, AdminUserRow, AdminUsersRole } from "./admin
 
 const EVENT_SCOPED_ROLES = ["supervisor", "gatekeeper", "advertiser"];
 
-export function useAdminUsers(role: AdminUsersRole, searchTerm: string, roleFilter: string) {
+export function useAdminUsers(role: AdminUsersRole, searchTerm: string, roleFilter: string, page: number) {
   const [rows, setRows] = useState<AdminUserRow[]>([]);
   const [eventOptions, setEventOptions] = useState<AdminUserEventOption[]>([]);
   const [userTotal, setUserTotal] = useState(0);
@@ -22,12 +22,12 @@ export function useAdminUsers(role: AdminUsersRole, searchTerm: string, roleFilt
   const refresh = useCallback(async () => {
     const requestId = ++latestRequest.current;
     setLoading(true);
-    const result = await listAdminUsers(searchTerm, roleFilter);
+    const result = await listAdminUsers(searchTerm, roleFilter, page, 25);
     if (requestId !== latestRequest.current) return;
     if (result.error) setError(result.error);
     else { setRows(result.rows); setEventOptions(result.eventOptions); setUserTotal(result.total); setError(""); }
     setLoading(false);
-  }, [searchTerm, roleFilter]);
+  }, [searchTerm, roleFilter, page]);
 
   useEffect(() => {
     void refresh();
