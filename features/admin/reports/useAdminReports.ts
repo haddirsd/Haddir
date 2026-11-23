@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
-import { getAdminReportData } from "./admin-reports.service";
-import type { AdminReportData } from "./admin-reports.types";
+import { getAdminEventReportPage, getAdminReportData } from "./admin-reports.service";
+import type { AdminEventReportPage, AdminReportData } from "./admin-reports.types";
 
-export function useAdminReports() {
+export function useAdminReports(eventId: string, bookingsPage: number, ticketsPage: number) {
   const [statistics, setStatistics] = useState<AdminReportData | null>(null);
+  const [eventPage, setEventPage] = useState<AdminEventReportPage>({ bookings: [], tickets: [], bookingTotal: 0, ticketTotal: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const latestRequest = useRef(0);
@@ -14,12 +15,19 @@ export function useAdminReports() {
   const refresh = useCallback(async () => {
     const requestId = ++latestRequest.current;
     setLoading(true);
-    const result = await getAdminReportData();
+    const [summaryResult, pageResult] = await Promise.all([
+      getAdminReportData(),
+      getAdminEventReportPage(eventId, bookingsPage, ticketsPage),
+    ]);
     if (requestId !== latestRequest.current) return;
-    if (result.error) setError(result.error);
-    else { setStatistics(result.data); setError(""); }
+    if (summaryResult.error || pageResult.error) setError(summaryResult.error || pageResult.error || "تعذر تحميل التقارير.");
+    else {
+      setStatistics(summaryResult.data);
+      setEventPage(pageResult.data);
+      setError("");
+    }
     setLoading(false);
-  }, []);
+  }, [eventId, bookingsPage, ticketsPage]);
 
   useEffect(() => {
     void refresh();
@@ -45,5 +53,5 @@ export function useAdminReports() {
     };
   }, [refresh]);
 
-  return { statistics, loading, error, refresh };
+  return { statistics, eventPage, loading, error, refresh };
 }
