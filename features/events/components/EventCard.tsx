@@ -26,7 +26,7 @@ export function EventCard({ event, variant, onOpen, clone = false }: EventCardPr
         aria-hidden={clone} aria-label={"عرض تفاصيل " + event.title}
         onClick={open} onKeyDown={handleKeyDown}>
         <div className={"trending-card-media " + event.cover}>
-          {event.coverImageUrl ? <img src={event.coverImageUrl} alt={clone ? "" : event.title} loading="lazy" decoding="async" /> : <span className="trending-placeholder">✦</span>}
+          {event.coverImageUrl ? <img src={event.coverImageUrl} alt={clone ? "" : event.title} width={1600} height={900} loading="lazy" decoding="async" /> : <span className="trending-placeholder">✦</span>}
           <div className="trending-overlay" />
           <span className="trending-category">{event.category}</span>
           <span className="trending-price">{event.price}</span>
@@ -45,7 +45,7 @@ export function EventCard({ event, variant, onOpen, clone = false }: EventCardPr
       tabIndex={0} aria-label={"عرض تفاصيل " + event.title} onClick={open} onKeyDown={handleKeyDown}>
       <div className="event-list-main">
         <div className="event-list-thumb">
-          {event.coverImageUrl ? <img src={event.coverImageUrl} alt={event.title} loading="lazy" decoding="async" /> : <span>✦</span>}
+          {event.coverImageUrl ? <img src={event.coverImageUrl} alt={event.title} width={480} height={480} loading="lazy" decoding="async" /> : <span>✦</span>}
         </div>
         <div className="event-list-info">
           <h3>{event.title}</h3>
