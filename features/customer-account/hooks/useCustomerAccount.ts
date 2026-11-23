@@ -30,9 +30,9 @@ export function useCustomerAccount(
   const [myNotificationsTotal, setMyNotificationsTotal] = useState(0);
   const [myNotificationsFilteredTotal, setMyNotificationsFilteredTotal] = useState(0);
   const [myUnreadNotificationCount, setMyUnreadNotificationCount] = useState(0);
-  const [accountDataLoading, setAccountDataLoading] = useState(false);
+  const [accountDataLoading, setAccountDataLoading] = useState(true);
   const [accountDataError, setAccountDataError] = useState("");
-  const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [notificationsLoading, setNotificationsLoading] = useState(true);
   const [notificationsError, setNotificationsError] = useState("");
   const latestNotificationRequest = useRef(0);
 
