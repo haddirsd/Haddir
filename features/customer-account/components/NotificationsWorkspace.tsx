@@ -12,6 +12,11 @@ type NotificationsWorkspaceProps = {
   filteredNotifications: CustomerNotification[];
   filter: "unread" | "read";
   unreadCount: number;
+  totalCount: number;
+  filteredTotal: number;
+  page: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
   onFilterChange: (filter: "unread" | "read") => void;
   onMarkAllRead: () => void;
   onOpenNotification: (notification: CustomerNotification) => void;
@@ -31,6 +36,11 @@ export function NotificationsWorkspace({
   filteredNotifications,
   filter,
   unreadCount,
+  totalCount,
+  filteredTotal,
+  page,
+  pageSize,
+  onPageChange,
   onFilterChange,
   onMarkAllRead,
   onOpenNotification,
@@ -44,7 +54,7 @@ export function NotificationsWorkspace({
             <span className="notifications-summary-label">ملخص الإشعارات</span>
             <strong className="notifications-summary-count">{unreadCount}</strong>
             <span className="notifications-summary-caption">إشعار غير مقروء</span>
-            <small className="notifications-summary-total">{notifications.length} إجمالي الإشعارات</small>
+            <small className="notifications-summary-total">{totalCount} إجمالي الإشعارات</small>
             <button type="button" className="notification-mark-all" onClick={onMarkAllRead} disabled={!unreadCount}>
               تعليم الكل
             </button>
@@ -82,6 +92,11 @@ export function NotificationsWorkspace({
                   {!notification.is_read && <button type="button" className="notification-toggle-read" onClick={() => onToggleRead(notification, true)}>تحديد كمقروء</button>}
                 </article>;
               })}
+            </div>}
+            {filteredTotal > pageSize && <div className="admin-pagination" style={{display:"flex",alignItems:"center",justifyContent:"center",gap:12,margin:"14px 0"}}>
+              <button type="button" className="admin-refresh" disabled={loading || page <= 1} onClick={() => onPageChange(page - 1)}>السابق</button>
+              <span>صفحة {page.toLocaleString("ar-SD-u-nu-latn")} من {Math.max(1, Math.ceil(filteredTotal / pageSize)).toLocaleString("ar-SD-u-nu-latn")} · {filteredTotal.toLocaleString("ar-SD-u-nu-latn")} إشعار</span>
+              <button type="button" className="admin-refresh" disabled={loading || page >= Math.ceil(filteredTotal / pageSize)} onClick={() => onPageChange(page + 1)}>التالي</button>
             </div>}
           </div>
         </div>
