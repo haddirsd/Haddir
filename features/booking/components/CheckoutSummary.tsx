@@ -19,7 +19,7 @@ export function CheckoutSummary({ event, selectedTier, totalLabel }: CheckoutSum
       <div className="checkout-event">
         <span className={"checkout-thumb event-cover " + event.cover}>
           {event.coverImageUrl ? (
-            <img className="event-cover-image" src={event.coverImageUrl} alt="" />
+            <img className="event-cover-image" src={event.coverImageUrl} alt="" width={480} height={450} decoding="async" />
           ) : (
             <span className="cover-symbol">✦</span>
           )}
