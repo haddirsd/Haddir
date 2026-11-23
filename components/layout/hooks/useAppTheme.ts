@@ -13,6 +13,7 @@ const useIsomorphicLayoutEffect =
 function applyTheme(darkMode: boolean) {
   const theme = darkMode ? "dark" : "light";
   document.documentElement.dataset.theme = theme;
+  document.documentElement.classList.toggle("theme-dark", darkMode);
   document.documentElement.style.colorScheme = theme;
 
   try {
