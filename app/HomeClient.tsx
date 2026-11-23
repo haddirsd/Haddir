@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { WelcomeSplash } from "../components/layout/WelcomeSplash";
 import { AppShell } from "../components/layout/AppShell";
 import { AppHeader } from "../components/layout/AppHeader";
 import { AppOverlays } from "../components/layout/AppOverlays";
@@ -84,7 +83,6 @@ export default function Home(){
   <BottomNav activeTab={activeTab} unreadCount={notificationView.unreadCount} onNavigate={go} className={isEventDetailOpen?"hide-mobile":""}/>
  </>}
  <div className="app-content">
- <WelcomeSplash />
  <EventsWorkspace
   showHome={!isGatekeeperPage&&activeTab==="home"}
   searchQuery={searchQuery}
