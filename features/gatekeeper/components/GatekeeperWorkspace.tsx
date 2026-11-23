@@ -6,6 +6,7 @@ import type { GatekeeperScanHistoryItem, GatekeeperScanStats, GatekeeperTicketAc
 import { ManualTicketEntry } from "./ManualTicketEntry";
 import { QrScanner } from "./QrScanner";
 import { ScanHistory } from "./ScanHistory";
+import { SkeletonState } from "../../../components/ui/SkeletonState";
 
 type AssignedEvent = { events?: { title?: string; venue?: string; city?: string; starts_at?: string } } | null;
 
@@ -52,7 +53,7 @@ export function GatekeeperWorkspace({
             <button type="button" className="btn btn-outline" onClick={onClose}>إغلاق</button>
           </div>
         </div>
-        <div className="gatekeeper-counter-grid">
+        {historyLoading?<SkeletonState variant="dashboard" count={4} label="جاري تحميل إحصائيات الدخول..." />:<div className="gatekeeper-counter-grid">
           <article className="accepted"><small>دخول ناجح</small><strong>{counts.accepted}</strong></article>
           <article className="used"><small>محاولات مكررة</small><strong>{counts.used}</strong></article>
           <article className="forged"><small>كود غير موجود</small><strong>{counts.forged}</strong></article>
