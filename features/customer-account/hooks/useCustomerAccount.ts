@@ -52,19 +52,24 @@ export function useCustomerAccount(
     setAccountDataError("");
     const refresh = async () => {
       const requestId = ++requestSequence;
-      const result = await loadCustomerAccountData(userId, ticketStatus, ticketPage);
-      if (!alive || requestId !== requestSequence) return;
-      if (result.error) setAccountDataError(result.error);
-      else {
-        setMyTickets(result.tickets);
-        setMyTicketCounts(result.ticketCounts);
-        setAccountDataError("");
-        const totalPages = Math.max(1, Math.ceil(result.ticketCounts[ticketStatus] / CUSTOMER_TICKETS_PAGE_SIZE));
-        if (ticketPage > totalPages) setTicketPage(totalPages);
-      }
-      if (firstLoad) {
-        setAccountDataLoading(false);
-        firstLoad = false;
+      try {
+        const result = await loadCustomerAccountData(userId, ticketStatus, ticketPage);
+        if (!alive || requestId !== requestSequence) return;
+        if (result.error) setAccountDataError(result.error);
+        else {
+          setMyTickets(result.tickets);
+          setMyTicketCounts(result.ticketCounts);
+          setAccountDataError("");
+          const totalPages = Math.max(1, Math.ceil(result.ticketCounts[ticketStatus] / CUSTOMER_TICKETS_PAGE_SIZE));
+          if (ticketPage > totalPages) setTicketPage(totalPages);
+        }
+      } catch (error) {
+        if (alive && requestId === requestSequence) setAccountDataError(error instanceof Error ? error.message : "تعذر تحميل تذاكرك.");
+      } finally {
+        if (alive && requestId === requestSequence && firstLoad) {
+          setAccountDataLoading(false);
+          firstLoad = false;
+        }
       }
     };
     void refresh();
@@ -83,23 +88,27 @@ export function useCustomerAccount(
     if (!userId) return;
     const requestId = ++latestNotificationRequest.current;
     setNotificationsLoading(true);
-    const result = await loadCustomerNotifications(userId, notificationFilter, notificationPage);
-    if (requestId !== latestNotificationRequest.current) return;
-    if (result.error) setNotificationsError(result.error);
-    else {
-      const totalPages = Math.max(1, Math.ceil(result.filteredTotal / CUSTOMER_NOTIFICATIONS_PAGE_SIZE));
-      if (notificationPage > totalPages) {
-        setNotificationsLoading(false);
-        setNotificationPage(totalPages);
-        return;
+    setNotificationsError("");
+    try {
+      const result = await loadCustomerNotifications(userId, notificationFilter, notificationPage);
+      if (requestId !== latestNotificationRequest.current) return;
+      if (result.error) setNotificationsError(result.error);
+      else {
+        const totalPages = Math.max(1, Math.ceil(result.filteredTotal / CUSTOMER_NOTIFICATIONS_PAGE_SIZE));
+        if (notificationPage > totalPages) {
+          setNotificationPage(totalPages);
+          return;
+        }
+        setMyNotifications(result.notifications);
+        setMyNotificationsTotal(result.total);
+        setMyNotificationsFilteredTotal(result.filteredTotal);
+        setMyUnreadNotificationCount(result.unreadCount);
       }
-      setMyNotifications(result.notifications);
-      setMyNotificationsTotal(result.total);
-      setMyNotificationsFilteredTotal(result.filteredTotal);
-      setMyUnreadNotificationCount(result.unreadCount);
-      setNotificationsError("");
+    } catch (error) {
+      if (requestId === latestNotificationRequest.current) setNotificationsError(error instanceof Error ? error.message : "تعذر تحميل الإشعارات.");
+    } finally {
+      if (requestId === latestNotificationRequest.current) setNotificationsLoading(false);
     }
-    setNotificationsLoading(false);
   }, [userId, notificationFilter, notificationPage, setNotificationPage]);
 
   useEffect(() => {
