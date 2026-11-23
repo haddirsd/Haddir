@@ -16,11 +16,12 @@ export default function AdminReportsWorkspace() {
   const [statsEventId,setStatsEventId] = useState("");
   const [bookingsPage,setBookingsPage] = useState(1);
   const [ticketsPage,setTicketsPage] = useState(1);
+  const [eventsPage,setEventsPage] = useState(1);
   const [printRows,setPrintRows] = useState<{bookings:Row[];tickets:Row[]}|null>(null);
   const [printLoading,setPrintLoading] = useState(false);
   const [printError,setPrintError] = useState("");
   const pageSize = 50;
-  const { statistics, eventPage, loading, error, refresh } = useAdminReports(statsEventId,bookingsPage,ticketsPage);
+  const { statistics, eventPage, loading, error, refresh } = useAdminReports(statsEventId,bookingsPage,ticketsPage,eventsPage);
 
   useEffect(() => {
     if (!printRows) return;
@@ -38,14 +39,12 @@ export default function AdminReportsWorkspace() {
           const ticketStats=data.tickets;
           const eventMetrics=data.eventMetrics as Row[];
           const eventMetricById=new Map<string,Row>(eventMetrics.map((item:Row)=>[item.event_id,item] as [string,Row]));
-          const allTicketTypes=data.events.flatMap(e=>e.ticket_types||[]);
-          const totalCapacity=sum(allTicketTypes,"quantity_total");
+          const totalCapacity=data.totalCapacity;
           const soldAttendees=Number(bookingStats.sold_quantity||0);
           const reservedAttendees=Number(bookingStats.reserved_quantity||0);
-          const remainingCapacity=Math.max(0,totalCapacity-sum(allTicketTypes,"quantity_sold"));
+          const remainingCapacity=data.remainingCapacity;
           const rejectedQty=Number(bookingStats.rejected_quantity||0);
-          const currentEvents=data.events.filter(e=>e.status==="published"&&(!e.ends_at||new Date(e.ends_at).getTime()>=Date.now()));
-          const pastEvents=data.events.filter(e=>e.status==="completed"||(!!e.ends_at&&new Date(e.ends_at).getTime()<Date.now()));
+
           const roleCounts=(r:string)=>Number(data.profiles[r]||0)+(r==="gatekeeper"?Number(data.profiles.organizer||0):0);
           const revenueRows=bookingStats.revenue||[];
           const commissionRows=bookingStats.commission||[];
@@ -66,6 +65,8 @@ export default function AdminReportsWorkspace() {
           const eventNetRows=eventRevenueRows.map((item:Row)=>({currency:item.currency,value:Number(item.value||0)-Number(commissionByCurrency.get(item.currency)||0)}));
           const bookingPageCount=Math.max(1,Math.ceil(eventPage.bookingTotal/pageSize));
           const ticketPageCount=Math.max(1,Math.ceil(eventPage.ticketTotal/pageSize));
+          const eventPageCount=Math.max(1,Math.ceil(data.eventTotal/pageSize));
+          const eventPager=()=> <div className="admin-pagination" style={{display:"flex",alignItems:"center",justifyContent:"center",gap:12,margin:"12px 0"}}><button type="button" className="admin-refresh" disabled={loading||eventsPage<=1} onClick={()=>{setEventsPage(value=>Math.max(1,value-1));setStatsEventId("");setBookingsPage(1);setTicketsPage(1);}}>السابق</button><span>صفحة {fmtCount(eventsPage)} من {fmtCount(eventPageCount)} · {fmtCount(data.eventTotal)} فعالية</span><button type="button" className="admin-refresh" disabled={loading||eventsPage>=eventPageCount} onClick={()=>{setEventsPage(value=>Math.min(eventPageCount,value+1));setStatsEventId("");setBookingsPage(1);setTicketsPage(1);}}>التالي</button></div>;
           const pager=(kind:"bookings"|"tickets",page:number,total:number,pages:number)=> <div className="admin-pagination" style={{display:printRows?"none":"flex",alignItems:"center",justifyContent:"center",gap:12,margin:"12px 0"}}><button type="button" className="admin-refresh" disabled={loading||page<=1} onClick={()=>kind==="bookings"?setBookingsPage(value=>Math.max(1,value-1)):setTicketsPage(value=>Math.max(1,value-1))}>السابق</button><span>صفحة {fmtCount(page)} من {fmtCount(pages)} · {fmtCount(total)} سجل</span><button type="button" className="admin-refresh" disabled={loading||page>=pages} onClick={()=>kind==="bookings"?setBookingsPage(value=>value+1):setTicketsPage(value=>value+1)}>التالي</button></div>;
           const metricCards=(items:{title:string;value:string|number;hint?:string}[]) => <div className="admin-metric-grid">{items.map(x=><article className="admin-metric" key={x.title}><small>{x.title}</small><strong>{typeof x.value==="number"?fmtCount(x.value):x.value}</strong>{x.hint&&<span className="admin-stat-hint">{x.hint}</span>}</article>)}</div>;
           return <div className="admin-statistics">
@@ -75,7 +76,7 @@ export default function AdminReportsWorkspace() {
             </div>
             {statsView==="general"?<>
               <h3 className="admin-stats-heading">ملخص الفعاليات</h3>
-              {metricCards([{title:"كل الفعاليات",value:data.events.length},{title:"الفعاليات الحالية",value:currentEvents.length},{title:"الفعاليات السابقة",value:pastEvents.length},{title:"المسودات",value:data.events.filter(e=>e.status==="draft").length},{title:"الفعاليات الملغاة",value:data.events.filter(e=>e.status==="cancelled").length}])}
+              {metricCards([{title:"كل الفعاليات",value:data.eventTotal},{title:"الفعاليات الحالية",value:data.eventCounts.current},{title:"الفعاليات السابقة",value:data.eventCounts.past},{title:"المسودات",value:data.eventCounts.draft},{title:"الفعاليات الملغاة",value:data.eventCounts.cancelled}])}
               <h3 className="admin-stats-heading">المستخدمون والأدوار</h3>
               {metricCards([{title:"إجمالي المستخدمين",value:Object.values(data.profiles).reduce((n,v)=>n+Number(v||0),0)},{title:"العملاء",value:roleCounts("customer")},{title:"البوابون",value:roleCounts("gatekeeper")},{title:"الموظفون",value:roleCounts("supervisor")},{title:"المشرفون",value:roleCounts("admin")},{title:"المعلنون",value:roleCounts("advertiser")}])}
               <h3 className="admin-stats-heading">التذاكر والحجوزات</h3>
@@ -84,8 +85,10 @@ export default function AdminReportsWorkspace() {
               {metricCards([{title:"إجمالي المبيعات المعتمدة",value:moneyLines(revenueRows,"value")},{title:"صافي دخل المنصة (العمولة)",value:moneyLines(commissionRows,"value"),hint:"حسب نسبة العمولة لكل فعالية، قبل المصروفات التشغيلية"}])}
               <h3 className="admin-stats-heading">ملخص كل فعالية</h3>
               <div className="admin-table-wrap"><table className="admin-data-table"><thead><tr><th>الفعالية</th><th>الحالة</th><th>الحجوزات</th><th>التذاكر المؤكدة</th><th>قيد الدفع/المراجعة</th><th>السعة</th><th>المتبقي فعلياً</th><th>المبيعات المعتمدة</th><th>دخل المنصة</th></tr></thead><tbody>{data.events.map(e=>{const m=eventMetricById.get(e.id)||{};const caps=e.ticket_types||[];return <tr key={e.id}><td>{e.title}</td><td>{statusLabels[e.status]||e.status}</td><td>{fmtCount(Number(m.booking_total||0))}</td><td>{fmtCount(Number(m.sold_quantity||0))}</td><td>{fmtCount(Number(m.reserved_quantity||0))}</td><td>{fmtCount(sum(caps,"quantity_total"))}</td><td>{fmtCount(Math.max(0,sum(caps,"quantity_total")-sum(caps,"quantity_sold")))}</td><td>{moneyLines(m.revenue||[],"value")}</td><td>{moneyLines(m.commission||[],"value")}</td></tr>;})}</tbody></table></div>
+              {eventPager()}
               <p className="admin-stats-note">المبيعات تشمل الحجوزات المؤكدة فقط. دخل المنصة هو قيمة العمولة المحسوبة من نسبة كل فعالية، قبل المصروفات التشغيلية. الطلبات المرفوضة والمعلقة لا تدخل في الإيرادات.</p>
             </>:<>
+              {eventPager()}
               <div className="admin-event-stat-select"><label htmlFor="stats-event-select">اختار الفعالية</label><HaddirSelect ariaLabel="اختيار الفعالية للإحصائيات" value={statsEventId} onChange={value=>{setStatsEventId(value);setBookingsPage(1);setTicketsPage(1);}} placeholder="اختر فعالية..." options={[{value:"",label:"اختر فعالية..."},...data.events.map(e=>({value:e.id,label:e.title+" — "+(statusLabels[e.status]||e.status)}))]}/></div>
               {!event?<p className="admin-no-data">اختار فعالية عشان تظهر إحصائياتها.</p>:<>
                 <div className="admin-selected-event"><div><small>الفعالية المحددة</small><h3>{event.title}</h3><span>{statusLabels[event.status]||event.status} · عمولة المنصة {Number(event.platform_fee_percent||0)}%</span></div><button className="admin-print-button" type="button" disabled={printLoading} onClick={async()=>{setPrintLoading(true);setPrintError("");const result=await getAllEventReportRows(event.id);if(result.error)setPrintError(result.error);else setPrintRows({bookings:result.data.bookings,tickets:result.data.tickets});setPrintLoading(false);}}>{printLoading?"جاري تجهيز التقرير الكامل…":"تحميل تقرير الفعالية PDF"}</button></div>
