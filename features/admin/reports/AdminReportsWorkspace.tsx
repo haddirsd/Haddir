@@ -96,7 +96,7 @@ export default function AdminReportsWorkspace() {
                 <div className="admin-event-report" dir="rtl">
                   <section className="admin-report-page admin-report-cover">
                     <div className="admin-report-topline"><img src="/ticket.svg" alt="ختم حاضر" /><span>حاضر · منصة الفعاليات</span><small>تقرير فعالية تفصيلي</small></div>
-                    {event.cover_image_url&&<img className="admin-report-cover-image" src={event.cover_image_url} alt="" />}
+                    {event.cover_image_url&&<img className="admin-report-cover-image" src={event.cover_image_url} alt="" width={1600} height={900} loading="lazy" decoding="async" />}
                     <div className="admin-report-cover-content">
                       <span className="admin-report-kicker">تقرير الأداء والتشغيل</span>
                       <h1>{event.title}</h1>
