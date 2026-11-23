@@ -18,18 +18,23 @@ export function useAdminEvents() {
   const refreshEvents = useCallback(async () => {
     const requestId = ++latestRequest.current;
     setLoading(true);
-    const result = await listAdminEvents(page);
-    if (requestId !== latestRequest.current) return;
-    if (result.error) {
-      setLoadError(result.error);
-    } else {
-      setRows(result.data);
-      setTotalCount(result.total);
-      setLoadError("");
-      const lastPage = Math.max(1, Math.ceil(result.total / PAGE_SIZE));
-      if (page > lastPage) setPage(lastPage);
+    setLoadError("");
+    try {
+      const result = await listAdminEvents(page);
+      if (requestId !== latestRequest.current) return;
+      if (result.error) {
+        setLoadError(result.error);
+      } else {
+        setRows(result.data);
+        setTotalCount(result.total);
+        const lastPage = Math.max(1, Math.ceil(result.total / PAGE_SIZE));
+        if (page > lastPage) setPage(lastPage);
+      }
+    } catch (error) {
+      if (requestId === latestRequest.current) setLoadError(error instanceof Error ? error.message : "تعذر تحميل الفعاليات.");
+    } finally {
+      if (requestId === latestRequest.current) setLoading(false);
     }
-    setLoading(false);
   }, [page]);
 
   useEffect(() => {
