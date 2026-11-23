@@ -43,10 +43,17 @@ export function useEvents() {
             ? current
             : current.filter((event) => event.id !== eventId);
         }
-        if (currentIndex === -1) return [...current, result.event];
-        return current.map((event, index) =>
-          index === currentIndex ? result.event! : event
-        );
+        const next =
+          currentIndex === -1
+            ? [...current, result.event]
+            : current.map((event, index) =>
+                index === currentIndex ? result.event! : event
+              );
+        return next.sort((a, b) => {
+          const aTime = a.startsAt ? new Date(a.startsAt).getTime() : Infinity;
+          const bTime = b.startsAt ? new Date(b.startsAt).getTime() : Infinity;
+          return aTime - bTime;
+        });
       });
       setTicketTypesError(result.ticketTypesError);
       setEventsError("");
