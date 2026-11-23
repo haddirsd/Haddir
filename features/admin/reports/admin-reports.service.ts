@@ -56,3 +56,28 @@ export async function getAdminEventReportPage(
     error: null,
   };
 }
+
+export async function getAllEventReportRows(eventId: string): Promise<{ data: AdminEventReportPage; error: string | null }> {
+  const supabase = getSupabaseBrowserClient();
+  if (!supabase) return { data: { bookings: [], tickets: [], bookingTotal: 0, ticketTotal: 0 }, error: "تعذر الاتصال بقاعدة البيانات." };
+  if (!eventId) return { data: { bookings: [], tickets: [], bookingTotal: 0, ticketTotal: 0 }, error: "اختار الفعالية أولاً." };
+  const fetchAll = async (table: "bookings" | "tickets", columns: string, sort: string) => {
+    const all: AdminReportRow[] = [];
+    let offset = 0;
+    while (true) {
+      const { data, error } = await supabase.from(table).select(columns).eq("event_id", eventId).order(sort, { ascending: false }).range(offset, offset + 999);
+      if (error) return { data: null as AdminReportRow[] | null, error };
+      all.push(...((data || []) as AdminReportRow[]));
+      if ((data || []).length < 1000) break;
+      offset += 1000;
+    }
+    return { data: all, error: null };
+  };
+  const [bookings, tickets] = await Promise.all([
+    fetchAll("bookings", "id,event_id,booking_number,user_id,customer_name,customer_email,customer_phone,subtotal,currency,status,created_at,booking_items(id,ticket_type_id,quantity,unit_price,line_total,ticket_types(name,currency))", "created_at"),
+    fetchAll("tickets", "id,event_id,ticket_type_id,ticket_code,attendee_name,status,issued_at,used_at", "issued_at"),
+  ]);
+  const failure = bookings.error || tickets.error;
+  if (failure) return { data: { bookings: [], tickets: [], bookingTotal: 0, ticketTotal: 0 }, error: "تعذر تجهيز التقرير الكامل: " + failure.message };
+  return { data: { bookings: bookings.data || [], tickets: tickets.data || [], bookingTotal: bookings.data?.length || 0, ticketTotal: tickets.data?.length || 0 }, error: null };
+}
