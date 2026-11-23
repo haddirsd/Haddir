@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { HaddirSelect } from "../../../components/ui/HaddirSelect";
 import { Activity, CalendarDays, RefreshCw, Search, SlidersHorizontal, UserRound, X } from "lucide-react";
-import { useAdminActivity } from "./useAdminActivity";
+import { ADMIN_ACTIVITY_PAGE_SIZE, useAdminActivity } from "./useAdminActivity";
 import type { AdminActivityRow } from "./admin-activity.types";
 
 const actionNames:Record<string,string>={"events.created":"أنشأ فعالية","events.updated":"عدّل بيانات فعالية","events.deleted":"حذف فعالية","event.cancelled":"ألغى فعالية / أخفاها","event.published":"نشر فعالية","profiles.created":"أنشأ حساب مستخدم","profiles.updated":"عدّل بيانات مستخدم","profiles.deleted":"حذف حساب مستخدم","user.role_changed":"غيّر دور مستخدم","bookings.created":"أنشأ حجزاً","bookings.updated":"عدّل بيانات الحجز","bookings.deleted":"حذف حجز","booking.confirmed":"وافق على الحجز","booking.rejected":"رفض الحجز","booking.pending":"أعاد الحجز إلى الانتظار","payment.approved":"اعتمد إثبات الدفع","payment.rejected":"رفض إثبات الدفع","payment.pending":"أعاد إثبات الدفع للمراجعة","payment_submissions.created":"سجّل إثبات دفع","payment_submissions.updated":"عدّل بيانات إثبات الدفع","payment_submissions.deleted":"حذف إثبات دفع","tickets.created":"أصدر تذكرة","tickets.updated":"عدّل بيانات تذكرة","tickets.deleted":"حذف تذكرة","ticket.checked_in":"أكد دخول التذكرة","ticket.checkin_reversed":"ألغى تأكيد دخول التذكرة","ticket.status_changed":"عدّل حالة التذكرة","ticket_types.created":"أضاف فئة تذاكر","ticket_types.updated":"عدّل فئة تذاكر","ticket_types.deleted":"حذف فئة تذاكر","event_payment_accounts.created":"أضاف حساب دفع","event_payment_accounts.updated":"عدّل حساب دفع","event_payment_accounts.deleted":"حذف حساب دفع"};
@@ -30,25 +30,23 @@ const detailText=(details:Record<string,unknown>|null)=>Object.entries(details||
 });
 
 export default function AdminActivityWorkspace() {
-  const { rows, loading, error, refresh } = useAdminActivity();
   const [search,setSearch]=useState("");
   const [roleFilter,setRoleFilter]=useState("all");
   const [groupFilter,setGroupFilter]=useState("all");
   const [period,setPeriod]=useState("all");
+  const [page,setPage]=useState(1);
+  const filters={search,role:roleFilter,group:groupFilter,period};
+  const { rows, total, loading, error, refresh } = useAdminActivity(page,filters);
+  const filtered=rows;
   const todayStart=new Date();todayStart.setHours(0,0,0,0);
-  const filtered=useMemo(()=>{
-    const term=search.trim().toLocaleLowerCase("ar");
-    const cutoff=period==="today"?todayStart.getTime():period==="7d"?Date.now()-7*86400000:period==="30d"?Date.now()-30*86400000:0;
-    return rows.filter(row=>{
-      const group=actionGroup(row.action);
-      const haystack=[row.actor_name,row.actor_role,row.action,actionNames[row.action],row.entity_label,row.entity_type,row.events?.title,...detailText(row.details).flatMap(item=>[item.label,item.value])].filter(Boolean).join(" ").toLocaleLowerCase("ar");
-      return (!term||haystack.includes(term))&&(roleFilter==="all"||row.actor_role===roleFilter)&&(groupFilter==="all"||group===groupFilter)&&(!cutoff||new Date(row.created_at).getTime()>=cutoff);
-    });
-  },[rows,search,roleFilter,groupFilter,period]);
   const todayCount=rows.filter(row=>new Date(row.created_at).getTime()>=todayStart.getTime()).length;
   const uniqueActors=new Set(rows.map(row=>row.actor_name).filter(Boolean)).size;
   const hasFilters=!!search||roleFilter!=="all"||groupFilter!=="all"||period!=="all";
-  const reset=()=>{setSearch("");setRoleFilter("all");setGroupFilter("all");setPeriod("all");};
+  const reset=()=>{setSearch("");setRoleFilter("all");setGroupFilter("all");setPeriod("all");setPage(1);};
+  const changeSearch=(value:string)=>{setSearch(value);setPage(1);};
+  const changeRole=(value:string)=>{setRoleFilter(value);setPage(1);};
+  const changeGroup=(value:string)=>{setGroupFilter(value);setPage(1);};
+  const changePeriod=(value:string)=>{setPeriod(value);setPage(1);};
   const dateLabel=(value:string)=>new Date(value).toLocaleString("ar-SD-u-nu-latn",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});
   return <section className="admin-panel admin-activity-workspace">
     <div className="admin-activity-heading">
@@ -57,20 +55,20 @@ export default function AdminActivityWorkspace() {
     </div>
     {error&&<div className="admin-notice" role="alert">{error}</div>}
     <div className="admin-activity-stats">
-      <article><span><Activity size={18}/></span><div><small>الإجراءات المعروضة</small><strong>{loading?"—":filtered.length.toLocaleString("ar-SD-u-nu-latn")}</strong></div></article>
-      <article><span><CalendarDays size={18}/></span><div><small>إجراءات اليوم</small><strong>{loading?"—":todayCount.toLocaleString("ar-SD-u-nu-latn")}</strong></div></article>
-      <article><span><UserRound size={18}/></span><div><small>منفذون مختلفون</small><strong>{loading?"—":uniqueActors.toLocaleString("ar-SD-u-nu-latn")}</strong></div></article>
+      <article><span><Activity size={18}/></span><div><small>إجراءات الصفحة</small><strong>{loading?"—":filtered.length.toLocaleString("ar-SD-u-nu-latn")}</strong></div></article>
+      <article><span><CalendarDays size={18}/></span><div><small>إجراءات اليوم في الصفحة</small><strong>{loading?"—":todayCount.toLocaleString("ar-SD-u-nu-latn")}</strong></div></article>
+      <article><span><UserRound size={18}/></span><div><small>منفذون في الصفحة</small><strong>{loading?"—":uniqueActors.toLocaleString("ar-SD-u-nu-latn")}</strong></div></article>
     </div>
     <div className="admin-activity-filter-panel">
       <div className="admin-activity-filter-title"><div><SlidersHorizontal size={16}/><b>البحث والتصفية</b></div>{hasFilters&&<button type="button" onClick={reset}><X size={14}/> مسح الفلاتر</button>}</div>
       <div className="admin-activity-filters">
-        <label className="admin-activity-search"><Search size={17}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="ابحث باسم المنفّذ أو الإجراء أو الفعالية..."/></label>
-        <label><span>نوع الإجراء</span><HaddirSelect value={groupFilter} onChange={setGroupFilter} options={[{value:"all",label:"كل العمليات"},{value:"events",label:"الفعاليات"},{value:"event",label:"إجراءات الفعالية"},{value:"bookings",label:"الحجوزات"},{value:"booking",label:"إجراءات الحجز"},{value:"payment",label:"المدفوعات"},{value:"ticket",label:"التذاكر"},{value:"tickets",label:"إدارة التذاكر"},{value:"ticket_types",label:"فئات التذاكر"},{value:"event_payment_accounts",label:"حسابات الدفع"},{value:"user",label:"المستخدمون"},{value:"profiles",label:"الحسابات"}]}/></label>
-        <label><span>دور المنفّذ</span><HaddirSelect value={roleFilter} onChange={setRoleFilter} options={[{value:"all",label:"كل الأدوار"},...Object.entries(roleNames).filter(([key])=>key!=="unknown").map(([key,value])=>({value:key,label:value}))]}/></label>
-        <label><span>الفترة الزمنية</span><HaddirSelect value={period} onChange={setPeriod} options={[{value:"all",label:"كل الفترات"},{value:"today",label:"اليوم"},{value:"7d",label:"آخر 7 أيام"},{value:"30d",label:"آخر 30 يوماً"}]}/></label>
+        <label className="admin-activity-search"><Search size={17}/><input value={search} onChange={e=>changeSearch(e.target.value)} placeholder="ابحث باسم المنفّذ أو الإجراء أو الفعالية..."/></label>
+        <label><span>نوع الإجراء</span><HaddirSelect value={groupFilter} onChange={changeGroup} options={[{value:"all",label:"كل العمليات"},{value:"events",label:"الفعاليات"},{value:"event",label:"إجراءات الفعالية"},{value:"bookings",label:"الحجوزات"},{value:"booking",label:"إجراءات الحجز"},{value:"payment",label:"المدفوعات"},{value:"ticket",label:"التذاكر"},{value:"tickets",label:"إدارة التذاكر"},{value:"ticket_types",label:"فئات التذاكر"},{value:"event_payment_accounts",label:"حسابات الدفع"},{value:"user",label:"المستخدمون"},{value:"profiles",label:"الحسابات"}]}/></label>
+        <label><span>دور المنفّذ</span><HaddirSelect value={roleFilter} onChange={changeRole} options={[{value:"all",label:"كل الأدوار"},...Object.entries(roleNames).filter(([key])=>key!=="unknown").map(([key,value])=>({value:key,label:value}))]}/></label>
+        <label><span>الفترة الزمنية</span><HaddirSelect value={period} onChange={changePeriod} options={[{value:"all",label:"كل الفترات"},{value:"today",label:"اليوم"},{value:"7d",label:"آخر 7 أيام"},{value:"30d",label:"آخر 30 يوماً"}]}/></label>
       </div>
     </div>
-    <div className="admin-activity-results-head"><div><h4>تفاصيل الإجراءات</h4><p>{loading?"يتم تحميل السجل...":`عرض ${filtered.length.toLocaleString("ar-SD-u-nu-latn")} من أصل ${rows.length.toLocaleString("ar-SD-u-nu-latn")} إجراء محمّل`}</p></div></div>
+    <div className="admin-activity-results-head"><div><h4>تفاصيل الإجراءات</h4><p>{loading?"يتم تحميل السجل...":`عرض ${filtered.length.toLocaleString("ar-SD-u-nu-latn")} في هذه الصفحة من أصل ${total.toLocaleString("ar-SD-u-nu-latn")} نتيجة`}</p></div></div>
     {loading?<div className="admin-activity-empty"><span className="admin-spinner"/><p>جاري تحميل سجل الإجراءات...</p></div>:filtered.length===0?<div className="admin-activity-empty"><span><Search size={23}/></span><b>{rows.length?"لا توجد نتائج مطابقة":"لا توجد إجراءات مسجلة حتى الآن"}</b><p>{rows.length?"جرّب تغيير كلمات البحث أو الفلاتر المحددة.":"ستظهر هنا العمليات الجديدة التي ينفذها فريق الإدارة."}</p>{hasFilters&&<button type="button" onClick={reset}>عرض كل الإجراءات</button>}</div>:<div className="admin-activity-list">{filtered.map((row:AdminActivityRow,index:number)=>{
       const details=detailText(row.details);const group=actionGroup(row.action);
       return <article className="admin-activity-item" key={row.id||index}>
@@ -83,6 +81,11 @@ export default function AdminActivityWorkspace() {
         </div>
       </article>;
     })}</div>}
-    <p className="admin-activity-footnote">يعرض السجل آخر 500 إجراء محمّل من قاعدة البيانات، ويتحدّث تلقائياً عند تسجيل إجراءات جديدة.</p>
+    {total > ADMIN_ACTIVITY_PAGE_SIZE && <div className="admin-pagination" style={{display:"flex",alignItems:"center",justifyContent:"center",gap:12,margin:"16px 0"}}>
+      <button type="button" className="admin-refresh" disabled={loading||page<=1} onClick={()=>setPage(value=>Math.max(1,value-1))}>السابق</button>
+      <span>صفحة {page.toLocaleString("ar-SD-u-nu-latn")} من {Math.ceil(total/ADMIN_ACTIVITY_PAGE_SIZE).toLocaleString("ar-SD-u-nu-latn")} · {total.toLocaleString("ar-SD-u-nu-latn")} إجراء</span>
+      <button type="button" className="admin-refresh" disabled={loading||page>=Math.ceil(total/ADMIN_ACTIVITY_PAGE_SIZE)} onClick={()=>setPage(value=>value+1)}>التالي</button>
+    </div>}
+    <p className="admin-activity-footnote">يعرض السجل النتائج المطابقة على صفحات من 50 إجراء، ويبحث ويصفّي مباشرة في قاعدة البيانات، ويتحدّث تلقائياً عند تسجيل إجراءات جديدة.</p>
   </section>;
 }
