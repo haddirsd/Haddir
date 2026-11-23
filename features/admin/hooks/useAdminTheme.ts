@@ -29,6 +29,7 @@ export function useAdminTheme() {
 
       setDarkMode(dark);
       document.documentElement.dataset.theme = dark ? "dark" : "light";
+      document.documentElement.classList.toggle("theme-dark", dark);
       document.documentElement.style.colorScheme = dark ? "dark" : "light";
 
       const themeMeta = document.querySelector('meta[name="theme-color"]');
