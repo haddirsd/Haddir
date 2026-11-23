@@ -2,21 +2,49 @@ import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import type { AdminReportData, AdminReportRow, AdminEventReportPage } from "./admin-reports.types";
 
 const PAGE_SIZE = 50;
+const EVENTS_PAGE_SIZE = 50;
 
-export async function getAdminReportData(): Promise<{ data: AdminReportData | null; error: string | null }> {
+export async function getAdminReportData(eventsPage: number): Promise<{ data: AdminReportData | null; error: string | null }> {
   const supabase = getSupabaseBrowserClient();
   if (!supabase) return { data: null, error: "تعذر الاتصال بقاعدة البيانات." };
-  const [{ data: events, error: eventsError }, { data: summary, error: summaryError }] = await Promise.all([
+  const now = new Date().toISOString();
+  const offset = (Math.max(1, eventsPage) - 1) * EVENTS_PAGE_SIZE;
+  const [
+    { data: events, count: eventTotal, error: eventsError },
+    { data: summary, error: summaryError },
+    { count: currentEvents, error: currentEventsError },
+    { count: pastEvents, error: pastEventsError },
+    { count: draftEvents, error: draftEventsError },
+    { count: cancelledEvents, error: cancelledEventsError },
+    { data: ticketTypes, error: ticketTypesError },
+  ] = await Promise.all([
     supabase.from("events")
-      .select("id,title,category,city,venue,address,description,location_url,cover_image_url,status,starts_at,ends_at,is_continuous,created_at,platform_fee_percent,ticket_types(id,name,description,price,currency,quantity_total,quantity_sold,is_active)")
+      .select("id,title,category,city,venue,address,description,location_url,cover_image_url,status,starts_at,ends_at,is_continuous,created_at,platform_fee_percent,ticket_types(id,name,description,price,currency,quantity_total,quantity_sold,is_active)", { count: "exact" })
       .order("created_at", { ascending: false })
-      .limit(200),
+      .range(offset, offset + EVENTS_PAGE_SIZE - 1),
     supabase.rpc("admin_get_report_summary"),
+    supabase.from("events").select("id", { count: "exact", head: true }).eq("status", "published").or("ends_at.is.null,ends_at.gte." + now),
+    supabase.from("events").select("id", { count: "exact", head: true }).or("status.eq.completed,ends_at.lt." + now),
+    supabase.from("events").select("id", { count: "exact", head: true }).eq("status", "draft"),
+    supabase.from("events").select("id", { count: "exact", head: true }).eq("status", "cancelled"),
+    supabase.from("ticket_types").select("quantity_total,quantity_sold"),
   ]);
-  if (eventsError || summaryError) return { data: null, error: "تعذر تحميل الإحصائيات: " + (eventsError || summaryError)?.message };
+  const failure = eventsError || summaryError || currentEventsError || pastEventsError || draftEventsError || cancelledEventsError || ticketTypesError;
+  if (failure) return { data: null, error: "تعذر تحميل الإحصائيات: " + failure.message };
+  const totalCapacity = (ticketTypes || []).reduce((sum, row) => sum + (row.quantity_total == null ? 0 : Number(row.quantity_total)), 0);
+  const soldCapacity = (ticketTypes || []).reduce((sum, row) => sum + Number(row.quantity_sold || 0), 0);
   return {
     data: {
       events: (events || []) as AdminReportRow[],
+      eventTotal: eventTotal || 0,
+      eventCounts: {
+        current: currentEvents || 0,
+        past: pastEvents || 0,
+        draft: draftEvents || 0,
+        cancelled: cancelledEvents || 0,
+      },
+      totalCapacity,
+      remainingCapacity: Math.max(0, totalCapacity - soldCapacity),
       profiles: summary?.profiles || {},
       bookings: summary?.bookings || {},
       tickets: summary?.tickets || {},
