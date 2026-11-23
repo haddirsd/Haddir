@@ -12,6 +12,7 @@ import { EventsWorkspace } from "../features/events/components/EventsWorkspace";
 import { TicketWorkspace } from "../features/customer-account/components/TicketWorkspace";
 import { NotificationsWorkspace } from "../features/customer-account/components/NotificationsWorkspace";
 import { useCustomerAccount } from "../features/customer-account/hooks/useCustomerAccount";
+import { CUSTOMER_TICKETS_PAGE_SIZE } from "../features/customer-account/services/customer-account.service";
 import { useCustomerAccountActions } from "../features/customer-account/hooks/useCustomerAccountActions";
 import { useCustomerTicketsView } from "../features/customer-account/hooks/useCustomerTicketsView";
 import { useCustomerNotificationView } from "../features/customer-account/hooks/useCustomerNotificationView";
@@ -31,8 +32,8 @@ export default function Home(){
  const [profileSaving,setProfileSaving]=useState(false);
  const { activeTab, setActiveTab, showPrivacySecurity, setShowPrivacySecurity, eventResetKey, setEventResetKey, activeWorkspace, isGatekeeperPage, go, backFromGatekeeper, closeGatekeeper } = useAppNavigation();
  const { authUser, userRole, pendingLegalRole, acceptOrganizerTerms, assignedEvent, fullName, setFullName, email, phone, setPhone, avatarUrl, profileEditing, setProfileEditing, saved, setSaved, authMessage, setAuthMessage } = useAuth();
- const { myTickets, myNotifications, accountDataLoading, accountDataError, markNotificationRead: markCustomerNotificationReadAction, markAllNotificationsRead: markAllCustomerNotificationsReadAction } = useCustomerAccount(authUser?.id ?? null);
  const ticketsView = useCustomerTicketsView(setUiNotice);
+ const { myTickets, myTicketCounts, myNotifications, accountDataLoading, accountDataError, markNotificationRead: markCustomerNotificationReadAction, markAllNotificationsRead: markAllCustomerNotificationsReadAction } = useCustomerAccount(authUser?.id ?? null, ticketsView.filter === "new" ? "valid" : "used", ticketsView.page, ticketsView.setPage);
  const accountActions = useCustomerAccountActions({
   authUser,
   fullName,
@@ -71,7 +72,7 @@ export default function Home(){
  />
  {pendingLegalRole === "advertiser" && <OrganizerTermsConsent onAccept={acceptOrganizerTerms} />}
  {!isGatekeeperPage&&(!showPrivacySecurity||!isEventDetailOpen)&&<>
-  <DesktopNav activeTab={activeTab} unreadCount={notificationView.unreadCount} ticketCount={myTickets.length} darkMode={darkMode} onNavigate={go} className={showPrivacySecurity?"hide-desktop":""}/>
+  <DesktopNav activeTab={activeTab} unreadCount={notificationView.unreadCount} ticketCount={myTicketCounts.valid + myTicketCounts.used} darkMode={darkMode} onNavigate={go} className={showPrivacySecurity?"hide-desktop":""}/>
   <BottomNav activeTab={activeTab} unreadCount={notificationView.unreadCount} onNavigate={go} className={isEventDetailOpen?"hide-mobile":""}/>
  </>}
  <div className="app-content">
@@ -92,9 +93,13 @@ export default function Home(){
   loading={accountDataLoading}
   error={accountDataError}
   tickets={myTickets}
+  ticketCounts={myTicketCounts}
   filter={ticketsView.filter}
+  page={ticketsView.page}
+  pageSize={CUSTOMER_TICKETS_PAGE_SIZE}
   expandedTicketId={ticketsView.expandedTicketId}
   onFilterChange={ticketsView.changeFilter}
+  onPageChange={ticketsView.changePage}
   onToggleTicket={ticketsView.toggleTicket}
   onDownloadTicket={(ticket)=>void ticketsView.downloadTicket(ticket)}
   formatEventDate={formatEventDate}
