@@ -17,7 +17,7 @@ export function BookingSummary({ event, selectedTier, totalLabel }: BookingSumma
     <>
       <div className="checkout-event">
         <span className={"checkout-thumb event-cover " + event.cover}>
-          {event.coverImageUrl ? <img className="event-cover-image" src={event.coverImageUrl} alt="" /> : <span className="cover-symbol">✦</span>}
+          {event.coverImageUrl ? <img className="event-cover-image" src={event.coverImageUrl} alt="" width={480} height={450} decoding="async" /> : <span className="cover-symbol">✦</span>}
         </span>
         <div><strong>{event.title}</strong><small>{tier?.name || "فئة التذكرة"}</small></div>
       </div>
