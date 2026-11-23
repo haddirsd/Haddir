@@ -1,6 +1,10 @@
 export type AdminReportRow = Record<string, any>;
 export type AdminReportData = {
   events: AdminReportRow[];
+  eventTotal: number;
+  eventCounts: { current: number; past: number; draft: number; cancelled: number };
+  totalCapacity: number;
+  remainingCapacity: number;
   profiles: Record<string, number>;
   bookings: Record<string, any>;
   tickets: Record<string, any>;
