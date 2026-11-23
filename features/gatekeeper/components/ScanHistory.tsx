@@ -6,6 +6,8 @@ export function ScanHistory({
 }: {
   items: GatekeeperScanHistoryItem[];
   loading: boolean;
+  error: string;
+  onRetry: () => void;
 }) {
   return (
     <section className="gatekeeper-manual-history" aria-label="سجل عمليات الدخول">
