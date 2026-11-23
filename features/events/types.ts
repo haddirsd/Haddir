@@ -13,6 +13,7 @@ export type EventTier = {
 
 export type EventItem = {
   id: string;
+  startsAt: string | null;
   date: string;
   title: string;
   place: string;
