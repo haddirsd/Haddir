@@ -1,19 +1,34 @@
 import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import type { CustomerNotification, CustomerTicket } from "../types";
 
-export async function loadCustomerAccountData(userId: string): Promise<{
+export const CUSTOMER_TICKETS_PAGE_SIZE = 25;
+
+export async function loadCustomerAccountData(
+  userId: string,
+  ticketStatus: "valid" | "used",
+  ticketPage: number,
+): Promise<{
   tickets: CustomerTicket[];
+  ticketCounts: { valid: number; used: number };
   notifications: CustomerNotification[];
   error: string | null;
 }> {
   const supabase = getSupabaseBrowserClient();
-  if (!supabase) return { tickets: [], notifications: [], error: "تعذر الاتصال بقاعدة البيانات." };
+  if (!supabase) return { tickets: [], ticketCounts: { valid: 0, used: 0 }, notifications: [], error: "تعذر الاتصال بقاعدة البيانات." };
 
-  const [ticketsResult, notificationsResult] = await Promise.all([
+  const offset = (ticketPage - 1) * CUSTOMER_TICKETS_PAGE_SIZE;
+  const otherStatus = ticketStatus === "valid" ? "used" : "valid";
+  const [ticketsResult, otherCountResult, notificationsResult] = await Promise.all([
     supabase.from("tickets")
-      .select("id,booking_item_id,ticket_code,status,issued_at,events(title,starts_at,is_continuous,venue,cover_image_url),ticket_types(name),bookings!inner(booking_number,user_id),booking_items(quantity)")
+      .select("id,booking_item_id,ticket_code,status,issued_at,events(title,starts_at,is_continuous,venue,cover_image_url),ticket_types(name),bookings!inner(booking_number,user_id),booking_items(quantity)", { count: "exact" })
       .eq("bookings.user_id", userId)
-      .order("issued_at", { ascending: false }),
+      .eq("status", ticketStatus)
+      .order("issued_at", { ascending: false })
+      .range(offset, offset + CUSTOMER_TICKETS_PAGE_SIZE - 1),
+    supabase.from("tickets")
+      .select("id,bookings!inner(user_id)", { count: "exact", head: true })
+      .eq("bookings.user_id", userId)
+      .eq("status", otherStatus),
     supabase.from("notifications")
       .select("id,title,message,type,is_read,created_at,booking_id")
       .eq("user_id", userId)
@@ -21,9 +36,14 @@ export async function loadCustomerAccountData(userId: string): Promise<{
       .limit(100),
   ]);
 
-  const failure = ticketsResult.error || notificationsResult.error;
+  const failure = ticketsResult.error || otherCountResult.error || notificationsResult.error;
+  const currentCount = ticketsResult.count || 0;
+  const otherCount = otherCountResult.count || 0;
   return {
     tickets: (ticketsResult.data || []) as CustomerTicket[],
+    ticketCounts: ticketStatus === "valid"
+      ? { valid: currentCount, used: otherCount }
+      : { valid: otherCount, used: currentCount },
     notifications: (notificationsResult.data || []) as CustomerNotification[],
     error: failure?.message || null,
   };
