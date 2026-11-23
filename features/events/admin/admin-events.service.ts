@@ -1,13 +1,8 @@
 import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
+import { optimizeImageToWebp } from "../../../lib/images/optimize-image";
 import type { AdminEventEditorData, AdminEventFormValues, AdminEventRow, AdminTicketForm, AdminEventAccountForm } from "./admin-events.types";
 
 const ADMIN_EVENTS_PAGE_SIZE = 25;
-const COVER_IMAGE_EXTENSIONS: Record<string, string> = {
-  "image/jpeg": "jpg",
-  "image/png": "png",
-  "image/webp": "webp",
-};
-
 const parseDateTime = (value: string): Date | null => {
   if (!value) return null;
   const date = new Date(value);
@@ -157,13 +152,20 @@ export async function saveAdminEvent(input: SaveAdminEventInput): Promise<{ mess
   let coverUrl = eventForm.cover_image_url.trim() || null;
   let uploadedCoverPath: string | null = null;
   if (coverFile) {
-    const coverMimeType = coverFile.type.toLowerCase();
-    const extension = COVER_IMAGE_EXTENSIONS[coverMimeType];
-    if (!extension) return { message: null, error: "الصيغ المدعومة: JPG أو PNG أو WebP." };
-    if (coverFile.size > 10 * 1024 * 1024) return { message: null, error: "حجم الصورة أكبر من 10 ميجابايت." };
-    uploadedCoverPath = user.id + "/" + crypto.randomUUID() + "." + extension;
-    const { error } = await supabase.storage.from("event-covers").upload(uploadedCoverPath, coverFile, {
-      contentType: coverMimeType, upsert: false, cacheControl: "31536000",
+    if (coverFile.size > 10 * 1024 * 1024) return { message: null, error: "حجم الصورة الأصلية أكبر من 10 ميجابايت." };
+    let optimizedCover: File;
+    try {
+      optimizedCover = await optimizeImageToWebp(coverFile, {
+        maxDimension: 1920,
+        quality: 0.86,
+        maxOutputBytes: 10 * 1024 * 1024,
+      });
+    } catch (error) {
+      return { message: null, error: error instanceof Error ? error.message : "تعذر تحسين صورة الغلاف." };
+    }
+    uploadedCoverPath = user.id + "/" + crypto.randomUUID() + ".webp";
+    const { error } = await supabase.storage.from("event-covers").upload(uploadedCoverPath, optimizedCover, {
+      contentType: "image/webp", upsert: false, cacheControl: "31536000",
     });
     if (error) return { message: null, error: "تعذر رفع صورة الغلاف: " + error.message };
     coverUrl = supabase.storage.from("event-covers").getPublicUrl(uploadedCoverPath).data.publicUrl;
