@@ -2140,7 +2140,7 @@ body{font-size:16px}
 }
 
 /* Administration workspace follows the same saved theme as the customer app */
-.admin-shell.theme-dark{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)){
   background:#11191b;
   color:#edf7f9;
 }
@@ -2149,185 +2149,185 @@ body{font-size:16px}
   background:#11191b;
   color:#edf7f9;
 }
-.admin-shell.theme-dark .admin-sidebar,
-.admin-shell.theme-dark .admin-topbar,
-.admin-shell.theme-dark .admin-panel,
-.admin-shell.theme-dark .admin-metric,
-.admin-shell.theme-dark .admin-shortcuts button,
-.admin-shell.theme-dark .admin-users-table-wrap{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-sidebar,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-topbar,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-panel,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-metric,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-shortcuts button,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-users-table-wrap{
   background:#1a272a;
   color:#edf7f9;
   border-color:#304144;
 }
-.admin-shell.theme-dark .admin-sidebar{border-left-color:#304144}
-.admin-shell.theme-dark .admin-topbar{border-bottom-color:#304144}
-.admin-shell.theme-dark .admin-sidebar nav button{color:#a9bdc1}
-.admin-shell.theme-dark .admin-sidebar nav button.active{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-sidebar{border-left-color:#304144}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-topbar{border-bottom-color:#304144}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-sidebar nav button{color:#a9bdc1}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-sidebar nav button.active{
   background:#28454b;
   color:#dcf3f8;
 }
-.admin-shell.theme-dark .admin-brand{color:#c5e6ed}
-.admin-shell.theme-dark .admin-brand small,
-.admin-shell.theme-dark .admin-side-caption,
-.admin-shell.theme-dark .admin-mini-profile small,
-.admin-shell.theme-dark .admin-topbar>div:first-child>span,
-.admin-shell.theme-dark .admin-top-user,
-.admin-shell.theme-dark .admin-metric small,
-.admin-shell.theme-dark .admin-panel-head p,
-.admin-shell.theme-dark .admin-footer,
-.admin-shell.theme-dark .admin-empty-panel p,
-.admin-shell.theme-dark .admin-empty-panel small,
-.admin-shell.theme-dark .admin-event-card-meta,
-.admin-shell.theme-dark .admin-booking-card-grid small,
-.admin-shell.theme-dark .admin-booking-card-head small,
-.admin-shell.theme-dark .admin-payment-card-grid small,
-.admin-shell.theme-dark .admin-payment-card-head small,
-.admin-shell.theme-dark .admin-form-hint,
-.admin-shell.theme-dark .admin-stat-hint,
-.admin-shell.theme-dark .admin-user-email{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-brand{color:#c5e6ed}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-brand small,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-side-caption,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-mini-profile small,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-topbar>div:first-child>span,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-top-user,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-metric small,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-panel-head p,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-footer,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-empty-panel p,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-empty-panel small,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-card-meta,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-booking-card-grid small,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-booking-card-head small,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-payment-card-grid small,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-payment-card-head small,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-form-hint,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-stat-hint,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-user-email{
   color:#a9bdc1;
 }
-.admin-shell.theme-dark .admin-mini-profile{border-top-color:#304144}
-.admin-shell.theme-dark .admin-mini-profile>span,
-.admin-shell.theme-dark .admin-avatar,
-.admin-shell.theme-dark .admin-metric>span,
-.admin-shell.theme-dark .admin-shortcuts button>span,
-.admin-shell.theme-dark .admin-empty-icon{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-mini-profile{border-top-color:#304144}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-mini-profile>span,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-avatar,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-metric>span,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-shortcuts button>span,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-empty-icon{
   background:#28454b;
   color:#c8eff7;
 }
-.admin-shell.theme-dark .admin-metric strong,
-.admin-shell.theme-dark .admin-panel-head h3,
-.admin-shell.theme-dark .admin-empty-panel h3,
-.admin-shell.theme-dark .admin-event-form h3,
-.admin-shell.theme-dark .admin-ticket-heading h3,
-.admin-shell.theme-dark .admin-ticket-row-head b,
-.admin-shell.theme-dark .admin-event-card-title h4,
-.admin-shell.theme-dark .admin-booking-card-head h4,
-.admin-shell.theme-dark .admin-booking-card-grid strong,
-.admin-shell.theme-dark .admin-payment-card-head h4,
-.admin-shell.theme-dark .admin-payment-card-grid strong,
-.admin-shell.theme-dark .admin-stats-heading,
-.admin-shell.theme-dark .admin-selected-event h3{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-metric strong,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-panel-head h3,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-empty-panel h3,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-form h3,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-ticket-heading h3,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-ticket-row-head b,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-card-title h4,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-booking-card-head h4,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-booking-card-grid strong,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-payment-card-head h4,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-payment-card-grid strong,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-stats-heading,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-selected-event h3{
   color:#edf7f9;
 }
-.admin-shell.theme-dark .admin-shortcuts button{border-color:#304144}
-.admin-shell.theme-dark .admin-shortcuts button>svg{color:#a9bdc1}
-.admin-shell.theme-dark .admin-empty-panel{background:transparent}
-.admin-shell.theme-dark .admin-event-form,
-.admin-shell.theme-dark .admin-ticket-editor,
-.admin-shell.theme-dark .admin-ticket-row,
-.admin-shell.theme-dark .admin-selected-event,
-.admin-shell.theme-dark .admin-stats-note,
-.admin-shell.theme-dark .admin-payment-note{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-shortcuts button{border-color:#304144}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-shortcuts button>svg{color:#a9bdc1}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-empty-panel{background:transparent}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-form,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-ticket-editor,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-ticket-row,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-selected-event,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-stats-note,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-payment-note{
   background:#1a272a;
   border-color:#304144;
   color:#edf7f9;
 }
-.admin-shell.theme-dark .admin-event-form label,
-.admin-shell.theme-dark .admin-event-stat-select label,
-.admin-shell.theme-dark .admin-payment-reject-box label{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-form label,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-stat-select label,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-payment-reject-box label{
   color:#c8dbdf;
 }
-.admin-shell.theme-dark .admin-event-form input,
-.admin-shell.theme-dark .admin-event-form textarea,
-.admin-shell.theme-dark .admin-event-form select,
-.admin-shell.theme-dark .admin-users-table select,
-.admin-shell.theme-dark .admin-search-box input,
-.admin-shell.theme-dark .admin-event-stat-select select,
-.admin-shell.theme-dark .admin-payment-reject-box textarea{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-form input,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-form textarea,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-form select,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-users-table select,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-search-box input,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-stat-select select,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-payment-reject-box textarea{
   background:#121c1e;
   border-color:#3a5155;
   color:#edf7f9;
   color-scheme:dark;
 }
-.admin-shell.theme-dark .admin-event-form input::placeholder,
-.admin-shell.theme-dark .admin-event-form textarea::placeholder,
-.admin-shell.theme-dark .admin-search-box input::placeholder{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-form input::placeholder,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-form textarea::placeholder,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-search-box input::placeholder{
   color:#889ea2;
 }
-.admin-shell.theme-dark .admin-event-form input:focus,
-.admin-shell.theme-dark .admin-event-form textarea:focus,
-.admin-shell.theme-dark .admin-users-table select:focus,
-.admin-shell.theme-dark .admin-search-box input:focus,
-.admin-shell.theme-dark .admin-event-stat-select select:focus,
-.admin-shell.theme-dark .admin-payment-reject-box textarea:focus{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-form input:focus,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-form textarea:focus,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-users-table select:focus,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-search-box input:focus,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-stat-select select:focus,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-payment-reject-box textarea:focus{
   border-color:#7bbcc9;
 }
-.admin-shell.theme-dark .admin-table-wrap,
-.admin-shell.theme-dark .admin-data-table,
-.admin-shell.theme-dark .admin-users-table{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-table-wrap,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-data-table,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-users-table{
   background:#1a272a;
   color:#edf7f9;
 }
-.admin-shell.theme-dark .admin-data-table th,
-.admin-shell.theme-dark .admin-users-table th{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-data-table th,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-users-table th{
   background:#25373b;
   color:#c8dbdf;
   border-color:#304144;
 }
-.admin-shell.theme-dark .admin-data-table td,
-.admin-shell.theme-dark .admin-users-table td{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-data-table td,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-users-table td{
   background:#1a272a;
   color:#e0edef;
   border-color:#304144;
 }
-.admin-shell.theme-dark .admin-data-table tbody tr:hover,
-.admin-shell.theme-dark .admin-users-table tbody tr:hover{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-data-table tbody tr:hover,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-users-table tbody tr:hover{
   background:#25373b;
 }
-.admin-shell.theme-dark .admin-users-table tr{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-users-table tr{
   background:#1a272a;
   border-color:#304144;
 }
-.admin-shell.theme-dark .admin-user-role{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-user-role{
   background:#28454b;
   color:#cdeef5;
 }
-.admin-shell.theme-dark .admin-user-saving,
-.admin-shell.theme-dark .admin-payment-receipt{color:#b2e5ef}
-.admin-shell.theme-dark .admin-users-success{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-user-saving,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-payment-receipt{color:#b2e5ef}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-users-success{
   background:#173323;
   border-color:#28563a;
   color:#a5e6b8;
 }
-.admin-shell.theme-dark .admin-notice{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-notice{
   background:#382b1c;
   border-color:#6d542e;
   color:#f1d49a;
 }
-.admin-shell.theme-dark .admin-payment-approve{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-payment-approve{
   background:#173323;
   color:#a5e6b8;
 }
-.admin-shell.theme-dark .admin-payment-reject{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-payment-reject{
   background:#3b3018;
   color:#f4d78b;
 }
-.admin-shell.theme-dark .admin-event-delete:hover{background:#57451e}
-.admin-shell.theme-dark .admin-stat-tabs button{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-delete:hover{background:#57451e}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-stat-tabs button{
   background:#1a272a;
   border-color:#3a5155;
   color:#c8dbdf;
 }
-.admin-shell.theme-dark .admin-stat-tabs button.active{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-stat-tabs button.active{
   background:#408b9a;
   border-color:#63a7b4;
   color:#fff;
 }
-.admin-shell.theme-dark .admin-event-card,
-.admin-shell.theme-dark .admin-booking-card,
-.admin-shell.theme-dark .admin-payment-card{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-card,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-booking-card,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-payment-card{
   background:#1a272a;
   border-color:#304144;
 }
-.admin-shell.theme-dark .admin-booking-card-event{background:#25373b;color:#e0edef}
-.admin-shell.theme-dark .admin-payment-actions,
-.admin-shell.theme-dark .admin-payment-card-head,
-.admin-shell.theme-dark .admin-booking-card-head{border-color:#304144}
-.admin-shell.theme-dark .admin-event-card-actions{border-color:#304144}
-.admin-shell.theme-dark .admin-selected-event span{color:#a9bdc1}
-.admin-shell.theme-dark .admin-spinner{border-color:#3a5155;border-top-color:#c5e6ed}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-booking-card-event{background:#25373b;color:#e0edef}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-payment-actions,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-payment-card-head,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-booking-card-head{border-color:#304144}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-card-actions{border-color:#304144}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-selected-event span{color:#a9bdc1}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-spinner{border-color:#3a5155;border-top-color:#c5e6ed}
 
 /* Customer profile forms and status surfaces */
 .theme-dark .profile-form,
@@ -3174,7 +3174,7 @@ body:has(.theme-dark){
     var(--bg)!important;
   color:var(--fg)!important;
 }
-.theme-dark.app-shell,.admin-shell.theme-dark{
+.theme-dark.app-shell,:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)){
   background:
     radial-gradient(circle at 85% 12%,rgba(45,160,185,.22) 0%,rgba(20,88,105,.10) 35%,transparent 70%),
     radial-gradient(circle at 15% 65%,rgba(19,78,94,.18) 0%,transparent 65%),
@@ -3782,7 +3782,7 @@ html[data-theme="dark"] body{
 }
 html[data-theme="dark"] .app-shell,
 html[data-theme="dark"] .admin-shell,
-.theme-dark.app-shell,.admin-shell.theme-dark{
+.theme-dark.app-shell,:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)){
   background:
     radial-gradient(circle at 85% 12%,rgba(45,160,185,.22) 0%,rgba(20,88,105,.10) 35%,transparent 70%),
     radial-gradient(circle at 15% 65%,rgba(19,78,94,.18) 0%,transparent 65%),
@@ -7838,8 +7838,8 @@ html[data-theme="dark"]{
   --glass-bg-strong:rgba(26,22,51,.98);
   color-scheme:dark;
 }
-.app-shell.theme-dark,
-.admin-shell.theme-dark,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)),
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)),
 .theme-dark.admin-loading,
 .theme-dark.admin-denied{
   --bg:#0E0B1F;
@@ -7895,16 +7895,16 @@ html[data-theme="dark"]{
   border-color:#5B2EFF!important;
   box-shadow:0 6px 16px rgba(91,46,255,.24)!important;
 }
-.app-shell.theme-dark .bottom-nav{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .bottom-nav{
   background:#1A1633!important;
   border-color:rgba(185,168,255,.2)!important;
   box-shadow:0 14px 36px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.04)!important;
 }
-.app-shell.theme-dark .bottom-nav button{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .bottom-nav button{
   color:#A9A3C9!important;
   background:transparent!important;
 }
-.app-shell.theme-dark .bottom-nav button.selected{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .bottom-nav button.selected{
   color:#FFFFFF!important;
   background:#5B2EFF!important;
   border-color:#8B70FF!important;
@@ -7918,13 +7918,13 @@ html[data-theme="dark"]{
   border-color:var(--line)!important;
   color:var(--text)!important;
 }
-.app-shell.theme-dark :is(.topbar,.screen-topbar,.detail-sticky-controls,.detail-topbar,.checkout-topbar),
-.admin-shell.theme-dark :is(.admin-sidebar,.admin-topbar){
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) :is(.topbar,.screen-topbar,.detail-sticky-controls,.detail-topbar,.checkout-topbar),
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) :is(.admin-sidebar,.admin-topbar){
   background:#1A1633!important;
   border-color:var(--line)!important;
   color:var(--text)!important;
 }
-.app-shell.theme-dark :is(.event-card,.event-list-card,.trending-card,.ticket-preview-card,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) :is(.event-card,.event-list-card,.trending-card,.ticket-preview-card,
 .haddir-ticket,.notification-item,.notifications-toolbar,.profile-card,.profile-form,
 .profile-account-card,.profile-settings-panel,.empty-panel,.settings-row,
 .role-workspace-button,.gatekeeper-workspace,.gatekeeper-assigned-event,
@@ -7936,23 +7936,23 @@ html[data-theme="dark"]{
   border-color:var(--line)!important;
   color:#F4F2FF!important;
 }
-.app-shell.theme-dark :is(.event-title,.event-list-info h3,.detail-title-row h1,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) :is(.event-title,.event-list-info h3,.detail-title-row h1,
 .detail-section h2,.screen-heading h1,.profile-card strong,.notification-item strong,
 .tier-name,.haddir-ticket-event h2,.detail-dock-summary strong){
   color:#F4F2FF!important;
 }
-.app-shell.theme-dark :is(.event-meta,.event-list-meta,.detail-section>p,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) :is(.event-meta,.event-list-meta,.detail-section>p,
 .detail-facts small,.screen-heading p,.profile-card p,.notification-item p,
 .notification-item small,.tier-note,.detail-dock-summary small,.detail-dock-summary>span){
   color:#A9A3C9!important;
 }
-.app-shell.theme-dark :is(input,textarea,select){
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) :is(input,textarea,select){
   background:#0E0B1F!important;
   color:#F4F2FF!important;
   border-color:var(--line)!important;
 }
-.app-shell.theme-dark :is(input,textarea,select)::placeholder{color:#A9A3C9!important}
-.admin-shell.theme-dark :is(.admin-panel,.admin-metric,.admin-event-card,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) :is(input,textarea,select)::placeholder{color:#A9A3C9!important}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) :is(.admin-panel,.admin-metric,.admin-event-card,
 .admin-booking-card,.admin-payment-card,.admin-event-form,.admin-ticket-editor,
 .admin-ticket-row,.admin-selected-event,.admin-users-table-wrap,.admin-table-wrap,
 .admin-data-table,.admin-users-table,.admin-stat-card,.admin-shortcuts button,
@@ -7961,19 +7961,19 @@ html[data-theme="dark"]{
   border-color:var(--line)!important;
   color:#F4F2FF!important;
 }
-.admin-shell.theme-dark :is(.admin-welcome,.admin-panel-head h3,.admin-metric strong,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) :is(.admin-welcome,.admin-panel-head h3,.admin-metric strong,
 .admin-event-card-title h4,.admin-booking-card-head h4,.admin-payment-card-head h4,
 .admin-stats-heading,.admin-selected-event h3,.admin-activity-results-head h4,
 .admin-data-table td,.admin-users-table td){
   color:#F4F2FF!important;
 }
-.admin-shell.theme-dark :is(.admin-panel-head p,.admin-footer,.admin-event-card-meta,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) :is(.admin-panel-head p,.admin-footer,.admin-event-card-meta,
 .admin-booking-card-grid small,.admin-booking-card-head small,
 .admin-payment-card-grid small,.admin-payment-card-head small,.admin-form-hint,
 .admin-stat-hint,.admin-user-email,.admin-sidebar nav button:not(.active)){
   color:#A9A3C9!important;
 }
-.admin-shell.theme-dark :is(input,textarea,select){
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) :is(input,textarea,select){
   background:#0E0B1F!important;
   color:#F4F2FF!important;
   border-color:var(--line)!important;
@@ -7986,8 +7986,8 @@ html[data-theme="dark"]{
   border-color:#FFB020!important;
   color:#1A1533!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-booking-dock .pay-button,
-.app-shell.theme-dark .event-detail-layout.payment-sheet .checkout-submit-dock .pay-button{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .detail-booking-dock .pay-button,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout.payment-sheet .checkout-submit-dock .pay-button{
   background:#FFB020!important;
   border-color:#FFB020!important;
   color:#1A1533!important;
@@ -7995,16 +7995,16 @@ html[data-theme="dark"]{
 
 
 /* Win against the legacy html[data-theme] navigation override. */
-html[data-theme="dark"] .app-shell.theme-dark .bottom-nav{
+html[data-theme="dark"] :is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .bottom-nav{
   background:#1A1633!important;
   border-color:rgba(185,168,255,.2)!important;
   box-shadow:0 14px 36px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.04)!important;
 }
-html[data-theme="dark"] .app-shell.theme-dark .bottom-nav button{
+html[data-theme="dark"] :is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .bottom-nav button{
   color:#A9A3C9!important;
   background:transparent!important;
 }
-html[data-theme="dark"] .app-shell.theme-dark .bottom-nav button.selected{
+html[data-theme="dark"] :is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .bottom-nav button.selected{
   color:#FFFFFF!important;
   background:#5B2EFF!important;
   border-color:#8B70FF!important;
@@ -8036,7 +8036,7 @@ html[data-theme="dark"]{
 .app-shell:not(.theme-dark),.admin-shell:not(.theme-dark){
   --success:#0B7F6C;
 }
-.app-shell.theme-dark,.admin-shell.theme-dark{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)),:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)){
   --success:#14D3B4;
 }
 
@@ -8104,25 +8104,25 @@ html[data-theme="dark"]{
 .admin-form-hint,.admin-stat-hint,.admin-user-email){
   color:var(--text-2)!important;
 }
-.app-shell.theme-dark :is(.event-title,.event-list-info h3,.detail-title-row h1,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) :is(.event-title,.event-list-info h3,.detail-title-row h1,
 .detail-section h2,.screen-heading h1,.profile-card strong,
 .notification-item strong,.tier-name,.detail-dock-summary strong),
-.admin-shell.theme-dark :is(.admin-panel-head h3,.admin-metric strong,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) :is(.admin-panel-head h3,.admin-metric strong,
 .admin-event-card-title h4,.admin-booking-card-head h4,
 .admin-payment-card-head h4,.admin-stats-heading,.admin-selected-event h3,
 .admin-data-table td,.admin-users-table td){
   color:#F4F2FF!important;
 }
-.app-shell.theme-dark :is(.event-meta,.event-list-meta,.detail-section>p,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) :is(.event-meta,.event-list-meta,.detail-section>p,
 .detail-facts small,.screen-heading p,.profile-card p,.notification-item p,
 .notification-item small,.tier-note,.detail-dock-summary small),
-.admin-shell.theme-dark :is(.admin-panel-head p,.admin-footer,.admin-event-card-meta,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) :is(.admin-panel-head p,.admin-footer,.admin-event-card-meta,
 .admin-booking-card-grid small,.admin-booking-card-head small,
 .admin-payment-card-grid small,.admin-payment-card-head small,
 .admin-form-hint,.admin-stat-hint,.admin-user-email){
   color:#A9A3C9!important;
 }
-.app-shell.theme-dark :is(.event-card,.event-list-card,.trending-card,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) :is(.event-card,.event-list-card,.trending-card,
 .ticket-preview-card,.notification-item,.profile-card,.profile-form,
 .profile-account-card,.profile-settings-panel,.empty-panel,.settings-row,
 .role-workspace-button,.gatekeeper-workspace,.gatekeeper-assigned-event,
@@ -8134,7 +8134,7 @@ html[data-theme="dark"]{
   border-color:var(--line)!important;
   color:#F4F2FF!important;
 }
-.admin-shell.theme-dark :is(.admin-panel,.admin-metric,.admin-event-card,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) :is(.admin-panel,.admin-metric,.admin-event-card,
 .admin-booking-card,.admin-payment-card,.admin-event-form,.admin-ticket-editor,
 .admin-ticket-row,.admin-selected-event,.admin-users-table-wrap,
 .admin-table-wrap,.admin-data-table,.admin-users-table,.admin-stat-card,
@@ -8154,8 +8154,8 @@ html[data-theme="dark"]{
   background:#fff;
   color:#1A1533;
 }
-.app-shell.theme-dark :is(input,textarea,select),
-.admin-shell.theme-dark :is(input,textarea,select){
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) :is(input,textarea,select),
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) :is(input,textarea,select){
   background:#0E0B1F!important;
   color:#F4F2FF!important;
   border-color:var(--line)!important;
@@ -8167,7 +8167,7 @@ html[data-theme="dark"]{
   color:var(--text-2)!important;
   border-color:var(--line)!important;
 }
-.admin-shell.theme-dark :is(.admin-data-table th,.admin-users-table th){
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) :is(.admin-data-table th,.admin-users-table th){
   background:#241E43!important;
   color:#B9A8FF!important;
 }
@@ -8251,12 +8251,12 @@ html[data-theme="dark"]{
 
 
 /* Night mode background: Haddir purple fading smoothly into black. */
-.app-shell.theme-dark,
-.admin-shell.theme-dark {
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)),
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) {
   --bg:#5D2FFF;
   background:linear-gradient(155deg,#5D2FFF 0%,#281568 48%,#000000 100%)!important;
 }
-.app-shell.theme-dark .detail-screen {
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .detail-screen {
   --bg:#5D2FFF;
   background:linear-gradient(155deg,#5D2FFF 0%,#281568 48%,#000000 100%)!important;
 }
@@ -8283,7 +8283,7 @@ html[data-theme="dark"] .admin-shell .admin-content {
 
 
 /* Final dark-mode legacy color cleanup: remove old teal/blue UI surfaces. */
-html[data-theme="dark"] .app-shell.theme-dark :is(.welcome-motion,.welcome-spark,.welcome-brand-mark,
+html[data-theme="dark"] :is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) :is(.welcome-motion,.welcome-spark,.welcome-brand-mark,
 .theme-toggle-knob,.gatekeeper-task-grid article,.gatekeeper-assigned-event,
 .gatekeeper-counter-grid article,.gatekeeper-manual-form input,
 .booking-success-dialog,.booking-success-dialog .success-summary,
@@ -8295,42 +8295,42 @@ html[data-theme="dark"] .app-shell.theme-dark :is(.welcome-motion,.welcome-spark
   border-color:rgba(185,168,255,.2)!important;
   color:#F4F2FF!important;
 }
-html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-sidebar nav button.active,
+html[data-theme="dark"] :is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) :is(.admin-sidebar nav button.active,
 .admin-stat-tabs button.active,.admin-create-button,.admin-brand>span,.admin-avatar){
   background:#5B2EFF!important;
   border-color:#5B2EFF!important;
   color:#FFFFFF!important;
 }
-html[data-theme="dark"] .app-shell.theme-dark :is(.btn-primary,.role-workspace-button.active){
+html[data-theme="dark"] :is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) :is(.btn-primary,.role-workspace-button.active){
   background:#5B2EFF!important;
   border-color:#5B2EFF!important;
   color:#FFFFFF!important;
 }
-html[data-theme="dark"] .app-shell.theme-dark .pay-button,
-html[data-theme="dark"] .app-shell.theme-dark .actionable-footer .pay-button{
+html[data-theme="dark"] :is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .pay-button,
+html[data-theme="dark"] :is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .actionable-footer .pay-button{
   background:#FFB020!important;
   border-color:#FFB020!important;
   color:#1A1533!important;
 }
-html[data-theme="dark"] .app-shell.theme-dark .bottom-nav button.selected{
+html[data-theme="dark"] :is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .bottom-nav button.selected{
   background:#5B2EFF!important;
   border-color:#5B2EFF!important;
   color:#FFFFFF!important;
 }
-html[data-theme="dark"] .app-shell.theme-dark .home-discovery .ticket-book-link{
+html[data-theme="dark"] :is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .home-discovery .ticket-book-link{
   background:#5B2EFF!important;
   border-color:#5B2EFF!important;
   color:#FFFFFF!important;
 }
-html[data-theme="dark"] .app-shell.theme-dark .trending-card-media{
+html[data-theme="dark"] :is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .trending-card-media{
   background:linear-gradient(145deg,#281568,#0E0B1F)!important;
 }
-html[data-theme="dark"] .app-shell.theme-dark .detail-booking-dock.actionable-footer,
-html[data-theme="dark"] .app-shell.theme-dark .event-detail-layout .detail-booking-dock{
+html[data-theme="dark"] :is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .detail-booking-dock.actionable-footer,
+html[data-theme="dark"] :is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout .detail-booking-dock{
   background:#1A1633!important;
   border-color:rgba(185,168,255,.2)!important;
 }
-html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
+html[data-theme="dark"] :is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) :is(.admin-event-form-section,
 .admin-activity-search,.admin-activity-filters select,.admin-payment-reject-box textarea){
   background:#0E0B1F!important;
   border-color:rgba(185,168,255,.2)!important;
@@ -8440,20 +8440,20 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
 }
 
 /* Night mode keeps the same identity while retaining turquoise only for success states. */
-.app-shell.theme-dark :is(.info-strip,.checkout-total,.account-details>div,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) :is(.info-strip,.checkout-total,.account-details>div,
 .guest-label,.notification-state,.receipt-upload){
   background:color-mix(in srgb,#5B2EFF 13%,#1A1633)!important;
   border-color:rgba(185,168,255,.2)!important;
   color:#A9A3C9!important;
 }
-.app-shell.theme-dark :is(.header-icon:not(.theme-toggle),.screen-icon,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) :is(.header-icon:not(.theme-toggle),.screen-icon,
 .empty-illustration,.notification-icon.system,.profile-avatar,.payment-icon,
 .upload-symbol,.upload-action,.detail-share,.share-round,.quantity-control button){
   background:color-mix(in srgb,#5B2EFF 16%,#1A1633)!important;
   border-color:rgba(185,168,255,.22)!important;
   color:#B9A8FF!important;
 }
-.admin-shell.theme-dark :is(.admin-metric>span,.admin-shortcuts button>span,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) :is(.admin-metric>span,.admin-shortcuts button>span,
 .admin-empty-icon,.admin-mini-profile>span,.admin-mini-avatar,
 .admin-activity-stats article>span,.admin-activity-item-rail>span,
 .admin-activity-empty>span,.admin-avatar,.admin-user-role,
@@ -8463,7 +8463,7 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
   border-color:rgba(185,168,255,.22)!important;
   color:#B9A8FF!important;
 }
-.admin-shell.theme-dark .admin-welcome{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-welcome{
   background:linear-gradient(115deg,#5B2EFF 0%,#281568 58%,#0E0B1F 100%)!important;
 }
 
@@ -8484,16 +8484,16 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
   border-color:#5D2FFF!important;
   box-shadow:0 7px 18px rgba(93,47,255,.28)!important;
 }
-.app-shell.theme-dark .bottom-nav{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .bottom-nav{
   background:linear-gradient(135deg,#5D2FFF 0%,#281568 42%,#0E0B1F 100%)!important;
   border-color:rgba(185,168,255,.28)!important;
   box-shadow:0 16px 40px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.12)!important;
 }
-.app-shell.theme-dark .bottom-nav button{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .bottom-nav button{
   color:#D0C8F2!important;
   background:transparent!important;
 }
-.app-shell.theme-dark .bottom-nav button.selected{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .bottom-nav button.selected{
   color:#FFFFFF!important;
   background:linear-gradient(135deg,#5D2FFF 0%,#4320C8 100%)!important;
   border-color:#B9A8FF!important;
@@ -8510,11 +8510,11 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
   border-color:#5D2FFF!important;
   box-shadow:0 7px 18px rgba(93,47,255,.22)!important;
 }
-.admin-shell.theme-dark .admin-sidebar nav button{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-sidebar nav button{
   color:#A9A3C9!important;
   background:transparent!important;
 }
-.admin-shell.theme-dark .admin-sidebar nav button.active{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-sidebar nav button.active{
   color:#FFFFFF!important;
   background:linear-gradient(135deg,#5D2FFF 0%,#281568 100%)!important;
   border-color:#8B70FF!important;
@@ -8554,7 +8554,7 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
 .app-shell .trending-section .redesign-title h2{
   color:#000000!important;
 }
-.app-shell.theme-dark .trending-section .redesign-title h2{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .trending-section .redesign-title h2{
   color:#FFFFFF!important;
 }
 
@@ -8563,7 +8563,7 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
 .app-shell:not(.theme-dark) .home-discovery .event-list-price{
   color:#A96500!important;
 }
-.app-shell.theme-dark .home-discovery .event-list-price{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .home-discovery .event-list-price{
   color:#FFB020!important;
 }
 .app-shell .home-discovery .trending-price{
@@ -8582,7 +8582,7 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
 
 /* Force gold pricing on the remaining homepage event cards in dark mode,
    whether the theme class is applied to the shell or an ancestor. */
-.app-shell.theme-dark .home-discovery .more-events .event-list-price,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .home-discovery .more-events .event-list-price,
 .theme-dark .app-shell .home-discovery .more-events .event-list-price,
 .theme-dark .home-discovery .more-events .event-list-price{
   color:#FFB020!important;
@@ -8591,12 +8591,12 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
 
 
 /* Pink accents on the homepage search icon and remaining-event ticket cut-outs in dark mode. */
-.app-shell.theme-dark .home-discovery .home-search>svg{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .home-discovery .home-search>svg{
   color:#FF7EB6!important;
   stroke:#FF7EB6!important;
 }
-.app-shell.theme-dark .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-perforation::before,
-.app-shell.theme-dark .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-perforation::after{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-perforation::before,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .ticket-card-perforation::after{
   background:#EF5265!important;
   box-shadow:0 0 0 3px rgba(239,82,101,.12),0 0 10px rgba(239,82,101,.42)!important;
 }
@@ -8610,7 +8610,7 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
   -webkit-backdrop-filter:blur(14px) saturate(145%)!important;
   backdrop-filter:blur(14px) saturate(145%)!important;
 }
-.app-shell.theme-dark .bottom-nav{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .bottom-nav{
   background:linear-gradient(135deg,rgba(93,47,255,.58),rgba(40,21,104,.58) 48%,rgba(14,11,31,.72))!important;
   border-color:rgba(185,168,255,.3)!important;
   box-shadow:0 16px 40px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.16)!important;
@@ -8629,8 +8629,8 @@ html[data-theme="dark"] .admin-shell.theme-dark :is(.admin-event-form-section,
 html[data-theme="dark"],
 html[data-theme="dark"] body,
 .theme-dark,
-.app-shell.theme-dark,
-.admin-shell.theme-dark,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)),
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)),
 .theme-dark.admin-denied{
   --bg:#1D135D!important;
 }
@@ -8652,65 +8652,65 @@ html[data-theme="dark"] .auth-gate,
 
 
 /* Dark-mode contrast fixes for homepage event categories and metadata icons. */
-.app-shell.theme-dark .home-discovery .trending-category{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .home-discovery .trending-category{
   color:#B9A8FF!important;
   -webkit-text-fill-color:#B9A8FF!important;
   background:rgba(29,19,93,.78)!important;
   border:1px solid rgba(185,168,255,.38)!important;
 }
-.app-shell.theme-dark .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-info>.event-category-chip{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-info>.event-category-chip{
   color:#B9A8FF!important;
   -webkit-text-fill-color:#B9A8FF!important;
   background:rgba(91,46,255,.16)!important;
   border-color:rgba(185,168,255,.3)!important;
 }
-.app-shell.theme-dark .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-info .event-list-meta p svg{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .home-discovery .more-events.redesigned-more .event-list-card.ticket-style-card .event-list-info .event-list-meta p svg{
   color:#B9A8FF!important;
   stroke:#B9A8FF!important;
 }
 
 
 /* Event details — dedicated dark palette, scoped to the details page only. */
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet){
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet){
   color:#F4F2FF!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-sticky-controls{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .detail-sticky-controls{
   background:#1A1633!important;
   border-color:rgba(185,168,255,.2)!important;
   box-shadow:0 6px 18px rgba(0,0,0,.2)!important;
   -webkit-backdrop-filter:none!important;
   backdrop-filter:none!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) :is(.detail-sticky-back,.detail-sticky-share,.detail-sticky-category){
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) :is(.detail-sticky-back,.detail-sticky-share,.detail-sticky-category){
   color:#B9A8FF!important;
   background:#241E43!important;
   border:1px solid rgba(185,168,255,.22)!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-sticky-category{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .detail-sticky-category{
   color:#F4F2FF!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-cover-title h1{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .detail-cover-title h1{
   color:#FFFFFF!important;
   text-shadow:0 2px 14px rgba(0,0,0,.55)!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-quick-info .quick-info-row{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .detail-quick-info .quick-info-row{
   color:#F4F2FF!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-quick-info .quick-info-row :is(small,span:not(.quick-info-icon)){
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .detail-quick-info .quick-info-row :is(small,span:not(.quick-info-icon)){
   color:#A9A3C9!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-quick-info .quick-info-row strong{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .detail-quick-info .quick-info-row strong{
   color:#F4F2FF!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .quick-info-icon{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .quick-info-icon{
   background:rgba(91,46,255,.2)!important;
   color:#B9A8FF!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .quick-location-row>svg{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .quick-location-row>svg{
   color:#B9A8FF!important;
   stroke:#B9A8FF!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) :is(.detail-about,.detail-ticket-section){
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) :is(.detail-about,.detail-ticket-section){
   background:#1A1633!important;
   border:1px solid rgba(185,168,255,.18)!important;
   color:#F4F2FF!important;
@@ -8718,81 +8718,81 @@ html[data-theme="dark"] .auth-gate,
   -webkit-backdrop-filter:none!important;
   backdrop-filter:none!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-section h2{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .detail-section h2{
   color:#F4F2FF!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-about p{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .detail-about p{
   color:#A9A3C9!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-sheet .detail-about h2:before{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .detail-sheet .detail-about h2:before{
   background:#B9A8FF!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .tier-heading>span{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .tier-heading>span{
   color:#A9A3C9!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .tier-card{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .tier-card{
   background:#241E43!important;
   border-color:rgba(185,168,255,.2)!important;
   color:#F4F2FF!important;
   box-shadow:none!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .tier-card .tier-name{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .tier-card .tier-name{
   color:#F4F2FF!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .tier-card .tier-price{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .tier-card .tier-price{
   color:#B9A8FF!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .tier-card .tier-availability{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .tier-card .tier-availability{
   color:#A9A3C9!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .tier-card .tier-radio{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .tier-card .tier-radio{
   border-color:rgba(185,168,255,.55)!important;
   color:#1A1633!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .tier-card.tier-selected{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .tier-card.tier-selected{
   background:rgba(91,46,255,.22)!important;
   border-color:#B9A8FF!important;
   box-shadow:0 0 0 1px rgba(185,168,255,.12)!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .tier-card.tier-selected .tier-radio{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .tier-card.tier-selected .tier-radio{
   background:#B9A8FF!important;
   border-color:#B9A8FF!important;
   color:#1A1633!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-quantity{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .detail-quantity{
   background:#1A1633!important;
   border:1px solid rgba(185,168,255,.2)!important;
   color:#F4F2FF!important;
   box-shadow:none!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .quantity-heading :is(h3,strong){
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .quantity-heading :is(h3,strong){
   color:#F4F2FF!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .quantity-heading span{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .quantity-heading span{
   color:#A9A3C9!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .quantity-control button{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .quantity-control button{
   background:#241E43!important;
   border-color:rgba(185,168,255,.28)!important;
   color:#B9A8FF!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .quantity-control strong{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .quantity-control strong{
   color:#F4F2FF!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .detail-booking-dock.actionable-footer{
   background:#1A1633!important;
   border:1px solid rgba(185,168,255,.22)!important;
   box-shadow:0 12px 30px rgba(0,0,0,.28)!important;
   -webkit-backdrop-filter:none!important;
   backdrop-filter:none!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-dock-summary :is(small,span){
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .detail-dock-summary :is(small,span){
   color:#A9A3C9!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-dock-summary strong{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .detail-dock-summary strong{
   color:#F4F2FF!important;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .ticket-count-badge{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .ticket-count-badge{
   background:rgba(91,46,255,.24)!important;
   border:1px solid rgba(185,168,255,.28)!important;
   color:#B9A8FF!important;
@@ -8922,94 +8922,94 @@ html[data-theme="dark"] .auth-gate,
 }
 
 /* Dark mode: purple canvas, deep-violet cards, lavender text and controlled success teal. */
-.app-shell.theme-dark .tickets-screen,
-.app-shell.theme-dark .notifications-screen{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .notifications-screen{
   color:#F4F2FF!important;
 }
-.app-shell.theme-dark .tickets-screen .ticket-tabs{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen .ticket-tabs{
   border-color:rgba(185,168,255,.22)!important;
 }
-.app-shell.theme-dark .tickets-screen .ticket-tabs button{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen .ticket-tabs button{
   color:#A9A3C9!important;
 }
-.app-shell.theme-dark .tickets-screen .ticket-tabs button.active,
-.app-shell.theme-dark .notifications-screen .notification-filters button.active{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen .ticket-tabs button.active,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .notifications-screen .notification-filters button.active{
   color:#B9A8FF!important;
 }
-.app-shell.theme-dark .tickets-screen .ticket-tabs button.active::after{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen .ticket-tabs button.active::after{
   background:#B9A8FF!important;
 }
-.app-shell.theme-dark .tickets-screen .ticket-tabs button span,
-.app-shell.theme-dark .notifications-screen .notification-filters button.active{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen .ticket-tabs button span,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .notifications-screen .notification-filters button.active{
   background:rgba(91,46,255,.22)!important;
   border-color:rgba(185,168,255,.28)!important;
   color:#B9A8FF!important;
 }
-.app-shell.theme-dark .tickets-screen .ticket-preview-card,
-.app-shell.theme-dark .notifications-screen .notifications-toolbar,
-.app-shell.theme-dark .notifications-screen .notification-item,
-.app-shell.theme-dark .tickets-screen>.empty-state,
-.app-shell.theme-dark .notifications-screen>.empty-state{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen .ticket-preview-card,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .notifications-screen .notifications-toolbar,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .notifications-screen .notification-item,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen>.empty-state,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .notifications-screen>.empty-state{
   background:#1A1633!important;
   border-color:rgba(185,168,255,.2)!important;
   color:#F4F2FF!important;
   box-shadow:0 10px 28px rgba(0,0,0,.18)!important;
 }
-.app-shell.theme-dark .tickets-screen .ticket-preview-copy>strong,
-.app-shell.theme-dark .notifications-screen .notification-copy strong,
-.app-shell.theme-dark .notifications-screen .notifications-toolbar strong{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen .ticket-preview-copy>strong,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .notifications-screen .notification-copy strong,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .notifications-screen .notifications-toolbar strong{
   color:#F4F2FF!important;
 }
-.app-shell.theme-dark .tickets-screen .ticket-preview-copy>span,
-.app-shell.theme-dark .notifications-screen .notification-copy p,
-.app-shell.theme-dark .notifications-screen .notification-copy small,
-.app-shell.theme-dark .notifications-screen .notifications-toolbar small{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen .ticket-preview-copy>span,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .notifications-screen .notification-copy p,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .notifications-screen .notification-copy small,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .notifications-screen .notifications-toolbar small{
   color:#A9A3C9!important;
 }
-.app-shell.theme-dark .tickets-screen .ticket-preview-status{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen .ticket-preview-status{
   background:rgba(20,211,180,.14)!important;
   color:#14D3B4!important;
 }
-.app-shell.theme-dark .tickets-screen .ticket-preview-status.used{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen .ticket-preview-status.used{
   background:#241E43!important;
   color:#A9A3C9!important;
 }
-.app-shell.theme-dark .tickets-screen .ticket-preview-image::after{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen .ticket-preview-image::after{
   background:#1A1633!important;
   box-shadow:0 0 0 1px rgba(185,168,255,.22)!important;
 }
-.app-shell.theme-dark .tickets-screen .ticket-preview-fallback{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen .ticket-preview-fallback{
   background:linear-gradient(145deg,#241E43,#30215F)!important;
   color:#B9A8FF!important;
 }
-.app-shell.theme-dark .notifications-screen .notification-icon{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .notifications-screen .notification-icon{
   background:rgba(91,46,255,.2)!important;
   color:#B9A8FF!important;
 }
-.app-shell.theme-dark .notifications-screen .notification-icon.booking{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .notifications-screen .notification-icon.booking{
   background:rgba(20,211,180,.13)!important;
   color:#14D3B4!important;
 }
-.app-shell.theme-dark .notifications-screen .notification-icon.event{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .notifications-screen .notification-icon.event{
   background:rgba(91,46,255,.2)!important;
   color:#B9A8FF!important;
 }
-.app-shell.theme-dark .notifications-screen .notification-state{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .notifications-screen .notification-state{
   background:rgba(91,46,255,.2)!important;
   color:#B9A8FF!important;
 }
-.app-shell.theme-dark .notifications-screen .notification-item.is-unread{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .notifications-screen .notification-item.is-unread{
   background:rgba(91,46,255,.13)!important;
   border-color:rgba(185,168,255,.4)!important;
 }
-.app-shell.theme-dark .notifications-screen .notification-mark-all,
-.app-shell.theme-dark .notifications-screen .notification-toggle-read{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .notifications-screen .notification-mark-all,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .notifications-screen .notification-toggle-read{
   color:#B9A8FF!important;
 }
-.app-shell.theme-dark .notifications-screen .notification-mark-all:disabled{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .notifications-screen .notification-mark-all:disabled{
   color:#6B6590!important;
 }
-.app-shell.theme-dark .tickets-screen .ticket-expanded-panel>.pay-button{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen .ticket-expanded-panel>.pay-button{
   background:#241E43!important;
   border-color:rgba(185,168,255,.3)!important;
   color:#B9A8FF!important;
@@ -9019,16 +9019,16 @@ html[data-theme="dark"] .auth-gate,
 .app-shell:not(.theme-dark) :is(.tickets-screen,.notifications-screen)>.empty-state{
   color:#6B6590!important;
 }
-.app-shell.theme-dark :is(.tickets-screen,.notifications-screen)>.empty-state{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) :is(.tickets-screen,.notifications-screen)>.empty-state{
   color:#A9A3C9!important;
 }
-.app-shell.theme-dark :is(.tickets-screen,.notifications-screen)>.empty-state strong{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) :is(.tickets-screen,.notifications-screen)>.empty-state strong{
   color:#F4F2FF!important;
 }
 .app-shell:not(.theme-dark) .notifications-screen .notification-item.is-read{
   opacity:.88;
 }
-.app-shell.theme-dark .notifications-screen .notification-item.is-read{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .notifications-screen .notification-item.is-read{
   opacity:.86;
 }
 
@@ -9102,25 +9102,25 @@ html[data-theme="dark"] .auth-gate,
   color:#FFFFFF!important;
   -webkit-text-fill-color:#FFFFFF!important;
 }
-.app-shell.theme-dark .tickets-screen .ticket-tabs button,
-.app-shell.theme-dark .tickets-screen .ticket-tabs button.active{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen .ticket-tabs button,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen .ticket-tabs button.active{
   border-color:rgba(185,168,255,.28)!important;
   background:#1A1633!important;
   color:#B9A8FF!important;
   -webkit-text-fill-color:#B9A8FF!important;
 }
-.app-shell.theme-dark .tickets-screen .ticket-tabs button.active{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen .ticket-tabs button.active{
   background:#5B2EFF!important;
   border-color:#5B2EFF!important;
   color:#FFFFFF!important;
   -webkit-text-fill-color:#FFFFFF!important;
 }
-.app-shell.theme-dark .tickets-screen .ticket-tabs button span{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen .ticket-tabs button span{
   background:rgba(185,168,255,.16)!important;
   color:#B9A8FF!important;
   -webkit-text-fill-color:#B9A8FF!important;
 }
-.app-shell.theme-dark .tickets-screen .ticket-tabs button.active span{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen .ticket-tabs button.active span{
   background:rgba(255,255,255,.2)!important;
   color:#FFFFFF!important;
   -webkit-text-fill-color:#FFFFFF!important;
@@ -9179,14 +9179,14 @@ html[data-theme="dark"] .auth-gate,
   box-shadow:0 2px 8px rgba(34,18,83,.2),inset 0 1px 0 rgba(255,255,255,.95)!important;
   transform:none!important;transition:left .3s cubic-bezier(.2,.8,.2,1),right .3s cubic-bezier(.2,.8,.2,1),background .28s ease,color .28s ease!important;
 }
-.app-shell.theme-dark .topbar .header-icon.theme-toggle{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .topbar .header-icon.theme-toggle{
   border-color:rgba(185,168,255,.38)!important;
   background:linear-gradient(120deg,#251A67 0%,#1A1633 55%,#34217F 100%)!important;
   color:#B9A8FF!important;box-shadow:0 5px 18px rgba(5,3,28,.34),inset 0 1px 0 rgba(255,255,255,.1)!important;
 }
-.app-shell.theme-dark .topbar .theme-toggle-sun{color:#A9A3C9!important;opacity:.55!important}
-.app-shell.theme-dark .topbar .theme-toggle-moon{color:#D8CCFF!important;opacity:1!important}
-.app-shell.theme-dark .topbar .theme-toggle-knob{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .topbar .theme-toggle-sun{color:#A9A3C9!important;opacity:.55!important}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .topbar .theme-toggle-moon{color:#D8CCFF!important;opacity:1!important}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .topbar .theme-toggle-knob{
   right:auto!important;left:1px!important;background:linear-gradient(145deg,#B9A8FF,#7652E8)!important;
   color:#FFFFFF!important;box-shadow:0 2px 10px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.28)!important;
 }
@@ -9197,7 +9197,7 @@ html[data-theme="dark"] .auth-gate,
   .app-shell .topbar .header-icon.theme-toggle:hover{
     box-shadow:0 7px 20px rgba(48,25,112,.2),inset 0 1px 0 rgba(255,255,255,.95)!important;
   }
-  .app-shell.theme-dark .topbar .header-icon.theme-toggle:hover{
+  :is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .topbar .header-icon.theme-toggle:hover{
     box-shadow:0 7px 22px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.14)!important;
   }
 }
@@ -9302,7 +9302,7 @@ html[data-theme="dark"] .auth-gate,
   background-color:#F6F4FF!important;
   background-image:radial-gradient(ellipse at 50% 0,rgba(91,46,255,.075),transparent 44%)!important;
 }
-.app-shell.theme-dark .detail-screen{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .detail-screen{
   background-color:#1D135D!important;
   background-image:radial-gradient(ellipse at 50% 0,rgba(185,168,255,.12),transparent 46%)!important;
 }
@@ -9311,7 +9311,7 @@ html[data-theme="dark"] .auth-gate,
   border-color:rgba(91,46,255,.18)!important;
   background:linear-gradient(115deg,#EEEAFB 0%,#FFFFFF 100%)!important;
 }
-.app-shell.theme-dark .detail-screen .map-link{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .detail-screen .map-link{
   color:#B9A8FF!important;
   border-color:rgba(185,168,255,.24)!important;
   background:linear-gradient(115deg,#241E43 0%,#1A1633 100%)!important;
@@ -9319,7 +9319,7 @@ html[data-theme="dark"] .auth-gate,
 .app-shell:not(.theme-dark) .detail-screen .map-link svg:first-child{
   color:#5B2EFF!important;background:#E3DCFF!important;
 }
-.app-shell.theme-dark .detail-screen .map-link svg:first-child{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .detail-screen .map-link svg:first-child{
   color:#B9A8FF!important;background:#30215F!important;
 }
 .app-shell:not(.theme-dark) .tier-card.tier-selected{
@@ -9330,12 +9330,12 @@ html[data-theme="dark"] .auth-gate,
 .app-shell:not(.theme-dark) .tier-card.tier-selected .tier-radio{
   background:#5B2EFF!important;border-color:#5B2EFF!important;
 }
-.app-shell.theme-dark .tier-card.tier-selected{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tier-card.tier-selected{
   border-color:#B9A8FF!important;
   background:rgba(91,46,255,.22)!important;
   box-shadow:0 8px 24px rgba(5,3,28,.2)!important;
 }
-.app-shell.theme-dark .tier-card.tier-selected .tier-radio{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tier-card.tier-selected .tier-radio{
   background:#5B2EFF!important;border-color:#B9A8FF!important;
 }
 .app-shell .trending-card:focus-visible{outline-color:#B9A8FF!important}
@@ -9346,22 +9346,22 @@ html[data-theme="dark"] .auth-gate,
 .app-shell:not(.theme-dark) .event-list-card:hover{
   border-color:rgba(91,46,255,.38)!important;
 }
-.app-shell.theme-dark .event-list-card:hover{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-list-card:hover{
   border-color:rgba(185,168,255,.48)!important;
 }
 .app-shell:not(.theme-dark) .event-list-top>span,
 .app-shell:not(.theme-dark) .event-list-info p svg{
   color:#5B2EFF!important;
 }
-.app-shell.theme-dark .event-list-top>span,
-.app-shell.theme-dark .event-list-info p svg{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-list-top>span,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-list-info p svg{
   color:#B9A8FF!important;
 }
 .app-shell:not(.theme-dark) .theme-dark .category.active,
 .app-shell:not(.theme-dark) .category.active{
   background:#5B2EFF!important;border-color:#5B2EFF!important;color:#FFFFFF!important;
 }
-.app-shell.theme-dark .category.active{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .category.active{
   background:#5B2EFF!important;border-color:#5B2EFF!important;color:#FFFFFF!important;
 }
 
@@ -9453,91 +9453,91 @@ html[data-theme="dark"] .auth-gate,
 .admin-shell:not(.theme-dark) .admin-activity-empty{border-color:rgba(91,46,255,.25)!important}
 
 /* Dark administration palette: lavender accents on deep-violet surfaces. */
-.admin-shell.theme-dark{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)){
   background:#1D135D!important;color:#F4F2FF!important;
 }
-.admin-shell.theme-dark .admin-sidebar,
-.admin-shell.theme-dark .admin-topbar,
-.admin-shell.theme-dark .admin-panel,
-.admin-shell.theme-dark .admin-metric,
-.admin-shell.theme-dark .admin-shortcuts button,
-.admin-shell.theme-dark .admin-users-table-wrap,
-.admin-shell.theme-dark .admin-activity-stats article,
-.admin-shell.theme-dark .admin-activity-filter-panel,
-.admin-shell.theme-dark .admin-activity-item{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-sidebar,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-topbar,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-panel,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-metric,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-shortcuts button,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-users-table-wrap,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-stats article,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-filter-panel,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-item{
   background:#1A1633!important;
   border-color:rgba(185,168,255,.2)!important;
   color:#F4F2FF!important;
 }
-.admin-shell.theme-dark .admin-sidebar{border-left-color:rgba(185,168,255,.2)!important}
-.admin-shell.theme-dark .admin-topbar{border-bottom-color:rgba(185,168,255,.2)!important}
-.admin-shell.theme-dark .admin-sidebar nav button.active,
-.admin-shell.theme-dark .admin-activity-filter-title button,
-.admin-shell.theme-dark .admin-activity-actor span,
-.admin-shell.theme-dark .admin-activity-action>span{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-sidebar{border-left-color:rgba(185,168,255,.2)!important}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-topbar{border-bottom-color:rgba(185,168,255,.2)!important}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-sidebar nav button.active,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-filter-title button,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-actor span,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-action>span{
   background:rgba(91,46,255,.24)!important;color:#B9A8FF!important;
 }
-.admin-shell.theme-dark .admin-brand,
-.admin-shell.theme-dark .admin-metric strong,
-.admin-shell.theme-dark .admin-footer span,
-.admin-shell.theme-dark .admin-form-message,
-.admin-shell.theme-dark .admin-activity-eyebrow,
-.admin-shell.theme-dark .admin-activity-action>b,
-.admin-shell.theme-dark .admin-activity-entity strong,
-.admin-shell.theme-dark .admin-metric>span,
-.admin-shell.theme-dark .admin-mini-profile>span,
-.admin-shell.theme-dark .admin-avatar,
-.admin-shell.theme-dark .admin-shortcuts button>span,
-.admin-shell.theme-dark .admin-empty-icon,
-.admin-shell.theme-dark .admin-activity-stats article>span,
-.admin-shell.theme-dark .admin-activity-item-rail>span,
-.admin-shell.theme-dark .admin-activity-empty>span{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-brand,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-metric strong,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-footer span,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-form-message,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-eyebrow,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-action>b,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-entity strong,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-metric>span,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-mini-profile>span,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-avatar,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-shortcuts button>span,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-empty-icon,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-stats article>span,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-item-rail>span,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-empty>span{
   color:#B9A8FF!important;
 }
-.admin-shell.theme-dark .admin-metric>span,
-.admin-shell.theme-dark .admin-mini-profile>span,
-.admin-shell.theme-dark .admin-avatar,
-.admin-shell.theme-dark .admin-shortcuts button>span,
-.admin-shell.theme-dark .admin-empty-icon,
-.admin-shell.theme-dark .admin-activity-stats article>span,
-.admin-shell.theme-dark .admin-activity-item-rail>span,
-.admin-shell.theme-dark .admin-activity-empty>span{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-metric>span,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-mini-profile>span,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-avatar,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-shortcuts button>span,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-empty-icon,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-stats article>span,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-item-rail>span,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-empty>span{
   background:rgba(91,46,255,.22)!important;
 }
-.admin-shell.theme-dark .admin-create-button,
-.admin-shell.theme-dark .admin-denied button,
-.admin-shell.theme-dark .admin-activity-empty button{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-create-button,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-denied button,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-empty button{
   background:#5B2EFF!important;border-color:#5B2EFF!important;color:#FFFFFF!important;
 }
-.admin-shell.theme-dark .admin-data-table th,
-.admin-shell.theme-dark .admin-users-table th{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-data-table th,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-users-table th{
   background:#241E43!important;color:#F4F2FF!important;border-color:rgba(185,168,255,.2)!important;
 }
-.admin-shell.theme-dark .admin-event-form input:focus,
-.admin-shell.theme-dark .admin-event-form textarea:focus,
-.admin-shell.theme-dark .admin-event-form select:focus,
-.admin-shell.theme-dark .admin-users-table select:focus,
-.admin-shell.theme-dark .admin-search-box input:focus{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-form input:focus,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-form textarea:focus,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-form select:focus,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-users-table select:focus,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-search-box input:focus{
   border-color:#B9A8FF!important;box-shadow:0 0 0 3px rgba(185,168,255,.12)!important;
 }
-.admin-shell.theme-dark .admin-event-form input,
-.admin-shell.theme-dark .admin-event-form textarea,
-.admin-shell.theme-dark .admin-event-form select,
-.admin-shell.theme-dark .admin-users-table select,
-.admin-shell.theme-dark .admin-search-box input,
-.admin-shell.theme-dark .admin-activity-filters select,
-.admin-shell.theme-dark .admin-activity-search{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-form input,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-form textarea,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-form select,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-users-table select,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-search-box input,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-filters select,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-search{
   background:#12102B!important;border-color:rgba(185,168,255,.22)!important;color:#F4F2FF!important;
 }
-.admin-shell.theme-dark .admin-activity-item-rail:after{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-item-rail:after{
   background:rgba(185,168,255,.2)!important;
 }
-.admin-shell.theme-dark .admin-activity-changes{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-changes{
   background:#241E43!important;
 }
-.admin-shell.theme-dark .admin-activity-empty{border-color:rgba(185,168,255,.3)!important}
-.admin-shell.theme-dark .admin-loading,
-.admin-shell.theme-dark .admin-denied,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-activity-empty{border-color:rgba(185,168,255,.3)!important}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-loading,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-denied,
 .theme-dark.admin-loading,
 .theme-dark.admin-denied{
   background:#1D135D!important;color:#F4F2FF!important;
@@ -9546,34 +9546,34 @@ html[data-theme="dark"] .auth-gate,
 
 /* Welcome banner: consistent high-contrast typography on the purple surface in both themes. */
 .admin-shell .admin-content .admin-welcome,
-.admin-shell.theme-dark .admin-content .admin-welcome{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-content .admin-welcome{
   color:#FFFFFF!important;
   background:linear-gradient(115deg,#5B2EFF 0%,#4320C8 58%,#281568 100%)!important;
 }
 .admin-shell .admin-content .admin-welcome .admin-eyebrow,
-.admin-shell.theme-dark .admin-content .admin-welcome .admin-eyebrow{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-content .admin-welcome .admin-eyebrow{
   color:#E6DEFF!important;
   opacity:1!important;
 }
 .admin-shell .admin-content .admin-welcome h2,
-.admin-shell.theme-dark .admin-content .admin-welcome h2{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-content .admin-welcome h2{
   color:#FFFFFF!important;
   -webkit-text-fill-color:#FFFFFF!important;
 }
 .admin-shell .admin-content .admin-welcome p,
-.admin-shell.theme-dark .admin-content .admin-welcome p{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-content .admin-welcome p{
   color:#F0ECFF!important;
   -webkit-text-fill-color:#F0ECFF!important;
   opacity:1!important;
 }
 .admin-shell .admin-content .admin-welcome-mark,
-.admin-shell.theme-dark .admin-content .admin-welcome-mark{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-content .admin-welcome-mark{
   color:#FFFFFF!important;
   border-color:rgba(255,255,255,.42)!important;
   background:rgba(255,255,255,.16)!important;
 }
 .admin-shell .admin-content .admin-welcome-mark svg,
-.admin-shell.theme-dark .admin-content .admin-welcome-mark svg{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-content .admin-welcome-mark svg{
   color:#FFFFFF!important;
   stroke:currentColor!important;
 }
@@ -9590,14 +9590,14 @@ html[data-theme="dark"] .auth-gate,
 .app-shell:not(.theme-dark) .profile-avatar-wrap .profile-avatar-edit svg{
   color:#FFFFFF!important;stroke:#FFFFFF!important;
 }
-.app-shell.theme-dark .profile-avatar-wrap .profile-avatar-edit{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .profile-avatar-wrap .profile-avatar-edit{
   background:linear-gradient(145deg,#C9BCFF 0%,#B9A8FF 100%)!important;
   border:2px solid #1A1633!important;
   color:#1D135D!important;
   -webkit-text-fill-color:#1D135D!important;
   box-shadow:0 4px 14px rgba(0,0,0,.38)!important;
 }
-.app-shell.theme-dark .profile-avatar-wrap .profile-avatar-edit svg{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .profile-avatar-wrap .profile-avatar-edit svg{
   color:#1D135D!important;stroke:#1D135D!important;
 }
 .app-shell .profile-avatar-wrap .profile-avatar-edit:hover{
@@ -9660,7 +9660,7 @@ html[data-theme="dark"] .auth-gate,
 
 
 /* True dark glass navigation: background content is blurred and refracted through the translucent bar. */
-.app-shell.theme-dark .bottom-nav{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .bottom-nav{
   background:linear-gradient(125deg,rgba(93,47,255,.28) 0%,rgba(29,19,93,.34) 48%,rgba(14,11,31,.42) 100%)!important;
   border:1px solid rgba(185,168,255,.28)!important;
   box-shadow:0 16px 42px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.20),inset 0 -1px 0 rgba(185,168,255,.08)!important;
@@ -9668,7 +9668,7 @@ html[data-theme="dark"] .auth-gate,
   backdrop-filter:blur(24px) saturate(185%) contrast(108%)!important;
 }
 @media(max-width:767px){
-  .app-shell.theme-dark .bottom-nav{
+  :is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .bottom-nav{
     -webkit-backdrop-filter:blur(20px) saturate(175%) contrast(106%)!important;
     backdrop-filter:blur(20px) saturate(175%) contrast(106%)!important;
   }
@@ -9705,7 +9705,7 @@ html[data-theme="dark"] .auth-gate,
   background:var(--bg)!important;
   color:var(--fg)!important;
 }
-.admin-shell.theme-dark{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)){
   --bg:#1D135D;
   --surface:#1A1633;
   --surface-strong:#1A1633;
@@ -9772,7 +9772,7 @@ html[data-theme="dark"] .auth-gate,
   color:var(--muted)!important;
 }
 .admin-shell .admin-welcome,
-.admin-shell.theme-dark .admin-welcome{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-welcome{
   background:linear-gradient(115deg,#5B2EFF 0%,#4320C8 58%,#1D135D 100%)!important;
   color:#FFFFFF!important;
 }
@@ -9785,7 +9785,7 @@ html[data-theme="dark"] .auth-gate,
   box-shadow:none!important;
 }
 .admin-shell .admin-sidebar nav button.active,
-.admin-shell.theme-dark .admin-sidebar nav button.active{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-sidebar nav button.active{
   color:#FFFFFF!important;
   background:#5B2EFF!important;
   border-color:#5B2EFF!important;
@@ -9853,7 +9853,7 @@ html[data-theme="dark"] .auth-gate,
   border-color:#F2D9A6!important;
   color:#805B16!important;
 }
-.admin-shell.theme-dark .admin-notice{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-notice{
   background:#302448!important;
   border-color:rgba(255,176,32,.3)!important;
   color:#FFD98A!important;
@@ -9862,7 +9862,7 @@ html[data-theme="dark"] .auth-gate,
   border-color:rgba(91,46,255,.18)!important;
   border-top-color:#5B2EFF!important;
 }
-.admin-shell.theme-dark .admin-spinner{
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-spinner{
   border-color:rgba(185,168,255,.2)!important;
   border-top-color:#B9A8FF!important;
 }
@@ -9875,7 +9875,7 @@ html[data-theme="dark"] .auth-gate,
   color:#5B2EFF!important;
   border-color:var(--line)!important;
 }
-.admin-shell.theme-dark :is(.admin-mini-profile>span,.admin-metric>span,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) :is(.admin-mini-profile>span,.admin-metric>span,
 .admin-shortcuts button>span,.admin-empty-icon,.admin-avatar){
   background:rgba(91,46,255,.2)!important;
   color:#B9A8FF!important;
@@ -9890,8 +9890,8 @@ html[data-theme="dark"] .auth-gate,
 .admin-shell .admin-booking-card-grid strong,
 .admin-shell .admin-payment-card-grid strong,
 .admin-shell .admin-selected-event h3{color:var(--fg)!important}
-.admin-shell.theme-dark .admin-event-form label,
-.admin-shell.theme-dark .admin-payment-reject-box label{color:var(--muted)!important}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-form label,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-payment-reject-box label{color:var(--muted)!important}
 .admin-shell .admin-table-wrap{border-color:var(--line)!important;background:var(--surface)!important}
 .admin-shell .admin-table-wrap :is(th,td){border-color:var(--line)!important}
 .admin-shell .admin-table-wrap th{background:var(--surface-soft)!important;color:var(--muted)!important}
@@ -9899,9 +9899,9 @@ html[data-theme="dark"] .auth-gate,
 .admin-shell .admin-event-card-actions small,
 .admin-shell .admin-user-saving,
 .admin-shell .admin-payment-receipt{color:#5B2EFF!important}
-.admin-shell.theme-dark .admin-event-card-actions small,
-.admin-shell.theme-dark .admin-user-saving,
-.admin-shell.theme-dark .admin-payment-receipt{color:#B9A8FF!important}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-event-card-actions small,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-user-saving,
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-payment-receipt{color:#B9A8FF!important}
 
 /* Advertiser and gatekeeper workspaces live inside the main app shell. */
 .app-shell .advertiser-profile-stats,
@@ -9919,15 +9919,15 @@ html[data-theme="dark"] .auth-gate,
   color:var(--fg)!important;
   box-shadow:none;
 }
-.app-shell.theme-dark .advertiser-profile-stats,
-.app-shell.theme-dark .advertiser-event-summary,
-.app-shell.theme-dark .advertiser-metric-grid article,
-.app-shell.theme-dark .advertiser-finance-card,
-.app-shell.theme-dark .advertiser-ticket-table,
-.app-shell.theme-dark .gatekeeper-workspace,
-.app-shell.theme-dark .gatekeeper-task-grid article,
-.app-shell.theme-dark .gatekeeper-assigned-event,
-.app-shell.theme-dark .gatekeeper-counter-grid article{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .advertiser-profile-stats,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .advertiser-event-summary,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .advertiser-metric-grid article,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .advertiser-finance-card,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .advertiser-ticket-table,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .gatekeeper-workspace,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .gatekeeper-task-grid article,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .gatekeeper-assigned-event,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .gatekeeper-counter-grid article{
   background:#1A1633!important;
   border-color:rgba(185,168,255,.2)!important;
   color:#F4F2FF!important;
@@ -9947,17 +9947,17 @@ html[data-theme="dark"] .auth-gate,
   color:var(--muted)!important;
 }
 .app-shell .advertiser-ticket-table :is(th,td){border-color:var(--line)!important}
-.app-shell.theme-dark .advertiser-ticket-table th{background:#241B49!important;color:#A9A3C9!important}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .advertiser-ticket-table th{background:#241B49!important;color:#A9A3C9!important}
 .app-shell .gatekeeper-task-grid article{color:#5B2EFF!important}
-.app-shell.theme-dark .gatekeeper-task-grid article{color:#B9A8FF!important}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .gatekeeper-task-grid article{color:#B9A8FF!important}
 .app-shell .gatekeeper-workspace-head p{color:#0B7F6C!important}
-.app-shell.theme-dark .gatekeeper-workspace-head p{color:#34D399!important}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .gatekeeper-workspace-head p{color:#34D399!important}
 .app-shell .gatekeeper-result.valid,
 .app-shell .gatekeeper-network.online{
   background:#E5F5F0!important;border-color:#B8E3D5!important;color:#0B6B58!important;
 }
-.app-shell.theme-dark .gatekeeper-result.valid,
-.app-shell.theme-dark .gatekeeper-network.online{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .gatekeeper-result.valid,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .gatekeeper-network.online{
   background:rgba(20,211,180,.12)!important;border-color:rgba(20,211,180,.28)!important;color:#34D399!important;
 }
 .app-shell .gatekeeper-result.invalid,
@@ -9965,19 +9965,19 @@ html[data-theme="dark"] .auth-gate,
 .app-shell .gatekeeper-network.offline{
   background:#FFF0F2!important;border-color:#FFD0D8!important;color:#B4233C!important;
 }
-.app-shell.theme-dark .gatekeeper-result.invalid,
-.app-shell.theme-dark .gatekeeper-result.error,
-.app-shell.theme-dark .gatekeeper-network.offline{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .gatekeeper-result.invalid,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .gatekeeper-result.error,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .gatekeeper-network.offline{
   background:rgba(255,84,112,.12)!important;border-color:rgba(255,84,112,.28)!important;color:#FF7B91!important;
 }
 .app-shell .gatekeeper-result.used{
   background:#FFF8E8!important;border-color:#F2D9A6!important;color:#805B16!important;
 }
-.app-shell.theme-dark .gatekeeper-result.used{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .gatekeeper-result.used{
   background:rgba(255,176,32,.12)!important;border-color:rgba(255,176,32,.28)!important;color:#FFB020!important;
 }
 .app-shell .gatekeeper-manual-form input,
-.app-shell.theme-dark .gatekeeper-manual-form input{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .gatekeeper-manual-form input{
   background:var(--surface)!important;color:var(--fg)!important;border-color:var(--line)!important;
 }
 @media(max-width:620px){
@@ -10075,7 +10075,7 @@ html[data-theme="dark"] .auth-gate,
   outline: 3px solid rgba(91,46,255,.58) !important;
   outline-offset: 3px !important;
 }
-.app-shell.theme-dark :is(button,a,[role="button"],input,select,textarea):focus-visible {
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) :is(button,a,[role="button"],input,select,textarea):focus-visible {
   outline-color: rgba(185,168,255,.82) !important;
 }
 @media (max-width: 360px) {
@@ -10192,30 +10192,30 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 .app-shell .privacy-screen{max-width:820px;margin-inline:auto;padding:22px 18px 40px;display:grid;gap:18px}
 .app-shell .privacy-intro{padding:12px 2px 22px;border-bottom:1px solid var(--line)}
 .app-shell .privacy-eyebrow{display:inline-block;color:#5B2EFF;font-size:12px;font-weight:800;margin-bottom:10px}
-.app-shell.theme-dark .privacy-eyebrow{color:#B9A8FF}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .privacy-eyebrow{color:#B9A8FF}
 .app-shell .privacy-intro h1{margin:0 0 14px;font-size:clamp(25px,5vw,32px);font-weight:900;color:var(--fg)}
 .app-shell .privacy-intro p,.app-shell .privacy-section-card>p{margin:0;color:var(--muted);font-size:14px;line-height:2}
 .app-shell .privacy-section-card{position:relative;padding:22px;border:1px solid var(--line);border-radius:20px;background:var(--surface);color:var(--fg);box-shadow:var(--haddir-glass-shadow)}
 .app-shell .privacy-icon{width:54px;height:54px;display:grid;place-items:center;border-radius:50%;margin-bottom:16px;background:rgba(91,46,255,.11);color:#5B2EFF}
-.app-shell.theme-dark .privacy-icon{background:rgba(185,168,255,.13);color:#B9A8FF}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .privacy-icon{background:rgba(185,168,255,.13);color:#B9A8FF}
 .app-shell .privacy-section-card h2{margin:0 0 14px;font-size:21px;font-weight:900;color:var(--fg)}
 .app-shell .privacy-section-card h3{margin:0 0 10px;font-size:16px;font-weight:800;color:var(--fg)}
 .app-shell .privacy-section-card>p+p{margin-top:12px}
 .app-shell .privacy-note{margin-top:14px!important;padding:12px 14px;border-radius:12px;background:rgba(91,46,255,.06);color:var(--muted)!important;font-size:12px!important}
-.app-shell.theme-dark .privacy-note{background:rgba(185,168,255,.08)}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .privacy-note{background:rgba(185,168,255,.08)}
 .app-shell .privacy-data-group{padding:15px 0;border-bottom:1px solid var(--line)}
 .app-shell .privacy-data-group:last-child{border-bottom:0;padding-bottom:0}
 .app-shell .privacy-data-group>strong{display:flex;align-items:center;gap:9px;color:var(--fg);font-size:14px}
 .app-shell .privacy-data-group>strong svg{color:#5B2EFF}
-.app-shell.theme-dark .privacy-data-group>strong svg{color:#B9A8FF}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .privacy-data-group>strong svg{color:#B9A8FF}
 .app-shell .privacy-data-group p,.app-shell .privacy-security-row p,.app-shell .privacy-delete-option p{margin:7px 0 0;color:var(--muted);font-size:13px;line-height:1.9}
 .app-shell .privacy-security-row{display:flex;align-items:flex-start;gap:12px;padding:16px 0;border-bottom:1px solid var(--line)}
 .app-shell .privacy-security-row>svg{flex:0 0 auto;color:#5B2EFF}
-.app-shell.theme-dark .privacy-security-row>svg{color:#B9A8FF}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .privacy-security-row>svg{color:#B9A8FF}
 .app-shell .privacy-security-row strong{font-size:15px;color:var(--fg)}
 .app-shell .privacy-delete-option{margin-top:14px;padding:17px;border:1px solid var(--line);border-radius:15px;background:var(--bg)}
 .app-shell .privacy-pending-label{display:inline-flex;margin-top:13px;padding:7px 10px;border-radius:9px;background:rgba(255,176,32,.12);color:#8A5A00;font-size:11px;font-weight:800}
-.app-shell.theme-dark .privacy-pending-label{color:#FFCB70;background:rgba(255,176,32,.12)}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .privacy-pending-label{color:#FFCB70;background:rgba(255,176,32,.12)}
 .app-shell .privacy-entry-button{margin:16px 0}
 .app-shell .privacy-back-button{display:inline-flex;align-items:center;gap:5px;justify-self:start;min-height:42px;padding:7px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);font-size:12px;font-weight:800}
 .app-shell .privacy-screen-topbar{grid-template-columns:1fr auto 1fr}
@@ -10224,11 +10224,11 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 
 .app-shell .privacy-data-group p b{display:block;margin-top:9px;color:var(--fg);font-weight:850}
 .app-shell .privacy-danger-button{display:inline-flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:48px;margin-top:16px;padding:11px 16px;border:1px solid rgba(255,84,112,.45);border-radius:13px;background:rgba(255,84,112,.10);color:#D92D50;font:inherit;font-size:14px;font-weight:900;cursor:pointer;transition:background .18s ease,transform .18s ease}
-.app-shell.theme-dark .privacy-danger-button{color:#FF7188;background:rgba(255,84,112,.12);border-color:rgba(255,84,112,.42)}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .privacy-danger-button{color:#FF7188;background:rgba(255,84,112,.12);border-color:rgba(255,84,112,.42)}
 .app-shell .privacy-danger-button:active{transform:scale(.985)}
 .app-shell .privacy-danger-button:disabled{opacity:.6;cursor:wait}
 .app-shell .privacy-delete-error{margin-top:12px!important;padding:10px 12px;border-radius:10px;background:rgba(255,84,112,.10);color:#D92D50!important;font-size:12px!important;line-height:1.8}
-.app-shell.theme-dark .privacy-delete-error{color:#FF8296!important}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .privacy-delete-error{color:#FF8296!important}
 
 
 
@@ -10271,19 +10271,19 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 .app-shell .booking-gate-primary,.app-shell .booking-gate-secondary{width:100%;min-height:50px;border-radius:14px;font:inherit;font-weight:850;cursor:pointer}
 .app-shell .booking-gate-primary{border:1px solid #5B2EFF;background:#5B2EFF;color:#FFFFFF}
 .app-shell .booking-gate-secondary{margin-top:9px;border:1px solid transparent;background:transparent;color:#6B6590}
-.app-shell.theme-dark .booking-gate-backdrop{background:rgba(7,5,24,.78)}
-.app-shell.theme-dark .booking-gate-dialog{background:#1A1633;color:#F4F2FF;border-color:rgba(185,168,255,.24);box-shadow:0 28px 90px rgba(0,0,0,.48)}
-.app-shell.theme-dark .booking-gate-icon{background:rgba(185,168,255,.14);color:#B9A8FF}
-.app-shell.theme-dark .booking-gate-dialog h2{color:#F4F2FF}
-.app-shell.theme-dark .booking-gate-dialog p,.app-shell.theme-dark .booking-gate-secondary{color:#A9A3C9}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .booking-gate-backdrop{background:rgba(7,5,24,.78)}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .booking-gate-dialog{background:#1A1633;color:#F4F2FF;border-color:rgba(185,168,255,.24);box-shadow:0 28px 90px rgba(0,0,0,.48)}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .booking-gate-icon{background:rgba(185,168,255,.14);color:#B9A8FF}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .booking-gate-dialog h2{color:#F4F2FF}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .booking-gate-dialog p,:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .booking-gate-secondary{color:#A9A3C9}
 @keyframes booking-gate-enter{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(prefers-reduced-motion:reduce){.app-shell .booking-gate-dialog{animation:none}}
 
 /* Unified Haddir dialog/select visual language */
 :is(.app-shell,.admin-shell) select{min-height:44px;padding:10px 40px 10px 13px;border:1px solid var(--line,rgba(91,46,255,.2));border-radius:12px;background-color:var(--surface,#fff);color:var(--fg,#1A1533);font:inherit;font-size:13px;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235B2EFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:left 13px center}
-:is(:is(.app-shell,.admin-shell).theme-dark,.admin-shell.theme-dark) select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23B9A8FF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")}
+:is(:is(.app-shell,.admin-shell).theme-dark,:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark))) select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23B9A8FF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")}
 :is(.app-shell,.admin-shell) select:focus{border-color:#5B2EFF;box-shadow:0 0 0 3px rgba(91,46,255,.12)}
-:is(:is(.app-shell,.admin-shell).theme-dark,.admin-shell.theme-dark) select:focus{border-color:#B9A8FF;box-shadow:0 0 0 3px rgba(185,168,255,.13)}
+:is(:is(.app-shell,.admin-shell).theme-dark,:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark))) select:focus{border-color:#B9A8FF;box-shadow:0 0 0 3px rgba(185,168,255,.13)}
 :is(.app-shell,.admin-shell) select:disabled{opacity:.55;cursor:not-allowed}
 
 /* Haddir native-feeling in-app dialogs and selectors */
@@ -10303,29 +10303,29 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 :is(.app-shell,.admin-shell) .haddir-dialog-cancel{border:1px solid rgba(107,101,144,.2);background:#F6F4FF;color:#6B6590}
 :is(.app-shell,.admin-shell) .haddir-dialog-actions button:disabled,:is(.app-shell,.admin-shell) .haddir-dialog-close:disabled{opacity:.55;cursor:wait}
 :is(.app-shell,.admin-shell) .haddir-dialog-input{width:100%;min-height:48px;padding:11px 13px;border:1px solid rgba(91,46,255,.22);border-radius:12px;background:#F6F4FF;color:#1A1533;font:inherit;text-align:start;direction:ltr}
-:is(:is(.app-shell,.admin-shell).theme-dark,.admin-shell.theme-dark) .haddir-dialog-backdrop{background:rgba(7,5,24,.8)}
-:is(:is(.app-shell,.admin-shell).theme-dark,.admin-shell.theme-dark) .haddir-dialog{background:#1A1633;color:#F4F2FF;border-color:rgba(185,168,255,.24);box-shadow:0 28px 90px rgba(0,0,0,.5)}
-:is(:is(.app-shell,.admin-shell).theme-dark,.admin-shell.theme-dark) .haddir-dialog-close{background:rgba(185,168,255,.12);color:#B9A8FF}
-:is(:is(.app-shell,.admin-shell).theme-dark,.admin-shell.theme-dark) .haddir-dialog h2{color:#F4F2FF}
-:is(:is(.app-shell,.admin-shell).theme-dark,.admin-shell.theme-dark) .haddir-dialog>p{color:#A9A3C9}
-:is(:is(.app-shell,.admin-shell).theme-dark,.admin-shell.theme-dark) .haddir-dialog-cancel{background:#0E0B1F;border-color:rgba(185,168,255,.2);color:#C9C3E8}
-:is(:is(.app-shell,.admin-shell).theme-dark,.admin-shell.theme-dark) .haddir-dialog-input{background:#0E0B1F;border-color:rgba(185,168,255,.28);color:#F4F2FF}
+:is(:is(.app-shell,.admin-shell).theme-dark,:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark))) .haddir-dialog-backdrop{background:rgba(7,5,24,.8)}
+:is(:is(.app-shell,.admin-shell).theme-dark,:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark))) .haddir-dialog{background:#1A1633;color:#F4F2FF;border-color:rgba(185,168,255,.24);box-shadow:0 28px 90px rgba(0,0,0,.5)}
+:is(:is(.app-shell,.admin-shell).theme-dark,:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark))) .haddir-dialog-close{background:rgba(185,168,255,.12);color:#B9A8FF}
+:is(:is(.app-shell,.admin-shell).theme-dark,:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark))) .haddir-dialog h2{color:#F4F2FF}
+:is(:is(.app-shell,.admin-shell).theme-dark,:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark))) .haddir-dialog>p{color:#A9A3C9}
+:is(:is(.app-shell,.admin-shell).theme-dark,:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark))) .haddir-dialog-cancel{background:#0E0B1F;border-color:rgba(185,168,255,.2);color:#C9C3E8}
+:is(:is(.app-shell,.admin-shell).theme-dark,:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark))) .haddir-dialog-input{background:#0E0B1F;border-color:rgba(185,168,255,.28);color:#F4F2FF}
 :is(.app-shell,.admin-shell) .haddir-select{position:relative;width:100%;min-width:0}
 :is(.app-shell,.admin-shell) .haddir-select-trigger{width:100%;min-height:46px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 13px;border:1px solid var(--line,rgba(91,46,255,.2));border-radius:12px;background:var(--surface,#fff);color:var(--fg,#1A1533);font:inherit;font-size:13px;text-align:start;cursor:pointer}
 :is(.app-shell,.admin-shell) .haddir-select-trigger svg{flex:0 0 auto;color:#5B2EFF}
-:is(:is(.app-shell,.admin-shell).theme-dark,.admin-shell.theme-dark) .haddir-select-trigger svg{color:#B9A8FF}
+:is(:is(.app-shell,.admin-shell).theme-dark,:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark))) .haddir-select-trigger svg{color:#B9A8FF}
 :is(.app-shell,.admin-shell) .haddir-select-trigger .is-placeholder{color:var(--muted,#6B6590)}
 :is(.app-shell,.admin-shell) .haddir-select-dismiss{position:fixed;inset:0;z-index:110010;border:0;background:transparent}
 :is(.app-shell,.admin-shell) .haddir-select-menu{position:absolute;inset-inline:0;top:calc(100% + 7px);z-index:110011;max-height:260px;overflow:auto;padding:6px;border:1px solid var(--line,rgba(91,46,255,.2));border-radius:14px;background:var(--surface,#fff);box-shadow:0 16px 42px rgba(14,11,31,.2)}
 :is(.app-shell,.admin-shell) .haddir-select-option{width:100%;min-height:43px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;border:0;border-radius:9px;background:transparent;color:var(--fg,#1A1533);font:inherit;font-size:13px;text-align:start;cursor:pointer}
 :is(.app-shell,.admin-shell) .haddir-select-option:hover,:is(.app-shell,.admin-shell) .haddir-select-option.is-selected{background:rgba(91,46,255,.09);color:#5B2EFF}
-:is(:is(.app-shell,.admin-shell).theme-dark,.admin-shell.theme-dark) .haddir-select-option:hover,:is(:is(.app-shell,.admin-shell).theme-dark,.admin-shell.theme-dark) .haddir-select-option.is-selected{background:rgba(185,168,255,.13);color:#B9A8FF}
+:is(:is(.app-shell,.admin-shell).theme-dark,:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark))) .haddir-select-option:hover,:is(:is(.app-shell,.admin-shell).theme-dark,:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark))) .haddir-select-option.is-selected{background:rgba(185,168,255,.13);color:#B9A8FF}
 :is(.app-shell,.admin-shell) .haddir-select-option:disabled{opacity:.45;cursor:not-allowed}
 @keyframes haddir-dialog-in{from{opacity:0;transform:translateY(9px) scale(.985)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){:is(.app-shell,.admin-shell) .haddir-dialog{animation:none}}
 
-:is(.app-shell.theme-dark,.admin-shell.theme-dark) .haddir-select-trigger{background:#1A1633;border-color:rgba(185,168,255,.24);color:#F4F2FF}
-:is(.app-shell.theme-dark,.admin-shell.theme-dark) .haddir-select-menu{background:#1A1633;border-color:rgba(185,168,255,.24)}
+:is(:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)),:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark))) .haddir-select-trigger{background:#1A1633;border-color:rgba(185,168,255,.24);color:#F4F2FF}
+:is(:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)),:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark))) .haddir-select-menu{background:#1A1633;border-color:rgba(185,168,255,.24)}
 
 
 /* Keep custom select menus above checkout/admin content and outside clipped containers. */
@@ -10789,26 +10789,26 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 .app-shell .privacy-delete-card>p{font-size:11px;line-height:1.9}
 .app-shell .privacy-delete-card .privacy-danger-button{width:100%;min-height:48px;margin-top:3px;border-radius:13px;background:#c43d49;font-size:12px}
 .app-shell .privacy-delete-card .privacy-danger-button:focus-visible,.app-shell .legal-accordion summary:focus-visible,.app-shell .privacy-entry-button:focus-visible{outline:3px solid rgba(91,46,255,.35);outline-offset:3px}
-.app-shell.theme-dark .legal-page-hero{background:linear-gradient(135deg,rgba(145,119,255,.12),rgba(11,127,108,.1)),var(--surface)}
-.app-shell.theme-dark .legal-page-symbol{background:rgba(22,31,35,.72);color:#b6a5ff}
-.app-shell.theme-dark .legal-page-privacy .legal-page-symbol{background:rgba(11,127,108,.16);color:#5ad0b8}
-.app-shell.theme-dark .legal-page-note{background:rgba(12,20,23,.42)}
-.app-shell.theme-dark .legal-accordion summary:before{background:rgba(145,119,255,.16);color:#b6a5ff}
-.app-shell.theme-dark .legal-accordion summary:after{background:rgba(255,255,255,.05)}
-.app-shell.theme-dark .legal-accordion[open] summary:after{background:rgba(145,119,255,.18);color:#b6a5ff}
-.app-shell.theme-dark .profile-legal-icon.terms{background:rgba(145,119,255,.16);color:#b6a5ff}
-.app-shell.theme-dark .profile-legal-icon.privacy{background:rgba(11,127,108,.18);color:#5ad0b8}
-.app-shell.theme-dark .legal-page-kicker span:first-child{background:rgba(185,168,255,.14);color:#c8baff}
-.app-shell.theme-dark .legal-page-note{border-color:var(--line);color:var(--muted)}
-.app-shell.theme-dark .legal-page-note svg{color:#70d6c4}
-.app-shell.theme-dark .legal-content-heading>span{background:var(--surface);color:var(--muted)}
-.app-shell.theme-dark .legal-accordion{background:var(--surface);border-color:var(--line)}
-.app-shell.theme-dark .legal-accordion-content{border-top-color:var(--line);color:var(--muted)}
-.app-shell.theme-dark .legal-accordion-content h3{color:var(--fg)}
-.app-shell.theme-dark .privacy-delete-card{background:linear-gradient(135deg,rgba(255,84,112,.09),transparent 75%),var(--surface);border-color:rgba(255,113,136,.24)}
-.app-shell.theme-dark .privacy-delete-card h2{color:var(--fg)}
-.app-shell.theme-dark .privacy-delete-card>p{color:var(--muted)}
-.app-shell.theme-dark .privacy-delete-card .privacy-icon{background:rgba(255,113,136,.13);color:#ff8296}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .legal-page-hero{background:linear-gradient(135deg,rgba(145,119,255,.12),rgba(11,127,108,.1)),var(--surface)}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .legal-page-symbol{background:rgba(22,31,35,.72);color:#b6a5ff}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .legal-page-privacy .legal-page-symbol{background:rgba(11,127,108,.16);color:#5ad0b8}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .legal-page-note{background:rgba(12,20,23,.42)}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .legal-accordion summary:before{background:rgba(145,119,255,.16);color:#b6a5ff}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .legal-accordion summary:after{background:rgba(255,255,255,.05)}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .legal-accordion[open] summary:after{background:rgba(145,119,255,.18);color:#b6a5ff}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .profile-legal-icon.terms{background:rgba(145,119,255,.16);color:#b6a5ff}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .profile-legal-icon.privacy{background:rgba(11,127,108,.18);color:#5ad0b8}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .legal-page-kicker span:first-child{background:rgba(185,168,255,.14);color:#c8baff}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .legal-page-note{border-color:var(--line);color:var(--muted)}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .legal-page-note svg{color:#70d6c4}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .legal-content-heading>span{background:var(--surface);color:var(--muted)}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .legal-accordion{background:var(--surface);border-color:var(--line)}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .legal-accordion-content{border-top-color:var(--line);color:var(--muted)}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .legal-accordion-content h3{color:var(--fg)}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .privacy-delete-card{background:linear-gradient(135deg,rgba(255,84,112,.09),transparent 75%),var(--surface);border-color:rgba(255,113,136,.24)}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .privacy-delete-card h2{color:var(--fg)}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .privacy-delete-card>p{color:var(--muted)}
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .privacy-delete-card .privacy-icon{background:rgba(255,113,136,.13);color:#ff8296}
 
 @media(max-width:600px){
  .app-shell .privacy-screen{width:calc(100% - 26px);padding-top:14px;gap:14px}
@@ -10866,18 +10866,18 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
   right:-78px;
   bottom:-122px;
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-about:after,
-.app-shell.theme-dark .home-discovery .event-list-card:before,
-.app-shell.theme-dark .tickets-screen .ticket-preview-card:before{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .detail-about:after,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .home-discovery .event-list-card:before,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen .ticket-preview-card:before{
   border-color:rgba(185,168,255,.22);
   box-shadow:0 0 0 18px rgba(185,168,255,.055),0 0 0 38px rgba(145,119,255,.045),0 0 0 60px rgba(90,208,184,.025);
   background:radial-gradient(circle,rgba(145,119,255,.13),rgba(90,208,184,.055) 48%,transparent 72%);
 }
-.app-shell.theme-dark .event-detail-layout:not(.payment-sheet) .detail-about{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .event-detail-layout:not(.payment-sheet) .detail-about{
   background:#1A1633!important;
 }
-.app-shell.theme-dark .home-discovery .event-list-card,
-.app-shell.theme-dark .tickets-screen .ticket-preview-card{
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .home-discovery .event-list-card,
+:is(.app-shell.theme-dark, html[data-theme="dark"] .app-shell:not(.theme-dark)) .tickets-screen .ticket-preview-card{
   background:var(--surface)!important;
 }
 @media(max-width:520px){
@@ -10966,10 +10966,10 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
 .admin-broadcast-feedback{margin-top:15px;padding:12px 14px;border-radius:12px;font-size:12px;line-height:1.8}
 .admin-broadcast-feedback.success{background:#edf8f1;color:#267344}
 .admin-broadcast-feedback.error{background:#fff1f0;color:#a23d35}
-.admin-shell.theme-dark .admin-broadcast-panel{background:#18272d;border-color:#2a4149}
-.admin-shell.theme-dark .admin-broadcast-panel h2,.admin-shell.theme-dark .admin-broadcast-label{color:#eef7f8}
-.admin-shell.theme-dark .admin-broadcast-textarea{background:#101d22;border-color:#38515a;color:#f0f7f8}
-.admin-shell.theme-dark .admin-broadcast-cancel{border-color:#38515a;color:#e5eff1}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-broadcast-panel{background:#18272d;border-color:#2a4149}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-broadcast-panel h2,:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-broadcast-label{color:#eef7f8}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-broadcast-textarea{background:#101d22;border-color:#38515a;color:#f0f7f8}
+:is(.admin-shell.theme-dark, html[data-theme="dark"] .admin-shell:not(.theme-dark)) .admin-broadcast-cancel{border-color:#38515a;color:#e5eff1}
 @media(max-width:600px){.admin-broadcast-panel{padding:17px;border-radius:16px}.admin-broadcast-actions{align-items:stretch;flex-direction:column}.admin-broadcast-send,.admin-broadcast-cancel{width:100%}}
 
 /* Event statistics report — unified screen and PDF presentation */
