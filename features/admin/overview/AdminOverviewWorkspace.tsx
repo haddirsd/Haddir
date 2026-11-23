@@ -3,6 +3,7 @@
 import { Activity, ArrowRight, CalendarDays, ClipboardCheck, RefreshCw, Ticket, Users, Wallet, ScrollText } from "lucide-react";
 import { useAdminOverview } from "./useAdminOverview";
 import type { AdminOverviewRole } from "./admin-overview.types";
+import { SkeletonState } from "../../../components/ui/SkeletonState";
 
 type Section = "events" | "bookings" | "payments" | "users" | "reports" | "activity";
 export default function AdminOverviewWorkspace({
@@ -20,7 +21,7 @@ export default function AdminOverviewWorkspace({
   return <section className="admin-overview-workspace">
     <div className="admin-panel-head"><div><h3>{supervisor?"المهام اليومية":"نظرة سريعة"}</h3><p>بيانات مباشرة من قاعدة بيانات حاضر</p></div><button className="admin-refresh" type="button" onClick={()=>void refresh()} disabled={loading}><RefreshCw size={16}/> تحديث</button></div>
     {error&&<div className="admin-notice" role="alert">{error}</div>}
-    <div className="admin-metric-grid">{metrics.map(metric=><article className="admin-metric" key={metric.title}><span><metric.icon size={20}/></span><small>{metric.title}</small><strong>{number(metric.value)}</strong></article>)}</div>
+    {loading?<SkeletonState variant="dashboard" count={metrics.length} label="جاري تحميل ملخص الإدارة..." />:<div className="admin-metric-grid">{metrics.map(metric=><article className="admin-metric" key={metric.title}><span><metric.icon size={20}/></span><small>{metric.title}</small><strong>{number(metric.value)}</strong></article>)}</div>}
     <div className="admin-panel"><div className="admin-panel-head"><div><h3>اختصارات الإدارة</h3><p>انتقل مباشرة إلى مساحة العمل المطلوبة</p></div></div><div className="admin-shortcuts">{shortcuts.map(item=><button key={item} onClick={()=>onNavigate(item)}><span>{item==="events"?<CalendarDays/>:item==="bookings"?<Ticket/>:item==="payments"?<Wallet/>:item==="users"?<Users/>:item==="reports"?<Activity/>:<ScrollText/>}</span><b>{labels[item]}</b><ArrowRight size={16}/></button>)}</div></div>
   </section>;
 }
