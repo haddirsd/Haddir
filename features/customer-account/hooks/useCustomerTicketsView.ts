@@ -44,6 +44,7 @@ export function useCustomerTicketsView(
     filter,
     page,
     expandedTicketId,
+    setPage,
     changeFilter,
     changePage,
     toggleTicket,
