@@ -11,10 +11,17 @@ export function useCustomerTicketsView(
   setNotice: (message: string) => void,
 ) {
   const [filter, setFilter] = useState<TicketFilter>("new");
+  const [page, setPage] = useState(1);
   const [expandedTicketId, setExpandedTicketId] = useState<string | null>(null);
 
   const changeFilter = (nextFilter: TicketFilter) => {
     setFilter(nextFilter);
+    setPage(1);
+    setExpandedTicketId(null);
+  };
+
+  const changePage = (nextPage: number) => {
+    setPage(Math.max(1, nextPage));
     setExpandedTicketId(null);
   };
 
@@ -35,8 +42,10 @@ export function useCustomerTicketsView(
 
   return {
     filter,
+    page,
     expandedTicketId,
     changeFilter,
+    changePage,
     toggleTicket,
     downloadTicket,
   };
