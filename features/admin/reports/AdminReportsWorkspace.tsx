@@ -117,7 +117,7 @@ export default function AdminReportsWorkspace() {
                     <h3 className="admin-report-subtitle">حالة التذاكر والدخول</h3>
                     <div className="admin-report-status-list">
                       <div><span>صالحة ولم تستخدم</span><b>{fmtCount(Math.max(0,Number(eventMetric.ticket_total||0)-Number(eventMetric.ticket_used||0)-Number(eventMetric.ticket_invalid||0)))}</b></div>
-                      <div><span>تم استخدامها عند البوابة</span><b>{fmtCount(checkedInTickets.length)}</b></div>
+                      <div><span>تم استخدامها عند البوابة</span><b>{fmtCount(Number(eventMetric.ticket_used||0))}</b></div>
                       <div><span>غير صالحة / ملغاة</span><b>{fmtCount(Number(eventMetric.ticket_invalid||0))}</b></div>
                       <div><span>إجمالي الكمية المحجوزة قيد المراجعة</span><b>{fmtCount(sum(eventTicketRows,"reserved"))}</b></div>
                     </div>
