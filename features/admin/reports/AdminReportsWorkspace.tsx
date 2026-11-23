@@ -27,7 +27,7 @@ export default function AdminReportsWorkspace() {
           const bookingStats=data.bookings;
           const ticketStats=data.tickets;
           const eventMetrics=data.eventMetrics as Row[];
-          const eventMetricById=new Map(eventMetrics.map((item:Row)=>[item.event_id,item]));
+          const eventMetricById=new Map<string,Row>(eventMetrics.map((item:Row)=>[item.event_id,item] as [string,Row]));
           const allTicketTypes=data.events.flatMap(e=>e.ticket_types||[]);
           const totalCapacity=sum(allTicketTypes,"quantity_total");
           const soldAttendees=Number(bookingStats.sold_quantity||0);
@@ -52,7 +52,7 @@ export default function AdminReportsWorkspace() {
           });
           const eventRevenueRows=eventMetric.revenue||[];
           const eventCommissionRows=eventMetric.commission||[];
-          const commissionByCurrency=new Map(eventCommissionRows.map((item:Row)=>[item.currency,Number(item.value||0)]));
+          const commissionByCurrency=new Map<string,number>(eventCommissionRows.map((item:Row)=>[item.currency,Number(item.value||0)] as [string,number]));
           const eventNetRows=eventRevenueRows.map((item:Row)=>({currency:item.currency,value:Number(item.value||0)-Number(commissionByCurrency.get(item.currency)||0)}));
           const bookingPageCount=Math.max(1,Math.ceil(eventPage.bookingTotal/pageSize));
           const ticketPageCount=Math.max(1,Math.ceil(eventPage.ticketTotal/pageSize));
