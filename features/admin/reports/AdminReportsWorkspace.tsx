@@ -11,9 +11,12 @@ const statusLabels: Record<string,string> = {draft:"مسودة",published:"من�
 const money = (value: unknown, currency = "SDG") => value == null ? "—" : `${Number(value).toLocaleString("ar-SD-u-nu-latn")} ${currency}`;
 
 export default function AdminReportsWorkspace() {
-  const { statistics, loading, error, refresh } = useAdminReports();
   const [statsView,setStatsView] = useState<"general"|"event">("general");
   const [statsEventId,setStatsEventId] = useState("");
+  const [bookingsPage,setBookingsPage] = useState(1);
+  const [ticketsPage,setTicketsPage] = useState(1);
+  const pageSize = 50;
+  const { statistics, eventPage, loading, error, refresh } = useAdminReports(statsEventId,bookingsPage,ticketsPage);
 
   const renderReport = () => {
     const data=statistics;
@@ -21,9 +24,10 @@ export default function AdminReportsWorkspace() {
           const fmtCount=(v:number)=>v.toLocaleString("ar-SD-u-nu-latn");
           const sum=(items:Row[],field:string)=>items.reduce((n,x)=>n+Number(x[field]||0),0);
           const moneyLines=(items:Row[],field:string)=>{const grouped=new Map<string,number>();items.forEach(x=>{const c=String(x.currency||"SDG").trim();grouped.set(c,(grouped.get(c)||0)+Number(x[field]||0));});return grouped.size?Array.from(grouped.entries()).map(([c,v])=>money(v,c)).join(" · "):money(0,"SDG");};
-          const confirmed=data.bookings.filter(x=>x.status==="confirmed");
-          const rejected=data.bookings.filter(x=>x.status==="rejected");
-          const pending=data.bookings.filter(x=>["pending_payment","under_review"].includes(x.status));
+          const bookingStats=data.bookings;
+          const ticketStats=data.tickets;
+          const eventMetrics=data.eventMetrics as Row[];
+          const eventMetricById=new Map(eventMetrics.map((item:Row)=>[item.event_id,item]));
           const allTicketTypes=data.events.flatMap(e=>e.ticket_types||[]);
           const totalCapacity=sum(allTicketTypes,"quantity_total");
           const soldAttendees=sum(confirmed.flatMap(b=>b.booking_items||[]),"quantity");
@@ -32,31 +36,27 @@ export default function AdminReportsWorkspace() {
           const rejectedQty=sum(rejected.flatMap(b=>b.booking_items||[]),"quantity");
           const currentEvents=data.events.filter(e=>e.status==="published"&&(!e.ends_at||new Date(e.ends_at).getTime()>=Date.now()));
           const pastEvents=data.events.filter(e=>e.status==="completed"||(!!e.ends_at&&new Date(e.ends_at).getTime()<Date.now()));
-          const roleCounts=(r:string)=>data.profiles.filter(p=>p.role===r||(r==="gatekeeper"&&p.role==="organizer")).length;
-          const revenueRows=confirmed.map(b=>({currency:b.currency,value:Number(b.subtotal||0)}));
-          const commissionRows=confirmed.map(b=>({currency:b.currency,value:Math.round((Number(b.subtotal||0)*Number(data.events.find(e=>e.id===b.event_id)?.platform_fee_percent||0)/100)*100)/100}));
+          const roleCounts=(r:string)=>Number(data.profiles[r]||0)+(r==="gatekeeper"?Number(data.profiles.organizer||0):0);
+          const revenueRows=bookingStats.revenue||[];
+          const commissionRows=bookingStats.commission||[];
           const event=data.events.find(e=>e.id===statsEventId);
-          const eventBookings=event?data.bookings.filter(b=>b.event_id===event.id):[];
-          const eventConfirmed=eventBookings.filter(b=>b.status==="confirmed");
-          const eventPending=eventBookings.filter(b=>["pending_payment","under_review"].includes(b.status));
-          const eventRejected=eventBookings.filter(b=>b.status==="rejected");
-          const eventPeople=new Set(eventBookings.filter(b=>!["rejected","cancelled","expired"].includes(b.status)).map(b=>b.user_id||b.customer_email||b.customer_phone||b.id)).size;
-          const eventTickets=data.tickets.filter(t=>t.event_id===event?.id);
-          const checkedInTickets=eventTickets.filter(t=>t.status==="used");
-
+          const eventMetric=(event&&eventMetricById.get(event.id))||{};
+          const eventBookings=eventPage.bookings;
+          const eventTickets=eventPage.tickets;
           const eventTicketRows=(event?.ticket_types||[]).map((type:Row)=>{
-            const items=eventConfirmed.flatMap(b=>b.booking_items||[]).filter((i:any)=>i.ticket_type_id===type.id);
-            const reservedItems=eventPending.flatMap(b=>b.booking_items||[]).filter((i:any)=>i.ticket_type_id===type.id);
-            const rejectedItems=eventRejected.flatMap(b=>b.booking_items||[]).filter((i:any)=>i.ticket_type_id===type.id);
-            const sold=sum(items,"quantity");
-            const reserved=sum(reservedItems,"quantity");
+            const metric=(eventMetric.ticket_type_metrics||[]).find((item:Row)=>item.ticket_type_id===type.id)||{};
+            const sold=Number(metric.sold||0);
+            const reserved=Number(metric.reserved||0);
             const inventoryUsed=Number(type.quantity_sold??(sold+reserved));
-            const revenue=items.reduce((n,i:any)=>n+Number(i.line_total||Number(i.unit_price||0)*Number(i.quantity||0)),0);
-            return {...type,sold,reserved,rejectedCount:sum(rejectedItems,"quantity"),revenue,remaining:type.quantity_total==null?"غير محدود":Math.max(0,Number(type.quantity_total)-inventoryUsed)};
+            return {...type,sold,reserved,rejectedCount:Number(metric.rejected||0),revenue:Number(metric.revenue||0),remaining:type.quantity_total==null?"غير محدود":Math.max(0,Number(type.quantity_total)-inventoryUsed)};
           });
-          const eventRevenueRows=eventConfirmed.flatMap(b=>(b.booking_items||[]).map((i:any)=>({currency:i.ticket_types?.currency||b.currency,value:Number(i.line_total||Number(i.unit_price||0)*Number(i.quantity||0))})));
-          const eventCommissionRows=eventRevenueRows.map(x=>({currency:x.currency,value:Math.round((x.value*Number(event?.platform_fee_percent||0)/100)*100)/100}));
-          const eventNetRows=eventRevenueRows.map(x=>({currency:x.currency,value:x.value*(1-Number(event?.platform_fee_percent||0)/100)}));
+          const eventRevenueRows=eventMetric.revenue||[];
+          const eventCommissionRows=eventMetric.commission||[];
+          const commissionByCurrency=new Map(eventCommissionRows.map((item:Row)=>[item.currency,Number(item.value||0)]));
+          const eventNetRows=eventRevenueRows.map((item:Row)=>({currency:item.currency,value:Number(item.value||0)-Number(commissionByCurrency.get(item.currency)||0)}));
+          const bookingPageCount=Math.max(1,Math.ceil(eventPage.bookingTotal/pageSize));
+          const ticketPageCount=Math.max(1,Math.ceil(eventPage.ticketTotal/pageSize));
+          const pager=(kind:"bookings"|"tickets",page:number,total:number,pages:number)=> <div className="admin-pagination" style={{display:"flex",alignItems:"center",justifyContent:"center",gap:12,margin:"12px 0"}}><button type="button" className="admin-refresh" disabled={loading||page<=1} onClick={()=>kind==="bookings"?setBookingsPage(value=>Math.max(1,value-1)):setTicketsPage(value=>Math.max(1,value-1))}>السابق</button><span>صفحة {fmtCount(page)} من {fmtCount(pages)} · {fmtCount(total)} سجل</span><button type="button" className="admin-refresh" disabled={loading||page>=pages} onClick={()=>kind==="bookings"?setBookingsPage(value=>value+1):setTicketsPage(value=>value+1)}>التالي</button></div>;
           const metricCards=(items:{title:string;value:string|number;hint?:string}[]) => <div className="admin-metric-grid">{items.map(x=><article className="admin-metric" key={x.title}><small>{x.title}</small><strong>{typeof x.value==="number"?fmtCount(x.value):x.value}</strong>{x.hint&&<span className="admin-stat-hint">{x.hint}</span>}</article>)}</div>;
           return <div className="admin-statistics">
             <div className="admin-stat-tabs">
@@ -67,16 +67,16 @@ export default function AdminReportsWorkspace() {
               <h3 className="admin-stats-heading">ملخص الفعاليات</h3>
               {metricCards([{title:"كل الفعاليات",value:data.events.length},{title:"الفعاليات الحالية",value:currentEvents.length},{title:"الفعاليات السابقة",value:pastEvents.length},{title:"المسودات",value:data.events.filter(e=>e.status==="draft").length},{title:"الفعاليات الملغاة",value:data.events.filter(e=>e.status==="cancelled").length}])}
               <h3 className="admin-stats-heading">المستخدمون والأدوار</h3>
-              {metricCards([{title:"إجمالي المستخدمين",value:data.profiles.length},{title:"العملاء",value:roleCounts("customer")},{title:"البوابون",value:roleCounts("gatekeeper")},{title:"الموظفون",value:roleCounts("supervisor")},{title:"المشرفون",value:roleCounts("admin")},{title:"المعلنون",value:roleCounts("advertiser")}])}
+              {metricCards([{title:"إجمالي المستخدمين",value:Object.values(data.profiles).reduce((n,v)=>n+Number(v||0),0)},{title:"العملاء",value:roleCounts("customer")},{title:"البوابون",value:roleCounts("gatekeeper")},{title:"الموظفون",value:roleCounts("supervisor")},{title:"المشرفون",value:roleCounts("admin")},{title:"المعلنون",value:roleCounts("advertiser")}])}
               <h3 className="admin-stats-heading">التذاكر والحجوزات</h3>
-              {metricCards([{title:"إجمالي سعة التذاكر",value:totalCapacity},{title:"الأشخاص في التذاكر المؤكدة",value:soldAttendees},{title:"رموز الدخول المستخدمة",value:data.tickets.filter(t=>t.status==="used").length},{title:"محجوزة قيد الدفع/المراجعة",value:reservedAttendees},{title:"التذاكر المتاحة فعلياً",value:remainingCapacity},{title:"ضمن حجوزات مرفوضة",value:rejectedQty},{title:"إجمالي الحجوزات",value:data.bookings.length},{title:"الحجوزات المؤكدة",value:confirmed.length},{title:"الحجوزات المرفوضة",value:rejected.length},{title:"بانتظار الدفع/المراجعة",value:pending.length}])}
+              {metricCards([{title:"إجمالي سعة التذاكر",value:totalCapacity},{title:"الأشخاص في التذاكر المؤكدة",value:soldAttendees},{title:"رموز الدخول المستخدمة",value:Number(ticketStats.used||0)},{title:"محجوزة قيد الدفع/المراجعة",value:reservedAttendees},{title:"التذاكر المتاحة فعلياً",value:remainingCapacity},{title:"ضمن حجوزات مرفوضة",value:rejectedQty},{title:"إجمالي الحجوزات",value:Number(bookingStats.total||0)},{title:"الحجوزات المؤكدة",value:Number(bookingStats.confirmed||0)},{title:"الحجوزات المرفوضة",value:Number(bookingStats.rejected||0)},{title:"بانتظار الدفع/المراجعة",value:Number(bookingStats.pending||0)}])}
               <h3 className="admin-stats-heading">المبيعات وأرباح المنصة</h3>
               {metricCards([{title:"إجمالي المبيعات المعتمدة",value:moneyLines(revenueRows,"value")},{title:"صافي دخل المنصة (العمولة)",value:moneyLines(commissionRows,"value"),hint:"حسب نسبة العمولة لكل فعالية، قبل المصروفات التشغيلية"}])}
               <h3 className="admin-stats-heading">ملخص كل فعالية</h3>
-              <div className="admin-table-wrap"><table className="admin-data-table"><thead><tr><th>الفعالية</th><th>الحالة</th><th>الحجوزات</th><th>التذاكر المؤكدة</th><th>قيد الدفع/المراجعة</th><th>السعة</th><th>المتبقي فعلياً</th><th>المبيعات المعتمدة</th><th>دخل المنصة</th></tr></thead><tbody>{data.events.map(e=>{const eb=data.bookings.filter(b=>b.event_id===e.id);const ec=eb.filter(b=>b.status==="confirmed");const issued=sum(ec.flatMap(b=>b.booking_items||[]),"quantity");const ep=eb.filter(b=>["pending_payment","under_review"].includes(b.status));const reserved=sum(ep.flatMap(b=>b.booking_items||[]),"quantity");const sales=ec.map(b=>({currency:b.currency,value:Number(b.subtotal||0)}));const fees=ec.map(b=>({currency:b.currency,value:Math.round((Number(b.subtotal||0)*Number(e.platform_fee_percent||0)/100)*100)/100}));const caps=e.ticket_types||[];return <tr key={e.id}><td>{e.title}</td><td>{statusLabels[e.status]||e.status}</td><td>{fmtCount(eb.length)}</td><td>{fmtCount(issued)}</td><td>{fmtCount(reserved)}</td><td>{fmtCount(sum(caps,"quantity_total"))}</td><td>{fmtCount(Math.max(0,sum(caps,"quantity_total")-sum(caps,"quantity_sold")))}</td><td>{moneyLines(sales,"value")}</td><td>{moneyLines(fees,"value")}</td></tr>;})}</tbody></table></div>
+              <div className="admin-table-wrap"><table className="admin-data-table"><thead><tr><th>الفعالية</th><th>الحالة</th><th>الحجوزات</th><th>التذاكر المؤكدة</th><th>قيد الدفع/المراجعة</th><th>السعة</th><th>المتبقي فعلياً</th><th>المبيعات المعتمدة</th><th>دخل المنصة</th></tr></thead><tbody>{data.events.map(e=>{const m=eventMetricById.get(e.id)||{};const caps=e.ticket_types||[];return <tr key={e.id}><td>{e.title}</td><td>{statusLabels[e.status]||e.status}</td><td>{fmtCount(Number(m.booking_total||0))}</td><td>{fmtCount(Number(m.sold_quantity||0))}</td><td>{fmtCount(Number(m.reserved_quantity||0))}</td><td>{fmtCount(sum(caps,"quantity_total"))}</td><td>{fmtCount(Math.max(0,sum(caps,"quantity_total")-sum(caps,"quantity_sold")))}</td><td>{moneyLines(m.revenue||[],"value")}</td><td>{moneyLines(m.commission||[],"value")}</td></tr>;})}</tbody></table></div>
               <p className="admin-stats-note">المبيعات تشمل الحجوزات المؤكدة فقط. دخل المنصة هو قيمة العمولة المحسوبة من نسبة كل فعالية، قبل المصروفات التشغيلية. الطلبات المرفوضة والمعلقة لا تدخل في الإيرادات.</p>
             </>:<>
-              <div className="admin-event-stat-select"><label htmlFor="stats-event-select">اختار الفعالية</label><HaddirSelect ariaLabel="اختيار الفعالية للإحصائيات" value={statsEventId} onChange={setStatsEventId} placeholder="اختر فعالية..." options={[{value:"",label:"اختر فعالية..."},...data.events.map(e=>({value:e.id,label:e.title+" — "+(statusLabels[e.status]||e.status)}))]}/></div>
+              <div className="admin-event-stat-select"><label htmlFor="stats-event-select">اختار الفعالية</label><HaddirSelect ariaLabel="اختيار الفعالية للإحصائيات" value={statsEventId} onChange={value=>{setStatsEventId(value);setBookingsPage(1);setTicketsPage(1);}} placeholder="اختر فعالية..." options={[{value:"",label:"اختر فعالية..."},...data.events.map(e=>({value:e.id,label:e.title+" — "+(statusLabels[e.status]||e.status)}))]}/></div>
               {!event?<p className="admin-no-data">اختار فعالية عشان تظهر إحصائياتها.</p>:<>
                 <div className="admin-selected-event"><div><small>الفعالية المحددة</small><h3>{event.title}</h3><span>{statusLabels[event.status]||event.status} · عمولة المنصة {Number(event.platform_fee_percent||0)}%</span></div><button className="admin-print-button" type="button" onClick={()=>window.print()}>تحميل تقرير الفعالية PDF</button></div>
                 <div className="admin-event-report" dir="rtl">
@@ -102,12 +102,12 @@ export default function AdminReportsWorkspace() {
                   <section className="admin-report-page">
                     <div className="admin-report-section-head"><span>01 / الملخص التنفيذي</span><h2>نظرة عامة على الأداء</h2><p>ملخص الحجوزات، أعداد التذاكر، المبيعات، ومؤشرات الدخول.</p></div>
                     <div className="admin-report-kpi-grid">
-                      <article><small>عدد الحاجزين</small><strong>{fmtCount(eventPeople)}</strong><span>حجوزات غير مرفوضة أو ملغاة أو منتهية</span></article>
-                      <article><small>الحجوزات المؤكدة</small><strong>{fmtCount(eventConfirmed.length)}</strong><span>حجوزات تم اعتمادها</span></article>
-                      <article><small>قيد الدفع / المراجعة</small><strong>{fmtCount(eventPending.length)}</strong><span>طلبات لم تكتمل مراجعتها</span></article>
-                      <article><small>الحجوزات المرفوضة</small><strong>{fmtCount(eventRejected.length)}</strong><span>طلبات لم يتم اعتمادها</span></article>
-                      <article><small>التذاكر المصدرة</small><strong>{fmtCount(eventTickets.length)}</strong><span>إجمالي رموز الدخول</span></article>
-                      <article><small>تم تسجيل الدخول</small><strong>{fmtCount(checkedInTickets.length)}</strong><span>{eventTickets.length?Math.round(checkedInTickets.length/eventTickets.length*100):0}% من التذاكر المصدرة</span></article>
+                      <article><small>عدد الحاجزين</small><strong>{fmtCount(Number(eventMetric.people_count||0))}</strong><span>حجوزات غير مرفوضة أو ملغاة أو منتهية</span></article>
+                      <article><small>الحجوزات المؤكدة</small><strong>{fmtCount(Number(eventMetric.confirmed_count||0))}</strong><span>حجوزات تم اعتمادها</span></article>
+                      <article><small>قيد الدفع / المراجعة</small><strong>{fmtCount(Number(eventMetric.pending_count||0))}</strong><span>طلبات لم تكتمل مراجعتها</span></article>
+                      <article><small>الحجوزات المرفوضة</small><strong>{fmtCount(Number(eventMetric.rejected_count||0))}</strong><span>طلبات لم يتم اعتمادها</span></article>
+                      <article><small>التذاكر المصدرة</small><strong>{fmtCount(Number(eventMetric.ticket_total||0))}</strong><span>إجمالي رموز الدخول</span></article>
+                      <article><small>تم تسجيل الدخول</small><strong>{fmtCount(Number(eventMetric.ticket_used||0))}</strong><span>{Number(eventMetric.ticket_total||0)?Math.round(Number(eventMetric.ticket_used||0)/Number(eventMetric.ticket_total||0)*100):0}% من التذاكر المصدرة</span></article>
                     </div>
                     <div className="admin-report-highlight">
                       <div><small>إجمالي المبيعات المعتمدة</small><strong>{moneyLines(eventRevenueRows,"value")}</strong></div>
@@ -116,9 +116,9 @@ export default function AdminReportsWorkspace() {
                     </div>
                     <h3 className="admin-report-subtitle">حالة التذاكر والدخول</h3>
                     <div className="admin-report-status-list">
-                      <div><span>صالحة ولم تستخدم</span><b>{fmtCount(eventTickets.filter(t=>t.status==="valid").length)}</b></div>
+                      <div><span>صالحة ولم تستخدم</span><b>{fmtCount(Math.max(0,Number(eventMetric.ticket_total||0)-Number(eventMetric.ticket_used||0)-Number(eventMetric.ticket_invalid||0)))}</b></div>
                       <div><span>تم استخدامها عند البوابة</span><b>{fmtCount(checkedInTickets.length)}</b></div>
-                      <div><span>غير صالحة / ملغاة</span><b>{fmtCount(eventTickets.filter(t=>!["valid","used"].includes(t.status)).length)}</b></div>
+                      <div><span>غير صالحة / ملغاة</span><b>{fmtCount(Number(eventMetric.ticket_invalid||0))}</b></div>
                       <div><span>إجمالي الكمية المحجوزة قيد المراجعة</span><b>{fmtCount(sum(eventTicketRows,"reserved"))}</b></div>
                     </div>
                     <p className="admin-report-note">تُحتسب المبيعات من الحجوزات المؤكدة فقط. صافي المنظم هو المبيعات المعتمدة بعد خصم عمولة المنصة، ولا يشمل المصروفات التشغيلية أو التسويات الخارجية.</p>
@@ -140,13 +140,15 @@ export default function AdminReportsWorkspace() {
                   <section className="admin-report-page admin-report-register">
                     <div className="admin-report-section-head"><span>03 / سجل الحجوزات</span><h2>تفاصيل طلبات الحجز</h2><p>سجل تفصيلي للحجوزات المرتبطة بهذه الفعالية.</p></div>
                     <div className="admin-report-table-wrap"><table><thead><tr><th>رقم الحجز</th><th>تاريخ الطلب</th><th>التذاكر</th><th>القيمة</th><th>الحالة</th></tr></thead><tbody>{eventBookings.map((b:Row)=><tr key={b.id}><td>{b.booking_number||b.id.slice(0,8)}</td><td>{b.created_at?new Date(b.created_at).toLocaleDateString("ar-SD-u-nu-latn"):"—"}</td><td>{(b.booking_items||[]).map((i:Row)=>`${i.ticket_types?.name||"تذكرة"} × ${i.quantity}`).join("، ")||"—"}</td><td>{money(b.subtotal,b.currency)}</td><td><span className={`admin-report-status status-${b.status}`}>{statusLabels[b.status]||b.status}</span></td></tr>)}</tbody></table></div>
-                    <div className="admin-report-footer"><span>بيانات الحجز كما هي مسجلة في النظام</span><b>04</b></div>
+                    {pager("bookings",bookingsPage,eventPage.bookingTotal,bookingPageCount)}
+                    <div className="admin-report-footer"><span>بيانات الحجوزات · الصفحة الحالية من السجل</span><b>04</b></div>
                   </section>
 
                   <section className="admin-report-page admin-report-register">
                     <div className="admin-report-section-head"><span>04 / سجل الدخول</span><h2>التذاكر والتحقق عند البوابة</h2><p>حالة رموز الدخول ووقت استخدامها عند التحقق.</p></div>
                     <div className="admin-report-table-wrap"><table><thead><tr><th>كود التذكرة</th><th>اسم حامل التذكرة</th><th>الفئة</th><th>الحالة</th><th>وقت الدخول</th></tr></thead><tbody>{eventTickets.map((t:Row)=><tr key={t.id}><td dir="ltr">{t.ticket_code||"—"}</td><td>{t.attendee_name||"—"}</td><td>{eventTicketRows.find((x: Row)=>x.id===t.ticket_type_id)?.name||"—"}</td><td>{t.status==="used"?"تم الدخول":t.status==="valid"?"صالحة":"غير صالحة"}</td><td>{t.used_at?new Date(t.used_at).toLocaleString("ar-SD-u-nu-latn"):"—"}</td></tr>)}</tbody></table></div>
-                    <div className="admin-report-note">هذا السجل يعرض بيانات التذاكر المتاحة في النظام وقت إصدار التقرير. أي دخول يتم بعد ذلك لن يظهر إلا في تقرير جديد.</div>
+                    {pager("tickets",ticketsPage,eventPage.ticketTotal,ticketPageCount)}
+                    <div className="admin-report-note">هذا السجل يعرض بيانات التذاكر · الصفحة الحالية من السجل في النظام وقت إصدار التقرير. أي دخول يتم بعد ذلك لن يظهر إلا في تقرير جديد.</div>
                     <div className="admin-report-footer"><span>حاضر · نهاية التقرير</span><b>05</b></div>
                   </section>
                 </div>
