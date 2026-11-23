@@ -63,6 +63,7 @@ function mapPublishedEvent(event: any, ticketRows: any[], index: number): EventI
 
   return {
     id: event.id,
+    startsAt: event.starts_at || null,
     date: event.is_continuous ? "تذكرة مستمرة" : formatEventDate(event.starts_at),
     title: event.title,
     place: event.city || "",
