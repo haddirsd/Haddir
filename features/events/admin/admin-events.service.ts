@@ -1,7 +1,7 @@
 import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import type { AdminEventEditorData, AdminEventFormValues, AdminEventRow, AdminTicketForm, AdminEventAccountForm } from "./admin-events.types";
 
-const ADMIN_EVENTS_PAGE_SIZE = 100;
+const ADMIN_EVENTS_PAGE_SIZE = 25;
 const COVER_IMAGE_EXTENSIONS: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png": "png",
@@ -14,26 +14,20 @@ const parseDateTime = (value: string): Date | null => {
   return Number.isNaN(date.getTime()) ? null : date;
 };
 
-export async function listAdminEvents(): Promise<{ data: AdminEventRow[]; error: string | null }> {
+export async function listAdminEvents(page = 1): Promise<{ data: AdminEventRow[]; total: number; error: string | null }> {
   const supabase = getSupabaseBrowserClient();
-  if (!supabase) return { data: [], error: "تعذر الاتصال بقاعدة البيانات." };
+  if (!supabase) return { data: [], total: 0, error: "تعذر الاتصال بقاعدة البيانات." };
 
-  const rows: AdminEventRow[] = [];
-  for (let offset = 0; ; offset += ADMIN_EVENTS_PAGE_SIZE) {
-    const { data, error } = await supabase.from("events")
-      .select("id,title,category,city,venue,starts_at,ends_at,is_continuous,status,created_at,is_trending,description,address,location_url,cover_image_url,platform_fee_percent")
-      .order("created_at", { ascending: false })
-      .order("id", { ascending: false })
-      .range(offset, offset + ADMIN_EVENTS_PAGE_SIZE - 1);
+  const safePage = Math.max(1, Math.floor(page));
+  const from = (safePage - 1) * ADMIN_EVENTS_PAGE_SIZE;
+  const { data, count, error } = await supabase.from("events")
+    .select("id,title,category,city,venue,starts_at,ends_at,is_continuous,status,created_at,is_trending,description,address,location_url,cover_image_url,platform_fee_percent", { count: "exact" })
+    .order("created_at", { ascending: false })
+    .order("id", { ascending: false })
+    .range(from, from + ADMIN_EVENTS_PAGE_SIZE - 1);
 
-    if (error) return { data: [], error: error.message };
-
-    const page = (data || []) as AdminEventRow[];
-    rows.push(...page);
-    if (page.length < ADMIN_EVENTS_PAGE_SIZE) break;
-  }
-
-  return { data: rows, error: null };
+  if (error) return { data: [], total: 0, error: error.message };
+  return { data: (data || []) as AdminEventRow[], total: count || 0, error: null };
 }
 
 const toLocalInput = (value: string | null) => value
