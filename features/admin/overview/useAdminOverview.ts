@@ -16,11 +16,17 @@ export function useAdminOverview(role: AdminOverviewRole) {
   const refresh = useCallback(async () => {
     const requestId = ++latestRequest.current;
     setLoading(true);
-    const result = await getAdminOverviewStats(role);
-    if (requestId !== latestRequest.current) return;
-    if (result.error) setError(result.error);
-    else { setStats(result.data || emptyStats); setError(""); }
-    setLoading(false);
+    setError("");
+    try {
+      const result = await getAdminOverviewStats(role);
+      if (requestId !== latestRequest.current) return;
+      if (result.error) setError(result.error);
+      else setStats(result.data || emptyStats);
+    } catch (error) {
+      if (requestId === latestRequest.current) setError(error instanceof Error ? error.message : "تعذر تحميل ملخص الإدارة.");
+    } finally {
+      if (requestId === latestRequest.current) setLoading(false);
+    }
   }, [role]);
 
   useEffect(() => {
