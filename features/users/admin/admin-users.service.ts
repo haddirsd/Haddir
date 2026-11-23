@@ -3,20 +3,22 @@ import type { AdminUserEventOption, AdminUserRow, AdminUsersResult } from "./adm
 
 const EVENT_SCOPED_ROLES = ["supervisor", "gatekeeper", "advertiser"];
 
-export async function listAdminUsers(searchTerm: string, roleFilter = "all"): Promise<AdminUsersResult> {
+export async function listAdminUsers(searchTerm: string, roleFilter = "all", page = 1, pageSize = 25): Promise<AdminUsersResult> {
   const supabase = getSupabaseBrowserClient();
   if (!supabase) return { rows: [], eventOptions: [], total: 0, error: "تعذر الاتصال بقاعدة البيانات." };
   const term = searchTerm.trim().replace(/[(),]/g, " ").replace(/[%_]/g, "");
-  const [{ data: userRows, error: userError }, { count, error: countError }] = await Promise.all([
-    supabase.rpc("admin_search_profiles", { p_query: term || null, p_limit: 200, p_offset: 0, p_role: roleFilter === "all" ? null : roleFilter }),
-    supabase.from("profiles").select("id", { count: "exact", head: true }),
+  const safePage = Math.max(1, Math.floor(page));
+  const safePageSize = Math.max(1, Math.min(100, Math.floor(pageSize)));
+  const [{ data: userRows, error: userError }, { data: total, error: countError }] = await Promise.all([
+    supabase.rpc("admin_search_profiles", { p_query: term || null, p_limit: safePageSize, p_offset: (safePage - 1) * safePageSize, p_role: roleFilter === "all" ? null : roleFilter }),
+    supabase.rpc("admin_count_profiles", { p_query: term || null, p_role: roleFilter === "all" ? null : roleFilter }),
   ]);
-  if (userError || countError) return { rows: [], eventOptions: [], total: count || 0, error: (userError || countError)?.message || "تعذر تحميل المستخدمين." };
+  if (userError || countError) return { rows: [], eventOptions: [], total: 0, error: (userError || countError)?.message || "تعذر تحميل المستخدمين." };
   const [{ data: assignments, error: assignmentError }, { data: events, error: eventError }] = await Promise.all([
-    supabase.from("event_role_assignments").select("user_id,event_id,assignment_role"),
+    (userRows || []).length ? supabase.from("event_role_assignments").select("user_id,event_id,assignment_role").in("user_id", (userRows || []).map((row: any) => row.id)) : Promise.resolve({ data: [], error: null }),
     supabase.from("events").select("id,title,status").in("status", ["draft", "published"]).order("created_at", { ascending: false }).limit(200),
   ]);
-  if (assignmentError || eventError) return { rows: [], eventOptions: [], total: count || 0, error: (assignmentError || eventError)?.message || "تعذر تحميل ربط الأدوار بالفعاليات." };
+  if (assignmentError || eventError) return { rows: [], eventOptions: [], total: Number(total || 0), error: (assignmentError || eventError)?.message || "تعذر تحميل ربط الأدوار بالفعاليات." };
   const byUser = new Map<string, string[]>();
   for (const assignment of assignments || []) {
     const user = (userRows || []).find((row: any) => row.id === assignment.user_id);
