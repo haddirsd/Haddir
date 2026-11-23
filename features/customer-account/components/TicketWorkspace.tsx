@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, Download, Ticket, UserRound } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Download, Ticket, UserRound } from "lucide-react";
 import { QRCodeSVG as QrCodeSVG } from "qrcode.react";
 import type { CustomerTicket } from "../types";
 
@@ -10,9 +10,13 @@ type TicketWorkspaceProps = {
   loading: boolean;
   error: string;
   tickets: CustomerTicket[];
+  ticketCounts: { valid: number; used: number };
   filter: "new" | "used";
+  page: number;
+  pageSize: number;
   expandedTicketId: string | null;
   onFilterChange: (filter: "new" | "used") => void;
+  onPageChange: (page: number) => void;
   onToggleTicket: (ticketId: string) => void;
   onDownloadTicket: (ticket: CustomerTicket) => void;
   formatEventDate: (value: string) => string;
@@ -22,24 +26,30 @@ export function TicketWorkspace({
   loading,
   error,
   tickets,
+  ticketCounts,
   filter,
+  page,
+  pageSize,
   expandedTicketId,
   onFilterChange,
+  onPageChange,
   onToggleTicket,
   onDownloadTicket,
   formatEventDate,
 }: TicketWorkspaceProps) {
-  const visibleTickets = tickets.filter((ticket) => ticket.status === (filter === "new" ? "valid" : "used"));
+  const visibleTickets = tickets;
+  const totalCount = ticketCounts[filter === "new" ? "valid" : "used"];
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
   return (
     <section className="screen container tickets-screen">
       {loading ? <div className="empty-state motion-loading" role="status"><span className="haddir-loading-indicator" aria-hidden="true"/><span>جاري تحميل تذاكرك...</span></div> : error ? <div className="empty-state" role="alert">{error}</div> : <>
         <div className="ticket-tabs" role="tablist" aria-label="حالة التذاكر">
           <button type="button" role="tab" aria-selected={filter === "new"} className={filter === "new" ? "active" : ""} onClick={() => onFilterChange("new")}>
-            تذاكر جديدة <span>{tickets.filter((ticket) => ticket.status === "valid").length}</span>
+            تذاكر جديدة <span>{ticketCounts.valid}</span>
           </button>
           <button type="button" role="tab" aria-selected={filter === "used"} className={filter === "used" ? "active" : ""} onClick={() => onFilterChange("used")}>
-            تذاكر مستخدمة <span>{tickets.filter((ticket) => ticket.status === "used").length}</span>
+            تذاكر مستخدمة <span>{ticketCounts.used}</span>
           </button>
         </div>
 
@@ -81,6 +91,11 @@ export function TicketWorkspace({
             </div>}
           </div>)}
         </div>}
+        {totalCount > pageSize && <nav className="ticket-pagination" aria-label="صفحات التذاكر">
+          <button type="button" className="btn btn-outline" onClick={() => onPageChange(page - 1)} disabled={page <= 1}><ChevronRight size={17}/> السابقة</button>
+          <span aria-live="polite">صفحة {page} من {totalPages}</span>
+          <button type="button" className="btn btn-outline" onClick={() => onPageChange(page + 1)} disabled={page >= totalPages}>التالية <ChevronLeft size={17}/></button>
+        </nav>}
       </>}
     </section>
   );
