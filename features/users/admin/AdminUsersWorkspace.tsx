@@ -14,11 +14,13 @@ export default function AdminUsersWorkspace({
   role, searchTerm, onSearchTermChange,
 }: { role: AdminUsersRole; searchTerm: string; onSearchTermChange: (value: string) => void }) {
   const [roleFilter, setRoleFilter] = useState("all");
+  const [page, setPage] = useState(1);
+  const pageSize = 25;
   const [pendingRole,setPendingRole]=useState<{row:AdminUserRow;nextRole:string;eventId:string|null}|null>(null);
   const {
     rows, eventOptions, userTotal, loading, error, message, updatingUserId,
     roleDrafts, setRoleDrafts, assignmentEventIds, setAssignmentEventIds, refresh, updateRole, removeAssignment,
-  } = useAdminUsers(role, searchTerm, roleFilter);
+  } = useAdminUsers(role, searchTerm, roleFilter, page);
   const roleNames: Record<string,string> = {
     owner:"مالك المنصة", admin:"مشرف إداري", supervisor:"مشرف فعالية",
     organizer:"منظم حاضر", gatekeeper:"منظم حاضر (بواب)", advertiser:"مُعلن", customer:"عميل",
@@ -29,14 +31,15 @@ export default function AdminUsersWorkspace({
     <div className="admin-panel-head">
       <div><h3>المستخدمون والصلاحيات</h3><p>إدارة أدوار الحسابات وربط المشرف والبوّاب والمعلن بفعاليات محددة</p></div>
       <div className="admin-panel-actions">
-        <label className="admin-search-box"><span>بحث بالرقم أو البريد أو الهاتف</span><input type="search" value={searchTerm} onChange={event=>onSearchTermChange(event.target.value)} placeholder="رقم الهاتف أو البريد الإلكتروني"/></label>
-        <label className="admin-search-box"><span>تصفية حسب الدور</span><HaddirSelect value={roleFilter} onChange={setRoleFilter} ariaLabel="تصفية حسب الدور" options={[{value:"all",label:"كل الأدوار"},{value:"customer",label:"العملاء"},{value:"supervisor",label:"مشرفو الفعاليات"},{value:"gatekeeper",label:"البوابون"},{value:"organizer",label:"المنظمون"},{value:"advertiser",label:"المعلنون"},{value:"admin",label:"المشرفون الإداريون"},{value:"owner",label:"مالك المنصة"}]}/></label>
-        <span className="admin-user-total">عدد النتائج: {rows.length.toLocaleString("ar-SD-u-nu-latn")} من {userTotal.toLocaleString("ar-SD-u-nu-latn")}</span>
+        <label className="admin-search-box"><span>بحث بالرقم أو البريد أو الهاتف</span><input type="search" value={searchTerm} onChange={event=>{setPage(1);onSearchTermChange(event.target.value);}} placeholder="رقم الهاتف أو البريد الإلكتروني"/></label>
+        <label className="admin-search-box"><span>تصفية حسب الدور</span><HaddirSelect value={roleFilter} onChange={value=>{setPage(1);setRoleFilter(value);}} ariaLabel="تصفية حسب الدور" options={[{value:"all",label:"كل الأدوار"},{value:"customer",label:"العملاء"},{value:"supervisor",label:"مشرفو الفعاليات"},{value:"gatekeeper",label:"البوابون"},{value:"organizer",label:"المنظمون"},{value:"advertiser",label:"المعلنون"},{value:"admin",label:"المشرفون الإداريون"},{value:"owner",label:"مالك المنصة"}]}/></label>
+        <span className="admin-user-total">عدد النتائج: {userTotal.toLocaleString("ar-SD-u-nu-latn")} · الصفحة {page.toLocaleString("ar-SD-u-nu-latn")} من {Math.max(1,Math.ceil(userTotal/pageSize)).toLocaleString("ar-SD-u-nu-latn")}</span>
         <button className="admin-refresh" type="button" onClick={()=>void refresh()} disabled={loading}><RefreshCw size={16}/> تحديث</button>
       </div>
     </div>
     {error&&<div className="admin-notice" role="alert">{error}</div>}
     {message&&<div className="admin-notice" role="status">{message}</div>}
+    <div className="admin-pagination" style={{display:"flex",alignItems:"center",justifyContent:"center",gap:12,margin:"12px 0"}}><button type="button" className="admin-refresh" disabled={loading||page<=1} onClick={()=>setPage(value=>Math.max(1,value-1))}>السابق</button><span>صفحة {page.toLocaleString("ar-SD-u-nu-latn")} / {Math.max(1,Math.ceil(userTotal/pageSize)).toLocaleString("ar-SD-u-nu-latn")}</span><button type="button" className="admin-refresh" disabled={loading||page>=Math.ceil(userTotal/pageSize)} onClick={()=>setPage(value=>value+1)}>التالي</button></div>
     {loading?<p className="admin-no-data">جاري تحميل المستخدمين...</p>:<div className="admin-users-table-wrap">
       <table className="admin-users-table">
         <thead><tr><th>الإسم</th><th>رقم الهاتف</th><th>الدور</th><th>تاريخ التسجيل</th><th>تعديل الدور / الفعاليات المكلّف بها</th></tr></thead>
