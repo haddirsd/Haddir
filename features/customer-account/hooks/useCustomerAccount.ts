@@ -89,6 +89,7 @@ export function useCustomerAccount(
     else {
       const totalPages = Math.max(1, Math.ceil(result.filteredTotal / CUSTOMER_NOTIFICATIONS_PAGE_SIZE));
       if (notificationPage > totalPages) {
+        setNotificationsLoading(false);
         setNotificationPage(totalPages);
         return;
       }
