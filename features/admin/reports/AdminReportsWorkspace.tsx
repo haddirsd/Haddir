@@ -6,6 +6,7 @@ import { HaddirSelect } from "../../../components/ui/HaddirSelect";
 import { useAdminReports } from "./useAdminReports";
 import { getAllEventReportRows } from "./admin-reports.service";
 import type { AdminReportRow } from "./admin-reports.types";
+import { SkeletonState } from "../../../components/ui/SkeletonState";
 
 type Row = AdminReportRow;
 const statusLabels: Record<string,string> = {draft:"مسودة",published:"منشورة",cancelled:"ملغاة",completed:"مكتملة",pending_payment:"بانتظار الدفع",under_review:"قيد المراجعة",confirmed:"مؤكد",rejected:"مرفوض",expired:"منتهي",submitted:"بانتظار المراجعة",approved:"مقبول",valid:"صالح",used:"مستخدم"};
@@ -174,6 +175,6 @@ export default function AdminReportsWorkspace() {
   return <section className="admin-panel">
     <div className="admin-panel-head"><div><h3>الإحصائيات والتقارير</h3><p>ملخص أداء الفعاليات والمبيعات والحجوزات والمستخدمين</p></div><button className="admin-refresh" type="button" onClick={()=>void refresh()} disabled={loading}><RefreshCw size={16}/> تحديث</button></div>
     {error&&<div className="admin-notice" role="alert">{error}</div>}
-    {loading?<p className="admin-no-data">جاري تجهيز الإحصائيات...</p>:renderReport()}
+    {loading?<SkeletonState variant="admin-table" count={5} label="جاري تجهيز الإحصائيات والتقارير..." />:renderReport()}
   </section>;
 }
