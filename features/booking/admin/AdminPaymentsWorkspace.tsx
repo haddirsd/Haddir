@@ -7,6 +7,7 @@ import { listAdminPaymentEvents, reviewAdminPayment } from "./admin-payments.ser
 import type { AdminPaymentEventFilter } from "./admin-payments.service";
 import { useAdminPayments } from "./useAdminPayments";
 import type { AdminPaymentDecision, AdminPaymentRow } from "./admin-payments.types";
+import { SkeletonState } from "../../../components/ui/SkeletonState";
 
 const statusLabels: Record<string,string> = { submitted:"بانتظار المراجعة", approved:"مقبول", rejected:"مرفوض" };
 const fmt = (value: unknown) => value == null || value === "" ? "—" : String(value);
@@ -74,7 +75,7 @@ export default function AdminPaymentsWorkspace() {
     {error&&<div className="admin-notice" role="alert">{error}</div>}
     {actionError&&<div className="admin-notice" role="alert">{actionError}</div>}
     {actionMessage&&<div className="admin-notice" role="status">{actionMessage}</div>}
-    {loading?<p className="admin-no-data">جاري تحميل إثباتات الدفع...</p>:<div className="admin-payment-cards">
+    {loading?<SkeletonState variant="admin-cards" count={4} label="جاري تحميل إثباتات الدفع..." />:<div className="admin-payment-cards">
       {rows.length===0?<p className="admin-no-data">لا توجد إثباتات دفع حتى الآن.</p>:rows.map((r:AdminPaymentRow,i:number)=>{
         const pending=r.status==="submitted";
         return <article className="admin-payment-card" key={r.id||i}>
