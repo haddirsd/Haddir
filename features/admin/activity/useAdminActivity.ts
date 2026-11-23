@@ -16,15 +16,20 @@ export function useAdminActivity(page: number, filters: AdminActivityFilters) {
   const refresh = useCallback(async () => {
     const requestId = ++latestRequest.current;
     setLoading(true);
-    const result = await listAdminActivity(page, ADMIN_ACTIVITY_PAGE_SIZE, filters);
-    if (requestId !== latestRequest.current) return;
-    if (result.error) setError(result.error);
-    else {
-      setRows(result.rows);
-      setTotal(result.total);
-      setError("");
+    setError("");
+    try {
+      const result = await listAdminActivity(page, ADMIN_ACTIVITY_PAGE_SIZE, filters);
+      if (requestId !== latestRequest.current) return;
+      if (result.error) setError(result.error);
+      else {
+        setRows(result.rows);
+        setTotal(result.total);
+      }
+    } catch (error) {
+      if (requestId === latestRequest.current) setError(error instanceof Error ? error.message : "تعذر تحميل سجل الإجراءات.");
+    } finally {
+      if (requestId === latestRequest.current) setLoading(false);
     }
-    setLoading(false);
   }, [page, filters.search, filters.role, filters.group, filters.period]);
   useEffect(() => {
     void refresh();
