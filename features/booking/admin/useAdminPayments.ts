@@ -15,11 +15,17 @@ export function useAdminPayments(page: number, eventId: string | null = null) {
   const refresh = useCallback(async () => {
     const requestId = ++latestRequest.current;
     setLoading(true);
-    const result = await listAdminPayments(page, eventId);
-    if (requestId !== latestRequest.current) return;
-    if (result.error) setError(result.error);
-    else { setRows(result.rows); setTotalCount(result.totalCount); setError(""); }
-    setLoading(false);
+    setError("");
+    try {
+      const result = await listAdminPayments(page, eventId);
+      if (requestId !== latestRequest.current) return;
+      if (result.error) setError(result.error);
+      else { setRows(result.rows); setTotalCount(result.totalCount); }
+    } catch (error) {
+      if (requestId === latestRequest.current) setError(error instanceof Error ? error.message : "تعذر تحميل إثباتات الدفع.");
+    } finally {
+      if (requestId === latestRequest.current) setLoading(false);
+    }
   }, [page, eventId]);
 
   useEffect(() => {
