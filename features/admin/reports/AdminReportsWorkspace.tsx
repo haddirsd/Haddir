@@ -30,10 +30,10 @@ export default function AdminReportsWorkspace() {
           const eventMetricById=new Map(eventMetrics.map((item:Row)=>[item.event_id,item]));
           const allTicketTypes=data.events.flatMap(e=>e.ticket_types||[]);
           const totalCapacity=sum(allTicketTypes,"quantity_total");
-          const soldAttendees=sum(confirmed.flatMap(b=>b.booking_items||[]),"quantity");
-          const reservedAttendees=sum(pending.flatMap(b=>b.booking_items||[]),"quantity");
+          const soldAttendees=Number(bookingStats.sold_quantity||0);
+          const reservedAttendees=Number(bookingStats.reserved_quantity||0);
           const remainingCapacity=Math.max(0,totalCapacity-sum(allTicketTypes,"quantity_sold"));
-          const rejectedQty=sum(rejected.flatMap(b=>b.booking_items||[]),"quantity");
+          const rejectedQty=Number(bookingStats.rejected_quantity||0);
           const currentEvents=data.events.filter(e=>e.status==="published"&&(!e.ends_at||new Date(e.ends_at).getTime()>=Date.now()));
           const pastEvents=data.events.filter(e=>e.status==="completed"||(!!e.ends_at&&new Date(e.ends_at).getTime()<Date.now()));
           const roleCounts=(r:string)=>Number(data.profiles[r]||0)+(r==="gatekeeper"?Number(data.profiles.organizer||0):0);
@@ -138,14 +138,14 @@ export default function AdminReportsWorkspace() {
                   </section>
 
                   <section className="admin-report-page admin-report-register">
-                    <div className="admin-report-section-head"><span>03 / سجل الحجوزات</span><h2>تفاصيل طلبات الحجز</h2><p>سجل تفصيلي للحجوزات المرتبطة بهذه الفعالية.</p></div>
+                    <div className="admin-report-section-head"><span>03 / سجل الحجوزات</span><h2>تفاصيل طلبات الحجز</h2><p>السجلات المعروضة مقسمة إلى صفحات من 50 حجزاً.</p></div>
                     <div className="admin-report-table-wrap"><table><thead><tr><th>رقم الحجز</th><th>تاريخ الطلب</th><th>التذاكر</th><th>القيمة</th><th>الحالة</th></tr></thead><tbody>{eventBookings.map((b:Row)=><tr key={b.id}><td>{b.booking_number||b.id.slice(0,8)}</td><td>{b.created_at?new Date(b.created_at).toLocaleDateString("ar-SD-u-nu-latn"):"—"}</td><td>{(b.booking_items||[]).map((i:Row)=>`${i.ticket_types?.name||"تذكرة"} × ${i.quantity}`).join("، ")||"—"}</td><td>{money(b.subtotal,b.currency)}</td><td><span className={`admin-report-status status-${b.status}`}>{statusLabels[b.status]||b.status}</span></td></tr>)}</tbody></table></div>
                     {pager("bookings",bookingsPage,eventPage.bookingTotal,bookingPageCount)}
                     <div className="admin-report-footer"><span>بيانات الحجوزات · الصفحة الحالية من السجل</span><b>04</b></div>
                   </section>
 
                   <section className="admin-report-page admin-report-register">
-                    <div className="admin-report-section-head"><span>04 / سجل الدخول</span><h2>التذاكر والتحقق عند البوابة</h2><p>حالة رموز الدخول ووقت استخدامها عند التحقق.</p></div>
+                    <div className="admin-report-section-head"><span>04 / سجل الدخول</span><h2>التذاكر والتحقق عند البوابة</h2><p>السجلات المعروضة مقسمة إلى صفحات من 50 تذكرة.</p></div>
                     <div className="admin-report-table-wrap"><table><thead><tr><th>كود التذكرة</th><th>اسم حامل التذكرة</th><th>الفئة</th><th>الحالة</th><th>وقت الدخول</th></tr></thead><tbody>{eventTickets.map((t:Row)=><tr key={t.id}><td dir="ltr">{t.ticket_code||"—"}</td><td>{t.attendee_name||"—"}</td><td>{eventTicketRows.find((x: Row)=>x.id===t.ticket_type_id)?.name||"—"}</td><td>{t.status==="used"?"تم الدخول":t.status==="valid"?"صالحة":"غير صالحة"}</td><td>{t.used_at?new Date(t.used_at).toLocaleString("ar-SD-u-nu-latn"):"—"}</td></tr>)}</tbody></table></div>
                     {pager("tickets",ticketsPage,eventPage.ticketTotal,ticketPageCount)}
                     <div className="admin-report-note">هذا السجل يعرض بيانات التذاكر · الصفحة الحالية من السجل في النظام وقت إصدار التقرير. أي دخول يتم بعد ذلك لن يظهر إلا في تقرير جديد.</div>
