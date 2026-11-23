@@ -25,6 +25,8 @@ import { OrganizerTermsConsent } from "../features/legal/OrganizerTermsConsent";
 export default function Home(){
  const [deletingAccount,setDeletingAccount]=useState(false);
  const [searchQuery,setSearchQuery]=useState("");
+ const [notificationFilter,setNotificationFilter]=useState<"unread"|"read">("unread");
+ const [notificationPage,setNotificationPage]=useState(1);
  const { darkMode, setDarkMode } = useAppTheme();
  const [accountDialog,setAccountDialog]=useState<AccountDialog>(null),[deleteEmailInput,setDeleteEmailInput]=useState(""),[uiNotice,setUiNotice]=useState("");
  const [bookingGate,setBookingGate]=useState<"login"|"phone"|null>(null);
@@ -33,7 +35,7 @@ export default function Home(){
  const { activeTab, setActiveTab, showPrivacySecurity, setShowPrivacySecurity, eventResetKey, setEventResetKey, activeWorkspace, isGatekeeperPage, go, backFromGatekeeper, closeGatekeeper } = useAppNavigation();
  const { authUser, userRole, pendingLegalRole, acceptOrganizerTerms, assignedEvent, fullName, setFullName, email, phone, setPhone, avatarUrl, profileEditing, setProfileEditing, saved, setSaved, authMessage, setAuthMessage } = useAuth();
  const ticketsView = useCustomerTicketsView(setUiNotice);
- const { myTickets, myTicketCounts, myNotifications, accountDataLoading, accountDataError, markNotificationRead: markCustomerNotificationReadAction, markAllNotificationsRead: markAllCustomerNotificationsReadAction } = useCustomerAccount(authUser?.id ?? null, ticketsView.filter === "new" ? "valid" : "used", ticketsView.page, ticketsView.setPage);
+ const { myTickets, myTicketCounts, myNotifications, myNotificationsTotal, myNotificationsFilteredTotal, myUnreadNotificationCount, accountDataLoading, accountDataError, notificationsLoading, notificationsError, markNotificationRead: markCustomerNotificationReadAction, markAllNotificationsRead: markAllCustomerNotificationsReadAction } = useCustomerAccount(authUser?.id ?? null, ticketsView.filter === "new" ? "valid" : "used", ticketsView.page, ticketsView.setPage, notificationFilter, notificationPage, setNotificationPage);
  const accountActions = useCustomerAccountActions({
   authUser,
   fullName,
@@ -51,6 +53,12 @@ export default function Home(){
  });
  const notificationView = useCustomerNotificationView({
   notifications: myNotifications,
+  filter: notificationFilter,
+  setFilter: setNotificationFilter,
+  page: notificationPage,
+  setPage: setNotificationPage,
+  unreadCount: myUnreadNotificationCount,
+  filteredTotal: myNotificationsFilteredTotal,
   markNotificationRead: markCustomerNotificationReadAction,
   markAllNotificationsRead: markAllCustomerNotificationsReadAction,
   onNavigateToTickets: () => go("tickets"),
@@ -105,9 +113,14 @@ export default function Home(){
   formatEventDate={formatEventDate}
  />}
  {!isGatekeeperPage&&activeTab==="notifications"&&<NotificationsWorkspace
-  loading={accountDataLoading}
-  error={accountDataError}
+  loading={notificationsLoading}
+  error={notificationsError}
   notifications={myNotifications}
+  totalCount={myNotificationsTotal}
+  filteredTotal={notificationView.filteredTotal}
+  page={notificationView.page}
+  pageSize={25}
+  onPageChange={notificationView.setPage}
   filteredNotifications={notificationView.filteredNotifications}
   filter={notificationView.filter}
   unreadCount={notificationView.unreadCount}
