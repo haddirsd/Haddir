@@ -12720,4 +12720,14 @@ html[data-theme="dark"] .app-shell .bottom-nav button:not(.selected),
 html[data-theme="dark"] .app-shell .bottom-nav button:not(.selected) :is(svg, span, .nav-label) {
   color: #E4DFFF !important;
 }
+/* Opaque dark fallback for engines without either standard or WebKit backdrop-filter support. */
+@supports not (backdrop-filter: blur(1px)) {
+  @supports not (-webkit-backdrop-filter: blur(1px)) {
+    html[data-theme="dark"] .app-shell .bottom-nav {
+      background: #1A1633 !important;
+      border-color: rgba(185, 168, 255, .24) !important;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, .34) !important;
+    }
+  }
+}
 
