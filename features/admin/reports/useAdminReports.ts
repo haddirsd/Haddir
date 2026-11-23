@@ -5,7 +5,7 @@ import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
 import { getAdminEventReportPage, getAdminReportData } from "./admin-reports.service";
 import type { AdminEventReportPage, AdminReportData } from "./admin-reports.types";
 
-export function useAdminReports(eventId: string, bookingsPage: number, ticketsPage: number) {
+export function useAdminReports(eventId: string, bookingsPage: number, ticketsPage: number, eventsPage: number) {
   const [statistics, setStatistics] = useState<AdminReportData | null>(null);
   const [eventPage, setEventPage] = useState<AdminEventReportPage>({ bookings: [], tickets: [], bookingTotal: 0, ticketTotal: 0 });
   const [loading, setLoading] = useState(true);
@@ -16,7 +16,7 @@ export function useAdminReports(eventId: string, bookingsPage: number, ticketsPa
     const requestId = ++latestRequest.current;
     setLoading(true);
     const [summaryResult, pageResult] = await Promise.all([
-      getAdminReportData(),
+      getAdminReportData(eventsPage),
       getAdminEventReportPage(eventId, bookingsPage, ticketsPage),
     ]);
     if (requestId !== latestRequest.current) return;
@@ -27,7 +27,7 @@ export function useAdminReports(eventId: string, bookingsPage: number, ticketsPa
       setError("");
     }
     setLoading(false);
-  }, [eventId, bookingsPage, ticketsPage]);
+  }, [eventId, bookingsPage, ticketsPage, eventsPage]);
 
   useEffect(() => {
     void refresh();
