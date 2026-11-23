@@ -12627,8 +12627,8 @@ html[data-theme="dark"] {
   --card-bg: var(--surface);
   --border-color: var(--line);
   --border: var(--line);
-  --text-2: #DED8F7;
-  --muted: #DED8F7;
+  --text-2: #A9A3C9;
+  --muted: #A9A3C9;
 }
 html[data-theme="dark"] .app-shell,
 html[data-theme="dark"] .app-shell.theme-dark,
@@ -12638,8 +12638,8 @@ html[data-theme="dark"] .admin-shell.theme-dark {
   --card-bg: var(--surface);
   --border-color: var(--line);
   --border: var(--line);
-  --text-2: #DED8F7;
-  --muted: #DED8F7;
+  --text-2: #A9A3C9;
+  --muted: #A9A3C9;
 }
 
 /* Payment step labels need AA contrast on the dark checkout canvas. */
@@ -12714,5 +12714,10 @@ html[data-theme="dark"] .app-shell .profile-save-error {
   border-radius: 10px;
   background: rgba(255, 84, 112, .12);
   color: #FFD1D9 !important;
+}
+/* Keep inactive navigation labels readable over the brightest purple part of the glass bar. */
+html[data-theme="dark"] .app-shell .bottom-nav button:not(.selected),
+html[data-theme="dark"] .app-shell .bottom-nav button:not(.selected) :is(svg, span, .nav-label) {
+  color: #E4DFFF !important;
 }
 
