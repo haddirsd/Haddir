@@ -25,14 +25,15 @@ async function decodeImage(file: File): Promise<DecodedImage> {
   const objectUrl = URL.createObjectURL(file);
   const image = new Image();
   try {
-    const loadPromise = new Promise<void>((resolve, reject) => {
-      image.onload = () => resolve();
-      image.onerror = () => reject(new Error("تعذر قراءة الصورة المختارة."));
-    });
-    image.src = objectUrl;
     if (typeof image.decode === "function") {
+      image.src = objectUrl;
       await image.decode();
     } else {
+      const loadPromise = new Promise<void>((resolve, reject) => {
+        image.onload = () => resolve();
+        image.onerror = () => reject(new Error("تعذر قراءة الصورة المختارة."));
+      });
+      image.src = objectUrl;
       await loadPromise;
     }
     return {
