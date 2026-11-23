@@ -12730,4 +12730,11 @@ html[data-theme="dark"] .app-shell .bottom-nav button:not(.selected) :is(svg, sp
     }
   }
 }
+/* High-specificity override for the existing dark bottom-nav rule. */
+html[data-theme="dark"] .app-shell.theme-dark .bottom-nav button:not(.selected),
+html[data-theme="dark"] .app-shell:not(.theme-dark) .bottom-nav button:not(.selected),
+html[data-theme="dark"] .app-shell.theme-dark .bottom-nav button:not(.selected) :is(svg, span, .nav-label),
+html[data-theme="dark"] .app-shell:not(.theme-dark) .bottom-nav button:not(.selected) :is(svg, span, .nav-label) {
+  color: #E4DFFF !important;
+}
 
