@@ -50,6 +50,8 @@ export function GatekeeperPage({
       scannerOpen={gatekeeper.scannerOpen}
       history={gatekeeper.gatekeeperHistory}
       historyLoading={gatekeeper.gatekeeperHistoryLoading}
+      historyError={gatekeeper.gatekeeperHistoryError}
+      onRefreshHistory={() => void gatekeeper.refreshGatekeeperData()}
       videoRef={gatekeeper.videoRef}
       onOpenScanner={gatekeeper.openScanner}
       onOpenManual={gatekeeper.openManualEntry}
