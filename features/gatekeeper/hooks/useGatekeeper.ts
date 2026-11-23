@@ -126,10 +126,15 @@ export function useGatekeeper({
     }
     setLastEntryMethod(entryMethod);
     setGatekeeperLoading(true);
-    const { data, error } = await submitGatekeeperTicketAction(code, confirm, entryMethod);
-    setGatekeeperLoading(false);
-    if (error) setGatekeeperResult({ ok: false, status: "error", message: error.message || "تعذر التحقق من التذكرة." });
-    else setGatekeeperResult(data as GatekeeperTicketActionResult);
+    try {
+      const { data, error } = await submitGatekeeperTicketAction(code, confirm, entryMethod);
+      if (error) setGatekeeperResult({ ok: false, status: "error", message: error.message || "تعذر التحقق من التذكرة." });
+      else setGatekeeperResult(data as GatekeeperTicketActionResult);
+    } catch (error) {
+      setGatekeeperResult({ ok: false, status: "error", message: error instanceof Error ? error.message : "تعذر التحقق من التذكرة." });
+    } finally {
+      setGatekeeperLoading(false);
+    }
     await refreshGatekeeperData();
   }, [authUser, assignedEvent, gatekeeperCode, gatekeeperOnline, prepareFeedbackAudio, refreshGatekeeperData]);
 
