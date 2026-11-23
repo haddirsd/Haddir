@@ -12631,7 +12631,9 @@ html[data-theme="dark"] {
   --muted: #DED8F7;
 }
 html[data-theme="dark"] .app-shell,
-html[data-theme="dark"] .admin-shell {
+html[data-theme="dark"] .app-shell.theme-dark,
+html[data-theme="dark"] .admin-shell,
+html[data-theme="dark"] .admin-shell.theme-dark {
   --card: var(--surface);
   --card-bg: var(--surface);
   --border-color: var(--line);
