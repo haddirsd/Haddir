@@ -58,7 +58,7 @@ export function GatekeeperWorkspace({
           <article className="used"><small>محاولات مكررة</small><strong>{counts.used}</strong></article>
           <article className="forged"><small>كود غير موجود</small><strong>{counts.forged}</strong></article>
           <article className="invalid"><small>غير صالحة</small><strong>{counts.invalid}</strong></article>
-        </div>
+        </div>}
         {assignedEvent?.events && <div className="gatekeeper-assigned-event"><small>الفعالية المصرح لك بها</small><strong>{assignedEvent.events.title}</strong><span>{assignedEvent.events.venue || assignedEvent.events.city || "الموقع غير محدد"} · {assignedEvent.events.starts_at ? formatDate(assignedEvent.events.starts_at) : "موعد غير محدد"}</span></div>}
         {!assignedEvent && <p className="gatekeeper-inline-error">حسابك غير مربوط بفعالية حالياً. راجع إدارة حاضر لتعيين الفعالية.</p>}
         <div className="gatekeeper-actions">
