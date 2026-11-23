@@ -2,6 +2,7 @@
 
 import { Bell, CalendarDays, CheckCircle2, Sparkles } from "lucide-react";
 import type { CustomerNotification } from "../types";
+import { SkeletonState } from "../../../components/ui/SkeletonState";
 
 export type { CustomerNotification } from "../types";
 
@@ -48,7 +49,7 @@ export function NotificationsWorkspace({
 }: NotificationsWorkspaceProps) {
   return (
     <section className="screen container notifications-screen">
-      {loading ? <div className="empty-state motion-loading" role="status"><span className="haddir-loading-indicator" aria-hidden="true"/><span>جاري تحميل الإشعارات...</span></div> : error ? <div className="empty-state" role="alert">{error}</div> : (
+      {loading ? <SkeletonState variant="notifications" count={5} label="جاري تحميل الإشعارات..." /> : error ? <div className="empty-state" role="alert">{error}</div> : (
         <div className="notifications-layout">
           <aside className="notifications-summary-card" aria-label="ملخص الإشعارات">
             <span className="notifications-summary-label">ملخص الإشعارات</span>
