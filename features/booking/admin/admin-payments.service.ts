@@ -20,10 +20,22 @@ export async function listAdminPayments(page = 0, eventId: string | null = null)
   if (eventId) query = query.eq("bookings.event_id", eventId);
   const { data, count, error } = await query;
   if (error) return { rows: [], totalCount: 0, error: error.message || "تعذر تحميل إثباتات الدفع." };
-  const rows = await Promise.all((data || []).map(async (row: any) => {
-    if (!row.receipt_path) return { ...row, receipt_url: null };
-    const { data: signed } = await supabase.storage.from("payment-receipts").createSignedUrl(row.receipt_path, 900);
-    return { ...row, receipt_url: signed?.signedUrl || null };
+  const receiptPaths = Array.from(new Set(
+    (data || [])
+      .map((row: any) => row.receipt_path)
+      .filter((path: unknown): path is string => typeof path === "string" && path.length > 0)
+  ));
+  const { data: signedFiles } = receiptPaths.length
+    ? await supabase.storage.from("payment-receipts").createSignedUrls(receiptPaths, 900)
+    : { data: [] };
+  const receiptUrls = new Map(
+    (signedFiles || []).flatMap((file) =>
+      file.path && file.signedUrl && !file.error ? [[file.path, file.signedUrl] as const] : []
+    )
+  );
+  const rows = (data || []).map((row: any) => ({
+    ...row,
+    receipt_url: row.receipt_path ? receiptUrls.get(row.receipt_path) || null : null,
   }));
   return { rows: rows as AdminPaymentRow[], totalCount: count ?? 0, error: null };
 }
