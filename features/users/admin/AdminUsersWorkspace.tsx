@@ -6,6 +6,7 @@ import { HaddirDialog } from "../../../components/ui/HaddirDialog";
 import { HaddirSelect } from "../../../components/ui/HaddirSelect";
 import { useAdminUsers } from "./useAdminUsers";
 import type { AdminUserRow, AdminUsersRole } from "./admin-users.types";
+import { SkeletonState } from "../../../components/ui/SkeletonState";
 
 const fmt = (value: unknown) => value == null || value === "" ? "—" : String(value);
 const EVENT_SCOPED_ROLES = ["supervisor", "gatekeeper", "advertiser"];
@@ -40,7 +41,7 @@ export default function AdminUsersWorkspace({
     {error&&<div className="admin-notice" role="alert">{error}</div>}
     {message&&<div className="admin-notice" role="status">{message}</div>}
     <div className="admin-pagination" style={{display:"flex",alignItems:"center",justifyContent:"center",gap:12,margin:"12px 0"}}><button type="button" className="admin-refresh" disabled={loading||page<=1} onClick={()=>setPage(value=>Math.max(1,value-1))}>السابق</button><span>صفحة {page.toLocaleString("ar-SD-u-nu-latn")} / {Math.max(1,Math.ceil(userTotal/pageSize)).toLocaleString("ar-SD-u-nu-latn")}</span><button type="button" className="admin-refresh" disabled={loading||page>=Math.ceil(userTotal/pageSize)} onClick={()=>setPage(value=>value+1)}>التالي</button></div>
-    {loading?<p className="admin-no-data">جاري تحميل المستخدمين...</p>:<div className="admin-users-table-wrap">
+    {loading?<SkeletonState variant="admin-table" count={6} label="جاري تحميل المستخدمين..." />:<div className="admin-users-table-wrap">
       <table className="admin-users-table">
         <thead><tr><th>الإسم</th><th>رقم الهاتف</th><th>الدور</th><th>تاريخ التسجيل</th><th>تعديل الدور / الفعاليات المكلّف بها</th></tr></thead>
         <tbody>{rows.map((row,index)=>{
