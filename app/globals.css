@@ -12620,3 +12620,95 @@ html[data-theme="dark"] .booking-success-backdrop .booking-success-dialog .succe
   opacity: 1 !important;
   will-change: auto !important;
 }
+
+/* Dark-mode audit corrections: align legacy tokens with the active purple palette. */
+html[data-theme="dark"] {
+  --card: var(--surface);
+  --card-bg: var(--surface);
+  --border-color: var(--line);
+  --border: var(--line);
+  --text-2: #DED8F7;
+  --muted: #DED8F7;
+}
+html[data-theme="dark"] .app-shell,
+html[data-theme="dark"] .admin-shell {
+  --card: var(--surface);
+  --card-bg: var(--surface);
+  --border-color: var(--line);
+  --border: var(--line);
+  --text-2: #DED8F7;
+  --muted: #DED8F7;
+}
+
+/* Payment step labels need AA contrast on the dark checkout canvas. */
+html[data-theme="dark"] .app-shell .payment-screen .section-kicker {
+  color: #DED8F7 !important;
+}
+
+/* Skeletons use the same dark surface and border tokens as their final content. */
+html[data-theme="dark"] .haddir-skeleton :is(
+  .haddir-skeleton-item,
+  .haddir-skeleton-metric,
+  .haddir-skeleton-table
+) {
+  background: #1A1633;
+  border-color: rgba(185, 168, 255, .2);
+}
+html[data-theme="dark"] .haddir-skeleton :is(
+  .haddir-skeleton-copy b,
+  .haddir-skeleton-copy i,
+  .haddir-skeleton-chip,
+  .haddir-skeleton-metric i,
+  .haddir-skeleton-metric b,
+  .haddir-skeleton-metric span,
+  .haddir-skeleton-table i
+) {
+  background: linear-gradient(
+    90deg,
+    rgba(185, 168, 255, .07),
+    rgba(185, 168, 255, .18),
+    rgba(185, 168, 255, .07)
+  );
+  background-size: 200% 100%;
+}
+
+/* Shared form and empty/loading primitives must not retain light-mode accents. */
+html[data-theme="dark"] .haddir-loading-spinner,
+html[data-theme="dark"] .haddir-empty-icon {
+  color: #DED8F7 !important;
+}
+html[data-theme="dark"] .haddir-empty-icon {
+  background: rgba(185, 168, 255, .14) !important;
+}
+html[data-theme="dark"] .haddir-field-error {
+  color: #FFD1D9 !important;
+}
+html[data-theme="dark"] .haddir-input:focus {
+  border-color: #B9A8FF !important;
+  box-shadow: 0 0 0 3px rgba(185, 168, 255, .22) !important;
+}
+
+/* Dark warning and feedback surfaces for staff workflows. */
+html[data-theme="dark"] .app-shell .gatekeeper-inline-error {
+  border: 1px solid rgba(255, 211, 138, .24);
+  background: #3B3018;
+  color: #FFD38A;
+}
+html[data-theme="dark"] .admin-shell .admin-broadcast-feedback.success {
+  border: 1px solid #28563A;
+  background: #173323;
+  color: #A5E6B8;
+}
+html[data-theme="dark"] .admin-shell .admin-broadcast-feedback.error {
+  border: 1px solid #71303C;
+  background: #3B2022;
+  color: #FF9AA6;
+}
+html[data-theme="dark"] .app-shell .profile-save-error {
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 84, 112, .25);
+  border-radius: 10px;
+  background: rgba(255, 84, 112, .12);
+  color: #FFD1D9 !important;
+}
+
