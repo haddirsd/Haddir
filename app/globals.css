@@ -12655,6 +12655,8 @@ html[data-theme="dark"] .haddir-skeleton :is(
   border-color: rgba(185, 168, 255, .2);
 }
 html[data-theme="dark"] .haddir-skeleton :is(
+  .haddir-skeleton-media,
+  .haddir-skeleton-avatar,
   .haddir-skeleton-copy b,
   .haddir-skeleton-copy i,
   .haddir-skeleton-chip,
