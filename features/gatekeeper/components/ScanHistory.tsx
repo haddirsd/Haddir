@@ -1,7 +1,8 @@
 import type { GatekeeperScanHistoryItem } from "../gatekeeper.types";
+import { SkeletonState } from "../../../components/ui/SkeletonState";
 
 export function ScanHistory({
-  items, loading,
+  items, loading, error, onRetry,
 }: {
   items: GatekeeperScanHistoryItem[];
   loading: boolean;
@@ -11,7 +12,8 @@ export function ScanHistory({
       <div className="gatekeeper-manual-history-head">
         <strong>سجل عمليات الدخول</strong><span>{items.length} عملية</span>
       </div>
-      {loading ? <p className="gatekeeper-history-empty">جاري تحميل السجل...</p>
+      {loading&&!error ? <SkeletonState variant="notifications" count={3} label="جاري تحميل سجل عمليات الدخول..." />
+        : error ? <p className="gatekeeper-history-empty" role="alert">{error} <button type="button" onClick={onRetry}>إعادة المحاولة</button></p>
         : items.length === 0 ? <p className="gatekeeper-history-empty">ما في عمليات مسح أو إدخال مسجلة حتى الآن.</p>
         : <div className="gatekeeper-history-list">
           {items.map(item => (
