@@ -15,18 +15,23 @@ export function useAdminReports(eventId: string, bookingsPage: number, ticketsPa
   const refresh = useCallback(async () => {
     const requestId = ++latestRequest.current;
     setLoading(true);
-    const [summaryResult, pageResult] = await Promise.all([
-      getAdminReportData(eventsPage),
-      getAdminEventReportPage(eventId, bookingsPage, ticketsPage),
-    ]);
-    if (requestId !== latestRequest.current) return;
-    if (summaryResult.error || pageResult.error) setError(summaryResult.error || pageResult.error || "تعذر تحميل التقارير.");
-    else {
-      setStatistics(summaryResult.data);
-      setEventPage(pageResult.data);
-      setError("");
+    setError("");
+    try {
+      const [summaryResult, pageResult] = await Promise.all([
+        getAdminReportData(eventsPage),
+        getAdminEventReportPage(eventId, bookingsPage, ticketsPage),
+      ]);
+      if (requestId !== latestRequest.current) return;
+      if (summaryResult.error || pageResult.error) setError(summaryResult.error || pageResult.error || "تعذر تحميل التقارير.");
+      else {
+        setStatistics(summaryResult.data);
+        setEventPage(pageResult.data);
+      }
+    } catch (error) {
+      if (requestId === latestRequest.current) setError(error instanceof Error ? error.message : "تعذر تحميل التقارير.");
+    } finally {
+      if (requestId === latestRequest.current) setLoading(false);
     }
-    setLoading(false);
   }, [eventId, bookingsPage, ticketsPage, eventsPage]);
 
   useEffect(() => {
