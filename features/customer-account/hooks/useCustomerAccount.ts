@@ -2,11 +2,14 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
-import { loadCustomerAccountData, markCustomerNotificationRead, markAllCustomerNotificationsRead } from "../services/customer-account.service";
+import { CUSTOMER_TICKETS_PAGE_SIZE, loadCustomerAccountData, markCustomerNotificationRead, markAllCustomerNotificationsRead } from "../services/customer-account.service";
 import type { CustomerNotification, CustomerTicket } from "../types";
 
-export function useCustomerAccount(userId: string | null) {
+type TicketStatus = "valid" | "used";
+
+export function useCustomerAccount(userId: string | null, ticketStatus: TicketStatus, ticketPage: number) {
   const [myTickets, setMyTickets] = useState<CustomerTicket[]>([]);
+  const [myTicketCounts, setMyTicketCounts] = useState({ valid: 0, used: 0 });
   const [myNotifications, setMyNotifications] = useState<CustomerNotification[]>([]);
   const [accountDataLoading, setAccountDataLoading] = useState(false);
   const [accountDataError, setAccountDataError] = useState("");
@@ -15,6 +18,7 @@ export function useCustomerAccount(userId: string | null) {
     const supabase = getSupabaseBrowserClient();
     if (!supabase || !userId) {
       setMyTickets([]);
+      setMyTicketCounts({ valid: 0, used: 0 });
       setMyNotifications([]);
       setAccountDataLoading(false);
       setAccountDataError("");
@@ -29,14 +33,22 @@ export function useCustomerAccount(userId: string | null) {
 
     const refresh = async () => {
       const requestId = ++requestSequence;
-      const result = await loadCustomerAccountData(userId);
+      const result = await loadCustomerAccountData(userId, ticketStatus, ticketPage);
       if (!alive || requestId !== requestSequence) return;
       if (result.error) {
         setAccountDataError(result.error);
       } else {
         setMyTickets(result.tickets);
+        setMyTicketCounts(result.ticketCounts);
         setMyNotifications(result.notifications);
         setAccountDataError("");
+        const totalPages = Math.max(1, Math.ceil(result.ticketCounts[ticketStatus] / CUSTOMER_TICKETS_PAGE_SIZE));
+        if (ticketPage > totalPages) {
+          // If a ticket was removed while viewing the last page, return to the new last page.
+          window.queueMicrotask(() => {
+            if (alive) setRequestedPage(totalPages);
+          });
+        }
       }
       if (firstLoad) {
         setAccountDataLoading(false);
@@ -56,7 +68,10 @@ export function useCustomerAccount(userId: string | null) {
       requestSequence++;
       void supabase.removeChannel(channel);
     };
-  }, [userId]);
+  }, [userId, ticketStatus, ticketPage]);
+
+  const [requestedPage, setRequestedPage] = useState<number | null>(null);
+  const setTicketPage = useCallback((page: number) => setRequestedPage(page), []);
 
   const markNotificationRead = useCallback(async (notificationId: string) => {
     if (!userId) return { error: "سجّل الدخول أولاً." };
@@ -83,6 +98,7 @@ export function useCustomerAccount(userId: string | null) {
 
   return {
     myTickets,
+    myTicketCounts,
     myNotifications,
     setMyNotifications,
     accountDataLoading,
@@ -90,5 +106,7 @@ export function useCustomerAccount(userId: string | null) {
     setAccountDataError,
     markNotificationRead,
     markAllNotificationsRead,
+    requestedPage,
+    setTicketPage,
   };
 }
