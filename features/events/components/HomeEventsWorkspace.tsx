@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { EventCard } from "./EventCard";
 import { EventFilters } from "./EventFilters";
 import type { EventItem } from "../types";
+import { SkeletonState } from "../../../components/ui/SkeletonState";
 
 type HomeEventsWorkspaceProps = {
   events: EventItem[];
@@ -92,7 +93,7 @@ export function HomeEventsWorkspace({ events, searchQuery, onSearchChange, loadi
         <EventFilters value={searchQuery} onChange={onSearchChange} />
 
         {loading ? (
-          <div className="empty-state" role="status"><span className="home-loading-mark" aria-hidden="true" /><strong>جاري تحميل الفعاليات...</strong></div>
+          <SkeletonState variant="events" count={4} label="جاري تحميل الفعاليات..." />
         ) : error ? (
           <div className="empty-state" role="alert"><strong>ما قدرنا نحمّل الفعاليات</strong><p>{error}</p><button className="btn btn-outline" onClick={onRetry}>إعادة المحاولة</button></div>
         ) : normalizedQuery && filteredEvents.length === 0 ? (
