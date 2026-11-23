@@ -174,7 +174,6 @@ export default function AdminReportsWorkspace() {
 
   return <section className="admin-panel">
     <div className="admin-panel-head"><div><h3>الإحصائيات والتقارير</h3><p>ملخص أداء الفعاليات والمبيعات والحجوزات والمستخدمين</p></div><button className="admin-refresh" type="button" onClick={()=>void refresh()} disabled={loading}><RefreshCw size={16}/> تحديث</button></div>
-    {error&&<div className="admin-notice" role="alert">{error}</div>}
-    {loading?<SkeletonState variant="admin-table" count={5} label="جاري تجهيز الإحصائيات والتقارير..." />:renderReport()}
+    {loading&&!error?<SkeletonState variant="admin-table" count={5} label="جاري تجهيز الإحصائيات والتقارير..." />:error?<div className="admin-notice" role="alert">{error}<button type="button" className="admin-refresh" onClick={()=>void refresh()}>إعادة المحاولة</button></div>:renderReport()}
   </section>;
 }
