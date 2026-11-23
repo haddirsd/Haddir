@@ -33,6 +33,7 @@ export function useGatekeeper({
   const [gatekeeperCounts, setGatekeeperCounts] = useState<GatekeeperScanStats>(emptyStats);
   const [gatekeeperHistory, setGatekeeperHistory] = useState<GatekeeperScanHistoryItem[]>([]);
   const [gatekeeperHistoryLoading, setGatekeeperHistoryLoading] = useState(false);
+  const [gatekeeperHistoryError, setGatekeeperHistoryError] = useState("");
   const [scannerOpen, setScannerOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const dataRequestSequence = useRef(0);
@@ -90,14 +91,21 @@ export function useGatekeeper({
     if (!assignedEvent?.event_id) return;
     const requestId = ++dataRequestSequence.current;
     setGatekeeperHistoryLoading(true);
-    const [{ data: stats }, { data: history, error }] = await Promise.all([
-      getGatekeeperScanStats(assignedEvent.event_id),
-      getGatekeeperScanHistory(assignedEvent.event_id),
-    ]);
-    if (requestId !== dataRequestSequence.current) return;
-    setGatekeeperHistoryLoading(false);
-    if (stats) setGatekeeperCounts({ ...emptyStats, ...stats });
-    if (!error && Array.isArray(history)) setGatekeeperHistory(history);
+    setGatekeeperHistoryError("");
+    try {
+      const [{ data: stats }, { data: history, error }] = await Promise.all([
+        getGatekeeperScanStats(assignedEvent.event_id),
+        getGatekeeperScanHistory(assignedEvent.event_id),
+      ]);
+      if (requestId !== dataRequestSequence.current) return;
+      if (stats) setGatekeeperCounts({ ...emptyStats, ...stats });
+      if (error) setGatekeeperHistoryError(error);
+      else if (Array.isArray(history)) setGatekeeperHistory(history);
+    } catch (error) {
+      if (requestId === dataRequestSequence.current) setGatekeeperHistoryError(error instanceof Error ? error.message : "تعذر تحميل سجل الدخول.");
+    } finally {
+      if (requestId === dataRequestSequence.current) setGatekeeperHistoryLoading(false);
+    }
   }, [assignedEvent?.event_id]);
 
   const runGatekeeperAction = useCallback(async (
@@ -222,7 +230,7 @@ export function useGatekeeper({
     gatekeeperResult, setGatekeeperResult,
     gatekeeperLoading, gatekeeperOnline,
     manualEntryOpen, setManualEntryOpen,
-    gatekeeperCounts, gatekeeperHistory, gatekeeperHistoryLoading,
+    gatekeeperCounts, gatekeeperHistory, gatekeeperHistoryLoading, gatekeeperHistoryError,
     scannerOpen, setScannerOpen, videoRef,
     runGatekeeperAction, refreshGatekeeperData, acknowledgeGatekeeperResult,
     openScanner, openManualEntry,
