@@ -4,6 +4,7 @@ import { useState } from "react";
 import { HaddirSelect } from "../../../components/ui/HaddirSelect";
 import { Activity, CalendarDays, RefreshCw, Search, SlidersHorizontal, UserRound, X } from "lucide-react";
 import { ADMIN_ACTIVITY_PAGE_SIZE, useAdminActivity } from "./useAdminActivity";
+import { SkeletonState } from "../../../components/ui/SkeletonState";
 import type { AdminActivityRow } from "./admin-activity.types";
 
 const actionNames:Record<string,string>={"events.created":"أنشأ فعالية","events.updated":"عدّل بيانات فعالية","events.deleted":"حذف فعالية","event.cancelled":"ألغى فعالية / أخفاها","event.published":"نشر فعالية","profiles.created":"أنشأ حساب مستخدم","profiles.updated":"عدّل بيانات مستخدم","profiles.deleted":"حذف حساب مستخدم","user.role_changed":"غيّر دور مستخدم","bookings.created":"أنشأ حجزاً","bookings.updated":"عدّل بيانات الحجز","bookings.deleted":"حذف حجز","booking.confirmed":"وافق على الحجز","booking.rejected":"رفض الحجز","booking.pending":"أعاد الحجز إلى الانتظار","payment.approved":"اعتمد إثبات الدفع","payment.rejected":"رفض إثبات الدفع","payment.pending":"أعاد إثبات الدفع للمراجعة","payment_submissions.created":"سجّل إثبات دفع","payment_submissions.updated":"عدّل بيانات إثبات الدفع","payment_submissions.deleted":"حذف إثبات دفع","tickets.created":"أصدر تذكرة","tickets.updated":"عدّل بيانات تذكرة","tickets.deleted":"حذف تذكرة","ticket.checked_in":"أكد دخول التذكرة","ticket.checkin_reversed":"ألغى تأكيد دخول التذكرة","ticket.status_changed":"عدّل حالة التذكرة","ticket_types.created":"أضاف فئة تذاكر","ticket_types.updated":"عدّل فئة تذاكر","ticket_types.deleted":"حذف فئة تذاكر","event_payment_accounts.created":"أضاف حساب دفع","event_payment_accounts.updated":"عدّل حساب دفع","event_payment_accounts.deleted":"حذف حساب دفع"};
@@ -53,7 +54,6 @@ export default function AdminActivityWorkspace() {
       <div><span className="admin-activity-eyebrow"><Activity size={14}/> الشفافية والمتابعة</span><h3>سجل الإجراءات</h3><p>تابع العمليات التي ينفذها فريق حاضر، واعرف من قام بها ومتى وما الذي تغيّر.</p></div>
       <button className="admin-refresh" type="button" onClick={()=>void refresh()} disabled={loading}><RefreshCw size={16}/> {loading?"جاري التحديث":"تحديث السجل"}</button>
     </div>
-    {error&&<div className="admin-notice" role="alert">{error}</div>}
     <div className="admin-activity-stats">
       <article><span><Activity size={18}/></span><div><small>إجراءات الصفحة</small><strong>{loading?"—":filtered.length.toLocaleString("ar-SD-u-nu-latn")}</strong></div></article>
       <article><span><CalendarDays size={18}/></span><div><small>إجراءات اليوم في الصفحة</small><strong>{loading?"—":todayCount.toLocaleString("ar-SD-u-nu-latn")}</strong></div></article>
@@ -69,7 +69,7 @@ export default function AdminActivityWorkspace() {
       </div>
     </div>
     <div className="admin-activity-results-head"><div><h4>تفاصيل الإجراءات</h4><p>{loading?"يتم تحميل السجل...":`عرض ${filtered.length.toLocaleString("ar-SD-u-nu-latn")} في هذه الصفحة من أصل ${total.toLocaleString("ar-SD-u-nu-latn")} نتيجة`}</p></div></div>
-    {loading?<div className="admin-activity-empty"><span className="admin-spinner"/><p>جاري تحميل سجل الإجراءات...</p></div>:filtered.length===0?<div className="admin-activity-empty"><span><Search size={23}/></span><b>{rows.length?"لا توجد نتائج مطابقة":"لا توجد إجراءات مسجلة حتى الآن"}</b><p>{rows.length?"جرّب تغيير كلمات البحث أو الفلاتر المحددة.":"ستظهر هنا العمليات الجديدة التي ينفذها فريق الإدارة."}</p>{hasFilters&&<button type="button" onClick={reset}>عرض كل الإجراءات</button>}</div>:<div className="admin-activity-list">{filtered.map((row:AdminActivityRow,index:number)=>{
+    {loading&&!error?<SkeletonState variant="notifications" count={5} label="جاري تحميل سجل الإجراءات..." />:error?<div className="admin-notice" role="alert">{error}<button type="button" className="admin-refresh" onClick={()=>void refresh()}>إعادة المحاولة</button></div>:filtered.length===0?<div className="admin-activity-empty"><span><Search size={23}/></span><b>{rows.length?"لا توجد نتائج مطابقة":"لا توجد إجراءات مسجلة حتى الآن"}</b><p>{rows.length?"جرّب تغيير كلمات البحث أو الفلاتر المحددة.":"ستظهر هنا العمليات الجديدة التي ينفذها فريق الإدارة."}</p>{hasFilters&&<button type="button" onClick={reset}>عرض كل الإجراءات</button>}</div>:<div className="admin-activity-list">{filtered.map((row:AdminActivityRow,index:number)=>{
       const details=detailText(row.details);const group=actionGroup(row.action);
       return <article className="admin-activity-item" key={row.id||index}>
         <div className="admin-activity-item-rail"><span><Activity size={16}/></span></div>
