@@ -33,7 +33,7 @@ export async function listAdminUsers(searchTerm: string, roleFilter = "all", pag
       return { ...user, assignment_event_ids: eventIds, assignment_event_id: eventIds[0] || "" };
     }) as AdminUserRow[],
     eventOptions: (events || []) as AdminUserEventOption[],
-    total: count || 0,
+    total: Number(total || 0),
     error: null,
   };
 }
