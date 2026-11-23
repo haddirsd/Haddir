@@ -31,7 +31,7 @@ export default function AdminBookingsWorkspace() {
       </div>
     </div>
     {error&&<p className="admin-form-message" role="alert">{error}</p>}
-    {loading?<SkeletonState variant="admin-cards" count={4} label="جاري تحميل الحجوزات..." />:<div className="admin-booking-cards">
+    {loading&&!error?<SkeletonState variant="admin-cards" count={4} label="جاري تحميل الحجوزات..." />:error?<div className="admin-notice" role="alert">{error}<button type="button" className="admin-refresh" onClick={()=>void refresh()}>إعادة المحاولة</button></div>:<div className="admin-booking-cards">
       {rows.length===0?<p className="admin-no-data">لا توجد حجوزات حتى الآن.</p>:rows.map((r:AdminBookingRow,i:number)=>{
         const items=(r.booking_items||[]).map(item=>`${item.ticket_types?.name||"تذكرة"} × ${item.quantity}`).join("، ")||"—";
         const payment=[...(r.payment_submissions||[])].sort((a,b)=>new Date(b.created_at||0).getTime()-new Date(a.created_at||0).getTime())[0];
