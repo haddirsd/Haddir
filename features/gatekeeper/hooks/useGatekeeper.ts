@@ -93,13 +93,13 @@ export function useGatekeeper({
     setGatekeeperHistoryLoading(true);
     setGatekeeperHistoryError("");
     try {
-      const [{ data: stats }, { data: history, error }] = await Promise.all([
+      const [{ data: stats, error: statsError }, { data: history, error: historyError }] = await Promise.all([
         getGatekeeperScanStats(assignedEvent.event_id),
         getGatekeeperScanHistory(assignedEvent.event_id),
       ]);
       if (requestId !== dataRequestSequence.current) return;
       if (stats) setGatekeeperCounts({ ...emptyStats, ...stats });
-      if (error) setGatekeeperHistoryError(error);
+      if (statsError || historyError) setGatekeeperHistoryError(statsError?.message || historyError?.message || "تعذر تحميل سجل الدخول.");
       else if (Array.isArray(history)) setGatekeeperHistory(history);
     } catch (error) {
       if (requestId === dataRequestSequence.current) setGatekeeperHistoryError(error instanceof Error ? error.message : "تعذر تحميل سجل الدخول.");
