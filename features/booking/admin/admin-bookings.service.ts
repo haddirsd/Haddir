@@ -22,13 +22,27 @@ export async function listAdminBookings(searchTerm = "", page = 0): Promise<Admi
   const { data, count, error } = await query;
   if (error) return { rows: [], totalCount: 0, error: error.message || "تعذر تحميل الحجوزات." };
 
-  const rows = await Promise.all((data || []).map(async (row: any) => {
-    const paymentSubmissions = await Promise.all((row.payment_submissions || []).map(async (payment: any) => {
-      if (!payment.receipt_path) return payment;
-      const { data: signed } = await supabase.storage.from("payment-receipts").createSignedUrl(payment.receipt_path, 900);
-      return { ...payment, receipt_url: signed?.signedUrl || null };
-    }));
-    return { ...row, payment_submissions: paymentSubmissions };
+  const receiptPaths = Array.from(new Set(
+    (data || []).flatMap((row: any) =>
+      (row.payment_submissions || [])
+        .map((payment: any) => payment.receipt_path)
+        .filter((path: unknown): path is string => typeof path === "string" && path.length > 0)
+    )
+  ));
+  const { data: signedFiles } = receiptPaths.length
+    ? await supabase.storage.from("payment-receipts").createSignedUrls(receiptPaths, 900)
+    : { data: [] };
+  const receiptUrls = new Map(
+    (signedFiles || []).flatMap((file) =>
+      file.path && file.signedUrl && !file.error ? [[file.path, file.signedUrl] as const] : []
+    )
+  );
+  const rows = (data || []).map((row: any) => ({
+    ...row,
+    payment_submissions: (row.payment_submissions || []).map((payment: any) => ({
+      ...payment,
+      receipt_url: payment.receipt_path ? receiptUrls.get(payment.receipt_path) || null : null,
+    })),
   }));
   return { rows: rows as AdminBookingRow[], totalCount: count ?? 0, error: null };
 }
