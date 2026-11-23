@@ -11,7 +11,7 @@ type AssignedEvent = { events?: { title?: string; venue?: string; city?: string;
 
 export function GatekeeperWorkspace({
   userRole, assignedEvent, online, counts, loading, code, result, manualEntryOpen,
-  scannerOpen, history, historyLoading, videoRef, onOpenScanner, onOpenManual,
+  scannerOpen, history, historyLoading, historyError, onRefreshHistory, videoRef, onOpenScanner, onOpenManual,
   onCodeChange, onManualSubmit, onAcknowledgeResult, onClose,
 }: {
   userRole: string;
@@ -25,6 +25,8 @@ export function GatekeeperWorkspace({
   scannerOpen: boolean;
   history: GatekeeperScanHistoryItem[];
   historyLoading: boolean;
+  historyError: string;
+  onRefreshHistory: () => void;
   videoRef: RefObject<HTMLVideoElement | null>;
   onOpenScanner: () => void;
   onOpenManual: () => void;
@@ -91,7 +93,7 @@ export function GatekeeperWorkspace({
             </section>
           </div>;
         })()}
-        <ScanHistory items={history} loading={historyLoading} />
+        <ScanHistory items={history} loading={historyLoading} error={historyError} onRetry={onRefreshHistory} />
       </div> : <div className="empty-state" role="alert">
         <strong>ما عندك صلاحية لواجهة البواب</strong><p>الواجهة دي مخصصة لحسابات البواب والمنظم المعتمدة فقط.</p>
         <button className="btn btn-outline" type="button" onClick={onClose}>العودة للملف الشخصي</button>
