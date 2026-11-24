@@ -9,6 +9,7 @@ import AdminUsersWorkspace from "../../users/admin/AdminUsersWorkspace";
 import AdminActivityWorkspace from "../activity/AdminActivityWorkspace";
 import AdminReportsWorkspace from "../reports/AdminReportsWorkspace";
 import AdminBroadcastNotifications from "./AdminBroadcastNotifications";
+import AdminBookingNotifications from "./AdminBookingNotifications";
 import AdminOverviewWorkspace from "../overview/AdminOverviewWorkspace";
 import { Activity, BadgeCheck, Banknote, CalendarDays, ClipboardCheck, LayoutDashboard, LogOut, Megaphone, Shield, Ticket, Users } from "lucide-react";
 import { HaddirDialog } from "../../../components/ui/HaddirDialog";
@@ -19,7 +20,7 @@ import { useAdminWorkspaceNavigation } from "../hooks/useAdminWorkspaceNavigatio
 
 export default function AdminPage() {
   const router = useRouter();
-  const { role, name, avatarUrl, loading, error } = useAdminAccess();
+  const { role, userId, name, avatarUrl, loading, error } = useAdminAccess();
   const darkMode = useAdminTheme();
   const {
     section,
@@ -58,7 +59,7 @@ export default function AdminPage() {
         {error&&<div className="admin-notice" role="status">{error}</div>}
         <div key={section} className="admin-section-transition">
           {section==="overview"&&<AdminOverviewWorkspace role={role} onNavigate={setAdminSection}/>}
-          {section==="notifications"&&<AdminBroadcastNotifications/>}
+          {section==="notifications"&&<><AdminBookingNotifications userId={userId}/><AdminBroadcastNotifications/></>}
           {section==="events"?<AdminEventsWorkspace role={role}/>:section==="bookings"?<AdminBookingsWorkspace/>:section==="payments"?<AdminPaymentsWorkspace/>:section==="users"?<AdminUsersWorkspace role={role} searchTerm={userSearchTerm} onSearchTermChange={setUserSearchTerm}/>:section==="activity"?<AdminActivityWorkspace/>:section==="reports"?<AdminReportsWorkspace/>:null}
         </div>
         <footer className="admin-footer">حاضر · نظام إدارة الفعاليات والتذاكر <span>{roleLabel}</span></footer>
