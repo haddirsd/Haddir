@@ -63,26 +63,48 @@ export async function listAdminPaymentEvents(): Promise<{ events: AdminPaymentEv
   if (scope.eventIds !== null && scope.eventIds.length === 0) return { events: [], error: null };
 
   let eventsQuery = supabase.from("events").select("id,title").order("title", { ascending: true });
-  let pendingQuery = supabase.from("payment_submissions")
-    .select("id,bookings!inner(event_id)")
-    .eq("status", "submitted");
-  if (scope.eventIds !== null) {
-    eventsQuery = eventsQuery.in("id", scope.eventIds);
-    pendingQuery = pendingQuery.in("bookings.event_id", scope.eventIds);
-  }
+  if (scope.eventIds !== null) eventsQuery = eventsQuery.in("id", scope.eventIds);
 
-  const [{ data: eventRows, error: eventsError }, { data: pendingRows, error: pendingError }] = await Promise.all([
+  const [{ data: eventRows, error: eventsError }, { data: firstPage, count: pendingCount, error: pendingError }] = await Promise.all([
     eventsQuery,
-    pendingQuery,
+    supabase.from("payment_submissions")
+      .select("id,booking_id", { count: "exact" })
+      .eq("status", "submitted")
+      .order("id", { ascending: true })
+      .range(0, 999),
   ]);
   if (eventsError) return { events: [], error: eventsError.message || "تعذر تحميل قائمة الفعاليات." };
   if (pendingError) return { events: [], error: pendingError.message || "تعذر تحميل أعداد الحجوزات المعلقة." };
 
+  const pendingRows = [...(firstPage || [])];
+  const totalPending = pendingCount ?? pendingRows.length;
+  for (let from = 1000; from < totalPending; from += 1000) {
+    const { data, error } = await supabase.from("payment_submissions")
+      .select("id,booking_id")
+      .eq("status", "submitted")
+      .order("id", { ascending: true })
+      .range(from, from + 999);
+    if (error) return { events: [], error: error.message || "تعذر استكمال تحميل أعداد الحجوزات المعلقة." };
+    pendingRows.push(...(data || []));
+  }
+
+  const bookingIds = [...new Set(pendingRows.map((row: any) => row.booking_id).filter(Boolean))];
+  const bookingEventIds = new Map<string, string>();
+  for (let from = 0; from < bookingIds.length; from += 500) {
+    const batch = bookingIds.slice(from, from + 500);
+    let bookingsQuery = supabase.from("bookings").select("id,event_id").in("id", batch);
+    if (scope.eventIds !== null) bookingsQuery = bookingsQuery.in("event_id", scope.eventIds);
+    const { data, error } = await bookingsQuery;
+    if (error) return { events: [], error: error.message || "تعذر ربط إثباتات الدفع بالفعاليات." };
+    for (const booking of data || []) {
+      if (booking.id && booking.event_id) bookingEventIds.set(booking.id, booking.event_id);
+    }
+  }
+
   const counts = new Map<string, number>();
-  for (const row of pendingRows || []) {
-    const booking = Array.isArray((row as any).bookings) ? (row as any).bookings[0] : (row as any).bookings;
-    const id = booking?.event_id;
-    if (id) counts.set(id, (counts.get(id) || 0) + 1);
+  for (const row of pendingRows) {
+    const eventId = bookingEventIds.get(row.booking_id);
+    if (eventId) counts.set(eventId, (counts.get(eventId) || 0) + 1);
   }
   return {
     events: (eventRows || []).map((event: any) => ({
