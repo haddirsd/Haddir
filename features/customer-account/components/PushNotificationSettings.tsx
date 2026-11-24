@@ -121,7 +121,7 @@ export function PushNotificationSettings({userId}:{userId:string|null}){
   <span aria-hidden="true" style={{width:42,height:42,flex:"0 0 42px",display:"grid",placeItems:"center",borderRadius:13,background:"rgba(91,46,255,.12)",color:"#5B2EFF"}}>{enabled?<BellRing size={21}/>:<BellOff size={21}/>}</span>
   <div style={{flex:"1 1 160px",minWidth:0}}>
    <strong style={{display:"block",fontSize:13}}>الإشعارات الخارجية</strong>
-   <span style={{display:"block",marginTop:4,fontSize:11,lineHeight:1.7,opacity:.72}}>تصلك تحديثات حجوزاتك حتى لو حاضر مقفول.</span>
+   <span style={{display:"block",marginTop:4,fontSize:11,lineHeight:1.7,opacity:.72}}>تصلك تنبيهات حسابك حتى لو حاضر مقفول.</span>
    {message&&<span role="status" aria-live="polite" style={{display:"block",marginTop:6,fontSize:11,lineHeight:1.7}}>{message}</span>}
   </div>
   {!supported?<span style={{fontSize:11,opacity:.7}}>غير مدعوم في هذا المتصفح</span>:<div style={{display:"flex",alignItems:"center",gap:9,flex:"0 0 auto"}}>
