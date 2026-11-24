@@ -8,6 +8,7 @@ import type { AdminRole } from "../types";
 export function useAdminAccess() {
   const router = useRouter();
   const [role, setRole] = useState<AdminRole | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [loading, setLoading] = useState(true);
@@ -42,6 +43,7 @@ export function useAdminAccess() {
         return;
       }
 
+      setUserId(user.id);
       setRole(profile.role as AdminRole);
       const metadata = user.user_metadata || {};
       setName(profile.full_name || metadata.full_name || metadata.name || user.email || "فريق حاضر");
@@ -55,5 +57,5 @@ export function useAdminAccess() {
     };
   }, [router]);
 
-  return { role, name, avatarUrl, loading, error };
+  return { role, userId, name, avatarUrl, loading, error };
 }
