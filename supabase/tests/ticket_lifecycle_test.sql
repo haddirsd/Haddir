@@ -102,9 +102,8 @@ select is(
 );
 
 select throws_ok(
-  $select public.review_payment_submission(
-    '46000000-0000-4000-8000-000000000003','approve',null
-  )$,
+  format('select public.review_payment_submission(%L,%L,NULL)',
+    '46000000-0000-4000-8000-000000000003','approve'),
   'P0001','لا يمكن اعتماد حجز بدون عناصر تذاكر',
   'Payment approval rejects a booking with no ticket items'
 );
