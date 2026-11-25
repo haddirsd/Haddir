@@ -23,6 +23,13 @@ function ok(test, message) {
   if (!test) throw new Error('FAIL: ' + message);
   console.log('PASS:', message);
 }
+function redactSensitiveString(value) {
+  return value
+    .replace(/Bearer\s+[^\s"'\]}]+/gi, 'Bearer [REDACTED]')
+    .replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g, '[REDACTED_JWT]')
+    .replace(/sb_(?:secret|publishable)_[A-Za-z0-9_-]+/gi, '[REDACTED_API_KEY]')
+    .replace(/((?:access[_-]?token|refresh[_-]?token|password|secret|api[_-]?key|authorization)\s*[:=]\s*)["']?[^\s"',}]+/gi, '$1[REDACTED]');
+}
 function redactSensitiveValues(value) {
   if (Array.isArray(value)) return value.map(redactSensitiveValues);
   if (value && typeof value === 'object') {
@@ -33,6 +40,7 @@ function redactSensitiveValues(value) {
         : redactSensitiveValues(item)
     ]));
   }
+  if (typeof value === 'string') return redactSensitiveString(value);
   return value;
 }
 function safeResponseBody(raw) {
