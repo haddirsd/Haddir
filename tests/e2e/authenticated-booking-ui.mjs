@@ -144,10 +144,10 @@ try {
   await context.tracing.start({ screenshots: true, snapshots: true, sources: true });
 
   const redactSecrets = (value) => String(value)
-    .replace(/(authorization\\s*[:=]\\s*bearer\\s+)[^\\s"'<>]+/gi, "$1[REDACTED]")
-    .replace(/(Bearer\\s+)[A-Za-z0-9._~+\\/-]+=*/gi, "$1[REDACTED]")
-    .replace(/eyJ[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}/g, "[REDACTED_JWT]")
-    .replace(/(apikey|api_key|anon_key|service_role_key|access_token|refresh_token)(\\s*[:=]\\s*)[^\\s"',}]+/gi, "$1$2[REDACTED]");
+    .replace(/(authorization\s*[:=]\s*bearer\s+)[^\s"'<>]+/gi, "$1[REDACTED]")
+    .replace(/(Bearer\s+)[A-Za-z0-9._~+\/-]+=*/gi, "$1[REDACTED]")
+    .replace(/eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/g, "[REDACTED_JWT]")
+    .replace(/(apikey|api_key|anon_key|service_role_key|access_token|refresh_token)(\s*[:=]\s*)[^\s"',}]+/gi, "$1$2[REDACTED]");
 
   const page = await context.newPage();
   page.on("pageerror", (error) => pageErrors.push(redactSecrets(error.stack || error.message)));
