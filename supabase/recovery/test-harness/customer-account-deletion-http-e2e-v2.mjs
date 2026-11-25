@@ -93,6 +93,7 @@ function seedOk(response, acceptedStatuses, message) {
       user_id: uid,
       event_id: eventId,
       status: 'pending_payment',
+      expires_at: new Date(Date.now() + 3600000).toISOString(),
       customer_name: 'Deletion E2E',
       customer_email: email,
       customer_phone: '0000000000',
