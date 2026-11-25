@@ -111,11 +111,15 @@ select is(
   'submitted'::text,
   'Rejected review attempt leaves the payment submission unchanged'
 );
+reset role;
 select is(
   (select count(*)::integer from public.tickets where booking_id='43000000-0000-4000-8000-000000000003'),
   1,
   'Rejected review attempt does not issue duplicate tickets'
 );
+set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"13000000-0000-4000-8000-000000000003","role":"authenticated"}',true);
+select set_config('request.jwt.claim.sub','13000000-0000-4000-8000-000000000003',true);
 select throws_ok(
   $$select public.review_payment_submission('63000000-0000-4000-8000-000000000002','reject','Unassigned event test rejection')$$,
   'P0001','لا تملك تكليفاً لمراجعة حجوزات هذه الفعالية','Supervisor cannot review payment for an unassigned event'
@@ -142,9 +146,10 @@ select throws_ok(
   '42501',null,'Gatekeeper cannot write check-ins directly even for the assigned event'
 );
 select lives_ok(
-  $$select public.gatekeeper_ticket_action('8130000001',true)$$,
+  $select public.gatekeeper_ticket_action('8130000001',true)$,
   'Gatekeeper can confirm a valid ticket within the assigned event'
 );
+reset role;
 select is(
   (select count(*)::integer from public.checkins where ticket_id='73000000-0000-4000-8000-000000000001'),
   1,
@@ -160,6 +165,9 @@ select is(
   '13000000-0000-4000-8000-000000000004'::uuid,
   'Check-in record identifies the authenticated gatekeeper'
 );
+set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"13000000-0000-4000-8000-000000000004","role":"authenticated"}',true);
+select set_config('request.jwt.claim.sub','13000000-0000-4000-8000-000000000004',true);
 select throws_ok(
   $$select public.gatekeeper_ticket_action('8130000002',false)$$,
   'P0001','هذه التذكرة لا تخص الفعالية المصرح لك بها','Gatekeeper scanner rejects a ticket from another event'
