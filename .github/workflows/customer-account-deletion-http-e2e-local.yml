@@ -47,7 +47,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          supabase functions serve delete-customer-account > /tmp/delete-customer-account-function.log 2>&1 &
+          supabase functions serve delete-customer-account --no-verify-jwt > /tmp/delete-customer-account-function.log 2>&1 &
           echo $! > /tmp/delete-customer-account-function.pid
           for attempt in $(seq 1 60); do
             status="$(curl --silent --output /tmp/delete-customer-account-health.txt --write-out '%{http_code}' http://127.0.0.1:54321/functions/v1/delete-customer-account || true)"
@@ -60,6 +60,39 @@ jobs:
           cat /tmp/delete-customer-account-function.log
           echo "Edge Function did not become ready."
           exit 1
+
+      - name: Verify function rejects missing and forged user JWTs
+        shell: bash
+        run: |
+          set -euo pipefail
+          eval "$(supabase status -o env)"
+
+          missing_auth_status="$(curl --silent --output /dev/null --write-out '%{http_code}' \
+            --max-time 15 \
+            --request POST \
+            --header "apikey: $ANON_KEY" \
+            --header 'Content-Type: application/json' \
+            --data '{}' \
+            http://127.0.0.1:54321/functions/v1/delete-customer-account)"
+          echo "Missing Authorization status: $missing_auth_status"
+          if [ "$missing_auth_status" != "401" ]; then
+            echo "SECURITY CHECK FAILED: missing Authorization did not return HTTP 401."
+            exit 1
+          fi
+
+          forged_jwt_status="$(curl --silent --output /dev/null --write-out '%{http_code}' \
+            --max-time 15 \
+            --request POST \
+            --header "apikey: $ANON_KEY" \
+            --header 'Authorization: Bearer not.a.valid.jwt' \
+            --header 'Content-Type: application/json' \
+            --data '{}' \
+            http://127.0.0.1:54321/functions/v1/delete-customer-account)"
+          echo "Forged JWT status: $forged_jwt_status"
+          if [ "$forged_jwt_status" != "401" ]; then
+            echo "SECURITY CHECK FAILED: forged JWT did not return HTTP 401."
+            exit 1
+          fi
 
       - name: Diagnose local profiles schema and seed requirements
         shell: bash
@@ -131,10 +164,50 @@ jobs:
         run: |
           set -euo pipefail
           eval "$(supabase status -o env)"
+          cat > /tmp/log-stale-booking-response.mjs <<'EOF'
+          const originalFetch = globalThis.fetch.bind(globalThis);
+          let deletionSucceeded = false;
+
+          globalThis.fetch = async (input, init = {}) => {
+            const requestUrl = typeof input === "string"
+              ? input
+              : input instanceof URL
+                ? input.href
+                : input.url;
+            const method = (init.method || (input instanceof Request ? input.method : "GET")).toUpperCase();
+            const response = await originalFetch(input, init);
+
+            if (
+              method === "POST" &&
+              requestUrl.includes("/functions/v1/delete-customer-account") &&
+              response.ok
+            ) {
+              deletionSucceeded = true;
+            } else if (
+              deletionSucceeded &&
+              method === "POST" &&
+              /\/rest\/v1\/bookings(?:\?|$)/.test(requestUrl)
+            ) {
+              const responseBody = await response.clone().text();
+              console.log("STALE_JWT_BOOKING_HTTP_STATUS:", response.status);
+              console.log("STALE_JWT_BOOKING_RESPONSE_BEGIN");
+              console.log(responseBody);
+              console.log("STALE_JWT_BOOKING_RESPONSE_END");
+              console.log(
+                "STALE_JWT_BOOKING_REJECTION_SOURCE:",
+                responseBody.includes("الحساب قيد الحذف")
+                  ? "DELETION_TOMBSTONE_MARKER"
+                  : "OTHER_OR_UNCONFIRMED"
+              );
+            }
+
+            return response;
+          };
+          EOF
           SUPABASE_URL="$API_URL" \
           SUPABASE_ANON_KEY="$ANON_KEY" \
           SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY" \
-            node supabase/recovery/test-harness/customer-account-deletion-http-e2e-v2.mjs
+            node --import /tmp/log-stale-booking-response.mjs supabase/recovery/test-harness/customer-account-deletion-http-e2e-v2.mjs
 
       - name: Show Edge Function logs on failure
         if: failure()
