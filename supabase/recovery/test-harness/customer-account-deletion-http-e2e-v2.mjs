@@ -154,15 +154,26 @@ function seedOk(response, acceptedStatuses, message) {
   ok(storageCheck.status === 200 && Array.isArray(storageCheck.data) && storageCheck.data.length === 0,
     'physical receipt object removed');
 
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uid)) {
+    throw new Error('Invalid UUID for local cleanup record verification');
+  }
   const cleanupRecordCheck = execFileSync('psql', [
     dbUrl,
     '-X',
     '-v', 'ON_ERROR_STOP=1',
-    '-v', `user_id=${uid}`,
     '-Atc',
-    "select exists (select 1 from private.customer_account_deletion_cleanup where user_id = :'user_id'::uuid and cardinality(receipt_paths) = 0)"
+    `select exists (select 1 from private.customer_account_deletion_cleanup where user_id = '${uid}'::uuid) as record_exists,
+            coalesce((select cardinality(receipt_paths) from private.customer_account_deletion_cleanup where user_id = '${uid}'::uuid), 0) = 0 as no_receipt_paths,
+            exists (select 1 from private.customer_account_deletion_cleanup where user_id = '${uid}'::uuid)
+              and coalesce((select cardinality(receipt_paths) from private.customer_account_deletion_cleanup where user_id = '${uid}'::uuid), 0) = 0 as result`
   ], { encoding: 'utf8' }).trim();
-  ok(cleanupRecordCheck === 't', 'local cleanup tombstone retained with no receipt paths');
+  const [recordExists, noReceiptPaths, cleanupResult] = cleanupRecordCheck.split('|');
+  console.log('Cleanup record query:', JSON.stringify({
+    record_exists: recordExists === 't',
+    no_receipt_paths: noReceiptPaths === 't',
+    result: cleanupResult === 't'
+  }));
+  ok(cleanupResult === 't', 'local cleanup tombstone retained with no receipt paths');
 
   const stale = await call('/rest/v1/bookings', {
     method: 'POST', token: jwt, headers: { Prefer: 'return=minimal' },
