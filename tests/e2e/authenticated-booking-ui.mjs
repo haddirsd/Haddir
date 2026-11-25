@@ -25,9 +25,11 @@ const email = `haddir-auth-ui-${suffix}@example.test`;
 const eventId = randomUUID();
 const ticketTypeId = randomUUID();
 const paymentAccountId = randomUUID();
-const receiptBytes = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jF1sAAAAASUVORK5CYII=", "base64");
+const receiptBytes = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAADklEQVR4nGP4DwUMMAYAj4IP8TylVlEAAAAASUVORK5CYII=", "base64");
 const pageErrors = [];
 const consoleErrors = [];
+const supabaseHttpErrors = [];
+const pendingResponseCaptures = [];
 let browser;
 let userId = null;
 let eventCreated = false;
@@ -134,10 +136,45 @@ try {
     { storageKey: `sb-${projectRef}-auth-token`, session: signedIn.session },
   );
 
+  const diagnosticsDir = process.env.CHROMIUM_DIAGNOSTICS_DIR || "/tmp/haddir-chromium-diagnostics";
+  const { mkdir } = await import("node:fs/promises");
+  await mkdir(diagnosticsDir, { recursive: true });
+  const tracePath = `${diagnosticsDir}/authenticated-booking-trace.zip`;
+  const screenshotPath = `${diagnosticsDir}/authenticated-booking-failure.png`;
+  await context.tracing.start({ screenshots: true, snapshots: true, sources: true });
+
+  const redactSecrets = (value) => String(value)
+    .replace(/(authorization\s*[:=]\s*bearer\s+)[^\s"'<>]+/gi, "$1[REDACTED]")
+    .replace(/(Bearer\s+)[A-Za-z0-9._~+\/-]+=*/gi, "$1[REDACTED]")
+    .replace(/eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/g, "[REDACTED_JWT]")
+    .replace(/(apikey|api_key|anon_key|service_role_key|access_token|refresh_token)(\s*[:=]\s*)[^\s"',}]+/gi, "$1$2[REDACTED]");
+
   const page = await context.newPage();
-  page.on("pageerror", (error) => pageErrors.push(error.stack || error.message));
+  page.on("pageerror", (error) => pageErrors.push(redactSecrets(error.stack || error.message)));
   page.on("console", (message) => {
-    if (message.type() === "error") consoleErrors.push(message.text());
+    if (message.type() === "error") consoleErrors.push(redactSecrets(message.text()));
+  });
+  page.on("response", (response) => {
+    const capture = (async () => {
+      const responseUrl = new URL(response.url());
+      const supabaseHost = new URL(url).host;
+      const isSupabase = responseUrl.host === supabaseHost
+        || responseUrl.host === "127.0.0.1:54321"
+        || responseUrl.host === "localhost:54321";
+      if (!isSupabase || response.status() < 400) return;
+      let body = "";
+      try {
+        body = await response.text();
+      } catch (error) {
+        body = `<unable to read response body: ${error.message}>`;
+      }
+      supabaseHttpErrors.push({
+        url: `${responseUrl.origin}${responseUrl.pathname}`,
+        status: response.status(),
+        body: redactSecrets(body),
+      });
+    })();
+    pendingResponseCaptures.push(capture);
   });
 
   const response = await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
@@ -181,7 +218,31 @@ try {
   const submitButton = page.getByRole("button", { name: /إرسال طلب الدفع للمراجعة/ });
   await submitButton.waitFor({ state: "visible" });
   await submitButton.click();
-  await page.getByRole("alertdialog", { name: "استلمنا طلب حجزك!" }).waitFor({ timeout: 20000 });
+  try {
+    await page.getByRole("alertdialog", { name: "استلمنا طلب حجزك!" }).waitFor({ timeout: 20000 });
+  } catch (error) {
+    await Promise.allSettled(pendingResponseCaptures);
+    const visibleAlerts = await page.locator('[role="alert"]:visible').allTextContents().catch(() => []);
+    console.error("CHROMIUM BOOKING DIAGNOSTICS: success dialog did not appear.");
+    console.error("Current page URL:", page.url());
+    console.error("Visible role=alert text:", JSON.stringify(visibleAlerts.map(redactSecrets)));
+    console.error("Collected console errors:", JSON.stringify(consoleErrors));
+    console.error("Collected page errors:", JSON.stringify(pageErrors));
+    console.error("Failed Supabase HTTP requests:", JSON.stringify(supabaseHttpErrors));
+    try {
+      await page.screenshot({ path: screenshotPath, fullPage: true });
+      console.error("Failure screenshot saved:", screenshotPath);
+    } catch (screenshotError) {
+      console.error("Could not save failure screenshot:", redactSecrets(screenshotError.stack || screenshotError.message));
+    }
+    try {
+      await context.tracing.stop({ path: tracePath });
+      console.error("Playwright trace saved:", tracePath);
+    } catch (traceError) {
+      console.error("Could not save Playwright trace:", redactSecrets(traceError.stack || traceError.message));
+    }
+    throw error;
+  }
 
   const booking = await dataOrThrow(
     await admin.from("bookings")

@@ -188,6 +188,8 @@ jobs:
           fi
 
           node --experimental-default-type=module --experimental-strip-types tests/e2e/browser-ui-smoke.mjs
+          mkdir -p /tmp/haddir-chromium-diagnostics
+          export CHROMIUM_DIAGNOSTICS_DIR="/tmp/haddir-chromium-diagnostics"
           node --experimental-default-type=module --experimental-strip-types tests/e2e/authenticated-booking-ui.mjs
           node --experimental-default-type=module --experimental-strip-types tests/e2e/admin-payment-review-ui.mjs
           node --experimental-default-type=module --experimental-strip-types tests/e2e/gatekeeper-ticket-checkin-ui.mjs
@@ -195,6 +197,15 @@ jobs:
           node --experimental-default-type=module --experimental-strip-types tests/e2e/owner-admin-management-ui.mjs
           node --experimental-default-type=module --experimental-strip-types tests/e2e/auth-session-lifecycle.mjs
           node --experimental-default-type=module --experimental-strip-types tests/e2e/customer-account-deletion-ui.mjs
+
+      - name: Upload authenticated Chromium booking diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: authenticated-booking-chromium-diagnostics
+          path: /tmp/haddir-chromium-diagnostics/
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Run complete customer booking lifecycle E2E test
         run: |
