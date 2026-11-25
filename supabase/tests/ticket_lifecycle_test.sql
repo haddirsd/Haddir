@@ -1,6 +1,6 @@
 begin;
 
-select plan(21);
+select plan(25);
 
 insert into auth.users (
   id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -60,6 +60,9 @@ insert into public.bookings(
  '42000000-0000-4000-8000-000000000001',100,'SDG','under_review'),
 ('44000000-0000-4000-8000-000000000002','TLC-BOOK-002','41000000-0000-4000-8000-000000000001',
  'Ticket Customer','ticket-lifecycle-customer@example.test','0914100001',
+ '42000000-0000-4000-8000-000000000001',100,'SDG','under_review'),
+('44000000-0000-4000-8000-000000000003','TLC-BOOK-003','41000000-0000-4000-8000-000000000001',
+ 'Ticket Customer','ticket-lifecycle-customer@example.test','0914100001',
  '42000000-0000-4000-8000-000000000001',100,'SDG','under_review');
 
 insert into public.booking_items(id,booking_id,ticket_type_id,quantity,unit_price,line_total) values
@@ -72,6 +75,8 @@ insert into public.payment_submissions(id,booking_id,submitted_by,amount,currenc
 ('46000000-0000-4000-8000-000000000001','44000000-0000-4000-8000-000000000001',
  '41000000-0000-4000-8000-000000000001',100,'SDG','submitted'),
 ('46000000-0000-4000-8000-000000000002','44000000-0000-4000-8000-000000000002',
+ '41000000-0000-4000-8000-000000000001',100,'SDG','submitted'),
+('46000000-0000-4000-8000-000000000003','44000000-0000-4000-8000-000000000003',
  '41000000-0000-4000-8000-000000000001',100,'SDG','submitted');
 
 set local role authenticated;
@@ -94,6 +99,25 @@ select is(
 select is(
   (select count(*)::integer from public.tickets where booking_id='44000000-0000-4000-8000-000000000001'),
   1,'Approval persists one ticket row'
+);
+
+select throws_ok(
+  format('select public.review_payment_submission(%L,%L,NULL)',
+    '46000000-0000-4000-8000-000000000003','approve'),
+  'P0001','لا يمكن اعتماد حجز بدون عناصر تذاكر',
+  'Payment approval rejects a booking with no ticket items'
+);
+select is(
+  (select status from public.bookings where id='44000000-0000-4000-8000-000000000003'),
+  'under_review','Rejected empty-booking approval leaves the booking under review'
+);
+select is(
+  (select status from public.payment_submissions where id='46000000-0000-4000-8000-000000000003'),
+  'submitted','Rejected empty-booking approval leaves payment submitted'
+);
+select is(
+  (select count(*)::integer from public.tickets where booking_id='44000000-0000-4000-8000-000000000003'),
+  0,'Rejected empty-booking approval issues no tickets'
 );
 
 select lives_ok(
