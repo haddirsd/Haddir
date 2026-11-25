@@ -207,6 +207,7 @@ jobs:
           SUPABASE_URL="$API_URL" \
           SUPABASE_ANON_KEY="$ANON_KEY" \
           SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY" \
+          DB_URL="$DB_URL" \
             node --import /tmp/log-stale-booking-response.mjs supabase/recovery/test-harness/customer-account-deletion-http-e2e-v2.mjs
 
       - name: Show Edge Function logs on failure
