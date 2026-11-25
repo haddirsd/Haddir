@@ -30,11 +30,11 @@ function redactSensitiveString(value) {
     safe = safe.split(secret).join('[REDACTED]');
   }
   return safe
-    .replace(/Bearer\\s+[^\\s"'\\]}]+/gi, 'Bearer [REDACTED]')
-    .replace(/\\b[A-Za-z0-9_-]{8,}\\.[A-Za-z0-9_-]{8,}\\.[A-Za-z0-9_-]{8,}\\b/g, '[REDACTED_JWT]')
+    .replace(/Bearer\s+[^\s"'\]}]+/gi, 'Bearer [REDACTED]')
+    .replace(/\b[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b/g, '[REDACTED_JWT]')
     .replace(/sb_(?:secret|publishable)_[A-Za-z0-9_-]+/gi, '[REDACTED_API_KEY]')
-    .replace(/(["']?[\\w.-]*(?:access[_-]?token|refresh[_-]?token|token|secret|password|passwd|authorization|api[_-]?key|private[_-]?key|credential|jwt)[\\w.-]*["']?\\s*[:=]\\s*)["']?[^\\s,"'}]+/gi, '$1[REDACTED]')
-    .replace(/(\\b(?:postgres(?:ql)?|mysql):\\/\\/[^:\\s/@]+:)[^@\\s/]+(@)/gi, '$1[REDACTED]$2');
+    .replace(/(["']?[\w.-]*(?:access[_-]?token|refresh[_-]?token|token|secret|password|passwd|authorization|api[_-]?key|private[_-]?key|credential|jwt)[\w.-]*["']?\s*[:=]\s*)["']?[^\s,"'}]+/gi, '$1[REDACTED]')
+    .replace(/(\b(?:postgres(?:ql)?|mysql):\/\/[^:\s/@]+:)[^@\s/]+(@)/gi, '$1[REDACTED]$2');
 }
 function redactSensitiveValues(value) {
   if (Array.isArray(value)) return value.map(redactSensitiveValues);
