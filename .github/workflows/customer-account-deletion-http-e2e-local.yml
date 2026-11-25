@@ -61,7 +61,7 @@ jobs:
           echo "Edge Function did not become ready."
           exit 1
 
-      - name: Verify function rejects missing and forged user JWTs
+      - name: Security check — reject missing Authorization and forged JWTs (HTTP 401)
         shell: bash
         run: |
           set -euo pipefail
@@ -93,71 +93,6 @@ jobs:
             echo "SECURITY CHECK FAILED: forged JWT did not return HTTP 401."
             exit 1
           fi
-
-      - name: Diagnose local profiles schema and seed requirements
-        shell: bash
-        run: |
-          set -euo pipefail
-          eval "$(supabase status -o env)"
-          echo "=== required columns without defaults in seed tables ==="
-          psql "$DB_URL" -X -v ON_ERROR_STOP=1 -P pager=off -c "
-            select c.table_schema, c.table_name, c.ordinal_position, c.column_name,
-                   c.data_type, c.udt_name, c.is_nullable, c.column_default
-            from information_schema.columns c
-            where (c.table_schema, c.table_name) in (
-              ('public', 'profiles'),
-              ('public', 'events'),
-              ('public', 'bookings'),
-              ('public', 'payment_submissions'),
-              ('auth', 'users')
-            )
-              and c.is_nullable = 'NO'
-              and c.column_default is null
-            order by c.table_schema, c.table_name, c.ordinal_position;"
-          echo "=== CHECK constraints in seed tables ==="
-          psql "$DB_URL" -X -v ON_ERROR_STOP=1 -P pager=off -c "
-            select n.nspname as table_schema, r.relname as table_name,
-                   c.conname, pg_get_constraintdef(c.oid, true) as definition
-            from pg_constraint c
-            join pg_class r on r.oid = c.conrelid
-            join pg_namespace n on n.oid = r.relnamespace
-            where (n.nspname, r.relname) in (
-              ('public', 'profiles'),
-              ('public', 'events'),
-              ('public', 'bookings'),
-              ('public', 'payment_submissions'),
-              ('auth', 'users')
-            )
-              and c.contype = 'c'
-            order by n.nspname, r.relname, c.conname;"
-          echo "=== profiles columns ==="
-          psql "$DB_URL" -X -v ON_ERROR_STOP=1 -P pager=off -c "
-            select ordinal_position, column_name, data_type, udt_name, is_nullable, column_default
-            from information_schema.columns
-            where table_schema = 'public' and table_name = 'profiles'
-            order by ordinal_position;"
-          echo "=== profiles CHECK / UNIQUE / FOREIGN KEY constraints ==="
-          psql "$DB_URL" -X -v ON_ERROR_STOP=1 -P pager=off -c "
-            select c.conname, c.contype, pg_get_constraintdef(c.oid, true) as definition
-            from pg_constraint c
-            join pg_class r on r.oid = c.conrelid
-            join pg_namespace n on n.oid = r.relnamespace
-            where n.nspname = 'public' and r.relname = 'profiles'
-              and c.contype in ('c', 'u', 'f')
-            order by c.contype, c.conname;"
-          echo "=== triggers on auth.users and public.profiles ==="
-          psql "$DB_URL" -X -v ON_ERROR_STOP=1 -P pager=off -c "
-            select n.nspname as schema_name, r.relname as table_name,
-                   t.tgname as trigger_name, pg_get_triggerdef(t.oid, true) as definition,
-                   p.proname as trigger_function
-            from pg_trigger t
-            join pg_class r on r.oid = t.tgrelid
-            join pg_namespace n on n.oid = r.relnamespace
-            join pg_proc p on p.oid = t.tgfoid
-            where not t.tgisinternal
-              and ((n.nspname = 'auth' and r.relname = 'users')
-                or (n.nspname = 'public' and r.relname = 'profiles'))
-            order by n.nspname, r.relname, t.tgname;"
 
       - name: Run customer account deletion HTTP E2E harness
         shell: bash
