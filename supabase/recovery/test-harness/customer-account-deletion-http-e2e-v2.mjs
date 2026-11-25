@@ -41,7 +41,7 @@ function redactSensitiveValues(value) {
   if (value && typeof value === 'object') {
     return Object.fromEntries(Object.entries(value).map(([key, item]) => [
       key,
-      /(?:token|secret|password|passwd|authorization|api.?key|private.?key|credential|service.?role|anon.?key|jwt)/i.test(key)
+      /(?:token|secret|password|passwd|authorization|key|credential|service.?role|jwt)/i.test(key)
         ? '[REDACTED]'
         : redactSensitiveValues(item)
     ]));
