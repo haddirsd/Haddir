@@ -25,7 +25,7 @@ const email = `haddir-auth-ui-${suffix}@example.test`;
 const eventId = randomUUID();
 const ticketTypeId = randomUUID();
 const paymentAccountId = randomUUID();
-const receiptBytes = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jF1sAAAAASUVORK5CYII=", "base64");
+const receiptBytes = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAADklEQVR4nGP4DwUMMAYAj4IP8TylVlEAAAAASUVORK5CYII=", "base64");
 const pageErrors = [];
 const consoleErrors = [];
 const supabaseHttpErrors = [];
