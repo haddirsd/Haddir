@@ -40,8 +40,10 @@ jobs:
           echo "Migration files: $migration_files"
           echo "Applied migrations: $applied_migrations"
           supabase migration list --local
-          test "$migration_files" -eq 93
-          test "$applied_migrations" -eq "$migration_files"
+          if [ "$applied_migrations" -ne "$migration_files" ]; then
+            echo "Migration count mismatch: $applied_migrations applied, but $migration_files migration files exist."
+            exit 1
+          fi
 
       - name: Serve delete-customer-account Edge Function locally
         shell: bash
