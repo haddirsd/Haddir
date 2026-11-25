@@ -146,7 +146,7 @@ select throws_ok(
   '42501',null,'Gatekeeper cannot write check-ins directly even for the assigned event'
 );
 select lives_ok(
-  $select public.gatekeeper_ticket_action('8130000001',true)$,
+  $$select public.gatekeeper_ticket_action('8130000001',true)$$,
   'Gatekeeper can confirm a valid ticket within the assigned event'
 );
 reset role;
