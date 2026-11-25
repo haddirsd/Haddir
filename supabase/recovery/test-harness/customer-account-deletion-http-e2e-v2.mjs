@@ -15,7 +15,7 @@ async function call(path, { method = 'GET', token, body, headers = {} } = {}) {
   const raw = await r.text();
   let data;
   try { data = raw ? JSON.parse(raw) : null; } catch { data = raw; }
-  return { status: r.status, data };
+  return { status: r.status, data, raw };
 }
 function ok(test, message) {
   if (!test) throw new Error('FAIL: ' + message);
@@ -40,7 +40,19 @@ function ok(test, message) {
     method: 'POST', token: service, headers: { Prefer: 'return=minimal' },
     body: { id: uid, role: 'customer' }
   });
-  ok([201, 204].includes(profile.status), 'seed customer profile');
+  if (![201, 204].includes(profile.status)) {
+    console.error('FAIL: seed customer profile');
+    console.error('HTTP status:', profile.status);
+    console.error('Response body:', profile.raw);
+    if (profile.data && typeof profile.data === 'object') {
+      console.error('code:', profile.data.code ?? null);
+      console.error('message:', profile.data.message ?? null);
+      console.error('details:', profile.data.details ?? null);
+      console.error('hint:', profile.data.hint ?? null);
+    }
+    throw new Error('seed customer profile failed');
+  }
+  console.log('PASS: seed customer profile');
 
   const event = await call('/rest/v1/events', {
     method: 'POST', token: service, headers: { Prefer: 'return=minimal' },
