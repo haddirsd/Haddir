@@ -79,6 +79,7 @@ function seedOk(response, acceptedStatuses, message) {
       slug: 'ci-deletion-test-' + eventId,
       created_by: null,
       starts_at: new Date(Date.now() - 86400000).toISOString(),
+      ends_at: new Date(Date.now() + 86400000).toISOString(),
       status: 'published'
     }
   });
