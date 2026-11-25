@@ -21,6 +21,22 @@ function ok(test, message) {
   if (!test) throw new Error('FAIL: ' + message);
   console.log('PASS:', message);
 }
+function seedOk(response, acceptedStatuses, message) {
+  if (acceptedStatuses.includes(response.status)) {
+    console.log('PASS:', message);
+    return;
+  }
+  console.error('FAIL:', message);
+  console.error('HTTP status:', response.status);
+  console.error('Response body:', response.raw);
+  if (response.data && typeof response.data === 'object') {
+    console.error('code:', response.data.code ?? null);
+    console.error('message:', response.data.message ?? null);
+    console.error('details:', response.data.details ?? null);
+    console.error('hint:', response.data.hint ?? null);
+  }
+  throw new Error(message + ' failed');
+}
 (async () => {
   const email = 'deletion-e2e-' + crypto.randomUUID() + '@example.com';
   const password = crypto.randomBytes(24).toString('base64url') + 'Aa1!';
@@ -33,46 +49,47 @@ function ok(test, message) {
     method: 'POST', token: service,
     body: { email, password, email_confirm: true, user_metadata: { full_name: 'Deletion E2E', phone: '0000000000' } }
   });
-  ok([200, 201].includes(created.status) && created.data?.id, 'create disposable Auth user');
+  seedOk(created, [200, 201], 'create disposable Auth user');
+  if (!created.data?.id) throw new Error('Auth user creation response did not contain an id');
   uid = created.data.id;
 
-  const profile = await call('/rest/v1/profiles', {
-    method: 'POST', token: service, headers: { Prefer: 'return=minimal' },
-    body: { id: uid, role: 'customer' }
+  const profile = await call('/rest/v1/profiles?id=eq.' + uid + '&select=id,role', {
+    token: service
   });
-  if (![201, 204].includes(profile.status)) {
-    console.error('FAIL: seed customer profile');
+  const profileRow = Array.isArray(profile.data) ? profile.data[0] : null;
+  if (profile.status !== 200 || !profileRow || profileRow.id !== uid || profileRow.role !== 'customer') {
+    console.error('FAIL: verify automatically created customer profile');
     console.error('HTTP status:', profile.status);
     console.error('Response body:', profile.raw);
-    if (profile.data && typeof profile.data === 'object') {
+    if (profile.data && typeof profile.data === 'object' && !Array.isArray(profile.data)) {
       console.error('code:', profile.data.code ?? null);
       console.error('message:', profile.data.message ?? null);
       console.error('details:', profile.data.details ?? null);
       console.error('hint:', profile.data.hint ?? null);
     }
-    throw new Error('seed customer profile failed');
+    throw new Error('automatically created customer profile verification failed');
   }
-  console.log('PASS: seed customer profile');
+  console.log('PASS: verify automatically created customer profile and role=customer');
 
   const event = await call('/rest/v1/events', {
     method: 'POST', token: service, headers: { Prefer: 'return=minimal' },
     body: { id: eventId, created_by: null, starts_at: new Date(Date.now() - 86400000).toISOString() }
   });
-  ok([201, 204].includes(event.status), 'seed past event');
+  seedOk(event, [201, 204], 'seed past event');
 
   const booking = await call('/rest/v1/bookings', {
     method: 'POST', token: service, headers: { Prefer: 'return=minimal' },
     body: { id: bookingId, user_id: uid, event_id: eventId, status: 'pending_payment',
       customer_name: 'Deletion E2E', customer_email: email, customer_phone: '0000000000' }
   });
-  ok([201, 204].includes(booking.status), 'seed pending booking');
+  seedOk(booking, [201, 204], 'seed pending booking');
 
   receiptPath = uid + '/' + bookingId + '/receipt.png';
   const payment = await call('/rest/v1/payment_submissions', {
     method: 'POST', token: service, headers: { Prefer: 'return=minimal' },
     body: { booking_id: bookingId, submitted_by: uid, receipt_path: receiptPath }
   });
-  ok([201, 204].includes(payment.status), 'seed payment submission');
+  seedOk(payment, [201, 204], 'seed payment submission');
 
   const login = await call('/auth/v1/token?grant_type=password', {
     method: 'POST', body: { email, password }
