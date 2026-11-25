@@ -4,6 +4,7 @@ const base = process.env.SUPABASE_URL;
 const anon = process.env.SUPABASE_ANON_KEY;
 const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const dbUrl = process.env.DB_URL;
+const sensitiveRuntimeValues = [anon, service, dbUrl].filter(value => typeof value === 'string' && value.length >= 8);
 if (!base || !anon || !service || !dbUrl) throw new Error('Missing local Supabase test connection or API secrets');
 
 async function call(path, { method = 'GET', token, body, headers = {} } = {}) {
@@ -24,18 +25,23 @@ function ok(test, message) {
   console.log('PASS:', message);
 }
 function redactSensitiveString(value) {
-  return value
-    .replace(/Bearer\s+[^\s"'\]}]+/gi, 'Bearer [REDACTED]')
-    .replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g, '[REDACTED_JWT]')
+  let safe = String(value);
+  for (const secret of sensitiveRuntimeValues) {
+    safe = safe.split(secret).join('[REDACTED]');
+  }
+  return safe
+    .replace(/Bearer\\s+[^\\s"'\\]}]+/gi, 'Bearer [REDACTED]')
+    .replace(/\\b[A-Za-z0-9_-]{8,}\\.[A-Za-z0-9_-]{8,}\\.[A-Za-z0-9_-]{8,}\\b/g, '[REDACTED_JWT]')
     .replace(/sb_(?:secret|publishable)_[A-Za-z0-9_-]+/gi, '[REDACTED_API_KEY]')
-    .replace(/((?:access[_-]?token|refresh[_-]?token|password|secret|api[_-]?key|authorization)\s*[:=]\s*)["']?[^\s"',}]+/gi, '$1[REDACTED]');
+    .replace(/(["']?[\\w.-]*(?:access[_-]?token|refresh[_-]?token|token|secret|password|passwd|authorization|api[_-]?key|private[_-]?key|credential|jwt)[\\w.-]*["']?\\s*[:=]\\s*)["']?[^\\s,"'}]+/gi, '$1[REDACTED]')
+    .replace(/(\\b(?:postgres(?:ql)?|mysql):\\/\\/[^:\\s/@]+:)[^@\\s/]+(@)/gi, '$1[REDACTED]$2');
 }
 function redactSensitiveValues(value) {
   if (Array.isArray(value)) return value.map(redactSensitiveValues);
   if (value && typeof value === 'object') {
     return Object.fromEntries(Object.entries(value).map(([key, item]) => [
       key,
-      /^(access_token|refresh_token|token|password|secret|apikey|api_key|authorization|service_role_key|anon_key)$/i.test(key)
+      /(?:token|secret|password|passwd|authorization|api.?key|private.?key|credential|service.?role|anon.?key|jwt)/i.test(key)
         ? '[REDACTED]'
         : redactSensitiveValues(item)
     ]));
@@ -47,11 +53,7 @@ function safeResponseBody(raw) {
   try {
     return JSON.stringify(redactSensitiveValues(JSON.parse(raw)));
   } catch {
-    return String(raw)
-      .replace(/Bearer\s+[^\s"'\]}]+/gi, 'Bearer [REDACTED]')
-      .replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g, '[REDACTED_JWT]')
-      .replace(/sb_(?:secret|publishable)_[A-Za-z0-9_-]+/gi, '[REDACTED_API_KEY]')
-      .replace(/((?:access[_-]?token|refresh[_-]?token|password|secret|api[_-]?key|authorization)\s*[:=]\s*)["']?[^\s"',}]+/gi, '$1[REDACTED]');
+    return redactSensitiveString(raw);
   }
 }
 function logSeedFailure(response, message) {
@@ -77,6 +79,7 @@ function seedOk(response, acceptedStatuses, message) {
 (async () => {
   const email = 'deletion-e2e-' + crypto.randomUUID() + '@example.com';
   const password = crypto.randomBytes(24).toString('base64url') + 'Aa1!';
+  sensitiveRuntimeValues.push(password);
   const eventId = crypto.randomUUID();
   const bookingId = crypto.randomUUID();
   let uid;
@@ -148,6 +151,7 @@ function seedOk(response, acceptedStatuses, message) {
   });
   ok(login.status === 200 && login.data?.access_token, 'obtain real Auth JWT');
   jwt = login.data.access_token;
+  if (typeof jwt === 'string' && jwt.length >= 8) sensitiveRuntimeValues.push(jwt);
 
   const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jF1sAAAAASUVORK5CYII=', 'base64');
   const uploaded = await call('/storage/v1/object/payment-receipts/' + receiptPath, {
@@ -158,7 +162,7 @@ function seedOk(response, acceptedStatuses, message) {
   const deleted = await call('/functions/v1/delete-customer-account', {
     method: 'POST', token: jwt, body: { confirm_email: email }
   });
-  if (!(deleted.status === 200 && deleted.data?.success === true)) throw new Error('FAIL: invoke customer deletion Edge Function HTTP ' + deleted.status + ': ' + JSON.stringify(deleted.data));
+  if (!(deleted.status === 200 && deleted.data?.success === true)) throw new Error('FAIL: invoke customer deletion Edge Function HTTP ' + deleted.status + ': ' + safeResponseBody(deleted.raw));
   console.log('PASS: invoke customer deletion Edge Function');
 
   const authCheck = await call('/auth/v1/admin/users/' + uid, { token: service });
