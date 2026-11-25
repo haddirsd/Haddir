@@ -99,11 +99,11 @@ select is((select description from public.events where id='23000000-0000-4000-80
 update public.ticket_types set price=999 where id='33000000-0000-4000-8000-000000000001';
 select is((select price from public.ticket_types where id='33000000-0000-4000-8000-000000000001'),100::numeric,'Supervisor cannot edit ticket types');
 select lives_ok(
-  $select public.review_payment_submission('63000000-0000-4000-8000-000000000001','reject','Assigned event test rejection')$,
+  $$select public.review_payment_submission('63000000-0000-4000-8000-000000000001','reject','Assigned event test rejection')$$,
   'Supervisor can review a payment for their assigned event'
 );
 select throws_ok(
-  $select public.review_payment_submission('63000000-0000-4000-8000-000000000003','reject','Booking is already confirmed')$,
+  $$select public.review_payment_submission('63000000-0000-4000-8000-000000000003','reject','Booking is already confirmed')$$,
   'P0001','حالة الحجز لا تسمح بمراجعة إثبات الدفع','Supervisor cannot review a submitted receipt after its booking is confirmed'
 );
 select is(
@@ -111,11 +111,15 @@ select is(
   'submitted'::text,
   'Rejected review attempt leaves the payment submission unchanged'
 );
+reset role;
 select is(
   (select count(*)::integer from public.tickets where booking_id='43000000-0000-4000-8000-000000000003'),
   1,
   'Rejected review attempt does not issue duplicate tickets'
 );
+set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"13000000-0000-4000-8000-000000000003","role":"authenticated"}',true);
+select set_config('request.jwt.claim.sub','13000000-0000-4000-8000-000000000003',true);
 select throws_ok(
   $$select public.review_payment_submission('63000000-0000-4000-8000-000000000002','reject','Unassigned event test rejection')$$,
   'P0001','لا تملك تكليفاً لمراجعة حجوزات هذه الفعالية','Supervisor cannot review payment for an unassigned event'
@@ -133,18 +137,19 @@ select is((select count(*)::integer from public.payment_submissions),0,'Gatekeep
 select is((select count(*)::integer from public.tickets where event_id='23000000-0000-4000-8000-000000000001'),1,'Gatekeeper can read tickets for the assigned event');
 select is((select count(*)::integer from public.tickets where event_id='23000000-0000-4000-8000-000000000002'),0,'Gatekeeper cannot read tickets from an unassigned event');
 select throws_ok(
-  $insert into public.checkins(ticket_id,event_id,checked_in_by) values ('73000000-0000-4000-8000-000000000002','23000000-0000-4000-8000-000000000002','13000000-0000-4000-8000-000000000004')$,
+  $$insert into public.checkins(ticket_id,event_id,checked_in_by) values ('73000000-0000-4000-8000-000000000002','23000000-0000-4000-8000-000000000002','13000000-0000-4000-8000-000000000004')$$,
   '42501',null,'Gatekeeper cannot bypass event assignment with a direct check-in insert'
 );
 
 select throws_ok(
-  $insert into public.checkins(ticket_id,event_id,checked_in_by) values ('73000000-0000-4000-8000-000000000001','23000000-0000-4000-8000-000000000001','13000000-0000-4000-8000-000000000004')$,
+  $$insert into public.checkins(ticket_id,event_id,checked_in_by) values ('73000000-0000-4000-8000-000000000001','23000000-0000-4000-8000-000000000001','13000000-0000-4000-8000-000000000004')$$,
   '42501',null,'Gatekeeper cannot write check-ins directly even for the assigned event'
 );
 select lives_ok(
-  $select public.gatekeeper_ticket_action('8130000001',true)$,
+  $$select public.gatekeeper_ticket_action('8130000001',true)$$,
   'Gatekeeper can confirm a valid ticket within the assigned event'
 );
+reset role;
 select is(
   (select count(*)::integer from public.checkins where ticket_id='73000000-0000-4000-8000-000000000001'),
   1,
@@ -160,13 +165,16 @@ select is(
   '13000000-0000-4000-8000-000000000004'::uuid,
   'Check-in record identifies the authenticated gatekeeper'
 );
+set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"13000000-0000-4000-8000-000000000004","role":"authenticated"}',true);
+select set_config('request.jwt.claim.sub','13000000-0000-4000-8000-000000000004',true);
 select throws_ok(
-  $select public.gatekeeper_ticket_action('8130000002',false)$,
+  $$select public.gatekeeper_ticket_action('8130000002',false)$$,
   'P0001','هذه التذكرة لا تخص الفعالية المصرح لك بها','Gatekeeper scanner rejects a ticket from another event'
 );
 
 select throws_ok(
-  $select public.gatekeeper_manual_ticket_action('8130000002',false)$,
+  $$select public.gatekeeper_manual_ticket_action('8130000002',false)$$,
   'P0001','هذه التذكرة لا تخص الفعالية المصرح لك بها','Gatekeeper manual entry rejects a ticket from another event'
 );
 select is(
