@@ -78,7 +78,8 @@ function seedOk(response, acceptedStatuses, message) {
       title: 'CI deletion test event',
       slug: 'ci-deletion-test-' + eventId,
       created_by: null,
-      starts_at: new Date(Date.now() - 86400000).toISOString()
+      starts_at: new Date(Date.now() - 86400000).toISOString(),
+      status: 'published'
     }
   });
   seedOk(event, [201, 204], 'seed past event');
