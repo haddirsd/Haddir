@@ -1,8 +1,10 @@
 import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 const base = process.env.SUPABASE_URL;
 const anon = process.env.SUPABASE_ANON_KEY;
 const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
-if (!base || !anon || !service) throw new Error('Missing disposable Supabase test secrets');
+const dbUrl = process.env.DB_URL;
+if (!base || !anon || !service || !dbUrl) throw new Error('Missing local Supabase test connection or API secrets');
 
 async function call(path, { method = 'GET', token, body, headers = {} } = {}) {
   const h = { apikey: anon, ...(token ? { Authorization: 'Bearer ' + token } : {}), ...headers };
@@ -152,10 +154,15 @@ function seedOk(response, acceptedStatuses, message) {
   ok(storageCheck.status === 200 && Array.isArray(storageCheck.data) && storageCheck.data.length === 0,
     'physical receipt object removed');
 
-  const tombstone = await call('/rest/v1/rpc/test_account_deletion_tombstone', {
-    method: 'POST', token: service, body: { p_user_id: uid }
-  });
-  ok(tombstone.status === 200 && tombstone.data === true, 'stale-token tombstone retained');
+  const cleanupRecordCheck = execFileSync('psql', [
+    dbUrl,
+    '-X',
+    '-v', 'ON_ERROR_STOP=1',
+    '-v', `user_id=${uid}`,
+    '-Atc',
+    "select exists (select 1 from private.customer_account_deletion_cleanup where user_id = :'user_id'::uuid and cardinality(receipt_paths) = 0)"
+  ], { encoding: 'utf8' }).trim();
+  ok(cleanupRecordCheck === 't', 'local cleanup tombstone retained with no receipt paths');
 
   const stale = await call('/rest/v1/bookings', {
     method: 'POST', token: jwt, headers: { Prefer: 'return=minimal' },
