@@ -23,20 +23,47 @@ function ok(test, message) {
   if (!test) throw new Error('FAIL: ' + message);
   console.log('PASS:', message);
 }
+function redactSensitiveValues(value) {
+  if (Array.isArray(value)) return value.map(redactSensitiveValues);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [
+      key,
+      /^(access_token|refresh_token|token|password|secret|apikey|api_key|authorization|service_role_key|anon_key)$/i.test(key)
+        ? '[REDACTED]'
+        : redactSensitiveValues(item)
+    ]));
+  }
+  return value;
+}
+function safeResponseBody(raw) {
+  try {
+    return JSON.stringify(redactSensitiveValues(JSON.parse(raw)));
+  } catch {
+    return String(raw)
+      .replace(/Bearer\s+[^\s"'\]}]+/gi, 'Bearer [REDACTED]')
+      .replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g, '[REDACTED_JWT]')
+      .replace(/sb_(?:secret|publishable)_[A-Za-z0-9_-]+/gi, '[REDACTED_API_KEY]')
+      .replace(/((?:access[_-]?token|refresh[_-]?token|password|secret|api[_-]?key|authorization)\s*[:=]\s*)["']?[^\s"',}]+/gi, '$1[REDACTED]');
+  }
+}
+function logSeedFailure(response, message) {
+  console.error('FAIL:', message);
+  console.error('HTTP status:', response.status);
+  console.error('Response body:', safeResponseBody(response.raw));
+  if (response.data && typeof response.data === 'object' && !Array.isArray(response.data)) {
+    const safe = redactSensitiveValues(response.data);
+    console.error('code:', safe.code ?? null);
+    console.error('message:', safe.message ?? null);
+    console.error('details:', safe.details ?? null);
+    console.error('hint:', safe.hint ?? null);
+  }
+}
 function seedOk(response, acceptedStatuses, message) {
   if (acceptedStatuses.includes(response.status)) {
     console.log('PASS:', message);
     return;
   }
-  console.error('FAIL:', message);
-  console.error('HTTP status:', response.status);
-  console.error('Response body:', response.raw);
-  if (response.data && typeof response.data === 'object') {
-    console.error('code:', response.data.code ?? null);
-    console.error('message:', response.data.message ?? null);
-    console.error('details:', response.data.details ?? null);
-    console.error('hint:', response.data.hint ?? null);
-  }
+  logSeedFailure(response, message);
   throw new Error(message + ' failed');
 }
 (async () => {
@@ -60,15 +87,7 @@ function seedOk(response, acceptedStatuses, message) {
   });
   const profileRow = Array.isArray(profile.data) ? profile.data[0] : null;
   if (profile.status !== 200 || !profileRow || profileRow.id !== uid || profileRow.role !== 'customer') {
-    console.error('FAIL: verify automatically created customer profile');
-    console.error('HTTP status:', profile.status);
-    console.error('Response body:', profile.raw);
-    if (profile.data && typeof profile.data === 'object' && !Array.isArray(profile.data)) {
-      console.error('code:', profile.data.code ?? null);
-      console.error('message:', profile.data.message ?? null);
-      console.error('details:', profile.data.details ?? null);
-      console.error('hint:', profile.data.hint ?? null);
-    }
+    logSeedFailure(profile, 'verify automatically created customer profile');
     throw new Error('automatically created customer profile verification failed');
   }
   console.log('PASS: verify automatically created customer profile and role=customer');
