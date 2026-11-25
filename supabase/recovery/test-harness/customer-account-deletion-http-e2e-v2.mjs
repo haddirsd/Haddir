@@ -73,21 +73,41 @@ function seedOk(response, acceptedStatuses, message) {
 
   const event = await call('/rest/v1/events', {
     method: 'POST', token: service, headers: { Prefer: 'return=minimal' },
-    body: { id: eventId, created_by: null, starts_at: new Date(Date.now() - 86400000).toISOString() }
+    body: {
+      id: eventId,
+      title: 'CI deletion test event',
+      slug: 'ci-deletion-test-' + eventId,
+      created_by: null,
+      starts_at: new Date(Date.now() - 86400000).toISOString()
+    }
   });
   seedOk(event, [201, 204], 'seed past event');
 
   const booking = await call('/rest/v1/bookings', {
     method: 'POST', token: service, headers: { Prefer: 'return=minimal' },
-    body: { id: bookingId, user_id: uid, event_id: eventId, status: 'pending_payment',
-      customer_name: 'Deletion E2E', customer_email: email, customer_phone: '0000000000' }
+    body: {
+      id: bookingId,
+      booking_number: 'CI-' + bookingId,
+      user_id: uid,
+      event_id: eventId,
+      status: 'pending_payment',
+      customer_name: 'Deletion E2E',
+      customer_email: email,
+      customer_phone: '0000000000',
+      subtotal: 0
+    }
   });
   seedOk(booking, [201, 204], 'seed pending booking');
 
   receiptPath = uid + '/' + bookingId + '/receipt.png';
   const payment = await call('/rest/v1/payment_submissions', {
     method: 'POST', token: service, headers: { Prefer: 'return=minimal' },
-    body: { booking_id: bookingId, submitted_by: uid, receipt_path: receiptPath }
+    body: {
+      booking_id: bookingId,
+      submitted_by: uid,
+      receipt_path: receiptPath,
+      amount: 0
+    }
   });
   seedOk(payment, [201, 204], 'seed payment submission');
 
