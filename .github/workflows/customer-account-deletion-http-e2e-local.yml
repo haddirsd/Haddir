@@ -27,6 +27,14 @@ jobs:
           fi
           test -f supabase/config.toml
 
+      - name: Temporary diagnostics — inspect port 54322 and Docker containers
+        shell: bash
+        run: |
+          echo "=== Processes listening on port 54322 ==="
+          sudo ss -ltnp | grep 54322 || true
+          echo "=== All Docker containers ==="
+          docker ps -a
+
       - name: Start local Supabase and apply repository migrations
         run: supabase start
 
@@ -121,7 +129,7 @@ jobs:
             } else if (
               deletionSucceeded &&
               method === "POST" &&
-              /\/rest\/v1\/bookings(?:\?|$)/.test(requestUrl)
+              /\\/rest\\/v1\\/bookings(?:\\?|$)/.test(requestUrl)
             ) {
               const responseBody = await response.clone().text();
               console.log("STALE_JWT_BOOKING_HTTP_STATUS:", response.status);
