@@ -1,0 +1,158 @@
+name: Customer account deletion HTTP E2E (local Supabase)
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  local-supabase-deletion-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.75.0
+
+      - name: Initialize local Supabase configuration when absent
+        run: |
+          if [ ! -f supabase/config.toml ]; then
+            supabase init
+          fi
+          test -f supabase/config.toml
+
+      - name: Start local Supabase and apply repository migrations
+        run: supabase start
+
+      - name: Verify all repository migrations were applied
+        shell: bash
+        run: |
+          set -euo pipefail
+          eval "$(supabase status -o env)"
+          migration_files="$(find supabase/migrations -maxdepth 1 -type f -name '*.sql' | wc -l | tr -d ' ')"
+          applied_migrations="$(psql "$DB_URL" -v ON_ERROR_STOP=1 -Atc 'select count(*) from supabase_migrations.schema_migrations')"
+          echo "Migration files: $migration_files"
+          echo "Applied migrations: $applied_migrations"
+          supabase migration list --local
+          test "$migration_files" -eq 93
+          test "$applied_migrations" -eq "$migration_files"
+
+      - name: Serve delete-customer-account Edge Function locally
+        shell: bash
+        run: |
+          set -euo pipefail
+          supabase functions serve delete-customer-account --no-verify-jwt > /tmp/delete-customer-account-function.log 2>&1 &
+          echo $! > /tmp/delete-customer-account-function.pid
+          for attempt in $(seq 1 60); do
+            status="$(curl --silent --output /tmp/delete-customer-account-health.txt --write-out '%{http_code}' http://127.0.0.1:54321/functions/v1/delete-customer-account || true)"
+            if [ "$status" = "405" ] || [ "$status" = "401" ]; then
+              echo "Edge Function is serving (HTTP $status on readiness probe)."
+              exit 0
+            fi
+            sleep 2
+          done
+          cat /tmp/delete-customer-account-function.log
+          echo "Edge Function did not become ready."
+          exit 1
+
+      - name: Security check — reject missing Authorization and forged JWTs (HTTP 401)
+        shell: bash
+        run: |
+          set -euo pipefail
+          eval "$(supabase status -o env)"
+
+          missing_auth_status="$(curl --silent --output /dev/null --write-out '%{http_code}' \
+            --max-time 15 \
+            --request POST \
+            --header "apikey: $ANON_KEY" \
+            --header 'Content-Type: application/json' \
+            --data '{}' \
+            http://127.0.0.1:54321/functions/v1/delete-customer-account)"
+          echo "Missing Authorization status: $missing_auth_status"
+          if [ "$missing_auth_status" != "401" ]; then
+            echo "SECURITY CHECK FAILED: missing Authorization did not return HTTP 401."
+            exit 1
+          fi
+
+          forged_jwt_status="$(curl --silent --output /dev/null --write-out '%{http_code}' \
+            --max-time 15 \
+            --request POST \
+            --header "apikey: $ANON_KEY" \
+            --header 'Authorization: Bearer not.a.valid.jwt' \
+            --header 'Content-Type: application/json' \
+            --data '{}' \
+            http://127.0.0.1:54321/functions/v1/delete-customer-account)"
+          echo "Forged JWT status: $forged_jwt_status"
+          if [ "$forged_jwt_status" != "401" ]; then
+            echo "SECURITY CHECK FAILED: forged JWT did not return HTTP 401."
+            exit 1
+          fi
+
+      - name: Run customer account deletion HTTP E2E harness
+        shell: bash
+        run: |
+          set -euo pipefail
+          eval "$(supabase status -o env)"
+          cat > /tmp/log-stale-booking-response.mjs <<'EOF'
+          const originalFetch = globalThis.fetch.bind(globalThis);
+          let deletionSucceeded = false;
+
+          globalThis.fetch = async (input, init = {}) => {
+            const requestUrl = typeof input === "string"
+              ? input
+              : input instanceof URL
+                ? input.href
+                : input.url;
+            const method = (init.method || (input instanceof Request ? input.method : "GET")).toUpperCase();
+            const response = await originalFetch(input, init);
+
+            if (
+              method === "POST" &&
+              requestUrl.includes("/functions/v1/delete-customer-account") &&
+              response.ok
+            ) {
+              deletionSucceeded = true;
+            } else if (
+              deletionSucceeded &&
+              method === "POST" &&
+              new URL(requestUrl).pathname === "/rest/v1/bookings"
+            ) {
+              const responseBody = await response.clone().text();
+              console.log("STALE_JWT_BOOKING_HTTP_STATUS:", response.status);
+              console.log("STALE_JWT_BOOKING_RESPONSE_BEGIN");
+              console.log(responseBody);
+              console.log("STALE_JWT_BOOKING_RESPONSE_END");
+              console.log(
+                "STALE_JWT_BOOKING_REJECTION_SOURCE:",
+                responseBody.includes("الحساب قيد الحذف")
+                  ? "DELETION_TOMBSTONE_MARKER"
+                  : "OTHER_OR_UNCONFIRMED"
+              );
+            }
+
+            return response;
+          };
+          EOF
+          SUPABASE_URL="$API_URL" \
+          SUPABASE_ANON_KEY="$ANON_KEY" \
+          SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY" \
+          DB_URL="$DB_URL" \
+            node --import /tmp/log-stale-booking-response.mjs supabase/recovery/test-harness/customer-account-deletion-http-e2e-v2.mjs
+
+      - name: Show Edge Function logs on failure
+        if: failure()
+        run: |
+          if [ -f /tmp/delete-customer-account-function.log ]; then
+            cat /tmp/delete-customer-account-function.log
+          fi
+
+      - name: Stop local Supabase
+        if: always()
+        run: supabase stop --no-backup
+        continue-on-error: true
