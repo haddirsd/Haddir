@@ -102,8 +102,13 @@ async function createEventThroughUi(user, label) {
 
 async function verifyEventDeletionGuards(owner) {
   const deletionReady = await createEventThroughUi(owner, "DeletionReady");
-  const eightDaysAgo = new Date(Date.now() - 8 * 86400000).toISOString();
-  await data(await service.from("events").update({ ends_at: eightDaysAgo }).eq("id", deletionReady.id).select("id").single(),
+  const eightDaysAgoDate = new Date(Date.now() - 8 * 86400000);
+  const eightDaysAgo = eightDaysAgoDate.toISOString();
+  const startsBeforeEightDaysAgo = new Date(eightDaysAgoDate.getTime() - 2 * 60 * 60 * 1000).toISOString();
+  await data(await service.from("events").update({
+    starts_at: startsBeforeEightDaysAgo,
+    ends_at: eightDaysAgo,
+  }).eq("id", deletionReady.id).select("id").single(),
     "Set eligible event end date");
 
   const eligiblePage = await openAdmin(owner);
@@ -131,8 +136,12 @@ async function verifyEventDeletionGuards(owner) {
   await eligiblePage.close();
 
   const recentActivity = await createEventThroughUi(owner, "RecentActivity");
-  await data(await service.from("events").update({ ends_at: new Date(Date.now() + 2 * 86400000).toISOString() })
-    .eq("id", recentActivity.id).select("id").single(), "Set event end date before creating recent booking");
+  const recentEnd = new Date(Date.now() + 2 * 86400000);
+  const recentStart = new Date(recentEnd.getTime() - 2 * 60 * 60 * 1000).toISOString();
+  await data(await service.from("events").update({
+    starts_at: recentStart,
+    ends_at: recentEnd.toISOString(),
+  }).eq("id", recentActivity.id).select("id").single(), "Set event end date before creating recent booking");
   const booking = await data(await service.from("bookings").insert({
     booking_number: "HDR-E2E-" + suffix.slice(0, 12),
     user_id: owner.id,
@@ -146,8 +155,11 @@ async function verifyEventDeletionGuards(owner) {
     created_at: new Date().toISOString(),
   }).select("id").single(), "Create recent booking activity");
   bookings.push(booking.id);
-  await data(await service.from("events").update({ ends_at: eightDaysAgo, status: "completed" })
-    .eq("id", recentActivity.id).select("id").single(), "Simulate editing ends_at into the past after booking");
+  await data(await service.from("events").update({
+    starts_at: startsBeforeEightDaysAgo,
+    ends_at: eightDaysAgo,
+    status: "completed",
+  }).eq("id", recentActivity.id).select("id").single(), "Simulate editing ends_at into the past after booking");
 
   const recentPage = await openAdmin(owner);
   await recentPage.getByRole("navigation", { name: "تبويبات لوحة الإدارة" })
