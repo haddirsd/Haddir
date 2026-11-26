@@ -54,6 +54,7 @@ async function browserPage(user, viewport = { width: 1440, height: 1000 }) {
   page.on("console", m => { if (m.type() === "error") consoleErrors.push(m.text()); });
   page.on("response", response => {
     if (response.status() < 400) return;
+    const scenario = currentScenario;
     const task = (async () => {
       let responseText = "<response body unavailable>";
       try {
@@ -64,7 +65,7 @@ async function browserPage(user, viewport = { width: 1440, height: 1000 }) {
       const request = response.request();
       const requestUrl = new URL(request.url());
       networkFailures.push({
-        scenario: currentScenario,
+        scenario,
         status: response.status(),
         method: request.method(),
         url: requestUrl.origin + requestUrl.pathname,
