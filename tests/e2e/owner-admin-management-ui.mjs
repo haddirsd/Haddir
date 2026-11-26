@@ -15,8 +15,12 @@ const suffix = randomUUID();
 const password = `Haddir-Admin-UI-${randomUUID()}-Aa1!`;
 const users = [];
 const events = [];
+const bookings = [];
 const errors = [];
 const consoleErrors = [];
+const networkFailures = [];
+const networkFailureTasks = [];
+let currentScenario = "test setup";
 let browser;
 
 async function data(result, action) {
@@ -48,6 +52,28 @@ async function browserPage(user, viewport = { width: 1440, height: 1000 }) {
   const page = await context.newPage();
   page.on("pageerror", e => errors.push(e.stack || e.message));
   page.on("console", m => { if (m.type() === "error") consoleErrors.push(m.text()); });
+  page.on("response", response => {
+    if (response.status() < 400) return;
+    const scenario = currentScenario;
+    const task = (async () => {
+      let responseText = "<response body unavailable>";
+      try {
+        responseText = await response.text();
+      } catch (error) {
+        responseText = "<failed to read response body: " + error.message + ">";
+      }
+      const request = response.request();
+      const requestUrl = new URL(request.url());
+      networkFailures.push({
+        scenario,
+        status: response.status(),
+        method: request.method(),
+        url: requestUrl.origin + requestUrl.pathname,
+        response: responseText,
+      });
+    })();
+    networkFailureTasks.push(task);
+  });
   return { context, page };
 }
 async function openAdmin(user) {
@@ -57,6 +83,7 @@ async function openAdmin(user) {
   return page;
 }
 async function createEventThroughUi(user, label) {
+  currentScenario = "event UI flow: " + label;
   const page = await openAdmin(user);
   const nav = page.getByRole("navigation", { name: "تبويبات لوحة الإدارة" });
   await nav.getByRole("button", { name: "الفعاليات" }).click();
@@ -96,9 +123,94 @@ async function createEventThroughUi(user, label) {
   const published = await data(await service.from("events").select("status").eq("id", row.id).single(), `Verify ${label} event publication persisted`);
   assert.equal(published.status, "published");
   await page.close();
+  return { id: row.id, title: edited.title };
+}
+
+async function verifyEventDeletionGuards(owner) {
+  currentScenario = "deletion guard: prepare eligible event";
+  const deletionReady = await createEventThroughUi(owner, "DeletionReady");
+  const eightDaysAgoDate = new Date(Date.now() - 8 * 86400000);
+  const eightDaysAgo = eightDaysAgoDate.toISOString();
+  const startsBeforeEightDaysAgo = new Date(eightDaysAgoDate.getTime() - 2 * 60 * 60 * 1000).toISOString();
+  await data(await service.from("events").update({
+    starts_at: startsBeforeEightDaysAgo,
+    ends_at: eightDaysAgo,
+  }).eq("id", deletionReady.id).select("id").single(),
+    "Set eligible event end date");
+
+  const eligiblePage = await openAdmin(owner);
+  await eligiblePage.getByRole("navigation", { name: "تبويبات لوحة الإدارة" })
+    .getByRole("button", { name: "الفعاليات" }).click();
+  const eligibleCard = eligiblePage.locator("article.admin-event-card").filter({ hasText: deletionReady.title });
+  const deleteButton = eligibleCard.getByRole("button", { name: "حذف" });
+  await deleteButton.waitFor({ state: "visible" });
+  assert.equal(await deleteButton.isDisabled(), false, "Event ended eight days ago should pass the UI date gate");
+  await deleteButton.click();
+
+  const dialog = eligiblePage.getByRole("dialog", { name: "تأكيد المحاسبة قبل حذف الفعالية" });
+  const confirm = dialog.getByRole("button", { name: "نعم، تمت المحاسبة وأؤكد الحذف" });
+  const eventName = dialog.getByRole("textbox", { name: "اكتب اسم الفعالية كما هو للتأكيد" });
+  assert.equal(await confirm.isDisabled(), true, "Delete confirmation starts disabled");
+  await eventName.fill(deletionReady.title + " wrong");
+  assert.equal(await confirm.isDisabled(), true, "A non-matching event name cannot confirm deletion");
+  await eventName.fill("  " + deletionReady.title + "  ");
+  assert.equal(await confirm.isDisabled(), false, "A full name match after trimming outer whitespace enables confirmation");
+  currentScenario = "deletion guard: eligible event, expected successful deletion";
+  await confirm.click();
+  await eligiblePage.getByRole("status").filter({ hasText: "تم حذف الفعالية وبياناتها التشغيلية" }).waitFor({ timeout: 20000 });
+  const deletedRows = await data(await service.from("events").select("id").eq("id", deletionReady.id),
+    "Verify eligible event deletion");
+  assert.equal(deletedRows.length, 0, "Eligible event is deleted through the real admin flow");
+  await eligiblePage.close();
+
+  currentScenario = "deletion guard: prepare event with recent booking activity";
+  const recentActivity = await createEventThroughUi(owner, "RecentActivity");
+  const recentEnd = new Date(Date.now() + 2 * 86400000);
+  const recentStart = new Date(recentEnd.getTime() - 2 * 60 * 60 * 1000).toISOString();
+  await data(await service.from("events").update({
+    starts_at: recentStart,
+    ends_at: recentEnd.toISOString(),
+  }).eq("id", recentActivity.id).select("id").single(), "Set event end date before creating recent booking");
+  const booking = await data(await service.from("bookings").insert({
+    booking_number: "HDR-E2E-" + suffix.slice(0, 12),
+    user_id: owner.id,
+    customer_name: "Haddir Admin UI owner",
+    customer_email: owner.email,
+    customer_phone: "0915000001",
+    event_id: recentActivity.id,
+    subtotal: 125,
+    currency: "SDG",
+    status: "confirmed",
+    created_at: new Date().toISOString(),
+  }).select("id").single(), "Create recent booking activity");
+  bookings.push(booking.id);
+  await data(await service.from("events").update({
+    starts_at: startsBeforeEightDaysAgo,
+    ends_at: eightDaysAgo,
+    status: "completed",
+  }).eq("id", recentActivity.id).select("id").single(), "Simulate editing ends_at into the past after booking");
+
+  const recentPage = await openAdmin(owner);
+  await recentPage.getByRole("navigation", { name: "تبويبات لوحة الإدارة" })
+    .getByRole("button", { name: "الفعاليات" }).click();
+  const recentCard = recentPage.locator("article.admin-event-card").filter({ hasText: recentActivity.title });
+  const recentDeleteButton = recentCard.getByRole("button", { name: "حذف" });
+  await recentDeleteButton.waitFor({ state: "visible" });
+  assert.equal(await recentDeleteButton.isDisabled(), false, "Past end date enables the UI date gate before server activity validation");
+  await recentDeleteButton.click();
+  const recentDialog = recentPage.getByRole("dialog", { name: "تأكيد المحاسبة قبل حذف الفعالية" });
+  await recentDialog.getByRole("textbox", { name: "اكتب اسم الفعالية كما هو للتأكيد" }).fill(recentActivity.title);
+  currentScenario = "deletion guard: recent activity, expected server-side rejection";
+  await recentDialog.getByRole("button", { name: "نعم، تمت المحاسبة وأؤكد الحذف" }).click();
+  await recentPage.getByRole("status").filter({ hasText: "يوجد نشاط خلال آخر 7 أيام" }).waitFor({ timeout: 20000 });
+  const retained = await data(await service.from("events").select("id").eq("id", recentActivity.id).single(),
+    "Verify recent activity prevents deletion");
+  assert.equal(retained.id, recentActivity.id, "Recent booking activity keeps the event intact");
+  await recentPage.close();
 }
 
 async function verifyRoleManagement(owner, adminUser, customer, ordinaryCustomer, secondAdmin) {
+  currentScenario = "role management UI";
   const ownerPage = await openAdmin(owner);
   const ownerNav = ownerPage.getByRole("navigation", { name: "تبويبات لوحة الإدارة" });
   await ownerNav.getByRole("button", { name: "المستخدمون" }).click();
@@ -182,13 +294,37 @@ try {
 
   await createEventThroughUi(owner, "Owner");
   await createEventThroughUi(adminUser, "Admin");
+  await verifyEventDeletionGuards(owner);
   await verifyRoleManagement(owner, adminUser, customer, ordinaryCustomer, secondAdmin);
 
+  // Wait for every captured HTTP failure body before classifying the expected rejection.
+  await Promise.all(networkFailureTasks);
+  const expectedRecentActivityRejections = networkFailures.filter(failure =>
+    failure.method === "POST" &&
+    new URL(failure.url).pathname.endsWith("/rest/v1/rpc/prepare_settled_event_deletion") &&
+    failure.status === 400 &&
+    failure.scenario === "deletion guard: recent activity, expected server-side rejection" &&
+    failure.response.includes("يوجد نشاط خلال آخر 7 أيام")
+  );
+  assert.equal(expectedRecentActivityRejections.length, 1,
+    `Expected exactly one 400 rejection for recent activity, got: ${JSON.stringify(networkFailures)}`);
+  assert.equal(networkFailures.length, 1,
+    `Unexpected additional HTTP failures: ${JSON.stringify(networkFailures)}`);
+
+  const expectedBrowserConsoleError = "Failed to load resource: the server responded with a status of 400 (Bad Request)";
+  assert.deepEqual(consoleErrors, [expectedBrowserConsoleError],
+    `Only the single console message caused by the verified recent-activity rejection is allowed; got: ${consoleErrors.join("; ")}`);
   assert.deepEqual(errors, [], `Admin UI runtime errors: ${errors.join("; ")}`);
-  assert.deepEqual(consoleErrors, [], `Admin UI console errors: ${consoleErrors.join("; ")}`);
-  console.log("PASS: owner/admin browser access and navigation, denied customer/advertiser/gatekeeper access, event create/edit/publish persistence for both privileged roles, owner role assignment, and administrator protection against changing owner/admin roles.");
+  console.log("PASS: owner/admin access and navigation, event create/edit/publish, deletion date gate, exact trimmed-name confirmation, recent-activity deletion rejection, and role-management protections.");
 } finally {
+  await Promise.allSettled(networkFailureTasks);
+  if (networkFailures.length) {
+    console.error("HTTP responses with status 400 or higher:", JSON.stringify(networkFailures, null, 2));
+  } else {
+    console.log("HTTP diagnostics: no responses with status 400 or higher were captured.");
+  }
   if (browser) await browser.close();
+  for (const bookingId of bookings) await service.from("bookings").delete().eq("id", bookingId);
   for (const eventId of events) await service.from("events").delete().eq("id", eventId);
   for (const userId of users) await service.auth.admin.deleteUser(userId);
 }
