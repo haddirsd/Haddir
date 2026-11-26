@@ -18,6 +18,9 @@ const events = [];
 const bookings = [];
 const errors = [];
 const consoleErrors = [];
+const networkFailures = [];
+const networkFailureTasks = [];
+let currentScenario = "test setup";
 let browser;
 
 async function data(result, action) {
@@ -49,6 +52,27 @@ async function browserPage(user, viewport = { width: 1440, height: 1000 }) {
   const page = await context.newPage();
   page.on("pageerror", e => errors.push(e.stack || e.message));
   page.on("console", m => { if (m.type() === "error") consoleErrors.push(m.text()); });
+  page.on("response", response => {
+    if (response.status() < 400) return;
+    const task = (async () => {
+      let responseText = "<response body unavailable>";
+      try {
+        responseText = await response.text();
+      } catch (error) {
+        responseText = "<failed to read response body: " + error.message + ">";
+      }
+      const request = response.request();
+      const requestUrl = new URL(request.url());
+      networkFailures.push({
+        scenario: currentScenario,
+        status: response.status(),
+        method: request.method(),
+        url: requestUrl.origin + requestUrl.pathname,
+        response: responseText,
+      });
+    })();
+    networkFailureTasks.push(task);
+  });
   return { context, page };
 }
 async function openAdmin(user) {
@@ -58,6 +82,7 @@ async function openAdmin(user) {
   return page;
 }
 async function createEventThroughUi(user, label) {
+  currentScenario = "event UI flow: " + label;
   const page = await openAdmin(user);
   const nav = page.getByRole("navigation", { name: "تبويبات لوحة الإدارة" });
   await nav.getByRole("button", { name: "الفعاليات" }).click();
@@ -101,6 +126,7 @@ async function createEventThroughUi(user, label) {
 }
 
 async function verifyEventDeletionGuards(owner) {
+  currentScenario = "deletion guard: prepare eligible event";
   const deletionReady = await createEventThroughUi(owner, "DeletionReady");
   const eightDaysAgoDate = new Date(Date.now() - 8 * 86400000);
   const eightDaysAgo = eightDaysAgoDate.toISOString();
@@ -128,6 +154,7 @@ async function verifyEventDeletionGuards(owner) {
   assert.equal(await confirm.isDisabled(), true, "A non-matching event name cannot confirm deletion");
   await eventName.fill("  " + deletionReady.title + "  ");
   assert.equal(await confirm.isDisabled(), false, "A full name match after trimming outer whitespace enables confirmation");
+  currentScenario = "deletion guard: eligible event, expected successful deletion";
   await confirm.click();
   await eligiblePage.getByRole("status").filter({ hasText: "تم حذف الفعالية وبياناتها التشغيلية" }).waitFor({ timeout: 20000 });
   const deletedRows = await data(await service.from("events").select("id").eq("id", deletionReady.id),
@@ -135,6 +162,7 @@ async function verifyEventDeletionGuards(owner) {
   assert.equal(deletedRows.length, 0, "Eligible event is deleted through the real admin flow");
   await eligiblePage.close();
 
+  currentScenario = "deletion guard: prepare event with recent booking activity";
   const recentActivity = await createEventThroughUi(owner, "RecentActivity");
   const recentEnd = new Date(Date.now() + 2 * 86400000);
   const recentStart = new Date(recentEnd.getTime() - 2 * 60 * 60 * 1000).toISOString();
@@ -171,6 +199,7 @@ async function verifyEventDeletionGuards(owner) {
   await recentDeleteButton.click();
   const recentDialog = recentPage.getByRole("dialog", { name: "تأكيد المحاسبة قبل حذف الفعالية" });
   await recentDialog.getByRole("textbox", { name: "اكتب اسم الفعالية كما هو للتأكيد" }).fill(recentActivity.title);
+  currentScenario = "deletion guard: recent activity, expected server-side rejection";
   await recentDialog.getByRole("button", { name: "نعم، تمت المحاسبة وأؤكد الحذف" }).click();
   await recentPage.getByRole("status").filter({ hasText: "يوجد نشاط خلال آخر 7 أيام" }).waitFor({ timeout: 20000 });
   const retained = await data(await service.from("events").select("id").eq("id", recentActivity.id).single(),
@@ -180,6 +209,7 @@ async function verifyEventDeletionGuards(owner) {
 }
 
 async function verifyRoleManagement(owner, adminUser, customer, ordinaryCustomer, secondAdmin) {
+  currentScenario = "role management UI";
   const ownerPage = await openAdmin(owner);
   const ownerNav = ownerPage.getByRole("navigation", { name: "تبويبات لوحة الإدارة" });
   await ownerNav.getByRole("button", { name: "المستخدمون" }).click();
@@ -270,6 +300,12 @@ try {
   assert.deepEqual(consoleErrors, [], `Admin UI console errors: ${consoleErrors.join("; ")}`);
   console.log("PASS: owner/admin access and navigation, event create/edit/publish, deletion date gate, exact trimmed-name confirmation, recent-activity deletion rejection, and role-management protections.");
 } finally {
+  await Promise.allSettled(networkFailureTasks);
+  if (networkFailures.length) {
+    console.error("HTTP responses with status 400 or higher:", JSON.stringify(networkFailures, null, 2));
+  } else {
+    console.log("HTTP diagnostics: no responses with status 400 or higher were captured.");
+  }
   if (browser) await browser.close();
   for (const bookingId of bookings) await service.from("bookings").delete().eq("id", bookingId);
   for (const eventId of events) await service.from("events").delete().eq("id", eventId);
