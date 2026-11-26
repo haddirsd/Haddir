@@ -12,12 +12,13 @@ type HaddirDialogProps = {
   cancelLabel?: string;
   tone?: "primary" | "danger" | "success";
   busy?: boolean;
+  confirmDisabled?: boolean;
   onConfirm: () => void | Promise<void>;
   onCancel: () => void;
   children?: ReactNode;
 };
 
-export function HaddirDialog({ open, title, description, confirmLabel = "تأكيد", cancelLabel = "إلغاء", tone = "primary", busy = false, onConfirm, onCancel, children }: HaddirDialogProps) {
+export function HaddirDialog({ open, title, description, confirmLabel = "تأكيد", cancelLabel = "إلغاء", tone = "primary", busy = false, confirmDisabled = false, onConfirm, onCancel, children }: HaddirDialogProps) {
   const [mounted, setMounted] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
@@ -43,7 +44,7 @@ export function HaddirDialog({ open, title, description, confirmLabel = "تأك�
           {description && <p>{description}</p>}
           {children}
           <div className="haddir-dialog-actions">
-            <button type="button" className={"haddir-dialog-confirm tone-" + tone} onClick={() => void onConfirm()} disabled={busy}>{busy ? "جاري التنفيذ..." : confirmLabel}</button>
+            <button type="button" className={"haddir-dialog-confirm tone-" + tone} onClick={() => void onConfirm()} disabled={busy || confirmDisabled}>{busy ? "جاري التنفيذ..." : confirmLabel}</button>
             <button type="button" className="haddir-dialog-cancel" onClick={onCancel} disabled={busy}>{cancelLabel}</button>
           </div>
         </section>

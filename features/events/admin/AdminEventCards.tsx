@@ -11,6 +11,29 @@ const statusLabels: Record<string, string> = {
 };
 const fmt = (value: unknown) => value == null || value === "" ? "—" : String(value);
 
+function getDeletionAvailability(endsAt: string | null) {
+  if (!endsAt) {
+    return { eligible: false, label: "حدّد تاريخ نهاية الفعالية أولاً." };
+  }
+
+  const endTime = new Date(endsAt).getTime();
+  if (!Number.isFinite(endTime)) {
+    return { eligible: false, label: "تاريخ نهاية الفعالية غير صالح." };
+  }
+
+  const allowedAt = new Date(endTime + 7 * 24 * 60 * 60 * 1000);
+  const formatted = new Intl.DateTimeFormat("ar-SD-u-nu-latn", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Africa/Khartoum",
+  }).format(allowedAt);
+
+  return {
+    eligible: allowedAt.getTime() <= Date.now(),
+    label: `تاريخ السماح بالحذف: ${formatted} بتوقيت السودان. يشترط أيضاً عدم وجود نشاط خلال آخر 7 أيام.`,
+  };
+}
+
 type Props = {
   rows: AdminEventRow[];
   role: AdminEventRole;
@@ -36,36 +59,40 @@ export default function AdminEventCards({
     <div className="admin-event-cards">
       {rows.length === 0 ? (
         <p className="admin-no-data">لا توجد فعاليات حتى الآن. أضف أول فعالية من الزر بالأعلى.</p>
-      ) : rows.map((event) => (
-        <article className="admin-event-card" key={event.id}>
-          <div className="admin-event-card-main">
-            <div className="admin-event-card-title">
-              <h4>{event.title || "فعالية بدون عنوان"}</h4>
-              <span className={"admin-event-status status-" + (event.status || "draft")}>
-                {statusLabels[event.status] || fmt(event.status)}
-              </span>
+      ) : rows.map((event) => {
+        const deletion = getDeletionAvailability(event.ends_at);
+        return (
+          <article className="admin-event-card" key={event.id}>
+            <div className="admin-event-card-main">
+              <div className="admin-event-card-title">
+                <h4>{event.title || "فعالية بدون عنوان"}</h4>
+                <span className={"admin-event-status status-" + (event.status || "draft")}>
+                  {statusLabels[event.status] || fmt(event.status)}
+                </span>
+              </div>
+              <div className="admin-event-card-meta">
+                <span><b>التصنيف:</b> {fmt(event.category)}</span>
+                <span><b>المدينة:</b> {fmt(event.city)}</span>
+                <span><b>المكان:</b> {fmt(event.venue)}</span>
+                <span><CalendarDays size={14} aria-hidden="true"/> <b>الموعد:</b> {event.is_continuous ? "مستمر" : event.starts_at ? new Date(event.starts_at).toLocaleString("ar-SD-u-nu-latn") : "—"}</span>
+                {event.address ? <span><MapPin size={14} aria-hidden="true"/> {event.address}</span> : null}
+              </div>
             </div>
-            <div className="admin-event-card-meta">
-              <span><b>التصنيف:</b> {fmt(event.category)}</span>
-              <span><b>المدينة:</b> {fmt(event.city)}</span>
-              <span><b>المكان:</b> {fmt(event.venue)}</span>
-              <span><CalendarDays size={14} aria-hidden="true"/> <b>الموعد:</b> {event.is_continuous ? "مستمر" : event.starts_at ? new Date(event.starts_at).toLocaleString("ar-SD-u-nu-latn") : "—"}</span>
-              {event.address ? <span><MapPin size={14} aria-hidden="true"/> {event.address}</span> : null}
-            </div>
-          </div>
-          {canManage && (
-            <div className="admin-event-card-actions">
-              <button className="admin-event-edit" type="button" disabled={loading} onClick={() => onEdit(event)}>تعديل</button>
-              <button className="admin-event-delete" type="button" disabled={loading} onClick={() => onDelete(event)}>حذف</button>
-              {event.status === "published" ? <button className="admin-event-edit" type="button" disabled={loading} onClick={() => onComplete(event)}>إنهاء الفعالية</button> : null}
-              {event.status === "draft" ? (
-                <button className="admin-create-button" type="button" disabled={loading} onClick={() => onPublish(event.id)}>نشر الفعالية</button>
-              ) : null}
-              {event.is_trending ? <small>رائج الآن</small> : null}
-            </div>
-          )}
-        </article>
-      ))}
+            {canManage && (
+              <div className="admin-event-card-actions">
+                <button className="admin-event-edit" type="button" disabled={loading} onClick={() => onEdit(event)}>تعديل</button>
+                <button className="admin-event-delete" type="button" disabled={loading || !deletion.eligible} onClick={() => onDelete(event)}>حذف</button>
+                <small className="admin-event-delete-availability">{deletion.label}</small>
+                {event.status === "published" ? <button className="admin-event-edit" type="button" disabled={loading} onClick={() => onComplete(event)}>إنهاء الفعالية</button> : null}
+                {event.status === "draft" ? (
+                  <button className="admin-create-button" type="button" disabled={loading} onClick={() => onPublish(event.id)}>نشر الفعالية</button>
+                ) : null}
+                {event.is_trending ? <small>رائج الآن</small> : null}
+              </div>
+            )}
+          </article>
+        );
+      })}
     </div>
   );
 }
