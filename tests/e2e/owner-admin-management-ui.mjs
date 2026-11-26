@@ -297,8 +297,24 @@ try {
   await verifyEventDeletionGuards(owner);
   await verifyRoleManagement(owner, adminUser, customer, ordinaryCustomer, secondAdmin);
 
+  // Wait for every captured HTTP failure body before classifying the expected rejection.
+  await Promise.all(networkFailureTasks);
+  const expectedRecentActivityRejections = networkFailures.filter(failure =>
+    failure.method === "POST" &&
+    new URL(failure.url).pathname.endsWith("/rest/v1/rpc/prepare_settled_event_deletion") &&
+    failure.status === 400 &&
+    failure.scenario === "deletion guard: recent activity, expected server-side rejection" &&
+    failure.response.includes("يوجد نشاط خلال آخر 7 أيام")
+  );
+  assert.equal(expectedRecentActivityRejections.length, 1,
+    `Expected exactly one 400 rejection for recent activity, got: ${JSON.stringify(networkFailures)}`);
+  assert.equal(networkFailures.length, 1,
+    `Unexpected additional HTTP failures: ${JSON.stringify(networkFailures)}`);
+
+  const expectedBrowserConsoleError = "Failed to load resource: the server responded with a status of 400 (Bad Request)";
+  assert.deepEqual(consoleErrors, [expectedBrowserConsoleError],
+    `Only the single console message caused by the verified recent-activity rejection is allowed; got: ${consoleErrors.join("; ")}`);
   assert.deepEqual(errors, [], `Admin UI runtime errors: ${errors.join("; ")}`);
-  assert.deepEqual(consoleErrors, [], `Admin UI console errors: ${consoleErrors.join("; ")}`);
   console.log("PASS: owner/admin access and navigation, event create/edit/publish, deletion date gate, exact trimmed-name confirmation, recent-activity deletion rejection, and role-management protections.");
 } finally {
   await Promise.allSettled(networkFailureTasks);
