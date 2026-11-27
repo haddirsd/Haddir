@@ -11,15 +11,25 @@ type DecodedImage = {
   dispose: () => void;
 };
 
+type EncodedImage = {
+  blob: Blob;
+  type: "image/webp" | "image/jpeg" | "image/png";
+  extension: "webp" | "jpg" | "png";
+};
+
 async function decodeImage(file: File): Promise<DecodedImage> {
   if (typeof createImageBitmap === "function") {
-    const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
-    return {
-      width: bitmap.width,
-      height: bitmap.height,
-      source: bitmap,
-      dispose: () => bitmap.close(),
-    };
+    try {
+      const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+      return {
+        width: bitmap.width,
+        height: bitmap.height,
+        source: bitmap,
+        dispose: () => bitmap.close(),
+      };
+    } catch {
+      // Fall back to HTMLImageElement when the browser exposes but cannot use createImageBitmap.
+    }
   }
 
   const objectUrl = URL.createObjectURL(file);
@@ -48,17 +58,85 @@ async function decodeImage(file: File): Promise<DecodedImage> {
   }
 }
 
-function canvasToWebp(canvas: HTMLCanvasElement, quality: number): Promise<Blob> {
+function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality?: number): Promise<Blob> {
   return new Promise((resolve, reject) => {
     canvas.toBlob(
-      blob => blob ? resolve(blob) : reject(new Error("المتصفح لم يتمكن من تحويل الصورة إلى WebP.")),
-      "image/webp",
+      blob => blob ? resolve(blob) : reject(new Error("تعذر تجهيز صورة الإيصال.")),
+      type,
       quality,
     );
   });
 }
 
-export async function optimizeImageToWebp(
+function createImageCanvas(
+  source: CanvasImageSource,
+  width: number,
+  height: number,
+): HTMLCanvasElement {
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("تعذر تجهيز الصورة للمعالجة.");
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+  context.drawImage(source, 0, 0, width, height);
+  return canvas;
+}
+
+async function encodeImage(
+  canvas: HTMLCanvasElement,
+  source: CanvasImageSource,
+  fileType: string,
+  quality: number,
+  maxOutputBytes: number,
+): Promise<EncodedImage> {
+  const qualities = [...new Set([quality, quality - 0.07, quality - 0.14, 0.68])]
+    .filter(value => value >= 0.6);
+
+  for (const candidateQuality of qualities) {
+    const candidate = await canvasToBlob(canvas, "image/webp", candidateQuality);
+    if (candidate.type !== "image/webp") break;
+    if (candidate.size <= maxOutputBytes) {
+      return { blob: candidate, type: "image/webp", extension: "webp" };
+    }
+  }
+
+  // Safari on iOS may return PNG when WebP encoding is requested.
+  // Preserve PNG input; use JPEG for opaque photographic formats.
+  if (fileType === "image/png") {
+    let width = canvas.width;
+    let height = canvas.height;
+    while (true) {
+      const pngCanvas = createImageCanvas(source, width, height);
+      const candidate = await canvasToBlob(pngCanvas, "image/png");
+      if (candidate.type !== "image/png") {
+        throw new Error("المتصفح لم يتمكن من تجهيز صورة الإيصال بصيغة PNG.");
+      }
+      if (candidate.size <= maxOutputBytes) {
+        return { blob: candidate, type: "image/png", extension: "png" };
+      }
+      if (Math.max(width, height) <= 320) break;
+      width = Math.max(1, Math.round(width * 0.85));
+      height = Math.max(1, Math.round(height * 0.85));
+    }
+  } else {
+    for (const candidateQuality of qualities) {
+      const candidate = await canvasToBlob(canvas, "image/jpeg", candidateQuality);
+      if (candidate.type !== "image/jpeg") {
+        throw new Error("المتصفح لم يتمكن من تجهيز صورة الإيصال بصيغة JPEG.");
+      }
+      if (candidate.size <= maxOutputBytes) {
+        return { blob: candidate, type: "image/jpeg", extension: "jpg" };
+      }
+    }
+  }
+
+  throw new Error("تعذر تقليل حجم الصورة إلى الحد المسموح. اختر صورة أصغر.");
+}
+
+export async function optimizeImageForUpload(
   file: File,
   options: ImageOptimizationOptions,
 ): Promise<File> {
@@ -87,36 +165,18 @@ export async function optimizeImageToWebp(
     const scale = Math.min(1, options.maxDimension / Math.max(decoded.width, decoded.height));
     const width = Math.max(1, Math.round(decoded.width * scale));
     const height = Math.max(1, Math.round(decoded.height * scale));
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-
-    const context = canvas.getContext("2d");
-    if (!context) throw new Error("تعذر تجهيز الصورة للمعالجة.");
-    context.imageSmoothingEnabled = true;
-    context.imageSmoothingQuality = "high";
-    context.drawImage(decoded.source, 0, 0, width, height);
-
-    let blob: Blob | null = null;
-    const qualities = [options.quality, options.quality - 0.07, options.quality - 0.14, 0.68];
-    for (const quality of [...new Set(qualities)].filter(value => value >= 0.6)) {
-      const candidate = await canvasToWebp(canvas, quality);
-      if (candidate.type !== "image/webp") {
-        throw new Error("المتصفح لا يدعم تحويل الصور إلى WebP.");
-      }
-      if (candidate.size <= options.maxOutputBytes) {
-        blob = candidate;
-        break;
-      }
-    }
-
-    if (!blob) {
-      throw new Error("تعذر تقليل حجم الصورة إلى الحد المسموح. اختر صورة أصغر.");
-    }
+    const canvas = createImageCanvas(decoded.source, width, height);
+    const encoded = await encodeImage(
+      canvas,
+      decoded.source,
+      file.type.toLowerCase(),
+      options.quality,
+      options.maxOutputBytes,
+    );
 
     const originalName = file.name.replace(/\.[^.]+$/, "") || "image";
-    return new File([blob], originalName + ".webp", {
-      type: "image/webp",
+    return new File([encoded.blob], `${originalName}.${encoded.extension}`, {
+      type: encoded.type,
       lastModified: Date.now(),
     });
   } finally {
