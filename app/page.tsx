@@ -6,7 +6,7 @@ type PageProps = {
 };
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://haddir-ticket.vercel.app";
-const defaultImage = "/icons/icon-512.png";
+const defaultImage = "/og-image.png";
 
 function logSocialMetadataMetrics(metrics: {
   result: string;
@@ -180,7 +180,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
       title,
       description,
       url: metadataBase,
-      images: [{ url: defaultImage, width: 512, height: 512, alt: "حاضر | Haddir" }],
+      images: [{ url: defaultImage, width: 1200, height: 630, alt: "حاضر | Haddir" }],
     },
     twitter: {
       card: "summary_large_image",
