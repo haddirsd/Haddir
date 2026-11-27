@@ -91,16 +91,27 @@ async function encodeImage(
   fileType: string,
   quality: number,
   maxOutputBytes: number,
+  allowFallback: boolean,
 ): Promise<EncodedImage> {
   const qualities = [...new Set([quality, quality - 0.07, quality - 0.14, 0.68])]
     .filter(value => value >= 0.6);
+  let webpSupported = true;
 
   for (const candidateQuality of qualities) {
     const candidate = await canvasToBlob(canvas, "image/webp", candidateQuality);
-    if (candidate.type !== "image/webp") break;
+    if (candidate.type !== "image/webp") {
+      webpSupported = false;
+      break;
+    }
     if (candidate.size <= maxOutputBytes) {
       return { blob: candidate, type: "image/webp", extension: "webp" };
     }
+  }
+
+  if (!allowFallback) {
+    throw new Error(webpSupported
+      ? "تعذر تقليل حجم الصورة إلى الحد المسموح. اختر صورة أصغر."
+      : "المتصفح لا يدعم تحويل الصور إلى WebP.");
   }
 
   // Safari on iOS may return PNG when WebP encoding is requested.
@@ -136,9 +147,10 @@ async function encodeImage(
   throw new Error("تعذر تقليل حجم الصورة إلى الحد المسموح. اختر صورة أصغر.");
 }
 
-export async function optimizeImageForUpload(
+async function optimizeImage(
   file: File,
   options: ImageOptimizationOptions,
+  allowFallback: boolean,
 ): Promise<File> {
   if (typeof document === "undefined") {
     throw new Error("معالجة الصور متاحة داخل المتصفح فقط.");
@@ -172,6 +184,7 @@ export async function optimizeImageForUpload(
       file.type.toLowerCase(),
       options.quality,
       options.maxOutputBytes,
+      allowFallback,
     );
 
     const originalName = file.name.replace(/\.[^.]+$/, "") || "image";
@@ -182,4 +195,19 @@ export async function optimizeImageForUpload(
   } finally {
     decoded.dispose();
   }
+}
+
+
+export function optimizeImageForUpload(
+  file: File,
+  options: ImageOptimizationOptions,
+): Promise<File> {
+  return optimizeImage(file, options, true);
+}
+
+export async function optimizeImageToWebp(
+  file: File,
+  options: ImageOptimizationOptions,
+): Promise<File> {
+  return optimizeImage(file, options, false);
 }
