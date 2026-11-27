@@ -20,6 +20,18 @@ export const metadata: Metadata = {
     title: "حاضر",
     statusBarStyle: "black-translucent",
   },
+  openGraph: {
+    type: "website",
+    locale: "ar_SD",
+    siteName: "حاضر",
+    title: "حاضر | فعاليات السودان في مكان واحد",
+    description: "اكتشف الفعاليات القادمة واحجز تذكرتك بسهولة مع حاضر.",
+    images: [{ url: "https://haddir-ticket.vercel.app/og-image.svg", width: 1200, height: 630, alt: "حاضر" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["https://haddir-ticket.vercel.app/og-image.svg"],
+  },
   icons: {
     icon: [
       { url: "/icons/icon-192-brand.svg", type: "image/svg+xml", sizes: "192x192" },
