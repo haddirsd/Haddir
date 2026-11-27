@@ -1,5 +1,5 @@
 import { getSupabaseBrowserClient } from "../../../lib/supabase/browser";
-import { optimizeImageToWebp } from "../../../lib/images/optimize-image";
+import { optimizeImageForUpload } from "../../../lib/images/optimize-image";
 
 type ServiceError = { message?: string } | null;
 
@@ -31,7 +31,7 @@ export async function uploadPaymentReceipt(userId: string, bookingId: string, re
 
   let optimizedReceipt: File;
   try {
-    optimizedReceipt = await optimizeImageToWebp(receipt, {
+    optimizedReceipt = await optimizeImageForUpload(receipt, {
       maxDimension: 2400,
       quality: 0.9,
       maxOutputBytes: MAX_RECEIPT_SIZE,
@@ -43,13 +43,18 @@ export async function uploadPaymentReceipt(userId: string, bookingId: string, re
     };
   }
 
-  const path = `${userId}/${bookingId}/${crypto.randomUUID()}.webp`;
+  const extension = optimizedReceipt.type === "image/webp"
+    ? "webp"
+    : optimizedReceipt.type === "image/png"
+      ? "png"
+      : "jpg";
+  const path = `${userId}/${bookingId}/${crypto.randomUUID()}.${extension}`;
 
   try {
     const { error } = await supabase.storage
       .from("payment-receipts")
       .upload(path, optimizedReceipt, {
-        contentType: "image/webp",
+        contentType: optimizedReceipt.type,
         upsert: false,
         cacheControl: "3600",
       });
