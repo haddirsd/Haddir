@@ -26,11 +26,11 @@ export const metadata: Metadata = {
     siteName: "حاضر",
     title: "حاضر | فعاليات السودان في مكان واحد",
     description: "اكتشف الفعاليات القادمة واحجز تذكرتك بسهولة مع حاضر.",
-    images: [{ url: "https://haddir-ticket.vercel.app/og-image.svg", width: 1200, height: 630, alt: "حاضر" }],
+    images: [{ url: "https://haddir-ticket.vercel.app/og-image.png", width: 1200, height: 630, alt: "حاضر" }],
   },
   twitter: {
     card: "summary_large_image",
-    images: ["https://haddir-ticket.vercel.app/og-image.svg"],
+    images: ["https://haddir-ticket.vercel.app/og-image.png"],
   },
   icons: {
     icon: [
